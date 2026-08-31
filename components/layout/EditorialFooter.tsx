@@ -105,15 +105,10 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
         </div>
 
         {/* Footer Bottom */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] font-sans font-medium uppercase tracking-widest text-taupe text-center sm:text-left">
-          <p className="text-center sm:text-left leading-relaxed">
+        <div className="pt-8 border-t border-white/10 flex items-center justify-center text-[12px] font-sans font-medium uppercase tracking-widest text-taupe text-center">
+          <p className="leading-relaxed">
             © {currentYear} MARJAAH TRADING W.L.L. ALL RIGHTS RESERVED.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <span className="hover:text-white transition-colors cursor-pointer">PRIVACY</span>
-            <span className="hover:text-white transition-colors cursor-pointer">TERMS</span>
-            <span className="hover:text-white transition-colors cursor-pointer">WARRANTY</span>
-          </div>
         </div>
 
         {/* Developer Credit */}
