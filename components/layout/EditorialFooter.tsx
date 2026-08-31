@@ -94,7 +94,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
             <span className="text-xs font-sans font-bold uppercase tracking-widest text-muted block">
               EXPLORE
             </span>
-            <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs font-sans font-bold uppercase tracking-widest text-white/80">
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-x-6 gap-y-3 text-xs font-sans font-bold uppercase tracking-widest text-white/80">
               <Link href={`/${locale}`} className="hover:text-[#8D9CF5] transition-colors">HOME</Link>
               <Link href={`/${locale}/shop`} className="hover:text-[#8D9CF5] transition-colors">SHOP</Link>
               <Link href={`/${locale}/offers`} className="hover:text-[#8D9CF5] transition-colors">OFFERS</Link>
@@ -105,9 +105,11 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
         </div>
 
         {/* Footer Bottom */}
-        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] font-sans font-medium uppercase tracking-widest text-taupe">
-          <p>© {currentYear} MARJAAH TRADING W.L.L. ALL RIGHTS RESERVED.</p>
-          <div className="flex items-center gap-6">
+        <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[12px] font-sans font-medium uppercase tracking-widest text-taupe text-center sm:text-left">
+          <p className="text-center sm:text-left leading-relaxed">
+            © {currentYear} MARJAAH TRADING W.L.L. ALL RIGHTS RESERVED.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-6">
             <span className="hover:text-white transition-colors cursor-pointer">PRIVACY</span>
             <span className="hover:text-white transition-colors cursor-pointer">TERMS</span>
             <span className="hover:text-white transition-colors cursor-pointer">WARRANTY</span>
