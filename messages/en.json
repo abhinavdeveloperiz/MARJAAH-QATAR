@@ -1,0 +1,167 @@
+{
+  "nav": {
+    "home": "Home",
+    "shop": "Shop",
+    "offers": "Offers",
+    "about": "About",
+    "contact": "Contact",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "account": "Account",
+    "login": "Login",
+    "search_placeholder": "Search products, brands...",
+    "categories": "Categories"
+  },
+  "hero": {
+    "badge": "Qatar's Premier Tech Store",
+    "title_1": "Power Your",
+    "title_2": "Digital World",
+    "subtitle": "Discover the latest laptops, desktops, gaming gear, and accessories. Genuine products, fast delivery across Qatar.",
+    "cta_shop": "Shop Now",
+    "cta_offers": "View Offers",
+    "scroll_hint": "Scroll to explore",
+    "stats": {
+      "products": "Products",
+      "brands": "Top Brands",
+      "delivery": "Day Delivery",
+      "warranty": "Warranty Support"
+    }
+  },
+  "categories": {
+    "title": "Browse by Category",
+    "subtitle": "Everything you need for your digital setup",
+    "view_all": "View All Categories"
+  },
+  "featured": {
+    "title": "Featured Products",
+    "subtitle": "Hand-picked tech from the world's best brands",
+    "add_to_cart": "Add to Cart",
+    "view_all": "View All Products"
+  },
+  "new_arrivals": {
+    "title": "New Arrivals",
+    "subtitle": "Fresh off the shelf — just in for you"
+  },
+  "best_sellers": {
+    "title": "Best Sellers",
+    "subtitle": "What Qatar is loving right now"
+  },
+  "flash_deals": {
+    "title": "Flash Deals",
+    "subtitle": "Limited-time offers — grab them before they're gone!",
+    "ends_in": "Ends in:",
+    "hours": "HRS",
+    "minutes": "MIN",
+    "seconds": "SEC",
+    "shop_deals": "Shop All Deals"
+  },
+  "brands": {
+    "title": "Top Brands We Carry"
+  },
+  "trust": {
+    "secure_payment": "Secure Payment",
+    "secure_payment_desc": "100% secure checkout",
+    "fast_delivery": "Fast Delivery",
+    "fast_delivery_desc": "Across Qatar in 1-2 days",
+    "warranty": "Warranty Support",
+    "warranty_desc": "Official warranty on all products",
+    "genuine": "Genuine Products",
+    "genuine_desc": "Authentic items guaranteed"
+  },
+  "newsletter": {
+    "title": "Stay in the Loop",
+    "subtitle": "Get exclusive deals, new arrivals, and tech news delivered to your inbox.",
+    "placeholder": "Enter your email address",
+    "subscribe": "Subscribe",
+    "privacy": "We respect your privacy. Unsubscribe anytime."
+  },
+  "footer": {
+    "tagline": "Qatar's premier destination for computers, laptops, and accessories.",
+    "quick_links": "Quick Links",
+    "categories": "Categories",
+    "support": "Support",
+    "contact_info": "Contact Info",
+    "rights": "All rights reserved.",
+    "made_in": "Made with ❤️ in Qatar",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "returns": "Returns Policy"
+  },
+  "product": {
+    "add_to_cart": "Add to Cart",
+    "buy_now": "Buy Now",
+    "wishlist": "Add to Wishlist",
+    "in_stock": "In Stock",
+    "low_stock": "Low Stock",
+    "out_of_stock": "Out of Stock",
+    "sku": "SKU",
+    "brand": "Brand",
+    "quantity": "Quantity",
+    "description": "Description",
+    "specifications": "Specifications",
+    "delivery_info": "Delivery & Warranty",
+    "reviews": "Customer Reviews",
+    "related": "You May Also Like",
+    "share": "Share",
+    "off": "OFF"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "empty_desc": "Add some products to get started",
+    "shop_now": "Shop Now",
+    "items": "items",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "free_shipping": "Free",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "continue": "Continue Shopping",
+    "remove": "Remove",
+    "quantity": "Qty"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "step_address": "Delivery Address",
+    "step_payment": "Payment",
+    "step_review": "Review Order",
+    "full_name": "Full Name",
+    "phone": "Phone Number",
+    "email": "Email Address",
+    "area": "Area / Zone",
+    "street": "Street Name",
+    "building": "Building / Villa No.",
+    "floor": "Floor (optional)",
+    "city": "City",
+    "payment_method": "Payment Method",
+    "cod": "Cash on Delivery",
+    "card": "Credit / Debit Card",
+    "order_summary": "Order Summary",
+    "place_order": "Place Order",
+    "processing": "Processing..."
+  },
+  "common": {
+    "qar": "QAR",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try Again",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "clear": "Clear",
+    "apply": "Apply",
+    "show_more": "Show More",
+    "show_less": "Show Less",
+    "select": "Select",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "confirm": "Confirm"
+  }
+}

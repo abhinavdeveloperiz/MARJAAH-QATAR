@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#181824" />
+      <stop offset="100%" stop-color="#09090D" />
+    </radialGradient>
+    <linearGradient id="metalWheel" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#94A3B8" />
+      <stop offset="50%" stop-color="#F1F5F9" />
+      <stop offset="100%" stop-color="#475569" />
+    </linearGradient>
+    <linearGradient id="mouseBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2D323E" />
+      <stop offset="50%" stop-color="#1E222B" />
+      <stop offset="100%" stop-color="#13161C" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bg)" rx="24" />
+  <circle cx="400" cy="300" r="160" fill="#38BDF8" opacity="0.1" />
+
+  <!-- Shadow -->
+  <ellipse cx="400" cy="450" rx="160" ry="24" fill="#000000" opacity="0.6" />
+
+  <!-- Sculpted Thumb Rest Wing (Left) -->
+  <path d="M260 360 C 240 390, 260 430, 310 430 C 340 430, 360 410, 370 380 Z" fill="#181B22" stroke="#333A48" stroke-width="1.5" />
+  <!-- Gesture button -->
+  <path d="M275 390 C 270 410, 285 418, 305 418" stroke="#00F0FF" stroke-width="2" fill="none" opacity="0.8" />
+
+  <!-- Main Ergonomic Mouse Body -->
+  <path d="M320 180 C 420 150, 490 200, 520 300 C 535 360, 500 440, 410 440 C 330 440, 290 380, 290 320 C 290 240, 300 190, 320 180 Z" fill="url(#mouseBody)" stroke="#3E4554" stroke-width="2" />
+
+  <!-- Left / Right Click Split -->
+  <path d="M380 162 L380 270" stroke="#0D1017" stroke-width="3" />
+  <path d="M380 270 C 380 290, 360 310, 330 320" stroke="#0D1017" stroke-width="2" fill="none" />
+
+  <!-- MagSpeed Metal Scroll Wheel -->
+  <rect x="368" y="180" width="24" height="60" rx="6" fill="url(#metalWheel)" stroke="#1E293B" stroke-width="1.5" />
+  <!-- Wheel Grips -->
+  <line x1="368" y1="195" x2="392" y2="195" stroke="#334155" stroke-width="2" />
+  <line x1="368" y1="210" x2="392" y2="210" stroke="#334155" stroke-width="2" />
+  <line x1="368" y1="225" x2="392" y2="225" stroke="#334155" stroke-width="2" />
+
+  <!-- Mode Switch Button -->
+  <rect x="374" y="252" width="12" height="16" rx="3" fill="#181B22" stroke="#475569" stroke-width="1" />
+
+  <!-- Thumb Scroll Wheel & Forward/Back buttons -->
+  <rect x="300" y="320" width="14" height="34" rx="4" fill="url(#metalWheel)" />
+  <rect x="296" y="362" width="10" height="12" rx="2" fill="#252A36" stroke="#475569" stroke-width="1" />
+  <rect x="310" y="362" width="10" height="12" rx="2" fill="#252A36" stroke="#475569" stroke-width="1" />
+
+  <!-- Logi Logo representation -->
+  <text x="450" y="380" fill="#64748B" font-size="16" font-family="sans-serif" font-weight="900" opacity="0.6">logi</text>
+
+  <!-- Spec badge -->
+  <rect x="640" y="40" width="120" height="28" rx="14" fill="#181B22" stroke="#38BDF8" stroke-width="1" />
+  <text x="700" y="58" fill="#38BDF8" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="1">8000 DPI</text>
+</svg>

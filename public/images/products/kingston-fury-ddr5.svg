@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#181424" />
+      <stop offset="100%" stop-color="#07050A" />
+    </radialGradient>
+    <linearGradient id="rgbDiffuser" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF0055" />
+      <stop offset="25%" stop-color="#7000FF" />
+      <stop offset="50%" stop-color="#00F0FF" />
+      <stop offset="75%" stop-color="#00FF66" />
+      <stop offset="100%" stop-color="#FFB800" />
+    </linearGradient>
+    <linearGradient id="goldDdr" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FCD34D" />
+      <stop offset="100%" stop-color="#B45309" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bg)" rx="24" />
+  <circle cx="400" cy="300" r="180" fill="#7000FF" opacity="0.15" />
+
+  <!-- RAM Stick 1 (Rear) -->
+  <g transform="translate(40, -40)">
+    <polygon points="180,240 620,240 600,420 200,420" fill="#18181B" stroke="#27272A" stroke-width="2" />
+    <!-- RGB Bar Top -->
+    <path d="M 180 240 L 620 240 L 610 220 L 190 220 Z" fill="url(#rgbDiffuser)" opacity="0.7" />
+    <!-- Gold Pins Bottom -->
+    <rect x="210" y="420" width="380" height="12" fill="url(#goldDdr)" />
+  </g>
+
+  <!-- RAM Stick 2 (Front Hero) -->
+  <!-- Shadow -->
+  <polygon points="180,480 620,480 580,510 220,510" fill="#000000" opacity="0.6" />
+
+  <!-- Aggressive Black Heatspreader Chassis -->
+  <polygon points="160,260 640,260 610,460 190,460" fill="#090D16" stroke="#1E293B" stroke-width="2" />
+  
+  <!-- Heatspreader Geometric Grooves -->
+  <polygon points="220,290 320,290 300,340 200,340" fill="#141E33" />
+  <polygon points="480,290 580,290 560,340 460,340" fill="#141E33" />
+
+  <!-- Top RGB Acrylic Light Bar -->
+  <path d="M 160 260 L 640 260 L 625 235 L 175 235 Z" fill="url(#rgbDiffuser)" stroke="#FFFFFF" stroke-width="0.5" />
+  
+  <!-- FURY BEAST Typography -->
+  <text x="400" y="370" fill="#FFFFFF" font-size="28" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="4">FURY</text>
+  <text x="400" y="395" fill="#8D9CF5" font-size="12" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="6">BEAST DDR5</text>
+
+  <!-- Gold Contact Pins (Bottom edge with DDR5 Key Notch) -->
+  <rect x="200" y="460" width="185" height="14" fill="url(#goldDdr)" />
+  <rect x="395" y="460" width="205" height="14" fill="url(#goldDdr)" />
+  <!-- DDR5 Key Notch Gap -->
+  <rect x="385" y="458" width="10" height="16" fill="#07050A" />
+
+  <!-- Spec Badge -->
+  <rect x="630" y="40" width="130" height="28" rx="14" fill="#1E1B4B" stroke="#8D9CF5" stroke-width="1" />
+  <text x="695" y="58" fill="#8D9CF5" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="1">DDR5-5200</text>
+</svg>
