@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
-import { ArrowDown, ArrowUpRight } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -144,27 +143,9 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         </div>
 
         {/* Balanced Subtitle */}
-        <p className="mt-4 sm:mt-6 mb-6 sm:mb-8 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
+        <p className="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
           Qatar&apos;s premier destination for custom gaming rigs, RTX 40-series workstations, OLED monitors, and authentic tech hardware with official GCC warranty.
         </p>
-
-        {/* Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-xs sm:max-w-none mx-auto">
-          <Link
-            href={`/${locale}/shop`}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#4063B2] via-[#5A7BE8] to-[#8D9CF5] hover:from-[#36529A] hover:to-[#7B8BE5] text-white font-sans font-bold text-xs sm:text-sm tracking-wider uppercase shadow-[0_0_25px_rgba(141,156,245,0.35)] hover:shadow-[0_0_40px_rgba(141,156,245,0.6)] transition-all duration-300 group cursor-pointer"
-          >
-            <span>EXPLORE CATALOG</span>
-            <ArrowUpRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
-          </Link>
-
-          <Link
-            href={`/${locale}/shop/gaming-pcs`}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 sm:px-8 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl bg-[#0B1120]/80 hover:bg-white/10 border border-white/20 hover:border-[#8D9CF5]/60 text-white/90 hover:text-white font-sans font-bold text-xs sm:text-sm tracking-wider uppercase backdrop-blur-xl transition-all duration-300 shadow-md cursor-pointer"
-          >
-            <span>CUSTOM PC RIGS</span>
-          </Link>
-        </div>
       </div>
 
       {/* 3. Bottom Utility & Scroll Strip */}
