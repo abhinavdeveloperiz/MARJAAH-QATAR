@@ -1,13 +1,13 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useCartStore } from "@/lib/store/cart";
 import Link from "next/link";
 import { ShoppingBag, ArrowRight, Trash2, Plus, Minus, Tag } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export default function CartPage({ params }: { params: { locale: string } }) {
-  const locale = params.locale;
+export default function CartPage() {
+  const locale = useLocale();
   const isRTL = locale === "ar";
   const { items, removeItem, updateQuantity, getTotalPrice, clearCart } = useCartStore();
   const total = getTotalPrice();

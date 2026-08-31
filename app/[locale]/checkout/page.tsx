@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "next-intl";
 import { useCartStore } from "@/lib/store/cart";
 import { cn } from "@/lib/utils";
 import { CheckCircle2, MapPin, CreditCard, ClipboardList, ChevronRight, Shield, Truck } from "lucide-react";
@@ -8,8 +9,8 @@ import Link from "next/link";
 
 const steps = ["address", "payment", "review"] as const;
 
-export default function CheckoutPage({ params }: { params: { locale: string } }) {
-  const locale = params.locale;
+export default function CheckoutPage() {
+  const locale = useLocale();
   const isRTL = locale === "ar";
   const [step, setStep] = useState<typeof steps[number]>("address");
   const [isPlaced, setIsPlaced] = useState(false);
