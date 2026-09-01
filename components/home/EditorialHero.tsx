@@ -63,67 +63,65 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[640px] sm:min-h-[720px] lg:h-[92vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-[84px] sm:pt-[96px] md:pt-[104px] pb-6 sm:pb-8 select-none"
-      style={{ backgroundColor: "var(--bg-base)", borderBottom: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-5 sm:pt-8 pb-5 sm:pb-8 select-none text-white"
+      style={{ backgroundColor: "#060913", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
       {/* Dynamic Parallax Background Layer */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <div
           ref={imageRef}
-          className="absolute -top-[15%] -left-[10%] -right-[10%] -bottom-[15%] bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out opacity-15 mix-blend-multiply"
+          className="absolute -top-[15%] -left-[10%] -right-[10%] -bottom-[15%] bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out"
           style={{
             backgroundImage: "url('/images/hero-station.jpg')",
             transform: `translate(${mousePos.x * 20}px, ${mousePos.y * 15}px) scale(1.08)`,
-            filter: "grayscale(20%) contrast(1.1)",
+            filter: "brightness(0.65) contrast(1.2) saturate(1.1)",
           }}
         />
 
         {/* Ambient Floating Glow Aura */}
         <div
-          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] lg:w-[850px] h-[350px] sm:h-[500px] bg-gradient-to-tr from-[#4063B2]/15 via-[#8D9CF5]/10 to-[#BB9AED]/10 rounded-full blur-[120px] sm:blur-[160px] transition-transform duration-1000 ease-out pointer-events-none"
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] lg:w-[800px] h-[350px] sm:h-[500px] bg-gradient-to-tr from-[#4063B2]/25 via-[#8D9CF5]/20 to-[#BB9AED]/15 rounded-full blur-[120px] sm:blur-[150px] transition-transform duration-1000 ease-out pointer-events-none"
           style={{
             transform: `translate(${-mousePos.x * 35}px, ${-mousePos.y * 35}px)`,
           }}
         />
 
         {/* Cyber Grid Background Matrix */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(64,99,178,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(64,99,178,0.06)_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(141,156,245,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(141,156,245,0.03)_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none" />
 
         {/* Cinematic Vignettes & Depth Overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-base)]/60 via-transparent to-[var(--bg-base)] pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#060913]/90 via-[#060913]/55 to-[#060913] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(6,9,19,0.92)_100%)] pointer-events-none" />
       </div>
 
-      {/* 1. Top 3-Column Specimen Editorial Header (Positioned Below Fixed Navbar) */}
-      <div
-        className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-4 pt-1 sm:pt-2 border-b pb-3 sm:pb-4 text-left"
-        style={{ borderColor: "var(--border-color)" }}
-      >
+      {/* 1. Top 3-Column Specimen Editorial Header (Matching Reference Poster Style) */}
+      <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-4 pt-1 sm:pt-2 border-b border-white/10 pb-3 sm:pb-4 text-left">
         {/* Col 1 */}
         <div className="space-y-0.5">
-          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "var(--color-primary)" }}>
-            <span className="font-black text-sm">›</span> HIGH-PERFORMANCE TECH
+          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+            <span className="text-[#8D9CF5] font-black text-sm">›</span> HIGH-PERFORMANCE TECH
           </p>
-          <p className="text-[10px] sm:text-[11px] font-sans leading-tight hidden sm:block" style={{ color: "var(--text-secondary)" }}>
-            Custom rigs, workstations &amp; genuine components.
+          <p className="text-[10px] sm:text-[11px] font-sans text-white/50 leading-tight hidden sm:block">
+            Custom rigs, workstations & genuine components.
           </p>
         </div>
 
         {/* Col 2 */}
         <div className="space-y-0.5">
-          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider flex items-center gap-1.5" style={{ color: "var(--color-primary)" }}>
-            <span className="font-black text-sm">›</span> ©MARJAAH TRADING
+          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+            <span className="text-[#8D9CF5] font-black text-sm">›</span> ©MARJAAH TRADING
           </p>
-          <p className="text-[10px] sm:text-[11px] font-sans leading-tight hidden sm:block" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-[10px] sm:text-[11px] font-sans text-white/50 leading-tight hidden sm:block">
             Official authorized GCC hardware showroom.
           </p>
         </div>
 
         {/* Col 3 */}
         <div className="space-y-0.5 hidden md:block text-right">
-          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider flex items-center justify-end gap-1.5" style={{ color: "var(--color-primary)" }}>
-            <span className="font-black text-sm">›</span> 2026 EDITION
+          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white flex items-center justify-end gap-1.5">
+            <span className="text-[#8D9CF5] font-black text-sm">›</span> 2026 EDITION
           </p>
-          <p className="text-[10px] sm:text-[11px] font-sans leading-tight" style={{ color: "var(--text-secondary)" }}>
+          <p className="text-[10px] sm:text-[11px] font-sans text-white/50 leading-tight">
             Same-day Doha dispatch with full warranty.
           </p>
         </div>
@@ -138,27 +136,24 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
       >
         {/* Monumental Headline */}
         <div className="relative inline-flex items-center justify-center my-auto select-none px-2 sm:px-6">
-          <h1 className="font-guminert text-[18vw] sm:text-[15vw] md:text-[13vw] lg:text-[11vw] xl:text-[10vw] font-bold leading-[0.92] tracking-[-0.03em] uppercase drop-shadow-[0_15px_35px_rgba(64,99,178,0.18)]">
-            <span className="bg-gradient-to-b from-[#0D1326] via-[#1A2747] to-[#4063B2] bg-clip-text text-transparent transition-all duration-300 hover:brightness-125 cursor-default font-extrabold">
+          <h1 className="font-guminert text-[18vw] sm:text-[15vw] md:text-[13vw] lg:text-[11vw] xl:text-[10vw] font-bold leading-[0.92] tracking-[-0.03em] uppercase drop-shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
+            <span className="bg-gradient-to-b from-white via-[#E0E7FF] to-[#8D9CF5] bg-clip-text text-transparent transition-all duration-300 hover:brightness-125 cursor-default font-extrabold">
               MARJAAH
             </span>
           </h1>
         </div>
 
         {/* Balanced Subtitle */}
-        <p className="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3" style={{ color: "var(--text-secondary)" }}>
+        <p className="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
           Qatar&apos;s premier destination for custom gaming rigs, RTX 40-series workstations, OLED monitors, and authentic tech hardware with official GCC warranty.
         </p>
       </div>
 
       {/* 3. Bottom Utility & Scroll Strip */}
-      <div
-        className="relative z-10 flex items-center justify-between gap-3 pt-3 sm:pt-4 border-t mt-auto"
-        style={{ borderColor: "var(--border-color)" }}
-      >
+      <div className="relative z-10 flex items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-white/10 mt-auto">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#4063B2] flex-shrink-0" />
-          <span className="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider truncate" style={{ color: "var(--text-secondary)" }}>
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#8D9CF5] flex-shrink-0" />
+          <span className="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white/50 truncate">
             M.SHOP • QATAR&apos;S HARDWARE AUTHORITY
           </span>
         </div>
@@ -166,10 +161,9 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         <button
           onClick={scrollToWorks}
           aria-label="Scroll down"
-          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border bg-white hover:bg-[#4063B2] hover:border-[#4063B2] hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer group flex-shrink-0 shadow-sm"
-          style={{ borderColor: "var(--border-color)", color: "var(--text-secondary)" }}
+          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/15 bg-[#0B1120]/60 hover:bg-[#8D9CF5] hover:border-[#8D9CF5] text-white/60 hover:text-[#060913] flex items-center justify-center transition-all duration-300 cursor-pointer group flex-shrink-0"
         >
-          <ArrowDown className="w-3.5 h-3.5 group-hover:text-white" />
+          <ArrowDown className="w-3.5 h-3.5 group-hover:text-[#060913]" />
         </button>
       </div>
     </section>
