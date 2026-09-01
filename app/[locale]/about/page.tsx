@@ -140,37 +140,6 @@ export default async function AboutPage({
                 ))}
               </div>
             </div>
-
-            {/* Contact CTA */}
-            <div
-              className="p-6 sm:p-8 rounded-3xl border text-center shadow-sm space-y-4"
-              style={{
-                backgroundColor: "var(--bg-surface)",
-                borderColor: "rgba(64,99,178,0.3)",
-              }}
-            >
-              <h3
-                className="text-lg sm:text-xl font-bold font-display uppercase tracking-tight"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {isRTL ? "هل تحتاج إلى استشارة لمؤسستك أو شركتك؟" : "Need Corporate Procurement in Qatar?"}
-              </h3>
-              <p
-                className="text-xs sm:text-sm font-medium leading-relaxed"
-                style={{ color: "var(--text-secondary)" }}
-              >
-                {isRTL
-                  ? "تواصل مباشرة مع خبرائنا عبر الواتساب للحصول على استشارة فورية"
-                  : "Connect directly with our hardware specialists for immediate corporate or personal advice."}
-              </p>
-              <Link
-                href={`/${locale}/contact`}
-                className="btn-primary justify-center w-full shadow-md py-3 text-xs sm:text-sm font-bold font-display"
-              >
-                <span>{isRTL ? "تواصل معنا" : "Contact Specialists"}</span>
-                <ArrowRight className={cn("w-4 h-4", isRTL && "rotate-180")} />
-              </Link>
-            </div>
           </div>
         </div>
       </section>
