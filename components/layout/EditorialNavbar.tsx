@@ -35,6 +35,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
   const logout = useAuthStore((s) => s.logout);
   const theme = useThemeStore((s) => s.theme);
   const isDark = theme === "dark";
+  const isRTL = locale === "ar";
 
   const totalCartItems = items.reduce((sum, i) => sum + i.quantity, 0);
   const totalWishlistItems = wishlistItems.length;
