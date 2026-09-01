@@ -10,7 +10,7 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
   const trustFeatures = [
     {
       icon: Truck,
-      title: "Express Doha Delivery",
+      title: "Express Delivery",
       glowColor: "from-blue-500/20 to-[#8D9CF5]/20",
     },
     {
