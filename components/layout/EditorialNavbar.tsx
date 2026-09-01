@@ -101,11 +101,11 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
     : "bg-transparent border-b border-transparent";
 
   const iconBtnClass = isScrolled
-    ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
-    : "bg-white/70 hover:bg-white/90 backdrop-blur-sm border-slate-200/70 text-slate-800 shadow-sm";
+    ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 shadow-sm"
+    : "bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-md shadow-sm";
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 select-none" style={{ color: "var(--text-primary)" }}>
+    <header className="fixed top-0 left-0 right-0 z-50 select-none">
       {/* Main Navbar */}
       <div className={cn("transition-all duration-300", navbarBg)}>
         <div className="container-custom h-[64px] sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">
@@ -115,30 +115,32 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
             aria-label="M.SHOP Home"
             className="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0"
           >
-            <Logo variant="light" size="md" />
+            <Logo variant={isScrolled ? "light" : "dark"} size="md" />
           </Link>
 
           {/* Desktop Nav Links */}
           <nav className="hidden lg:flex items-center gap-8">
-            {navLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300",
-                  pathname === item.href
-                    ? "drop-shadow-[0_0_12px_rgba(77,99,199,0.3)]"
-                    : "hover:tracking-[0.2em]"
-                )}
-                style={{
-                  color: pathname === item.href
-                    ? "var(--color-accent)"
-                    : "var(--text-secondary)",
-                }}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navLinks.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300",
+                    isActive
+                      ? isScrolled
+                        ? "text-[#4063B2] drop-shadow-[0_0_10px_rgba(64,99,178,0.3)]"
+                        : "text-[#8D9CF5] drop-shadow-[0_0_12px_rgba(141,156,245,0.8)] font-black"
+                      : isScrolled
+                        ? "text-slate-700 hover:text-[#4063B2] hover:tracking-[0.2em]"
+                        : "text-white/90 hover:text-white hover:tracking-[0.2em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right Actions */}
@@ -152,7 +154,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 iconBtnClass
               )}
             >
-              <Search className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
+              <Search className={cn("w-4 h-4", isScrolled ? "text-[#4063B2]" : "text-[#8D9CF5]")} />
             </button>
 
             {/* Wishlist Link */}
@@ -182,7 +184,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 iconBtnClass
               )}
             >
-              <ShoppingBag className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
+              <ShoppingBag className={cn("w-4 h-4", isScrolled ? "text-[#4063B2]" : "text-[#8D9CF5]")} />
               {totalCartItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#8D9CF5] text-[#070B14] font-display text-[9px] flex items-center justify-center font-bold shadow-[0_0_10px_#8D9CF5]">
                   {totalCartItems}
