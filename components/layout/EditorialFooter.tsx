@@ -149,7 +149,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
             href="https://www.inspirezesttechnologies.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block text-xs sm:text-sm font-sans font-normal text-[#D4AF37] hover:text-[#F3C34D] hover:underline underline-offset-4 tracking-wide transition-all duration-300"
+            className="inline-block text-xs sm:text-sm font-sans font-semibold text-black hover:text-[#4063B2] hover:underline underline-offset-4 tracking-wide transition-all duration-300"
           >
             Designed and Developed by InspireZest Technologies Pvt Ltd.
           </a>

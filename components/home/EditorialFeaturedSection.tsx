@@ -129,7 +129,7 @@ export function EditorialFeaturedSection({ locale }: EditorialFeaturedSectionPro
               style={{ color: "var(--text-primary)" }}
               onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-accent)")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-primary)")}>
-              <span>{isRTL ? "استكشف التجميعات ومحطات العمل" : "DISCOVER CUSTOM BUILDS"}</span>
+              <span>{isRTL ? "استكشف جميع الأجهزة" : "DISCOVER ALL PRODUCTS"}</span>
               <ArrowRight
                 className={cn(
                   "w-4 h-4 transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-2",

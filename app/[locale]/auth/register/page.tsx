@@ -64,69 +64,72 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <Link
           href="/en"
-          className="inline-flex items-center gap-2 text-[#8D9CF5] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-[#4063B2] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-blue-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Store
         </Link>
 
-        <div className="bg-[#0B1120] border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-sm">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8D9CF5]/10 border border-[#8D9CF5]/30 mb-4">
-              <Zap className="w-3.5 h-3.5 text-[#8D9CF5]" />
-              <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/30 mb-4">
+              <Zap className="w-3.5 h-3.5 text-[#4063B2]" />
+              <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#4063B2]">
                 M.SHOP Qatar
               </span>
             </div>
-            <h1 className="text-2xl font-tall uppercase text-white mb-2">Create Account</h1>
-            <p className="text-xs text-white/50 font-sans">Join M.SHOP for faster checkout & order tracking</p>
+            <h1 className="text-2xl font-tall uppercase mb-2 font-display" style={{ color: "var(--text-primary)" }}>Create Account</h1>
+            <p className="text-xs font-sans" style={{ color: "var(--text-secondary)" }}>Join M.SHOP for faster checkout & order tracking</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Name */}
             <div>
-              <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                 Full Name
               </label>
               <input
                 {...register("name")}
                 type="text"
                 placeholder="Your full name"
-                className="w-full px-4 py-3.5 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                className="w-full px-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
+                style={{ color: "var(--text-primary)" }}
               />
-              {errors.name && <p className="mt-1.5 text-xs text-red-400">{errors.name.message}</p>}
+              {errors.name && <p className="mt-1.5 text-xs text-red-500">{errors.name.message}</p>}
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                 Email Address
               </label>
               <input
                 {...register("email")}
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-3.5 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                className="w-full px-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
+                style={{ color: "var(--text-primary)" }}
               />
-              {errors.email && <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>}
+              {errors.email && <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>}
             </div>
 
             {/* Phone */}
             <div>
-              <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                 Phone Number
               </label>
               <input
                 {...register("phone")}
                 type="tel"
                 placeholder="+974 5000 0000"
-                className="w-full px-4 py-3.5 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                className="w-full px-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
+                style={{ color: "var(--text-primary)" }}
               />
-              {errors.phone && <p className="mt-1.5 text-xs text-red-400">{errors.phone.message}</p>}
+              {errors.phone && <p className="mt-1.5 text-xs text-red-500">{errors.phone.message}</p>}
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                 Password
               </label>
               <div className="relative">
@@ -134,22 +137,23 @@ export default function RegisterPage() {
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   placeholder="Min. 8 characters"
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
+                  style={{ color: "var(--text-primary)" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && <p className="mt-1.5 text-xs text-red-400">{errors.password.message}</p>}
+              {errors.password && <p className="mt-1.5 text-xs text-red-500">{errors.password.message}</p>}
             </div>
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                 Confirm Password
               </label>
               <div className="relative">
@@ -157,18 +161,19 @@ export default function RegisterPage() {
                   {...register("confirmPassword")}
                   type={showConfirm ? "text" : "password"}
                   placeholder="Repeat password"
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
+                  style={{ color: "var(--text-primary)" }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirm(!showConfirm)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
                 >
                   {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.confirmPassword.message}</p>
+                <p className="mt-1.5 text-xs text-red-500">{errors.confirmPassword.message}</p>
               )}
             </div>
 
@@ -183,34 +188,34 @@ export default function RegisterPage() {
                 />
                 <label
                   htmlFor="terms"
-                  className="w-5 h-5 rounded flex items-center justify-center border border-white/20 bg-[#10192D] peer-checked:bg-[#8D9CF5] peer-checked:border-[#8D9CF5] cursor-pointer transition-all"
+                  className="w-5 h-5 rounded flex items-center justify-center border border-border-color bg-surface-2 peer-checked:bg-[#4063B2] peer-checked:border-[#4063B2] cursor-pointer transition-all"
                 >
                   <Check className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" />
                 </label>
               </div>
-              <label htmlFor="terms" className="text-xs text-white/50 font-sans cursor-pointer leading-relaxed">
+              <label htmlFor="terms" className="text-xs font-sans cursor-pointer leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 I agree to M.SHOP&apos;s{" "}
-                <span className="text-[#8D9CF5]">Terms of Service</span> and{" "}
-                <span className="text-[#8D9CF5]">Privacy Policy</span>
+                <span className="text-[#4063B2] font-semibold">Terms of Service</span> and{" "}
+                <span className="text-[#4063B2] font-semibold">Privacy Policy</span>
               </label>
             </div>
-            {errors.terms && <p className="text-xs text-red-400">{errors.terms.message}</p>}
+            {errors.terms && <p className="text-xs text-red-500">{errors.terms.message}</p>}
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
             >
               <UserPlus className="w-4 h-4" />
               {isSubmitting ? "Creating Account..." : "Create Account"}
             </button>
           </form>
 
-          <p className="text-center text-xs text-white/40 font-sans mt-6">
+          <p className="text-center text-xs font-sans mt-6" style={{ color: "var(--text-tertiary)" }}>
             Already have an account?{" "}
             <Link
               href="/en/auth/login"
-              className="text-[#8D9CF5] hover:text-white transition-colors font-semibold"
+              className="text-[#4063B2] hover:text-blue-800 transition-colors font-semibold"
             >
               Sign in
             </Link>

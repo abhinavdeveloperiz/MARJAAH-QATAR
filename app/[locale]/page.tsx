@@ -7,12 +7,11 @@ import { EditorialFeaturedSection } from "@/components/home/EditorialFeaturedSec
 import { FlashDeals } from "@/components/home/FlashDeals";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
 import { NewArrivals } from "@/components/home/NewArrivals";
-import { NewsletterSection } from "@/components/home/NewsletterSection";
 
 export const metadata: Metadata = {
   title: "M.SHOP Qatar — High-Performance Hardware & Computers",
   description:
-    "Qatar's premier destination for high-performance laptops, custom PC components, gaming hardware, and genuine tech accessories with official brand warranties.",
+    "Qatar's premier destination for high-performance laptops, PC components, gaming hardware, and genuine tech accessories with official brand warranties.",
 };
 
 export default async function HomePage({
@@ -49,9 +48,6 @@ export default async function HomePage({
 
       {/* 7. New Arrivals */}
       <NewArrivals locale={locale} />
-
-      {/* 8. VIP Newsletter & Concierge */}
-      <NewsletterSection locale={locale} />
     </>
   );
 }

@@ -36,28 +36,28 @@ export default function ForgotPasswordPage() {
       <div className="w-full max-w-md">
         <Link
           href="/en/auth/login"
-          className="inline-flex items-center gap-2 text-[#8D9CF5] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-[#4063B2] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-blue-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Login
         </Link>
 
-        <div className="bg-[#0B1120] border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-sm">
           {sent ? (
             /* Success State */
             <div className="text-center py-6">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle2 className="w-8 h-8 text-emerald-400" />
+              <div className="w-16 h-16 rounded-full bg-emerald-50 border border-emerald-200 flex items-center justify-center mx-auto mb-6">
+                <CheckCircle2 className="w-8 h-8 text-emerald-600" />
               </div>
-              <h2 className="text-xl font-tall uppercase text-white mb-3">Check Your Inbox</h2>
-              <p className="text-xs text-white/50 font-sans leading-relaxed">
+              <h2 className="text-xl font-tall uppercase mb-3 font-display" style={{ color: "var(--text-primary)" }}>Check Your Inbox</h2>
+              <p className="text-xs font-sans leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                 We sent a password reset link to{" "}
-                <span className="text-[#8D9CF5] font-semibold">{submittedEmail}</span>.
+                <span className="text-[#4063B2] font-semibold">{submittedEmail}</span>.
                 <br className="mb-2" />
                 It may take a minute to arrive.
               </p>
               <Link
                 href="/en/auth/login"
-                className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-xl bg-gradient-to-r from-[#4063B2] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all"
+                className="inline-flex items-center gap-2 mt-8 px-6 py-3 rounded-xl bg-gradient-to-r from-[#4063B2] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md"
               >
                 Back to Login
               </Link>
@@ -65,41 +65,42 @@ export default function ForgotPasswordPage() {
           ) : (
             <>
               <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8D9CF5]/10 border border-[#8D9CF5]/30 mb-4">
-                  <Zap className="w-3.5 h-3.5 text-[#8D9CF5]" />
-                  <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/30 mb-4">
+                  <Zap className="w-3.5 h-3.5 text-[#4063B2]" />
+                  <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#4063B2]">
                     Password Reset
                   </span>
                 </div>
-                <h1 className="text-2xl font-tall uppercase text-white mb-2">Forgot Password</h1>
-                <p className="text-xs text-white/50 font-sans">
+                <h1 className="text-2xl font-tall uppercase mb-2 font-display" style={{ color: "var(--text-primary)" }}>Forgot Password</h1>
+                <p className="text-xs font-sans" style={{ color: "var(--text-secondary)" }}>
                   Enter your email and we&apos;ll send you a reset link
                 </p>
               </div>
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
                 <div>
-                  <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+                  <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#8D9CF5]" />
+                    <Mail className="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-[#4063B2]" />
                     <input
                       {...register("email")}
                       type="email"
                       placeholder="you@example.com"
-                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                      className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
+                      style={{ color: "var(--text-primary)" }}
                     />
                   </div>
                   {errors.email && (
-                    <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>
+                    <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>
                   )}
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? "Sending..." : "Send Reset Link"}
                 </button>

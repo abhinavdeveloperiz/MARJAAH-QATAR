@@ -63,8 +63,8 @@ export function BrandsStrip({ locale }: BrandsStripProps) {
           
           {/* Left Column: Heading & Description (4 cols) */}
           <div className="lg:col-span-4 space-y-5 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#4063B2]/20 border border-[#8D9CF5]/40 text-[#8D9CF5] text-xs font-bold uppercase tracking-widest font-sans shadow-[0_0_12px_rgba(141,156,245,0.2)]">
-              <Sparkles className="w-3.5 h-3.5 text-[#8D9CF5]" />
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/20 text-[#4063B2] text-xs font-bold uppercase tracking-widest font-sans">
+              <Sparkles className="w-3.5 h-3.5 text-[#4063B2]" />
               {isRTL ? "شركاء التقنية المعتمدون" : "AUTHORIZED GCC PARTNERS"}
             </div>
 
@@ -89,18 +89,18 @@ export function BrandsStrip({ locale }: BrandsStripProps) {
               </Link>
             </div>
 
-            <div className="flex items-center justify-center lg:justify-start gap-3 pt-2 text-xs font-medium text-white/50">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="flex items-center justify-center lg:justify-start gap-3 pt-2 text-xs font-medium text-slate-500">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>{isRTL ? "منتجات أصلية مع ضمان محلي" : "100% Genuine with Local Warranty"}</span>
             </div>
           </div>
 
           {/* Right Column: 4-Column Vertical Flowing Waterfall (8 cols) */}
-          <div className="lg:col-span-8 relative h-[380px] sm:h-[420px] rounded-3xl overflow-hidden p-3 sm:p-4 backdrop-blur-md" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
+          <div className="lg:col-span-8 relative h-[380px] sm:h-[420px] rounded-3xl overflow-hidden p-3 sm:p-4 shadow-sm" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
             
             {/* Top & Bottom Smooth Gradient Fade Masks */}
-            <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-[#070B14] via-[#070B14]/80 to-transparent z-20 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[#070B14] via-[#070B14]/80 to-transparent z-20 pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white via-white/80 to-transparent z-20 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 h-full">
               
@@ -194,18 +194,18 @@ function BrandCard({ brand, locale }: { brand: { name: string; color: string; ca
   return (
     <Link
       href={`/${locale}/shop?brand=${encodeURIComponent(brand.name)}`}
-      className="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl bg-[#10192D] border border-white/10 hover:border-[#8D9CF5]/70 hover:bg-[#16223D] hover:shadow-[0_0_20px_rgba(141,156,245,0.25)] transition-all duration-300 shadow-md group cursor-pointer"
+      className="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl bg-surface-2 border border-border-color hover:border-[#4063B2]/50 hover:bg-surface hover:shadow-md transition-all duration-300 shadow-sm group cursor-pointer"
     >
       <div className="flex items-center justify-between mb-1">
         <span
           className="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105"
-          style={{ color: brand.color }}
+          style={{ color: brand.color === "#E5E7EB" ? "#334155" : brand.color }}
         >
           {brand.name}
         </span>
-        <span className="w-1.5 h-1.5 rounded-full bg-white/20 group-hover:bg-[#8D9CF5] transition-colors" />
+        <span className="w-1.5 h-1.5 rounded-full bg-slate-300 group-hover:bg-[#4063B2] transition-colors" />
       </div>
-      <p className="text-[11px] font-sans font-medium text-white/50 group-hover:text-white/80 transition-colors truncate">
+      <p className="text-[11px] font-sans font-medium text-slate-500 group-hover:text-slate-700 transition-colors truncate">
         {brand.category}
       </p>
     </Link>

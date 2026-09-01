@@ -19,7 +19,7 @@ export function JsonLd({ locale }: JsonLdProps) {
     logo: `${baseUrl}/images/logo-dark.png`,
     image: `${baseUrl}/images/hero-station.jpg`,
     description:
-      "Qatar's premier destination for high-performance laptops, custom PC gaming rigs, GPUs, OLED displays, and genuine tech with official GCC warranty.",
+      "Qatar's premier destination for high-performance laptops, gaming rigs, GPUs, OLED displays, and genuine tech with official GCC warranty.",
     telephone: site.contact.phone,
     email: site.contact.email,
     priceRange: "QAR 50 - QAR 25000",

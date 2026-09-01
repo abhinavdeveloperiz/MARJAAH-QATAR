@@ -48,21 +48,21 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
       <div className="w-full max-w-md">
         <Link
           href="/en"
-          className="inline-flex items-center gap-2 text-[#8D9CF5] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-white transition-colors"
+          className="inline-flex items-center gap-2 text-[#4063B2] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-blue-800 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Store
         </Link>
 
-        <div className="rounded-3xl p-8 shadow-2xl" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
+        <div className="rounded-3xl p-8 shadow-sm" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
           <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8D9CF5]/10 border border-[#8D9CF5]/30 mb-4">
-              <Zap className="w-3.5 h-3.5 text-[#8D9CF5]" />
-              <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/30 mb-4">
+              <Zap className="w-3.5 h-3.5 text-[#4063B2]" />
+              <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#4063B2]">
                 M.SHOP Qatar
               </span>
             </div>
-            <h1 className="text-2xl font-tall uppercase mb-2" style={{ color: "var(--text-primary)" }}>Sign In</h1>
-            <p className="text-xs font-sans" style={{ color: "var(--text-tertiary)" }}>Access your M.SHOP account</p>
+            <h1 className="text-2xl font-tall uppercase mb-2 font-display" style={{ color: "var(--text-primary)" }}>Sign In</h1>
+            <p className="text-xs font-sans" style={{ color: "var(--text-secondary)" }}>Access your M.SHOP account</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -80,7 +80,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                 onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border-color)")}
               />
               {errors.email && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>
+                <p className="mt-1.5 text-xs text-red-500">{errors.email.message}</p>
               )}
             </div>
 
@@ -91,7 +91,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                 </label>
                 <Link
                   href="/en/auth/forgot-password"
-                  className="text-[11px] text-[#8D9CF5] hover:text-white transition-colors font-sans"
+                  className="text-[11px] text-[#4063B2] hover:text-blue-800 transition-colors font-sans font-semibold"
                 >
                   Forgot password?
                 </Link>
@@ -109,20 +109,20 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition-colors"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-red-400">{errors.password.message}</p>
+                <p className="mt-1.5 text-xs text-red-500">{errors.password.message}</p>
               )}
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-lg disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
+              className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
             >
               <LogIn className="w-4 h-4" />
               {isSubmitting ? "Signing in..." : "Sign In"}
@@ -133,10 +133,8 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
             New to M.SHOP?{" "}
             <Link
               href="/en/auth/register"
-              className="font-semibold transition-colors"
-              style={{ color: "var(--color-accent)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-accent)")}>
+              className="font-semibold text-[#4063B2] hover:text-blue-800 transition-colors"
+            >
               Create an account
             </Link>
           </p>

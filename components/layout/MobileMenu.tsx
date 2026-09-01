@@ -67,14 +67,14 @@ export function MobileMenu({ isOpen, onClose, locale, navLinks }: MobileMenuProp
         className="fixed top-0 bottom-0 z-[70] w-[320px] bg-surface flex flex-col shadow-2xl right-0 translate-x-full"
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-surface-2">
+        <div className="flex items-center justify-between p-5 border-b border-border-color">
           <Link href={`/${locale}`} onClick={onClose} className="flex items-center">
-            <Logo variant="dark" size="sm" />
+            <Logo variant="light" size="sm" />
           </Link>
           <button
             onClick={onClose}
             aria-label="Close menu"
-            className="w-8 h-8 rounded-lg hover:bg-surface-2 flex items-center justify-center text-muted hover:text-white transition-all"
+            className="w-8 h-8 rounded-lg hover:bg-surface-2 flex items-center justify-center text-slate-500 hover:text-slate-900 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -87,9 +87,9 @@ export function MobileMenu({ isOpen, onClose, locale, navLinks }: MobileMenuProp
               key={link.href}
               href={link.href}
               onClick={onClose}
-              className="mobile-nav-item flex items-center justify-between px-4 py-3.5 rounded-xl hover:bg-surface-2 text-muted hover:text-white transition-all duration-200 mb-1"
+              className="mobile-nav-item flex items-center justify-between px-4 py-3.5 rounded-xl hover:bg-surface-2 text-slate-700 hover:text-[#4063B2] transition-all duration-200 mb-1"
             >
-              <span className="font-medium">{link.label}</span>
+              <span className="font-semibold">{link.label}</span>
               <div className="flex items-center gap-2">
                 {link.badge && (
                   <span className="badge-accent text-xs">{link.badge}</span>
@@ -100,8 +100,8 @@ export function MobileMenu({ isOpen, onClose, locale, navLinks }: MobileMenuProp
           ))}
 
           {/* Categories Section */}
-          <div className="mt-4 pt-4 border-t border-surface-2">
-            <p className="px-4 text-xs font-semibold text-muted uppercase tracking-wider mb-2">
+          <div className="mt-4 pt-4 border-t border-border-color">
+            <p className="px-4 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Categories
             </p>
             {categories.slice(0, 5).map((cat) => (
@@ -111,11 +111,11 @@ export function MobileMenu({ isOpen, onClose, locale, navLinks }: MobileMenuProp
                 onClick={onClose}
                 className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-2 transition-all duration-200 mb-1"
               >
-                <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0">
+                <div className="w-8 h-8 rounded-lg overflow-hidden flex-shrink-0 bg-surface-2">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-muted hover:text-white text-sm font-medium">
+                <span className="text-slate-700 hover:text-[#4063B2] text-sm font-semibold">
                   {cat.name}
                 </span>
               </Link>
@@ -124,22 +124,22 @@ export function MobileMenu({ isOpen, onClose, locale, navLinks }: MobileMenuProp
         </nav>
 
         {/* Footer Actions */}
-        <div className="p-4 border-t border-surface-2 space-y-2">
+        <div className="p-4 border-t border-border-color space-y-2">
           <Link
             href={`/${locale}/account`}
             onClick={onClose}
-            className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-2 text-muted hover:text-white transition-all"
+            className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-2 text-slate-700 hover:text-[#4063B2] transition-all"
           >
-            <User className="w-5 h-5" />
-            <span className="font-medium">My Account</span>
+            <User className="w-5 h-5 text-[#4063B2]" />
+            <span className="font-semibold">My Account</span>
           </Link>
           <Link
             href={`/${locale}/wishlist`}
             onClick={onClose}
-            className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-2 text-muted hover:text-white transition-all"
+            className="mobile-nav-item flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-2 text-slate-700 hover:text-[#4063B2] transition-all"
           >
-            <Heart className="w-5 h-5" />
-            <span className="font-medium">Wishlist</span>
+            <Heart className="w-5 h-5 text-pink-500" />
+            <span className="font-semibold">Wishlist</span>
           </Link>
         </div>
       </div>

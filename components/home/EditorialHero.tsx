@@ -115,7 +115,7 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
 
         {/* Balanced Subtitle */}
         <p className="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
-          Qatar&apos;s premier destination for custom gaming rigs, RTX 40-series workstations, OLED monitors, and authentic tech hardware with official GCC warranty.
+          Qatar&apos;s premier destination for high-performance laptops, RTX workstations, OLED monitors, and authentic tech hardware with official GCC warranty.
         </p>
       </div>
 

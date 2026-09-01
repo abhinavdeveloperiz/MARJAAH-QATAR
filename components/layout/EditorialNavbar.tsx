@@ -98,11 +98,9 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
 
   const navbarBg = isScrolled
     ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-md"
-    : "bg-transparent border-b border-transparent";
+    : "bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-sm";
 
-  const iconBtnClass = isScrolled
-    ? "bg-slate-100/80 hover:bg-slate-200 text-slate-700 hover:text-[#4063B2]"
-    : "bg-white/10 hover:bg-white/20 text-white hover:text-white";
+  const iconBtnClass = "bg-transparent hover:bg-slate-100/80 text-slate-700 hover:text-[#4063B2]";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 select-none">
@@ -115,7 +113,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
             aria-label="M.SHOP Home"
             className="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0"
           >
-            <Logo variant={isScrolled ? "light" : "dark"} size="md" />
+            <Logo variant="light" size="md" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -129,12 +127,8 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                   className={cn(
                     "text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300",
                     isActive
-                      ? isScrolled
-                        ? "text-[#4063B2] drop-shadow-[0_0_10px_rgba(64,99,178,0.3)]"
-                        : "text-[#8D9CF5] drop-shadow-[0_0_12px_rgba(141,156,245,0.8)] font-black"
-                      : isScrolled
-                        ? "text-slate-700 hover:text-[#4063B2] hover:tracking-[0.2em]"
-                        : "text-white/90 hover:text-white hover:tracking-[0.2em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]"
+                      ? "text-[#4063B2] font-black"
+                      : "text-slate-700 hover:text-[#4063B2] hover:tracking-[0.2em]"
                   )}
                 >
                   {item.label}
@@ -154,7 +148,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 iconBtnClass
               )}
             >
-              <Search className={cn("w-4 h-4", isScrolled ? "text-[#4063B2]" : "text-[#8D9CF5]")} />
+              <Search className="w-4 h-4 text-[#4063B2]" />
             </button>
 
             {/* Wishlist Link */}
@@ -164,10 +158,10 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               className={cn(
                 "relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0",
                 iconBtnClass,
-                "hover:text-rose-400"
+                "hover:text-rose-500"
               )}
             >
-              <Heart className="w-4 h-4 text-rose-400" />
+              <Heart className="w-4 h-4 text-rose-500" />
               {totalWishlistItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-display text-[9px] flex items-center justify-center font-bold shadow-md">
                   {totalWishlistItems}
@@ -184,9 +178,9 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 iconBtnClass
               )}
             >
-              <ShoppingBag className={cn("w-4 h-4", isScrolled ? "text-[#4063B2]" : "text-[#8D9CF5]")} />
+              <ShoppingBag className="w-4 h-4 text-[#4063B2]" />
               {totalCartItems > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#8D9CF5] text-[#070B14] font-display text-[9px] flex items-center justify-center font-bold shadow-[0_0_10px_#8D9CF5]">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#4063B2] text-white font-display text-[9px] flex items-center justify-center font-bold shadow-md">
                   {totalCartItems}
                 </span>
               )}

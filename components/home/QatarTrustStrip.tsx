@@ -29,7 +29,7 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
     {
       icon: Headphones,
       title: "Dedicated Tech Support",
-      desc: "Direct 24/7 WhatsApp consultation & PC build guidance",
+      desc: "Direct 24/7 WhatsApp consultation & product assistance",
       glowColor: "from-[#8D9CF5]/20 to-pink-500/20",
     },
   ];

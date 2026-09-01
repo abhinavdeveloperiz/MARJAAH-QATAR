@@ -22,6 +22,8 @@ export default function CheckoutPage() {
   });
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "card">("card");
 
+  const [orderId] = useState(() => Math.floor(10000 + Math.random() * 90000));
+
   const stepIndex = steps.indexOf(step);
 
   const handlePlaceOrder = async () => {
@@ -32,29 +34,71 @@ export default function CheckoutPage() {
 
   if (isPlaced) {
     return (
-      <div className="min-h-screen bg-base flex flex-col items-center justify-center gap-6 px-4 text-center">
-        <div className="w-24 h-24 rounded-full bg-success/20 border border-success/30 flex items-center justify-center animate-scale-in">
-          <CheckCircle2 className="w-12 h-12 text-success" />
-        </div>
-        <div>
-          <h1 className="text-3xl font-bold text-white mb-3">{isRTL ? "تم الطلب بنجاح!" : "Order Placed Successfully!"}</h1>
-          <p className="text-muted text-lg max-w-md">
-            {isRTL ? "شكراً لطلبك. سنتواصل معك قريباً لتأكيد الطلب." : "Thank you! We'll send you a confirmation shortly."}
-          </p>
-          <p className="text-primary-400 font-bold mt-2">{isRTL ? "رقم الطلب: #MTQ-" : "Order #MTQ-"}{Math.floor(Math.random() * 90000) + 10000}</p>
-        </div>
-        <div className="flex gap-3 flex-wrap justify-center">
-          <Link href={`/${locale}/account/orders`} className="btn-primary">{isRTL ? "تتبع طلبك" : "Track Order"}</Link>
-          <Link href={`/${locale}/shop`} className="btn-secondary">{isRTL ? "مواصلة التسوق" : "Continue Shopping"}</Link>
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 px-4 py-24 text-center" style={{ backgroundColor: "var(--bg-base)" }}>
+        <div
+          className="max-w-lg w-full rounded-3xl p-8 sm:p-12 shadow-2xl flex flex-col items-center gap-6 animate-scale-in"
+          style={{
+            backgroundColor: "var(--bg-surface)",
+            border: "1px solid var(--border-color)",
+          }}
+        >
+          <div className="w-20 h-20 rounded-full bg-emerald-500/10 border-2 border-emerald-500/30 flex items-center justify-center shadow-inner">
+            <CheckCircle2 className="w-10 h-10 text-emerald-600 dark:text-emerald-400" />
+          </div>
+          <div>
+            <h1
+              className="text-2xl sm:text-4xl font-black font-display tracking-tight uppercase mb-3"
+              style={{ color: "var(--text-primary)" }}
+            >
+              {isRTL ? "تم الطلب بنجاح!" : "ORDER PLACED SUCCESSFULLY!"}
+            </h1>
+            <p
+              className="text-base sm:text-lg font-medium leading-relaxed"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {isRTL ? "شكراً لطلبك. سنتواصل معك قريباً لتأكيد الطلب." : "Thank you! We'll send you a confirmation shortly."}
+            </p>
+            <div
+              className="mt-5 inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl border shadow-sm"
+              style={{
+                backgroundColor: "var(--bg-surface-2)",
+                borderColor: "var(--border-color)",
+              }}
+            >
+              <span
+                className="text-xs font-bold tracking-wider uppercase font-display"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                {isRTL ? "رقم الطلب:" : "Order"}
+              </span>
+              <span className="font-mono font-bold text-sm sm:text-base text-[#4063B2]">
+                #MTQ-{orderId}
+              </span>
+            </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full justify-center pt-2">
+            <Link
+              href={`/${locale}/account/orders`}
+              className="btn-primary justify-center flex-1 py-3.5 text-sm font-bold font-display shadow-md"
+            >
+              {isRTL ? "تتبع طلبك" : "TRACK ORDER"}
+            </Link>
+            <Link
+              href={`/${locale}/shop`}
+              className="btn-secondary justify-center flex-1 py-3.5 text-sm font-bold font-display shadow-sm"
+            >
+              {isRTL ? "مواصلة التسوق" : "CONTINUE SHOPPING"}
+            </Link>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-dark-300 pt-24 md:pt-28">
+    <div className="min-h-screen bg-base pt-24 md:pt-28">
       <div className="container-custom py-8 md:py-12">
-        <h1 className="text-3xl font-bold text-white mb-8 font-display">{isRTL ? "إتمام الشراء" : "Checkout"}</h1>
+        <h1 className="text-3xl font-bold mb-8 font-display" style={{ color: "var(--text-primary)" }}>{isRTL ? "إتمام الشراء" : "Checkout"}</h1>
 
         {/* Step indicators */}
         <div className="flex items-center gap-0 mb-10 max-w-md">
@@ -69,15 +113,15 @@ export default function CheckoutPage() {
                   onClick={() => stepIndex > i && setStep(s)}
                   className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2 transition-all duration-300",
-                    isDone ? "bg-success border-success text-white"
-                      : isCurrent ? "bg-primary-500 border-primary-500 text-white"
-                        : "bg-surface-2 border-surface-3 text-muted"
+                    isDone ? "bg-emerald-600 border-emerald-600 text-white"
+                      : isCurrent ? "bg-[#4063B2] border-[#4063B2] text-white"
+                        : "bg-surface-2 border-border-color text-slate-500"
                   )}
                 >
                   {isDone ? <CheckCircle2 className="w-5 h-5" /> : <Icon className="w-5 h-5" />}
                 </button>
                 {i < steps.length - 1 && (
-                  <div className={cn("flex-1 h-0.5 mx-1 transition-all duration-300", isDone ? "bg-success" : "bg-surface-3")} />
+                  <div className={cn("flex-1 h-0.5 mx-1 transition-all duration-300", isDone ? "bg-emerald-600" : "bg-slate-200")} />
                 )}
               </div>
             );
@@ -89,9 +133,9 @@ export default function CheckoutPage() {
           <div className="lg:col-span-2">
             {/* Step 1: Address */}
             {step === "address" && (
-              <div className="bg-surface rounded-2xl border border-surface-3 p-6 space-y-4">
-                <h2 className="text-white font-bold text-xl flex items-center gap-2">
-                  <MapPin className="w-5 h-5 text-primary-400" />
+              <div className="bg-surface rounded-2xl border border-border-color p-6 space-y-4 shadow-sm">
+                <h2 className="font-bold text-xl flex items-center gap-2 font-display" style={{ color: "var(--text-primary)" }}>
+                  <MapPin className="w-5 h-5 text-[#4063B2]" />
                   {isRTL ? "عنوان التوصيل" : "Delivery Address"}
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -106,12 +150,12 @@ export default function CheckoutPage() {
                     { key: "city", label: isRTL ? "المدينة" : "City", type: "text" },
                   ].map((field) => (
                     <div key={field.key} className={field.full ? "sm:col-span-2" : ""}>
-                      <label className="text-muted text-sm font-medium mb-1.5 block">{field.label}</label>
+                      <label className="text-slate-600 text-sm font-medium mb-1.5 block">{field.label}</label>
                       <input
                         type={field.type}
                         value={addressForm[field.key as keyof typeof addressForm]}
                         onChange={(e) => setAddressForm((prev) => ({ ...prev, [field.key]: e.target.value }))}
-                        className="input"
+                        className="input bg-surface-2 border-border-color"
                         required
                       />
                     </div>
@@ -126,9 +170,9 @@ export default function CheckoutPage() {
 
             {/* Step 2: Payment */}
             {step === "payment" && (
-              <div className="bg-surface rounded-2xl border border-surface-3 p-6 space-y-4">
-                <h2 className="text-white font-bold text-xl flex items-center gap-2">
-                  <CreditCard className="w-5 h-5 text-primary-400" />
+              <div className="bg-surface rounded-2xl border border-border-color p-6 space-y-4 shadow-sm">
+                <h2 className="font-bold text-xl flex items-center gap-2 font-display" style={{ color: "var(--text-primary)" }}>
+                  <CreditCard className="w-5 h-5 text-[#4063B2]" />
                   {isRTL ? "طريقة الدفع" : "Payment Method"}
                 </h2>
                 <div className="space-y-3">
@@ -138,18 +182,18 @@ export default function CheckoutPage() {
                   ].map((method) => (
                     <label key={method.value} className={cn(
                       "flex items-center gap-4 p-4 rounded-2xl border-2 cursor-pointer transition-all",
-                      paymentMethod === method.value ? "border-primary-500 bg-primary-500/5" : "border-surface-3 hover:border-primary-500/30"
+                      paymentMethod === method.value ? "border-[#4063B2] bg-[#4063B2]/5" : "border-border-color hover:border-[#4063B2]/30"
                     )}>
                       <input type="radio" name="payment" value={method.value} checked={paymentMethod === method.value as "cod" | "card"}
                         onChange={() => setPaymentMethod(method.value as "cod" | "card")} className="sr-only" />
-                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", paymentMethod === method.value ? "bg-primary-500/20" : "bg-surface-2")}>
-                        <method.icon className={cn("w-6 h-6", paymentMethod === method.value ? "text-primary-400" : "text-muted")} />
+                      <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center", paymentMethod === method.value ? "bg-[#4063B2]/15 text-[#4063B2]" : "bg-surface-2 text-slate-500")}>
+                        <method.icon className="w-6 h-6" />
                       </div>
                       <div>
-                        <p className="text-white font-semibold">{method.label}</p>
-                        <p className="text-muted text-sm">{method.desc}</p>
+                        <p className="font-semibold" style={{ color: "var(--text-primary)" }}>{method.label}</p>
+                        <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{method.desc}</p>
                       </div>
-                      <div className={cn("ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === method.value ? "border-primary-500 bg-primary-500" : "border-surface-3")}>
+                      <div className={cn("ml-auto w-5 h-5 rounded-full border-2 flex items-center justify-center", paymentMethod === method.value ? "border-[#4063B2] bg-[#4063B2]" : "border-border-color")}>
                         {paymentMethod === method.value && <div className="w-2 h-2 rounded-full bg-white" />}
                       </div>
                     </label>
@@ -167,34 +211,34 @@ export default function CheckoutPage() {
 
             {/* Step 3: Review */}
             {step === "review" && (
-              <div className="bg-surface rounded-2xl border border-surface-3 p-6 space-y-4">
-                <h2 className="text-white font-bold text-xl flex items-center gap-2">
-                  <ClipboardList className="w-5 h-5 text-primary-400" />
+              <div className="bg-surface rounded-2xl border border-border-color p-6 space-y-4 shadow-sm">
+                <h2 className="font-bold text-xl flex items-center gap-2 font-display" style={{ color: "var(--text-primary)" }}>
+                  <ClipboardList className="w-5 h-5 text-[#4063B2]" />
                   {isRTL ? "مراجعة الطلب" : "Review Order"}
                 </h2>
                 {/* Items */}
                 <div className="space-y-3">
                   {items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 p-3 bg-surface-2 rounded-xl">
+                    <div key={item.id} className="flex items-center gap-3 p-3 bg-surface-2 rounded-xl border border-border-color">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
                       <div className="flex-1">
-                        <p className="text-white text-sm font-medium line-clamp-1">{item.name}</p>
-                        <p className="text-muted text-xs">Qty: {item.quantity}</p>
+                        <p className="text-sm font-medium line-clamp-1" style={{ color: "var(--text-primary)" }}>{item.name}</p>
+                        <p className="text-xs" style={{ color: "var(--text-secondary)" }}>Qty: {item.quantity}</p>
                       </div>
-                      <p className="text-white font-semibold text-sm">QAR {(item.price * item.quantity).toLocaleString()}</p>
+                      <p className="font-semibold text-sm" style={{ color: "var(--text-primary)" }}>QAR {(item.price * item.quantity).toLocaleString()}</p>
                     </div>
                   ))}
                 </div>
                 {/* Address summary */}
-                <div className="bg-surface-2 rounded-xl p-4">
-                  <p className="text-muted text-xs mb-2 font-semibold uppercase tracking-wider">Delivery to:</p>
-                  <p className="text-white text-sm">{addressForm.fullName} · {addressForm.phone}</p>
-                  <p className="text-muted text-sm">{addressForm.area}, {addressForm.street}, Bldg {addressForm.building}, {addressForm.city}</p>
+                <div className="bg-surface-2 rounded-xl p-4 border border-border-color">
+                  <p className="text-xs mb-2 font-semibold uppercase tracking-wider text-[#4063B2]">Delivery to:</p>
+                  <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>{addressForm.fullName} · {addressForm.phone}</p>
+                  <p className="text-sm" style={{ color: "var(--text-secondary)" }}>{addressForm.area}, {addressForm.street}, Bldg {addressForm.building}, {addressForm.city}</p>
                 </div>
                 <div className="flex gap-3">
                   <button onClick={() => setStep("payment")} className="btn-secondary">{isRTL ? "رجوع" : "Back"}</button>
-                  <button onClick={handlePlaceOrder} className="btn-primary flex-1 justify-center shadow-glow-primary">
+                  <button onClick={handlePlaceOrder} className="btn-primary flex-1 justify-center shadow-md">
                     <Shield className="w-4 h-4" />
                     {isRTL ? "تأكيد الطلب" : "Place Order Securely"}
                   </button>
@@ -205,23 +249,23 @@ export default function CheckoutPage() {
 
           {/* Summary sidebar */}
           <div>
-            <div className="bg-surface rounded-2xl border border-surface-3 p-6 sticky top-24">
-              <h3 className="text-white font-bold mb-4">{isRTL ? "ملخص الطلب" : "Order Summary"}</h3>
+            <div className="bg-surface rounded-2xl border border-border-color p-6 sticky top-24 shadow-sm">
+              <h3 className="font-bold mb-4 font-display" style={{ color: "var(--text-primary)" }}>{isRTL ? "ملخص الطلب" : "Order Summary"}</h3>
               <div className="space-y-2 mb-4">
                 {items.slice(0, 3).map((item) => (
                   <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-muted truncate max-w-[140px]">{item.name} ×{item.quantity}</span>
-                    <span className="text-white font-medium">QAR {(item.price * item.quantity).toLocaleString()}</span>
+                    <span className="truncate max-w-[140px]" style={{ color: "var(--text-secondary)" }}>{item.name} ×{item.quantity}</span>
+                    <span className="font-medium" style={{ color: "var(--text-primary)" }}>QAR {(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
-                {items.length > 3 && <p className="text-muted text-xs">+{items.length - 3} more items</p>}
+                {items.length > 3 && <p className="text-xs" style={{ color: "var(--text-secondary)" }}>+{items.length - 3} more items</p>}
               </div>
               <div className="divider mb-4" />
               <div className="space-y-2">
-                <div className="flex justify-between text-sm"><span className="text-muted">Subtotal</span><span className="text-white">QAR {total.toLocaleString()}</span></div>
-                <div className="flex justify-between text-sm"><span className="text-muted">Shipping</span><span className={total >= 500 ? "text-success" : "text-white"}>{total >= 500 ? "Free" : "QAR 20"}</span></div>
+                <div className="flex justify-between text-sm"><span style={{ color: "var(--text-secondary)" }}>Subtotal</span><span style={{ color: "var(--text-primary)" }}>QAR {total.toLocaleString()}</span></div>
+                <div className="flex justify-between text-sm"><span style={{ color: "var(--text-secondary)" }}>Shipping</span><span className={total >= 500 ? "text-emerald-600 font-medium" : "font-medium"} style={{ color: total >= 500 ? undefined : "var(--text-primary)" }}>{total >= 500 ? "Free" : "QAR 20"}</span></div>
                 <div className="divider" />
-                <div className="flex justify-between font-bold text-lg"><span className="text-white">Total</span><span className="text-primary-400">QAR {(total + (total >= 500 ? 0 : 20)).toLocaleString()}</span></div>
+                <div className="flex justify-between font-bold text-lg"><span style={{ color: "var(--text-primary)" }}>Total</span><span className="text-[#4063B2] font-display font-black">QAR {(total + (total >= 500 ? 0 : 20)).toLocaleString()}</span></div>
               </div>
             </div>
           </div>

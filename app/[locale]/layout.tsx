@@ -17,10 +17,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     template: "%s | M.SHOP — Marjaah Trading Qatar",
-    default: "M.SHOP Qatar | High-Performance Hardware & Custom PCs in Doha",
+    default: "M.SHOP Qatar | High-Performance Hardware & Computers in Doha",
   },
   description:
-    "Qatar's premier online store for high-performance laptops, custom PC gaming rigs, graphics cards (RTX 4090), OLED displays, and genuine tech accessories with same-day Doha delivery.",
+    "Qatar's premier online store for high-performance laptops, gaming rigs, graphics cards (RTX 4090), OLED displays, and genuine tech accessories with same-day Doha delivery.",
   keywords: [
     "M.SHOP Qatar",
     "M SHOP",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     "computers Qatar",
     "laptops Doha",
     "gaming PC Qatar",
-    "custom PC build Doha",
+    "workstations Doha",
     "RTX 4090 Qatar",
     "ASUS ROG Doha",
     "Alienware Qatar",
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     locale: "en_QA",
     url: siteUrl,
     siteName: "M.SHOP Qatar — Marjaah Trading",
-    title: "M.SHOP Qatar | High-Performance Hardware & Custom PCs",
+    title: "M.SHOP Qatar | High-Performance Hardware & Computers",
     description:
       "Order high-performance gaming rigs, laptops, and original hardware in Qatar with 100% official brand warranty and same-day Doha delivery.",
     images: [
@@ -76,7 +76,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "M.SHOP Qatar | High-Performance Hardware & Custom PCs",
+    title: "M.SHOP Qatar | High-Performance Hardware & Computers",
     description:
       "Order high-performance gaming rigs, laptops, and original hardware in Qatar with 100% official brand warranty and same-day Doha delivery.",
     images: ["/images/hero-station.jpg"],

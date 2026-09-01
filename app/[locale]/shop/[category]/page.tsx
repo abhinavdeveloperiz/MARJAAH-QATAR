@@ -79,28 +79,28 @@ export default async function CategoryPage({
   return (
     <div className="min-h-screen bg-base pt-[72px]">
       {/* Category Hero Header */}
-      <section className="relative border-b border-white/10 bg-gradient-to-b from-[#10192D]/90 via-[#0B1120]/95 to-dark-300 overflow-hidden">
+      <section className="relative overflow-hidden" style={{ borderBottom: "1px solid var(--border-color)", backgroundColor: "var(--bg-surface)" }}>
         <div className="container-custom py-8 md:py-12 relative z-10">
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <div className="space-y-4 max-w-2xl">
               {/* Breadcrumb */}
-              <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-sans font-medium text-white/50">
-                <Link href={`/${locale}`} className="hover:text-white transition-colors">
+              <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-sans font-medium text-slate-500">
+                <Link href={`/${locale}`} className="hover:text-[#4063B2] transition-colors">
                   {isRTL ? "الرئيسية" : "Home"}
                 </Link>
-                <ChevronRight className={isRTL ? "w-3 h-3 rotate-180 text-white/30" : "w-3 h-3 text-white/30"} />
-                <Link href={`/${locale}/shop`} className="hover:text-white transition-colors">
+                <ChevronRight className={isRTL ? "w-3 h-3 rotate-180 text-slate-400" : "w-3 h-3 text-slate-400"} />
+                <Link href={`/${locale}/shop`} className="hover:text-[#4063B2] transition-colors">
                   {isRTL ? "المتجر" : "Shop"}
                 </Link>
-                <ChevronRight className={isRTL ? "w-3 h-3 rotate-180 text-white/30" : "w-3 h-3 text-white/30"} />
-                <span className="text-[#8D9CF5] font-semibold">{isRTL ? cat.nameAr : cat.name}</span>
+                <ChevronRight className={isRTL ? "w-3 h-3 rotate-180 text-slate-400" : "w-3 h-3 text-slate-400"} />
+                <span className="text-[#4063B2] font-semibold">{isRTL ? cat.nameAr : cat.name}</span>
               </nav>
 
               <div className="space-y-2">
-                <h1 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-tight">
+                <h1 className="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight" style={{ color: "var(--text-primary)" }}>
                   {isRTL ? cat.nameAr : cat.name}
                 </h1>
-                <p className="text-[#94A3B8] text-sm sm:text-base font-medium leading-relaxed">
+                <p className="text-sm sm:text-base font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   {isRTL
                     ? `تصفح أحدث وأقوى موديلات ${cat.nameAr} الأصلية المتوفرة حالياً في قطر مع خدمة التوصيل السريع بالدوحة.`
                     : `Discover the ultimate selection of high-performance ${cat.name} available in Qatar with official brand warranties.`}
@@ -109,13 +109,13 @@ export default async function CategoryPage({
             </div>
 
             {/* Quick Trust Badges */}
-            <div className="flex items-center gap-4 text-xs font-sans font-semibold text-white/70 bg-white/5 border border-white/10 px-4 py-2.5 rounded-2xl backdrop-blur-md">
-              <span className="inline-flex items-center gap-1.5 text-emerald-400">
+            <div className="flex items-center gap-4 text-xs font-sans font-semibold bg-surface-2 border border-border-color px-4 py-2.5 rounded-2xl shadow-sm">
+              <span className="inline-flex items-center gap-1.5 text-emerald-600">
                 <ShieldCheck className="w-4 h-4" />
                 <span>{isRTL ? "ضمان رسمي" : "Official Warranty"}</span>
               </span>
-              <span className="w-1 h-1 rounded-full bg-white/30" />
-              <span className="inline-flex items-center gap-1.5 text-[#8D9CF5]">
+              <span className="w-1 h-1 rounded-full bg-slate-300" />
+              <span className="inline-flex items-center gap-1.5 text-[#4063B2]">
                 <Truck className="w-4 h-4" />
                 <span>{isRTL ? "توصيل بالدوحة" : "Doha Dispatch"}</span>
               </span>

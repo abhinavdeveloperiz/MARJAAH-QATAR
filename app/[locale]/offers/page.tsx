@@ -26,20 +26,20 @@ export default async function OffersPage({
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-accent-500/5 rounded-full blur-3xl" />
         <div className="container-custom relative z-10 text-center">
-          <div className="inline-flex items-center gap-2 bg-accent-500/10 border border-accent-500/20 text-accent-400 px-4 py-1.5 rounded-full text-sm font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 bg-[#4063B2]/10 border border-[#4063B2]/20 text-[#4063B2] px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest mb-4">
             <Zap className="w-4 h-4 fill-current" />
             {isRTL ? "عروض محدودة" : "Limited Time Offers"}
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-black mb-4 uppercase tracking-tight font-display" style={{ color: "var(--text-primary)" }}>
             {isRTL ? "العروض والتخفيضات" : "Deals & Offers"}
           </h1>
-          <p className="text-muted text-lg max-w-xl mx-auto">
+          <p className="text-lg max-w-xl mx-auto font-medium" style={{ color: "var(--text-secondary)" }}>
             {isRTL
               ? "أفضل الأسعار على التقنية في قطر. لا تفوّت هذه العروض!"
               : "Best prices on tech in Qatar. Don't miss out!"}
           </p>
           <div className="flex items-center justify-center gap-3 mt-6">
-            <span className="text-white font-semibold text-lg">
+            <span className="font-semibold text-lg font-display" style={{ color: "var(--text-primary)" }}>
               {saleProducts.length} {isRTL ? "منتج بخصم" : "products on sale"}
             </span>
           </div>

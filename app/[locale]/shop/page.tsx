@@ -35,52 +35,52 @@ export default async function ShopPage({
             <div className="space-y-4 max-w-2xl">
               {/* Refined Breadcrumb & Badge */}
               <div className="flex items-center gap-3 flex-wrap">
-                <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-sans font-medium text-white/50">
-                  <Link href={`/${locale}`} className="hover:text-white transition-colors">
+                <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-sans font-medium text-slate-500">
+                  <Link href={`/${locale}`} className="hover:text-[#4063B2] transition-colors">
                     {isRTL ? "الرئيسية" : "Home"}
                   </Link>
-                  <ChevronRight className={isRTL ? "w-3 h-3 rotate-180 text-white/30" : "w-3 h-3 text-white/30"} />
-                  <span className="text-cyan-400 font-semibold">{isRTL ? "المتجر" : "Shop"}</span>
+                  <ChevronRight className={isRTL ? "w-3 h-3 rotate-180 text-slate-400" : "w-3 h-3 text-slate-400"} />
+                  <span className="text-[#4063B2] font-semibold">{isRTL ? "المتجر" : "Shop"}</span>
                 </nav>
 
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-500/10 border border-primary-500/20 text-cyan-300 text-[11px] font-bold tracking-wider uppercase">
-                  <Sparkles className="w-3 h-3 text-cyan-400" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/20 text-[#4063B2] text-[11px] font-bold tracking-wider uppercase">
+                  <Sparkles className="w-3 h-3 text-[#4063B2]" />
                   {isRTL ? "المتجر الرسمي بقطر" : "OFFICIAL QATAR CATALOG"}
                 </span>
               </div>
 
               {/* Title */}
               <div>
-                <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight uppercase leading-none">
+                <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-black tracking-tight uppercase leading-none" style={{ color: "var(--text-primary)" }}>
                   {isRTL ? "جميع المنتجات والمعدات" : "ALL PRODUCTS"}
                 </h1>
-                <p className="text-sm sm:text-base text-white/70 font-sans font-medium mt-2.5 max-w-xl leading-relaxed">
+                <p className="text-sm sm:text-base font-sans font-medium mt-2.5 max-w-xl leading-relaxed" style={{ color: "var(--text-secondary)" }}>
                   {isRTL
-                    ? "استكشف أحدث الحواسيب المحمولة، ومكونات التجميعات الاحترافية، وإكسسوارات الجيمنج مع ضمان رسمي وتوصيل فوري في الدوحة."
-                    : "Explore high-performance laptops, custom PC apparatus, gaming peripherals, and genuine accessories with official local warranty."}
+                    ? "استكشف أحدث الحواسيب المحمولة، والمعدات الاحترافية، وإكسسوارات الجيمنج مع ضمان رسمي وتوصيل فوري في الدوحة."
+                    : "Explore high-performance laptops, desktop apparatus, gaming peripherals, and genuine accessories with official local warranty."}
                 </p>
               </div>
             </div>
 
             {/* Right Trust Stats Strip */}
-            <div className="flex items-center gap-4 sm:gap-6 pt-2 lg:pt-0 border-t border-white/5 lg:border-t-0">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
-                <div className="w-9 h-9 rounded-xl bg-primary-500/20 flex items-center justify-center flex-shrink-0 text-cyan-400">
+            <div className="flex items-center gap-4 sm:gap-6 pt-2 lg:pt-0 border-t border-border-color lg:border-t-0">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-2 border border-border-color shadow-sm">
+                <div className="w-9 h-9 rounded-xl bg-[#4063B2]/10 flex items-center justify-center flex-shrink-0 text-[#4063B2]">
                   <Cpu className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm font-display leading-tight">{totalCount}+ {isRTL ? "منتج" : "Units"}</p>
-                  <p className="text-white/50 text-[11px] font-medium">{isRTL ? "أجهزة أصلية" : "Genuine Stock"}</p>
+                  <p className="font-bold text-sm font-display leading-tight" style={{ color: "var(--text-primary)" }}>{totalCount}+ {isRTL ? "منتج" : "Units"}</p>
+                  <p className="text-[11px] font-medium" style={{ color: "var(--text-secondary)" }}>{isRTL ? "أجهزة أصلية" : "Genuine Stock"}</p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white/[0.03] border border-white/10 backdrop-blur-sm">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0 text-emerald-400">
+              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-2 border border-border-color shadow-sm">
+                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0 text-emerald-600">
                   <Truck className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="text-white font-bold text-sm font-display leading-tight">{isRTL ? "1-2 يوم" : "1-2 Days"}</p>
-                  <p className="text-white/50 text-[11px] font-medium">{isRTL ? "توصيل الدوحة" : "Qatar Express"}</p>
+                  <p className="font-bold text-sm font-display leading-tight" style={{ color: "var(--text-primary)" }}>{isRTL ? "1-2 يوم" : "1-2 Days"}</p>
+                  <p className="text-[11px] font-medium" style={{ color: "var(--text-secondary)" }}>{isRTL ? "توصيل الدوحة" : "Qatar Express"}</p>
                 </div>
               </div>
             </div>

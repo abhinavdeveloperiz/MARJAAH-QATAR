@@ -23,7 +23,7 @@ export const site = {
   heroSubtitle: "QATAR TECH APPARATUS",
 
   heroBio:
-    "Qatar's premier destination for high-performance laptops, custom PC components, gaming gear, and authentic computer accessories. Official brand warranties with fast 1-2 day delivery across Doha & all Qatar municipalities.",
+    "Qatar's premier destination for high-performance laptops, computer components, gaming gear, and authentic computer accessories. Official brand warranties with fast 1-2 day delivery across Doha & all Qatar municipalities.",
   heroBioAr:
     "وجهة قطر الأولى لأجهزة اللابتوب الاحترافية، ومكونات الحواسيب، ومعدات الألعاب، والإكسسوارات الأصلية بضمان رسمي وتوصيل سريع خلال 1-2 يوم في الدوحة وجميع مناطق قطر.",
 
@@ -55,7 +55,7 @@ export const site = {
     ],
     expertise: [
       "High-End Gaming Laptops",
-      "Custom PC Builds",
+      "High-Performance Workstations",
       "Curved OLED Displays",
       "Pro Content Creator Rigs",
       "High-Speed NVMe Storage",
@@ -72,9 +72,9 @@ export const site = {
     headingLine1Ar: "ارتقِ بإمكانياتك",
     headingLine2Ar: "الرقمية معنا.",
     intro:
-      "Looking for custom hardware configurations, enterprise workstation procurement, or instant product assistance in Doha? Connect with our team today.",
+      "Looking for enterprise workstation procurement, hardware inquiries, or instant product assistance in Doha? Connect with our team today.",
     introAr:
-      "هل تبحث عن تجميعات حواسيب مخصصة، أو عروض أسعار للشركات، أو استشارة فورية لطلبك في الدوحة؟ فريقنا جاهز لمساعدتك.",
+      "هل تبحث عن عروض أسعار للشركات، أو استشارة فورية لطلبك في الدوحة؟ فريقنا جاهز لمساعدتك.",
     email: "sales@marjaah.qa",
     supportEmail: "support@marjaah.qa",
     phone: "+974 4455 6677",
