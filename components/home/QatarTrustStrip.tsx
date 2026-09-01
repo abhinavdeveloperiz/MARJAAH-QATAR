@@ -35,7 +35,7 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
   ];
 
   return (
-    <section className="py-6 sm:py-8 md:py-10 relative z-20" style={{ backgroundColor: "var(--bg-surface)", borderBottom: "1px solid var(--border-color)" }}>
+    <section className="pt-4 sm:pt-6 pb-8 sm:pb-12 relative z-20" style={{ backgroundColor: "var(--bg-base)", borderBottom: "1px solid var(--border-color)" }}>
       <div className="container-custom">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {trustFeatures.map((item, index) => {
@@ -43,17 +43,15 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
             return (
               <div
                 key={index}
-                className="group relative p-4 sm:p-5 rounded-xl sm:rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(141,156,245,0.12)] overflow-hidden"
+                className="group relative p-4 sm:p-5 rounded-2xl transition-all duration-300 shadow-sm hover:shadow-xl hover:-translate-y-1 overflow-hidden"
                 style={{
-                  backgroundColor: "var(--bg-surface-2)",
+                  backgroundColor: "var(--bg-surface)",
                   border: "1px solid var(--border-color)",
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = "var(--bg-surface-3)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(141,156,245,0.4)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(64,99,178,0.4)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = "var(--bg-surface-2)";
                   (e.currentTarget as HTMLElement).style.borderColor = "var(--border-color)";
                 }}
               >

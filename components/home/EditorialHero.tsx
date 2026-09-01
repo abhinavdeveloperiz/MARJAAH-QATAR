@@ -63,8 +63,8 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-[72px] sm:pt-[84px] pb-6 sm:pb-8 select-none text-white"
-      style={{ backgroundColor: "#060913", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
+      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-[72px] sm:pt-[84px] pb-8 sm:pb-12 select-none text-white"
+      style={{ backgroundColor: "#060913" }}
     >
       {/* Dynamic Parallax Background Layer */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -92,6 +92,9 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         {/* Cinematic Vignettes & Depth Overlays */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#060913]/90 via-[#060913]/55 to-[#060913] pointer-events-none" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(6,9,19,0.92)_100%)] pointer-events-none" />
+
+        {/* Seamless Atmospheric Gradient Blend into Page Background */}
+        <div className="absolute inset-x-0 bottom-0 h-44 sm:h-56 bg-gradient-to-t from-[var(--bg-base)] via-[var(--bg-base)]/80 via-45% to-transparent pointer-events-none z-10" />
       </div>
 
       {/* 2. Central Typography Showcase */}
@@ -117,10 +120,10 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
       </div>
 
       {/* 3. Bottom Utility & Scroll Strip */}
-      <div className="relative z-10 flex items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-white/10 mt-auto">
+      <div className="relative z-20 flex items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-slate-400/20 mt-auto">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#8D9CF5] flex-shrink-0" />
-          <span className="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white/50 truncate">
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#4063B2] flex-shrink-0" />
+          <span className="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider text-slate-700 dark:text-white/60 truncate">
             M.SHOP • QATAR&apos;S HARDWARE AUTHORITY
           </span>
         </div>
@@ -128,9 +131,9 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         <button
           onClick={scrollToWorks}
           aria-label="Scroll down"
-          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-white/15 bg-[#0B1120]/60 hover:bg-[#8D9CF5] hover:border-[#8D9CF5] text-white/60 hover:text-[#060913] flex items-center justify-center transition-all duration-300 cursor-pointer group flex-shrink-0"
+          className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-300/40 bg-white/80 dark:bg-[#0B1120]/60 hover:bg-[#4063B2] hover:border-[#4063B2] text-slate-700 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer group flex-shrink-0 shadow-sm"
         >
-          <ArrowDown className="w-3.5 h-3.5 group-hover:text-[#060913]" />
+          <ArrowDown className="w-3.5 h-3.5 group-hover:text-white" />
         </button>
       </div>
     </section>
