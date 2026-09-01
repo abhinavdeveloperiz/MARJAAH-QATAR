@@ -104,10 +104,10 @@ export default async function AboutPage({
 
           {/* Right Column (5 cols) */}
           <div className="lg:col-span-5 space-y-8">
-            {/* Authorized Brand Partners */}
+            {/* Authorized Brands */}
             <div className="bg-surface rounded-3xl p-6 sm:p-8 border border-border-color shadow-sm space-y-5">
               <span className="text-[#4063B2] text-xs font-bold uppercase tracking-widest font-sans block">
-                {isRTL ? "شركاء الماركات الرسمية" : "Authorized Brand Partners"}
+                {isRTL ? "الماركات المعتمدة" : "Authorized Brands"}
               </span>
               <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
                 {about.clients.map((brand) => (
