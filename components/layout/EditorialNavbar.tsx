@@ -101,8 +101,8 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
     : "bg-transparent border-b border-transparent";
 
   const iconBtnClass = isScrolled
-    ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700 shadow-sm"
-    : "bg-white/10 hover:bg-white/20 border-white/20 text-white backdrop-blur-md shadow-sm";
+    ? "bg-slate-100/80 hover:bg-slate-200 text-slate-700 hover:text-[#4063B2]"
+    : "bg-white/10 hover:bg-white/20 text-white hover:text-white";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 select-none">
@@ -150,7 +150,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               onClick={() => setSearchOpen(true)}
               aria-label="Search Catalog"
               className={cn(
-                "w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
+                "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
                 iconBtnClass
               )}
             >
@@ -162,7 +162,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               href={`/${locale}/wishlist`}
               aria-label="Wishlist"
               className={cn(
-                "relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-all flex-shrink-0",
+                "relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0",
                 iconBtnClass,
                 "hover:text-rose-400"
               )}
@@ -180,7 +180,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               onClick={openCart}
               aria-label="Open cart"
               className={cn(
-                "relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center cursor-pointer transition-all flex-shrink-0",
+                "relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all flex-shrink-0",
                 iconBtnClass
               )}
             >
@@ -199,9 +199,8 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className={cn(
-                      "flex items-center gap-2 px-3 py-2 rounded-xl border transition-all cursor-pointer",
-                      iconBtnClass,
-                      "hover:border-[#8D9CF5]/40"
+                      "flex items-center gap-2 px-3 py-2 rounded-xl transition-all cursor-pointer",
+                      iconBtnClass
                     )}
                     aria-label="My Account"
                   >
@@ -277,7 +276,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Toggle Menu"
               className={cn(
-                "lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
+                "lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
                 iconBtnClass
               )}
             >
