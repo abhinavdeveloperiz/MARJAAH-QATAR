@@ -8,7 +8,6 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { WhatsAppWidget } from "@/components/ui/WhatsAppWidget";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { ThemeScript } from "@/app/theme-script";
 import { notFound } from "next/navigation";
 
 const locales = ["en"];
@@ -112,10 +111,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang="en" dir="ltr" className="dark" suppressHydrationWarning>
-      <head>
-        <ThemeScript />
-      </head>
+    <html lang="en" dir="ltr" className="light" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <JsonLd locale={locale} />
         <NextIntlClientProvider messages={messages}>

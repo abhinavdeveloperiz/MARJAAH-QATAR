@@ -4,54 +4,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Dark Mode CSS Custom Properties (default) ──────────────── */
+/* ─── White Theme CSS Custom Properties (Default Storefront Theme) ─── */
 :root,
-.dark {
-  --bg-base:      #070B14;
-  --bg-surface:   #0B1120;
-  --bg-surface-2: #10192D;
-  --bg-surface-3: #16223D;
-
-  --text-primary:   #F1F5FE;
-  --text-secondary: #94A3B8;
-  --text-tertiary:  rgba(241, 245, 254, 0.40);
-
-  --border-color:   rgba(255, 255, 255, 0.08);
-  --border-strong:  rgba(255, 255, 255, 0.15);
-
-  --color-navy:     #070B14;
-  --color-surface:  #0B1120;
-  --color-surface-2:#10192D;
-  --color-surface-3:#16223D;
-  --color-primary:  #4063B2;
-  --color-accent:   #8D9CF5;
-  --color-accent-hover: #A8B4F8;
-  --color-violet:   #BB9AED;
-  --color-sage:     #8D9CF5;
-  --color-taupe:    #94A3B8;
-  --color-muted:    #94A3B8;
-  --color-cyan:     #8D9CF5;
-  --color-soft-blue:#BB9AED;
-  --color-white:    #F1F5FE;
-
-  --scrollbar-track: #070B14;
-  --scrollbar-thumb: #16223D;
-  --scrollbar-hover: #8D9CF5;
-
-  --selection-bg:   #4063B2;
-  --selection-text: #ffffff;
-
-  --font-guminert: 'Space Grotesk', 'Outfit', 'Urbanist', system-ui, sans-serif;
-  --font-condenso: 'Space Grotesk', 'Outfit', sans-serif;
-  --font-tall:     'Space Grotesk', 'Outfit', sans-serif;
-  --font-anton:    'Space Grotesk', 'Outfit', sans-serif;
-  --font-inter:    'Inter', system-ui, -apple-system, sans-serif;
-  --font-outfit:   'Outfit', sans-serif;
-
-  --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* ─── Light Mode CSS Custom Properties ───────────────────────── */
 .light {
   --bg-base:      #F5F7FA;
   --bg-surface:   #FFFFFF;
@@ -83,6 +37,52 @@
   --scrollbar-track: #E2E8F0;
   --scrollbar-thumb: #A0AEC0;
   --scrollbar-hover: #4D63C7;
+
+  --selection-bg:   #4063B2;
+  --selection-text: #ffffff;
+
+  --font-guminert: 'Space Grotesk', 'Outfit', 'Urbanist', system-ui, sans-serif;
+  --font-condenso: 'Space Grotesk', 'Outfit', sans-serif;
+  --font-tall:     'Space Grotesk', 'Outfit', sans-serif;
+  --font-anton:    'Space Grotesk', 'Outfit', sans-serif;
+  --font-inter:    'Inter', system-ui, -apple-system, sans-serif;
+  --font-outfit:   'Outfit', sans-serif;
+
+  --ease-fluid: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dark mode fallback if explicitly needed */
+.dark {
+  --bg-base:      #070B14;
+  --bg-surface:   #0B1120;
+  --bg-surface-2: #10192D;
+  --bg-surface-3: #16223D;
+
+  --text-primary:   #F1F5FE;
+  --text-secondary: #94A3B8;
+  --text-tertiary:  rgba(241, 245, 254, 0.40);
+
+  --border-color:   rgba(255, 255, 255, 0.08);
+  --border-strong:  rgba(255, 255, 255, 0.15);
+
+  --color-navy:     #070B14;
+  --color-surface:  #0B1120;
+  --color-surface-2:#10192D;
+  --color-surface-3:#16223D;
+  --color-primary:  #4063B2;
+  --color-accent:   #8D9CF5;
+  --color-accent-hover: #A8B4F8;
+  --color-violet:   #BB9AED;
+  --color-sage:     #8D9CF5;
+  --color-taupe:    #94A3B8;
+  --color-muted:    #94A3B8;
+  --color-cyan:     #8D9CF5;
+  --color-soft-blue:#BB9AED;
+  --color-white:    #F1F5FE;
+
+  --scrollbar-track: #070B14;
+  --scrollbar-thumb: #16223D;
+  --scrollbar-hover: #8D9CF5;
 
   --selection-bg:   #4063B2;
   --selection-text: #ffffff;

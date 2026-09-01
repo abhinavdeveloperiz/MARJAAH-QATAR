@@ -9,8 +9,6 @@ import { useWishlistStore } from "@/lib/store/wishlist";
 import { useAuthStore } from "@/lib/store/auth";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
-import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { useThemeStore } from "@/lib/store/theme";
 
 interface EditorialNavbarProps {
   locale: string;
@@ -33,8 +31,6 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
   const authUser = useAuthStore((s) => s.user);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const logout = useAuthStore((s) => s.logout);
-  const theme = useThemeStore((s) => s.theme);
-  const isDark = theme === "dark";
   const isRTL = locale === "ar";
 
   const totalCartItems = items.reduce((sum, i) => sum + i.quantity, 0);
@@ -100,17 +96,13 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
     { href: `/${locale}/contact`, label: "CONTACT" },
   ];
 
-  const navbarBg = isDark
-    ? isScrolled
-      ? "bg-[#0B1120]/95 backdrop-blur-md border-b border-white/10 shadow-2xl"
-      : "bg-[#0B1120]/80 backdrop-blur-md border-b border-white/5"
-    : isScrolled
-      ? "bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-lg"
-      : "bg-white/85 backdrop-blur-md border-b border-slate-100";
+  const navbarBg = isScrolled
+    ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-md"
+    : "bg-transparent border-b border-transparent";
 
-  const iconBtnClass = isDark
-    ? "bg-white/5 hover:bg-white/10 border-white/10"
-    : "bg-slate-100 hover:bg-slate-200 border-slate-200";
+  const iconBtnClass = isScrolled
+    ? "bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700"
+    : "bg-white/70 hover:bg-white/90 backdrop-blur-sm border-slate-200/70 text-slate-800 shadow-sm";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 select-none" style={{ color: "var(--text-primary)" }}>
@@ -123,7 +115,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
             aria-label="M.SHOP Home"
             className="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0"
           >
-            <Logo variant="auto" size="md" />
+            <Logo variant="light" size="md" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -135,7 +127,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 className={cn(
                   "text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300",
                   pathname === item.href
-                    ? "drop-shadow-[0_0_12px_rgba(141,156,245,0.6)]"
+                    ? "drop-shadow-[0_0_12px_rgba(77,99,199,0.3)]"
                     : "hover:tracking-[0.2em]"
                 )}
                 style={{
@@ -151,9 +143,6 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
 
           {/* Right Actions */}
           <div className="flex items-center gap-1.5 sm:gap-3 md:gap-5 flex-shrink-0">
-            {/* Theme Toggle */}
-            <ThemeToggle />
-
             {/* Search Trigger */}
             <button
               onClick={() => setSearchOpen(true)}
@@ -287,9 +276,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               aria-label="Toggle Menu"
               className={cn(
                 "lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl border flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
-                isDark
-                  ? "bg-[#8D9CF5]/10 hover:bg-[#8D9CF5]/20 border-[#8D9CF5]/30 text-[#8D9CF5] hover:text-white"
-                  : "bg-blue-100 hover:bg-blue-200 border-blue-300 text-blue-700 hover:text-blue-900"
+                iconBtnClass
               )}
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -489,23 +476,6 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               </Link>
             )}
 
-            {/* Theme Toggle in mobile drawer */}
-            <div
-              className="flex items-center justify-between py-2.5"
-              style={{ borderBottom: "1px solid var(--border-color)" }}
-            >
-              <div className="flex items-center gap-3">
-                <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>
-                  {isLoggedIn ? "09" : "08"}
-                </span>
-                <span className="text-sm sm:text-base font-sans font-bold tracking-widest uppercase" style={{ color: "var(--text-primary)" }}>
-                  {isRTL
-                    ? (isDark ? "الوضع الليلي" : "الوضع النهاري")
-                    : (isDark ? "DARK MODE" : "LIGHT MODE")}
-                </span>
-              </div>
-              <ThemeToggle />
-            </div>
           </div>
 
           <div className="space-y-3 pt-6" style={{ borderTop: "1px solid var(--border-color)" }}>

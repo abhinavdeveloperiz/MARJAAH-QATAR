@@ -32,7 +32,7 @@ const sizeConfig = {
  * - `iconOnly={true}`: Just the iconic stylized M. mark
  */
 export function Logo({
-  variant = "dark",
+  variant = "light",
   showText = true,
   iconOnly = false,
   size = "md",
@@ -42,9 +42,9 @@ export function Logo({
   const theme = useThemeStore((s) => s.theme);
   const dims = sizeConfig[size] || sizeConfig.md;
 
-  // Resolve effective variant
+  // Resolve effective variant (defaults to light for white storefront)
   const effectiveVariant =
-    variant === "auto" ? (theme === "light" ? "light" : "dark") : variant;
+    variant === "auto" ? (theme === "dark" ? "dark" : "light") : variant;
 
   const isLight = effectiveVariant === "light";
   const logoSrc = isLight ? "/images/logo-light.png" : "/images/logo-dark.png";
