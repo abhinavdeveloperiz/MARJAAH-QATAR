@@ -114,43 +114,6 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 select-none" style={{ color: "var(--text-primary)" }}>
-      {/* Top Announcement / Express Delivery Bar */}
-      <div
-        style={{
-          background: isDark
-            ? "linear-gradient(to right, #182447, #0B1120, #182447)"
-            : "linear-gradient(to right, #E8ECF4, #F5F7FA, #E8ECF4)",
-          borderBottom: "1px solid var(--border-color)",
-        }}
-        className="text-[10px] sm:text-[11px] font-sans font-semibold py-1.5 px-3 sm:px-4 text-center"
-      >
-        <div className="container-custom flex items-center justify-between">
-          <div className="hidden md:flex items-center gap-4" style={{ color: "var(--text-secondary)" }}>
-            <span className="inline-flex items-center gap-1.5 text-emerald-500 dark:text-emerald-400">
-              <Truck className="w-3.5 h-3.5" />
-              <span>Same-Day Dispatch Across Doha</span>
-            </span>
-            <span className="w-1 h-1 rounded-full" style={{ backgroundColor: "var(--border-strong)" }} />
-            <span className="inline-flex items-center gap-1.5" style={{ color: "var(--color-accent)" }}>
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>100% Official Brand Warranty</span>
-            </span>
-          </div>
-
-          <div className="mx-auto md:mx-0 flex items-center justify-center gap-1.5 text-center">
-            <Zap className="w-3.5 h-3.5 flex-shrink-0" style={{ color: "var(--color-accent)", fill: "var(--color-accent)" }} />
-            <span className="text-[10px] sm:text-xs" style={{ color: "var(--text-primary)", opacity: 0.9 }}>
-              Special Prices on Rigs &amp; Laptops — Shop Now
-            </span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2 text-[10px] font-sans font-bold tracking-wider uppercase" style={{ color: "var(--color-accent)" }}>
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span>Doha Showroom Active</span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <div className={cn("transition-all duration-300", navbarBg)}>
         <div className="container-custom h-[64px] sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">

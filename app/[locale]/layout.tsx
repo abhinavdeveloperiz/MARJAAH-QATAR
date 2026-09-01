@@ -6,6 +6,7 @@ import { EditorialNavbar } from "@/components/layout/EditorialNavbar";
 import { EditorialFooter } from "@/components/layout/EditorialFooter";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { WhatsAppWidget } from "@/components/ui/WhatsAppWidget";
+import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { ThemeScript } from "@/app/theme-script";
 import { notFound } from "next/navigation";
@@ -123,6 +124,7 @@ export default async function LocaleLayout({
             <main className="flex-1">{children}</main>
             <EditorialFooter locale={locale} />
             <CartDrawer />
+            <ScrollToTop />
             <WhatsAppWidget />
           </div>
           <Toaster
