@@ -63,7 +63,7 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-5 sm:pt-8 pb-5 sm:pb-8 select-none text-white"
+      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-[72px] sm:pt-[84px] pb-6 sm:pb-8 select-none text-white"
       style={{ backgroundColor: "#060913", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
       {/* Dynamic Parallax Background Layer */}
@@ -94,42 +94,9 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,rgba(6,9,19,0.92)_100%)] pointer-events-none" />
       </div>
 
-      {/* 1. Top 3-Column Specimen Editorial Header (Matching Reference Poster Style) */}
-      <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-4 pt-1 sm:pt-2 border-b border-white/10 pb-3 sm:pb-4 text-left">
-        {/* Col 1 */}
-        <div className="space-y-0.5">
-          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
-            <span className="text-[#8D9CF5] font-black text-sm">›</span> HIGH-PERFORMANCE TECH
-          </p>
-          <p className="text-[10px] sm:text-[11px] font-sans text-white/50 leading-tight hidden sm:block">
-            Custom rigs, workstations & genuine components.
-          </p>
-        </div>
-
-        {/* Col 2 */}
-        <div className="space-y-0.5">
-          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
-            <span className="text-[#8D9CF5] font-black text-sm">›</span> ©MARJAAH TRADING
-          </p>
-          <p className="text-[10px] sm:text-[11px] font-sans text-white/50 leading-tight hidden sm:block">
-            Official authorized GCC hardware showroom.
-          </p>
-        </div>
-
-        {/* Col 3 */}
-        <div className="space-y-0.5 hidden md:block text-right">
-          <p className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-wider text-white flex items-center justify-end gap-1.5">
-            <span className="text-[#8D9CF5] font-black text-sm">›</span> 2026 EDITION
-          </p>
-          <p className="text-[10px] sm:text-[11px] font-sans text-white/50 leading-tight">
-            Same-day Doha dispatch with full warranty.
-          </p>
-        </div>
-      </div>
-
       {/* 2. Central Typography Showcase */}
       <div
-        className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-6xl mx-auto w-full py-4 sm:py-6 md:py-8"
+        className="relative z-10 flex-1 flex flex-col items-center justify-center text-center max-w-6xl mx-auto w-full py-8 sm:py-12 md:py-16 pt-16 sm:pt-20"
         style={{
           transform: `perspective(1000px) rotateX(${-mousePos.y * 2}deg) rotateY(${mousePos.x * 2.5}deg) translateZ(10px)`,
         }}
