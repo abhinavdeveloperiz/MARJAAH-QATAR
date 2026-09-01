@@ -96,11 +96,23 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
     { href: `/${locale}/contact`, label: "CONTACT" },
   ];
 
-  const navbarBg = isScrolled
-    ? "bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-md"
-    : "bg-white/85 backdrop-blur-md border-b border-slate-200/60 shadow-sm";
+  const isHomePage =
+    pathname === `/${locale}` ||
+    pathname === `/${locale}/` ||
+    pathname === "/" ||
+    pathname === "";
 
-  const iconBtnClass = "bg-transparent hover:bg-slate-100/80 text-slate-700 hover:text-[#4063B2]";
+  const isTransparent = isHomePage && !isScrolled;
+
+  const navbarBg = isTransparent
+    ? "bg-transparent border-b border-transparent shadow-none"
+    : isScrolled
+      ? "bg-white/95 dark:bg-[#070B14]/95 backdrop-blur-md border-b border-slate-200/80 dark:border-white/10 shadow-md"
+      : "bg-white/85 dark:bg-[#070B14]/85 backdrop-blur-md border-b border-slate-200/60 dark:border-white/10 shadow-sm";
+
+  const iconBtnClass = isTransparent
+    ? "bg-transparent hover:bg-white/10 text-white"
+    : "bg-transparent hover:bg-slate-100/80 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200 hover:text-[#4063B2]";
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 select-none">
@@ -113,7 +125,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
             aria-label="M.SHOP Home"
             className="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0"
           >
-            <Logo variant="light" size="md" />
+            <Logo variant={isTransparent ? "dark" : "light"} size="md" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -126,9 +138,13 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                   href={item.href}
                   className={cn(
                     "text-xs font-sans font-bold tracking-widest uppercase transition-all duration-300",
-                    isActive
-                      ? "text-[#4063B2] font-black"
-                      : "text-slate-700 hover:text-[#4063B2] hover:tracking-[0.2em]"
+                    isTransparent
+                      ? isActive
+                        ? "text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                        : "text-white/85 hover:text-white hover:tracking-[0.2em] drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]"
+                      : isActive
+                        ? "text-[#4063B2] font-black"
+                        : "text-slate-700 dark:text-slate-200 hover:text-[#4063B2] hover:tracking-[0.2em]"
                   )}
                 >
                   {item.label}
@@ -148,7 +164,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 iconBtnClass
               )}
             >
-              <Search className="w-4 h-4 text-[#4063B2]" />
+              <Search className={cn("w-4 h-4", isTransparent ? "text-white" : "text-[#4063B2]")} />
             </button>
 
             {/* Wishlist Link */}
@@ -158,10 +174,10 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               className={cn(
                 "relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0",
                 iconBtnClass,
-                "hover:text-rose-500"
+                "hover:text-rose-400"
               )}
             >
-              <Heart className="w-4 h-4 text-rose-500" />
+              <Heart className="w-4 h-4 text-rose-400" />
               {totalWishlistItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-display text-[9px] flex items-center justify-center font-bold shadow-md">
                   {totalWishlistItems}
@@ -178,7 +194,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 iconBtnClass
               )}
             >
-              <ShoppingBag className="w-4 h-4 text-[#4063B2]" />
+              <ShoppingBag className={cn("w-4 h-4", isTransparent ? "text-white" : "text-[#4063B2]")} />
               {totalCartItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#4063B2] text-white font-display text-[9px] flex items-center justify-center font-bold shadow-md">
                   {totalCartItems}
@@ -201,7 +217,10 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                     <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#4063B2] to-[#8D9CF5] flex items-center justify-center text-white font-tall text-xs">
                       {userInitials}
                     </div>
-                    <span className="text-xs font-sans font-semibold max-w-[80px] truncate" style={{ color: "var(--text-secondary)" }}>
+                    <span
+                      className="text-xs font-sans font-semibold max-w-[80px] truncate"
+                      style={{ color: isTransparent ? "#ffffff" : "var(--text-secondary)" }}
+                    >
                       {authUser.name.split(" ")[0]}
                     </span>
                   </button>
