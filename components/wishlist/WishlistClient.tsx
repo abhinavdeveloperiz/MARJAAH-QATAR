@@ -50,7 +50,7 @@ export function WishlistClient({ locale }: WishlistClientProps) {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#070B14] pt-[120px] pb-24">
+      <div className="min-h-screen bg-base pt-[120px] pb-24">
         <div className="container-custom">
           <div className="h-64 rounded-3xl bg-[#0B1120] animate-pulse" />
         </div>
@@ -59,7 +59,7 @@ export function WishlistClient({ locale }: WishlistClientProps) {
   }
 
   return (
-    <div className="min-h-screen bg-[#070B14] pt-[100px] pb-24">
+    <div className="min-h-screen bg-base pt-[100px] pb-24">
       {/* Hero Header */}
       <section className="border-b border-white/10 bg-gradient-to-b from-[#10192D]/90 via-[#0B1120]/95 to-[#070B14] py-8 md:py-12">
         <div className="container-custom">

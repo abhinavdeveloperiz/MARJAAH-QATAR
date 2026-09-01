@@ -37,7 +37,7 @@ export function NewsletterSection({ locale }: NewsletterSectionProps) {
     <section
       ref={sectionRef}
       className="py-28 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #07080B 0%, #150E2A 50%, #071624 100%)" }}
+      style={{ backgroundColor: "var(--bg-base)" }}
     >
       {/* Background ambient glows */}
       <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary-500/10 rounded-full blur-[140px] pointer-events-none" />
@@ -53,17 +53,17 @@ export function NewsletterSection({ locale }: NewsletterSectionProps) {
       />
 
       <div className="container-custom relative z-10">
-        <div className="max-w-3xl mx-auto text-center bg-surface/80 backdrop-blur-xl rounded-3xl p-8 sm:p-14 border border-white/10 shadow-2xl">
+        <div className="max-w-3xl mx-auto text-center backdrop-blur-xl rounded-3xl p-8 sm:p-14 shadow-2xl" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
           {/* Icon */}
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary-500 to-blue-500 flex items-center justify-center mx-auto mb-6 shadow-lg">
             <Sparkles className="w-8 h-8 text-white" />
           </div>
 
           {/* Heading */}
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-4 font-display leading-tight gradient-text">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-4 font-display leading-tight" style={{ color: "var(--text-primary)" }}>
             {t("title")}
           </h2>
-          <p className="text-muted text-base sm:text-lg mb-8 font-medium max-w-xl mx-auto">{t("subtitle")}</p>
+          <p className="text-base sm:text-lg mb-8 font-medium max-w-xl mx-auto" style={{ color: "var(--text-secondary)" }}>{t("subtitle")}</p>
 
           {/* Form */}
           {!isSubmitted ? (
@@ -105,7 +105,7 @@ export function NewsletterSection({ locale }: NewsletterSectionProps) {
           )}
 
           {!isSubmitted && (
-            <p className="text-muted text-xs mt-5 font-medium">{t("privacy")}</p>
+            <p className="text-xs mt-5 font-medium" style={{ color: "var(--text-secondary)" }}>{t("privacy")}</p>
           )}
         </div>
       </div>

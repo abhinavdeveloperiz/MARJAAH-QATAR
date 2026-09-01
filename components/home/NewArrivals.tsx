@@ -47,25 +47,31 @@ export function NewArrivals({ locale }: NewArrivalsProps) {
         <div className="flex items-center justify-between gap-6 mb-14">
           <div>
             <div className="flex items-center gap-2 mb-2.5">
-              <Sparkles className="w-4 h-4 text-[#8D9CF5]" />
-              <p className="text-xs font-sans font-bold tracking-widest uppercase text-[#8D9CF5]">{isRTL ? "وصلت للتو" : "Fresh Off The Assembly"}</p>
+              <Sparkles className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
+              <p className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: "var(--color-accent)" }}>{isRTL ? "وصلت للتو" : "Fresh Off The Assembly"}</p>
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-tight">{t("title")}</h2>
-            <p className="text-[#94A3B8] text-base sm:text-lg mt-2 font-medium">{t("subtitle")}</p>
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight" style={{ color: "var(--text-primary)" }}>{t("title")}</h2>
+            <p className="text-base sm:text-lg mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>{t("subtitle")}</p>
           </div>
           {/* Carousel navigation */}
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => emblaApi?.scrollPrev()}
               aria-label="Previous items"
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#10192D] border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white hover:border-[#8D9CF5] hover:shadow-[0_0_15px_rgba(141,156,245,0.3)] transition-all cursor-pointer shadow-md"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center hover:border-[#8D9CF5] hover:shadow-[0_0_15px_rgba(141,156,245,0.3)] transition-all cursor-pointer shadow-md"
+              style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border-color)", color: "var(--text-secondary)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={() => emblaApi?.scrollNext()}
               aria-label="Next items"
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-[#10192D] border border-white/10 flex items-center justify-center text-[#94A3B8] hover:text-white hover:border-[#8D9CF5] hover:shadow-[0_0_15px_rgba(141,156,245,0.3)] transition-all cursor-pointer shadow-md"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl flex items-center justify-center hover:border-[#8D9CF5] hover:shadow-[0_0_15px_rgba(141,156,245,0.3)] transition-all cursor-pointer shadow-md"
+              style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border-color)", color: "var(--text-secondary)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
             >
               <ChevronRight className="w-5 h-5" />
             </button>

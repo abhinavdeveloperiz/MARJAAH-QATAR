@@ -50,7 +50,7 @@ export function FeaturedCategories({ locale }: FeaturedCategoriesProps) {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-24 bg-dark-300 relative overflow-hidden">
+    <section ref={sectionRef} className="py-24 relative overflow-hidden" style={{ backgroundColor: "var(--bg-base)" }}>
       {/* Background glow */}
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-primary-500/10 rounded-full blur-[140px] pointer-events-none" />
 
@@ -59,16 +59,18 @@ export function FeaturedCategories({ locale }: FeaturedCategoriesProps) {
         <div ref={headingRef} className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-14">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Sparkles className="w-4 h-4 text-[#8D9CF5]" />
-              <p className="text-xs font-sans font-bold tracking-widest uppercase text-[#8D9CF5]">{isRTL ? "تصفح الفئات" : "Explore Collections"}</p>
+              <Sparkles className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
+              <p className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: "var(--color-accent)" }}>{isRTL ? "تصفح الفئات" : "Explore Collections"}</p>
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-tight">{t("title")}</h2>
-            <p className="text-[#94A3B8] text-base sm:text-lg mt-2 font-medium">{t("subtitle")}</p>
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight" style={{ color: "var(--text-primary)" }}>{t("title")}</h2>
+            <p className="text-base sm:text-lg mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>{t("subtitle")}</p>
           </div>
           <Link
             href={`/${locale}/shop`}
-            className="text-xs font-sans font-bold tracking-widest uppercase text-[#8D9CF5] hover:text-[#BB9AED] flex items-center gap-2 flex-shrink-0 transition-colors"
-          >
+            className="text-xs font-sans font-bold tracking-widest uppercase flex items-center gap-2 flex-shrink-0 transition-colors"
+            style={{ color: "var(--color-accent)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--color-violet)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-accent)")}>
             {t("view_all")}
             <ArrowRight className={cn("w-4 h-4", isRTL && "rotate-180")} />
           </Link>

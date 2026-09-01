@@ -35,7 +35,7 @@ export default async function ContactPage({
   const { contact } = site;
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-base">
       <section className="container-custom pt-28 md:pt-36 pb-16 md:pb-24 min-h-[calc(100vh-140px)]">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
           {/* Left Column: Direct Info (6 cols) */}

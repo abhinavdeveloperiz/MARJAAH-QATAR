@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useThemeStore } from "@/lib/store/theme";
 
 export interface LogoProps {
   variant?: "dark" | "light" | "auto";
@@ -27,6 +28,7 @@ const sizeConfig = {
  * Uses the exact original high-res logo assets uploaded by the user:
  * - `variant="dark"`: White SHOP lettering for dark/black backgrounds
  * - `variant="light"`: Original Royal Blue SHOP lettering for light/white backgrounds
+ * - `variant="auto"`: Automatically picks the correct variant based on current theme
  * - `iconOnly={true}`: Just the iconic stylized M. mark
  */
 export function Logo({
@@ -37,8 +39,14 @@ export function Logo({
   className,
   subtext,
 }: LogoProps) {
+  const theme = useThemeStore((s) => s.theme);
   const dims = sizeConfig[size] || sizeConfig.md;
-  const isLight = variant === "light";
+
+  // Resolve effective variant
+  const effectiveVariant =
+    variant === "auto" ? (theme === "light" ? "light" : "dark") : variant;
+
+  const isLight = effectiveVariant === "light";
   const logoSrc = isLight ? "/images/logo-light.png" : "/images/logo-dark.png";
   const subtitleColor = isLight ? "text-slate-600 border-slate-300" : "text-taupe border-white/20";
 

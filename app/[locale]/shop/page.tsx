@@ -22,9 +22,9 @@ export default async function ShopPage({
   const totalCount = products.length;
 
   return (
-    <div className="min-h-screen bg-dark-300 pt-[72px]">
+    <div className="min-h-screen pt-[72px]" style={{ backgroundColor: "var(--bg-base)" }}>
       {/* Premium Hero Shop Header */}
-      <section className="relative border-b border-white/10 bg-gradient-to-b from-[#0F172A]/90 via-[#0B1120]/95 to-dark-300 overflow-hidden">
+      <section className="relative overflow-hidden" style={{ borderBottom: "1px solid var(--border-color)", backgroundColor: "var(--bg-surface)" }}>
         {/* Subtle Ambient Glow Effect */}
         <div className="absolute -top-24 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-0 right-10 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />

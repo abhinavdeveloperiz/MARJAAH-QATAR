@@ -50,7 +50,7 @@ export function ProductDetailClient({ product, locale }: ProductDetailClientProp
   };
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-base">
       {/* Breadcrumb */}
       <div className="bg-surface/80 backdrop-blur-md border-b border-surface-3 pt-24 md:pt-28 pb-4">
         <div className="container-custom">

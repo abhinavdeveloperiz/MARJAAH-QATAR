@@ -63,7 +63,8 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] bg-[#060913] text-white overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-5 sm:pt-8 pb-5 sm:pb-8 select-none border-b border-white/10"
+      className="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between px-5 sm:px-8 md:px-12 lg:px-16 pt-5 sm:pt-8 pb-5 sm:pb-8 select-none text-white"
+      style={{ backgroundColor: "#060913", borderBottom: "1px solid rgba(255,255,255,0.08)" }}
     >
       {/* Dynamic Parallax Background Layer */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">

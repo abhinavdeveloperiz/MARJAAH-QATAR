@@ -54,7 +54,7 @@ export function FlashDeals({ locale }: FlashDealsProps) {
     <section
       ref={sectionRef}
       className="py-24 relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #07080B 0%, #120D24 50%, #071520 100%)" }}
+      style={{ backgroundColor: "var(--bg-surface)" }}
     >
       {/* Background glow */}
       <div className="absolute top-0 left-1/3 w-[600px] h-[350px] bg-primary-500/10 rounded-full blur-[140px] pointer-events-none" />
@@ -65,13 +65,13 @@ export function FlashDeals({ locale }: FlashDealsProps) {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 mb-14">
           <div>
             <div className="flex items-center gap-2.5 mb-2.5">
-              <div className="w-8 h-8 rounded-xl bg-[#4063B2]/20 border border-[#8D9CF5]/40 flex items-center justify-center shadow-[0_0_12px_rgba(141,156,245,0.3)]">
-                <Zap className="w-4 h-4 text-[#8D9CF5] fill-[#8D9CF5]" />
+              <div className="w-8 h-8 rounded-xl flex items-center justify-center shadow-[0_0_12px_rgba(141,156,245,0.3)]" style={{ backgroundColor: "rgba(64,99,178,0.2)", border: "1px solid rgba(141,156,245,0.4)" }}>
+                <Zap className="w-4 h-4 fill-current" style={{ color: "var(--color-accent)" }} />
               </div>
-              <p className="text-xs font-sans font-bold tracking-widest uppercase text-[#8D9CF5]">{isRTL ? "عروض حصرية محدودة" : "Limited Time Drops"}</p>
+              <p className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: "var(--color-accent)" }}>{isRTL ? "عروض حصرية محدودة" : "Limited Time Drops"}</p>
             </div>
-            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl text-white uppercase tracking-tight">{t("title")}</h2>
-            <p className="text-[#94A3B8] mt-2 font-medium">{t("subtitle")}</p>
+            <h2 className="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight" style={{ color: "var(--text-primary)" }}>{t("title")}</h2>
+            <p className="mt-2 font-medium" style={{ color: "var(--text-secondary)" }}>{t("subtitle")}</p>
           </div>
         </div>
 
@@ -84,7 +84,7 @@ export function FlashDeals({ locale }: FlashDealsProps) {
             return (
               <div key={product.id} className="deal-card">
                 <Link href={`/${locale}/product/${product.slug}`}>
-                  <div className="bg-surface rounded-2xl border border-surface-3 overflow-hidden hover:border-cyan-500/50 transition-all duration-300 group hover:shadow-glow-cyan">
+                  <div className="rounded-2xl overflow-hidden hover:border-[rgba(141,156,245,0.5)] transition-all duration-300 group hover:shadow-glow-accent" style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--bg-surface-3)" }}>
                     {/* Image */}
                     <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-dark-200 to-dark-100 flex items-center justify-center">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -116,14 +116,14 @@ export function FlashDeals({ locale }: FlashDealsProps) {
                     </div>
                     {/* Info */}
                     <div className="p-5">
-                      <p className="text-cyan-400 text-xs font-bold mb-1 font-display uppercase tracking-wider">{product.brand}</p>
-                      <h3 className="text-white text-sm font-semibold line-clamp-2 mb-3 leading-snug">
+                      <p className="text-xs font-bold mb-1 font-display uppercase tracking-wider" style={{ color: "var(--color-accent)" }}>{product.brand}</p>
+                      <h3 className="text-sm font-semibold line-clamp-2 mb-3 leading-snug" style={{ color: "var(--text-primary)" }}>
                         {isRTL ? product.nameAr : product.name}
                       </h3>
                       {/* Price */}
                       <div className="flex items-baseline gap-2 mb-3">
-                        <span className="text-white font-black text-lg font-display">QAR {product.price.toLocaleString()}</span>
-                        <span className="text-muted text-xs line-through font-medium">QAR {product.originalPrice?.toLocaleString()}</span>
+                        <span className="font-black text-lg font-display" style={{ color: "var(--text-primary)" }}>QAR {product.price.toLocaleString()}</span>
+                        <span className="text-xs line-through font-medium" style={{ color: "var(--text-secondary)" }}>QAR {product.originalPrice?.toLocaleString()}</span>
                       </div>
                       {/* Savings */}
                       <div className="flex items-center justify-between pt-1">

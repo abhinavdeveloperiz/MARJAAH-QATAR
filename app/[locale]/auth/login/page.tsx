@@ -44,7 +44,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] flex items-center justify-center px-4 py-20">
+    <div className="min-h-screen flex items-center justify-center px-4 py-20" style={{ backgroundColor: "var(--bg-base)" }}>
       <div className="w-full max-w-md">
         <Link
           href="/en"
@@ -53,7 +53,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
           <ArrowLeft className="w-4 h-4" /> Back to Store
         </Link>
 
-        <div className="bg-[#0B1120] border border-white/10 rounded-3xl p-8 shadow-2xl">
+        <div className="rounded-3xl p-8 shadow-2xl" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#8D9CF5]/10 border border-[#8D9CF5]/30 mb-4">
               <Zap className="w-3.5 h-3.5 text-[#8D9CF5]" />
@@ -61,20 +61,23 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                 M.SHOP Qatar
               </span>
             </div>
-            <h1 className="text-2xl font-tall uppercase text-white mb-2">Sign In</h1>
-            <p className="text-xs text-white/50 font-sans">Access your M.SHOP account</p>
+            <h1 className="text-2xl font-tall uppercase mb-2" style={{ color: "var(--text-primary)" }}>Sign In</h1>
+            <p className="text-xs font-sans" style={{ color: "var(--text-tertiary)" }}>Access your M.SHOP account</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="block text-xs font-sans font-semibold text-white/70 uppercase tracking-wider mb-2">
+              <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
                 Email Address
               </label>
               <input
                 {...register("email")}
                 type="email"
                 placeholder="you@example.com"
-                className="w-full px-4 py-3.5 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                className="w-full px-4 py-3.5 rounded-xl text-sm focus:outline-none transition-colors"
+                style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+                onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
+                onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border-color)")}
               />
               {errors.email && (
                 <p className="mt-1.5 text-xs text-red-400">{errors.email.message}</p>
@@ -83,7 +86,7 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs font-sans font-semibold text-white/70 uppercase tracking-wider">
+                <label className="text-xs font-sans font-semibold uppercase tracking-wider" style={{ color: "var(--text-secondary)" }}>
                   Password
                 </label>
                 <Link
@@ -98,7 +101,10 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3.5 pr-12 rounded-xl bg-[#10192D] border border-white/10 focus:border-[#8D9CF5] text-white text-sm focus:outline-none transition-colors placeholder:text-white/20"
+                  className="w-full px-4 py-3.5 pr-12 rounded-xl text-sm focus:outline-none transition-colors"
+                  style={{ backgroundColor: "var(--bg-surface-2)", border: "1px solid var(--border-color)", color: "var(--text-primary)" }}
+                  onFocus={(e) => (e.currentTarget.style.borderColor = "var(--color-accent)")}
+                  onBlur={(e) => (e.currentTarget.style.borderColor = "var(--border-color)")}
                 />
                 <button
                   type="button"
@@ -123,12 +129,14 @@ export default function LoginPage({ params }: { params: Promise<{ locale: string
             </button>
           </form>
 
-          <p className="text-center text-xs text-white/40 font-sans mt-6">
+          <p className="text-center text-xs font-sans mt-6" style={{ color: "var(--text-tertiary)" }}>
             New to M.SHOP?{" "}
             <Link
               href="/en/auth/register"
-              className="text-[#8D9CF5] hover:text-white transition-colors font-semibold"
-            >
+              className="font-semibold transition-colors"
+              style={{ color: "var(--color-accent)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--color-accent)")}>
               Create an account
             </Link>
           </p>

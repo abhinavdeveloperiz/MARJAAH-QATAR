@@ -7,6 +7,7 @@ import { EditorialFooter } from "@/components/layout/EditorialFooter";
 import { CartDrawer } from "@/components/cart/CartDrawer";
 import { WhatsAppWidget } from "@/components/ui/WhatsAppWidget";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ThemeScript } from "@/app/theme-script";
 import { notFound } from "next/navigation";
 
 const locales = ["en"];
@@ -110,11 +111,14 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang="en" dir="ltr" suppressHydrationWarning>
+    <html lang="en" dir="ltr" className="dark" suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body suppressHydrationWarning>
         <JsonLd locale={locale} />
         <NextIntlClientProvider messages={messages}>
-          <div className="flex flex-col min-h-screen bg-navy text-white">
+          <div className="flex flex-col min-h-screen" style={{ backgroundColor: "var(--bg-base)", color: "var(--text-primary)" }}>
             <EditorialNavbar locale={locale} />
             <main className="flex-1">{children}</main>
             <EditorialFooter locale={locale} />
@@ -126,9 +130,9 @@ export default async function LocaleLayout({
             toastOptions={{
               className: "toast-custom",
               style: {
-                background: "#0B1120",
-                color: "#F9FAFB",
-                border: "1px solid rgba(141, 156, 245, 0.2)",
+                background: "var(--bg-surface)",
+                color: "var(--text-primary)",
+                border: "1px solid var(--border-color)",
                 borderRadius: "16px",
               },
               duration: 3000,

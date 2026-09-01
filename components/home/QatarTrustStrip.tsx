@@ -35,7 +35,7 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
   ];
 
   return (
-    <section className="py-6 sm:py-8 md:py-10 bg-[#060913] border-b border-white/10 relative z-20">
+    <section className="py-6 sm:py-8 md:py-10 relative z-20" style={{ backgroundColor: "var(--bg-surface)", borderBottom: "1px solid var(--border-color)" }}>
       <div className="container-custom">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-5">
           {trustFeatures.map((item, index) => {
@@ -43,18 +43,30 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
             return (
               <div
                 key={index}
-                className="group relative p-4 sm:p-5 rounded-xl sm:rounded-2xl bg-[#0B1120]/70 hover:bg-[#10192D] border border-white/10 hover:border-[#8D9CF5]/40 transition-all duration-300 hover:shadow-[0_0_20px_rgba(141,156,245,0.15)] overflow-hidden"
+                className="group relative p-4 sm:p-5 rounded-xl sm:rounded-2xl transition-all duration-300 hover:shadow-[0_0_20px_rgba(141,156,245,0.12)] overflow-hidden"
+                style={{
+                  backgroundColor: "var(--bg-surface-2)",
+                  border: "1px solid var(--border-color)",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = "var(--bg-surface-3)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "rgba(141,156,245,0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.backgroundColor = "var(--bg-surface-2)";
+                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border-color)";
+                }}
               >
                 <div className="flex items-center sm:items-start gap-3.5 sm:gap-4">
-                  <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${item.glowColor} border border-[#8D9CF5]/30 flex items-center justify-center flex-shrink-0 text-[#8D9CF5] shadow-sm`}>
+                  <div className={`w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-gradient-to-br ${item.glowColor} border border-[#8D9CF5]/30 flex items-center justify-center flex-shrink-0 shadow-sm`} style={{ color: "var(--color-accent)" }}>
                     <Icon className="w-5 h-5 sm:w-5 sm:h-5" />
                   </div>
 
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-white font-bold font-sans text-xs sm:text-sm tracking-tight group-hover:text-[#A5B4FC] transition-colors">
+                    <h3 className="font-bold font-sans text-xs sm:text-sm tracking-tight transition-colors" style={{ color: "var(--text-primary)" }}>
                       {item.title}
                     </h3>
-                    <p className="text-[#94A3B8] text-[11px] sm:text-xs font-sans mt-0.5 leading-snug">
+                    <p className="text-[11px] sm:text-xs font-sans mt-0.5 leading-snug" style={{ color: "var(--text-secondary)" }}>
                       {item.desc}
                     </p>
                   </div>

@@ -53,7 +53,7 @@ export function BrandsStrip({ locale }: BrandsStripProps) {
   const col4Items = [...column4, ...column4, ...column4];
 
   return (
-    <section className="py-20 bg-navy border-y border-white/10 overflow-hidden relative select-none">
+    <section className="py-20 overflow-hidden relative select-none" style={{ backgroundColor: "var(--bg-base)", borderTop: "1px solid var(--border-color)", borderBottom: "1px solid var(--border-color)" }}>
       {/* Background Ambient Glow */}
       <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -69,10 +69,10 @@ export function BrandsStrip({ locale }: BrandsStripProps) {
             </div>
 
             <div>
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white uppercase font-display leading-tight tracking-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black uppercase font-display leading-tight tracking-tight" style={{ color: "var(--text-primary)" }}>
                 {isRTL ? "أفضل العلامات التجارية" : "TOP BRANDS WE CARRY"}
               </h2>
-              <p className="text-white/60 text-sm sm:text-base font-sans font-medium mt-3 leading-relaxed max-w-md mx-auto lg:mx-0">
+              <p className="text-sm sm:text-base font-sans font-medium mt-3 leading-relaxed max-w-md mx-auto lg:mx-0" style={{ color: "var(--text-secondary)" }}>
                 {isRTL
                   ? "نوفر أحدث الأجهزة والمكونات الأصلية 100% من كبرى الشركات العالمية الرائدة بضمان رسمي وتوصيل فوري في قطر."
                   : "Direct authorization and official warranty across global computing titans, gaming pioneers, and hardware innovators in Doha."}
@@ -96,7 +96,7 @@ export function BrandsStrip({ locale }: BrandsStripProps) {
           </div>
 
           {/* Right Column: 4-Column Vertical Flowing Waterfall (8 cols) */}
-          <div className="lg:col-span-8 relative h-[380px] sm:h-[420px] rounded-3xl overflow-hidden bg-[#0B1120]/80 border border-white/10 p-3 sm:p-4 backdrop-blur-md">
+          <div className="lg:col-span-8 relative h-[380px] sm:h-[420px] rounded-3xl overflow-hidden p-3 sm:p-4 backdrop-blur-md" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
             
             {/* Top & Bottom Smooth Gradient Fade Masks */}
             <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-[#070B14] via-[#070B14]/80 to-transparent z-20 pointer-events-none" />

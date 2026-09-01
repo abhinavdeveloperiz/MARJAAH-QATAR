@@ -18,11 +18,11 @@ export default async function OffersPage({
   const saleProducts = getOnSaleProducts();
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen" style={{ backgroundColor: "var(--bg-base)" }}>
       {/* Header */}
       <div
         className="relative pt-28 md:pt-36 pb-16 md:pb-20 overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #0C1520 0%, #0A0A0F 100%)" }}
+        style={{ backgroundColor: "var(--bg-surface)" }}
       >
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-accent-500/5 rounded-full blur-3xl" />
         <div className="container-custom relative z-10 text-center">

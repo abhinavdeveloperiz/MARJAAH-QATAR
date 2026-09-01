@@ -60,7 +60,7 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070B14] flex items-center justify-center px-4 py-20">
+    <div className="min-h-screen bg-base flex items-center justify-center px-4 py-20">
       <div className="w-full max-w-md">
         <Link
           href="/en"

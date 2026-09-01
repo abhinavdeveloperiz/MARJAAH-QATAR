@@ -77,7 +77,7 @@ export default async function CategoryPage({
   const categoryProducts = getProductsByCategory(categorySlug);
 
   return (
-    <div className="min-h-screen bg-dark-300 pt-[72px]">
+    <div className="min-h-screen bg-base pt-[72px]">
       {/* Category Hero Header */}
       <section className="relative border-b border-white/10 bg-gradient-to-b from-[#10192D]/90 via-[#0B1120]/95 to-dark-300 overflow-hidden">
         <div className="container-custom py-8 md:py-12 relative z-10">

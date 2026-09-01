@@ -33,11 +33,11 @@ export default function AccountDashboardPage() {
   return (
     <div className="space-y-6">
       {/* Greeting */}
-      <div className="bg-gradient-to-r from-[#0B1120] via-[#10192D] to-[#0B1120] border border-white/10 rounded-2xl p-6">
-        <p className="text-xs font-sans font-bold uppercase tracking-widest text-[#8D9CF5] mb-1">
+      <div className="rounded-2xl p-6" style={{ background: "linear-gradient(to right, var(--bg-surface), var(--bg-surface-2), var(--bg-surface))", border: "1px solid var(--border-color)" }}>
+        <p className="text-xs font-sans font-bold uppercase tracking-widest mb-1" style={{ color: "var(--color-accent)" }}>
           Welcome back
         </p>
-        <h1 className="text-2xl font-tall uppercase text-white">{user.name}</h1>
+        <h1 className="text-2xl font-tall uppercase" style={{ color: "var(--text-primary)" }}>{user.name}</h1>
         <p className="text-xs text-white/40 font-sans mt-1">
           Member since{" "}
           {new Date(user.createdAt).toLocaleDateString("en-US", {

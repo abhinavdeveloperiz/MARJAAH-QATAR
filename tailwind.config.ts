@@ -10,7 +10,20 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Deep Midnight Slate Navy matching the M.SHOP dark aesthetic
+        // ─── Semantic Theme Tokens (CSS-variable backed) ──────────────────
+        // These automatically flip between dark/light via CSS vars in globals.css
+        base: "var(--bg-base)",
+        surface: {
+          DEFAULT: "var(--bg-surface)",
+          2: "var(--bg-surface-2)",
+          3: "var(--bg-surface-3)",
+        },
+        "text-primary": "var(--text-primary)",
+        "text-secondary": "var(--text-secondary)",
+        "text-tertiary": "var(--text-tertiary)",
+        "border-default": "var(--border-color)",
+
+        // ─── Deep Midnight Slate Navy matching the M.SHOP dark aesthetic ──
         navy: {
           DEFAULT: "#070B14",
           50: "#1A2540",
@@ -20,7 +33,7 @@ const config: Config = {
           400: "#090E1B",
           500: "#070B14",
         },
-        // Royal Tech Blue extracted directly from M.SHOP logo
+        // ─── Royal Tech Blue extracted directly from M.SHOP logo ──────────
         primary: {
           DEFAULT: "#4063B2",
           50: "#EEF2FF",
@@ -34,7 +47,7 @@ const config: Config = {
           800: "#223363",
           900: "#182447",
         },
-        // Electric Periwinkle Blue-Violet from M.SHOP logo icon gradient
+        // ─── Electric Periwinkle Blue-Violet from M.SHOP logo icon gradient
         accent: {
           DEFAULT: "#8D9CF5",
           light: "#A8B4F8",
@@ -42,18 +55,13 @@ const config: Config = {
           500: "#8D9CF5",
           400: "#A8B4F8",
         },
-        // Lavender / Lilac Violet from M.SHOP logo icon gradient
+        // ─── Lavender / Lilac Violet from M.SHOP logo icon gradient ───────
         violet: {
           DEFAULT: "#BB9AED",
           light: "#CEB7F2",
           dark: "#9E76E4",
         },
-        // Modern Dark Tech Surface Layers
-        surface: {
-          DEFAULT: "#0B1120",
-          2: "#10192D",
-          3: "#16223D",
-        },
+        // ─── Modern Dark Tech Surface Layers (kept for backward compat) ───
         dark: {
           DEFAULT: "#070B14",
           50: "#131C32",
@@ -61,8 +69,8 @@ const config: Config = {
           200: "#0B1120",
           300: "#070B14",
         },
-        // Slate neutrals
-        muted: "#94A3B8",
+        // ─── Slate neutrals ───────────────────────────────────────────────
+        muted: "var(--text-secondary)",
         taupe: "#94A3B8",
         sage: "#8D9CF5",
         cyan: {

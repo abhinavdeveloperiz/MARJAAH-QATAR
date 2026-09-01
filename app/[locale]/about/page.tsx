@@ -36,7 +36,7 @@ export default async function AboutPage({
   const { about } = site;
 
   return (
-    <div className="min-h-screen bg-dark-300">
+    <div className="min-h-screen bg-base">
       {/* Header Section from Template */}
       <section className="container-custom pt-28 md:pt-36 pb-12 md:pb-16 border-b border-surface-3">
         <div className="max-w-4xl">

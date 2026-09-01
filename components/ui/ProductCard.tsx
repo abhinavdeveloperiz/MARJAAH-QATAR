@@ -79,7 +79,7 @@ export function ProductCard({ product, locale, variant = "default" }: ProductCar
         onMouseLeave={() => { setIsHovered(false); setActiveImage(0); }}
       >
         {/* Image Container */}
-        <div className="relative overflow-hidden bg-gradient-to-br from-dark-200 to-dark-100 aspect-[4/3] flex items-center justify-center">
+        <div className="relative overflow-hidden aspect-[4/3] flex items-center justify-center" style={{ background: "linear-gradient(to bottom right, var(--bg-surface-2), var(--bg-surface-3))" }}>
           {/* Product image or fallback */}
           {!imgError ? (
             /* eslint-disable-next-line @next/next/no-img-element */
@@ -93,11 +93,11 @@ export function ProductCard({ product, locale, variant = "default" }: ProductCar
               )}
             />
           ) : (
-            <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-b from-dark-200/80 to-surface border-b border-surface-3/50 text-center select-none">
-              <div className="w-14 h-14 rounded-2xl bg-surface-2/80 border border-white/10 flex items-center justify-center mb-2 shadow-inner group-hover:border-[#8D9CF5]/40 transition-colors">
-                <Package className="w-7 h-7 text-[#8D9CF5]/70 group-hover:text-[#8D9CF5] transition-colors" />
+            <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center select-none" style={{ background: "linear-gradient(to bottom, var(--bg-surface-2), var(--bg-surface))", borderBottom: "1px solid var(--bg-surface-3)" }}>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-2 shadow-inner group-hover:border-[#8D9CF5]/40 transition-colors" style={{ backgroundColor: "var(--bg-surface-3)", border: "1px solid var(--border-color)" }}>
+                <Package className="w-7 h-7 transition-colors" style={{ color: "var(--color-accent)" }} />
               </div>
-              <span className="text-[11px] font-bold text-muted/80 uppercase tracking-wider font-display">
+              <span className="text-[11px] font-bold uppercase tracking-wider font-display" style={{ color: "var(--text-secondary)" }}>
                 {product.brand}
               </span>
             </div>
@@ -142,16 +142,18 @@ export function ProductCard({ product, locale, variant = "default" }: ProductCar
               onClick={handleWishlist}
               aria-label="Wishlist"
               className={cn(
-                "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 bg-surface/90 backdrop-blur-md border border-white/10 shadow-lg cursor-pointer",
+                "w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 backdrop-blur-md shadow-lg cursor-pointer",
                 isInWishlist
                   ? "bg-rose-500/20 border-rose-500/50 text-rose-400"
                   : "text-muted hover:text-rose-400"
               )}
+              style={!isInWishlist ? { backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" } : {}}
             >
               <Heart className={cn("w-4 h-4", isInWishlist && "fill-current")} />
             </button>
             <div
-              className="w-9 h-9 rounded-xl bg-surface/90 backdrop-blur-md border border-white/10 flex items-center justify-center text-muted hover:text-white transition-all duration-200 shadow-lg"
+              className="w-9 h-9 rounded-xl backdrop-blur-md flex items-center justify-center transition-all duration-200 shadow-lg"
+              style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)", color: "var(--text-secondary)" }}
               title={isRTL ? "عرض التفاصيل" : "View Details"}
             >
               <Eye className="w-4 h-4" />
@@ -176,18 +178,19 @@ export function ProductCard({ product, locale, variant = "default" }: ProductCar
         </div>
 
         {/* Product Info */}
-        <div className="p-4 sm:p-5 flex flex-col flex-1 bg-surface">
+        <div className="p-4 sm:p-5 flex flex-col flex-1" style={{ backgroundColor: "var(--bg-surface)" }}>
           {/* Brand */}
-          <p className="text-[#8D9CF5] text-xs font-bold uppercase tracking-wider mb-1.5 font-display">
+          <p className="text-xs font-bold uppercase tracking-wider mb-1.5 font-display" style={{ color: "var(--color-accent)" }}>
             {product.brand}
           </p>
 
           {/* Name */}
           <h3
             className={cn(
-              "text-white font-semibold leading-snug mb-2 flex-1 hover:text-[#8D9CF5] transition-colors",
+              "font-semibold leading-snug mb-2 flex-1 transition-colors",
               variant === "default" ? "text-sm sm:text-base line-clamp-2" : "text-xs line-clamp-2"
             )}
+            style={{ color: "var(--text-primary)" }}
           >
             {isRTL ? product.nameAr : product.name}
           </h3>
@@ -212,11 +215,11 @@ export function ProductCard({ product, locale, variant = "default" }: ProductCar
 
           {/* Price with Unbounded display font */}
           <div className="flex items-baseline gap-2.5 mb-4">
-            <span className="text-white font-black text-lg sm:text-xl font-display">
+            <span className="font-black text-lg sm:text-xl font-display" style={{ color: "var(--text-primary)" }}>
               QAR {product.price.toLocaleString()}
             </span>
             {product.originalPrice && (
-              <span className="text-muted text-xs sm:text-sm line-through font-medium">
+              <span className="text-xs sm:text-sm line-through font-medium" style={{ color: "var(--text-secondary)" }}>
                 QAR {product.originalPrice.toLocaleString()}
               </span>
             )}
