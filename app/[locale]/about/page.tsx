@@ -37,63 +37,85 @@ export default async function AboutPage({
 
   return (
     <div className="min-h-screen bg-base">
-      {/* Header Section from Template */}
-      <section className="container-custom pt-28 md:pt-36 pb-12 md:pb-16 border-b border-border-color">
-        <div className="max-w-4xl">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/20 text-[#4063B2] text-xs font-bold tracking-widest uppercase mb-6 font-display">
+      {/* Header Section */}
+      <section
+        className="container-custom pt-24 sm:pt-28 md:pt-36 pb-12 md:pb-16 border-b border-border-color"
+      >
+        <div className="max-w-4xl space-y-4 sm:space-y-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/20 text-[#4063B2] text-[11px] sm:text-xs font-bold tracking-widest uppercase font-display">
             <Sparkles className="w-3.5 h-3.5" />
-            {isRTL ? "من نحن — M.SHOP قطر" : "ABOUT M.SHOP QATAR"}
+            <span>{isRTL ? "من نحن — M.SHOP قطر" : "ABOUT M.SHOP QATAR"}</span>
           </div>
 
-          <h1 className="font-display text-5xl sm:text-7xl md:text-8xl font-black tracking-tight leading-none mb-6" style={{ color: "var(--text-primary)" }}>
+          <h1
+            className="font-display text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight uppercase leading-none"
+            style={{ color: "var(--text-primary)" }}
+          >
             {isRTL ? about.headingAr : about.heading}
           </h1>
 
-          <p className="text-xl sm:text-2xl text-[#4063B2] font-semibold font-display leading-snug">
+          <p className="text-lg sm:text-xl md:text-2xl text-[#4063B2] font-bold font-display leading-snug">
             {isRTL ? about.taglineAr : about.tagline}
           </p>
         </div>
       </section>
 
-      {/* Main Editorial Content (From Template Structure) */}
-      <section className="container-custom py-16 md:py-24">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+      {/* Main Content */}
+      <section className="container-custom py-12 sm:py-16 md:py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           {/* Left Narrative Column (7 cols) */}
-          <div className="lg:col-span-7 space-y-8">
-            <div className="space-y-6 text-lg md:text-xl leading-relaxed font-medium" style={{ color: "var(--text-secondary)" }}>
+          <div className="lg:col-span-7 space-y-10">
+            {/* Story Paragraphs */}
+            <div className="space-y-6 text-base sm:text-lg md:text-xl font-medium leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               {(isRTL ? about.paragraphsAr : about.paragraphs).map((paragraph, i) => (
-                <p key={i} className="text-slate-700 leading-relaxed">
+                <p key={i} className="leading-relaxed">
                   {paragraph}
                 </p>
               ))}
             </div>
 
             {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-border-color">
-              {[
-                { num: "5,000+", label: isRTL ? "منتج متوفر" : "Hardware Units" },
-                { num: "50+", label: isRTL ? "ماركة عالمية" : "Global Brands" },
-                { num: "1-2", label: isRTL ? "أيام التوصيل" : "Days Delivery" },
-                { num: "100%", label: isRTL ? "أصالة وضمان" : "Official Warranty" },
-              ].map((stat, i) => (
-                <div key={i} className="p-4 rounded-2xl bg-surface border border-border-color shadow-sm">
-                  <p className="text-2xl sm:text-3xl font-black text-[#4063B2] font-display mb-1">{stat.num}</p>
-                  <p className="text-slate-600 text-xs font-semibold">{stat.label}</p>
-                </div>
-              ))}
+            <div className="pt-8 border-t border-border-color">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                {[
+                  { num: "5,000+", label: isRTL ? "منتج متوفر" : "Hardware Units" },
+                  { num: "50+", label: isRTL ? "ماركة عالمية" : "Global Brands" },
+                  { num: "1-2", label: isRTL ? "أيام التوصيل" : "Days Delivery" },
+                  { num: "100%", label: isRTL ? "أصالة وضمان" : "Official Warranty" },
+                ].map((stat, i) => (
+                  <div
+                    key={i}
+                    className="p-4 sm:p-5 rounded-2xl bg-surface border border-border-color shadow-sm flex flex-col justify-between"
+                  >
+                    <p className="text-2xl sm:text-3xl lg:text-4xl font-black text-[#4063B2] font-display mb-1">
+                      {stat.num}
+                    </p>
+                    <p
+                      className="text-xs font-bold uppercase tracking-wider font-sans"
+                      style={{ color: "var(--text-secondary)" }}
+                    >
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Right Column: Authorized Brands & Hardware Expertise (5 cols) */}
-          <div className="lg:col-span-5 space-y-10">
+          {/* Right Column (5 cols) */}
+          <div className="lg:col-span-5 space-y-8">
             {/* Authorized Brand Partners */}
-            <div className="bg-surface rounded-3xl p-8 border border-border-color shadow-sm">
-              <p className="text-[#4063B2] text-xs font-bold uppercase tracking-widest font-sans mb-6">
+            <div className="bg-surface rounded-3xl p-6 sm:p-8 border border-border-color shadow-sm space-y-5">
+              <span className="text-[#4063B2] text-xs font-bold uppercase tracking-widest font-sans block">
                 {isRTL ? "شركاء الماركات الرسمية" : "Authorized Brand Partners"}
-              </p>
-              <ul className="space-y-3.5">
+              </span>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-3">
                 {about.clients.map((brand) => (
-                  <li key={brand} className="flex items-center gap-3 text-base sm:text-lg font-bold font-display" style={{ color: "var(--text-primary)" }}>
+                  <li
+                    key={brand}
+                    className="flex items-center gap-3 text-sm sm:text-base font-bold font-display"
+                    style={{ color: "var(--text-primary)" }}
+                  >
                     <CheckCircle className="w-4 h-4 text-[#4063B2] flex-shrink-0" />
                     <span>{brand}</span>
                   </li>
@@ -102,15 +124,16 @@ export default async function AboutPage({
             </div>
 
             {/* Hardware Domains & Expertise */}
-            <div className="bg-surface rounded-3xl p-8 border border-border-color shadow-sm">
-              <p className="text-[#4063B2] text-xs font-bold uppercase tracking-widest font-sans mb-6">
+            <div className="bg-surface rounded-3xl p-6 sm:p-8 border border-border-color shadow-sm space-y-5">
+              <span className="text-[#4063B2] text-xs font-bold uppercase tracking-widest font-sans block">
                 {isRTL ? "مجالات التخصص" : "Hardware Capabilities"}
-              </p>
-              <div className="flex flex-wrap gap-2.5">
+              </span>
+              <div className="flex flex-wrap gap-2">
                 {about.expertise.map((item) => (
                   <span
                     key={item}
-                    className="text-xs font-bold font-sans px-3.5 py-2 rounded-xl bg-surface-2 border border-surface-3 text-slate-700 hover:text-[#4063B2] hover:border-[#4063B2]/40 transition-colors"
+                    className="text-xs font-bold font-sans px-3.5 py-2 rounded-xl bg-surface-2 border border-border-color transition-colors"
+                    style={{ color: "var(--text-primary)" }}
                   >
                     {item}
                   </span>
@@ -119,15 +142,32 @@ export default async function AboutPage({
             </div>
 
             {/* Contact CTA */}
-            <div className="p-8 rounded-3xl bg-gradient-to-br from-[#4063B2]/10 via-surface to-[#8D9CF5]/10 border border-[#4063B2]/30 text-center shadow-sm">
-              <h3 className="text-xl font-bold font-display mb-2" style={{ color: "var(--text-primary)" }}>
+            <div
+              className="p-6 sm:p-8 rounded-3xl border text-center shadow-sm space-y-4"
+              style={{
+                backgroundColor: "var(--bg-surface)",
+                borderColor: "rgba(64,99,178,0.3)",
+              }}
+            >
+              <h3
+                className="text-lg sm:text-xl font-bold font-display uppercase tracking-tight"
+                style={{ color: "var(--text-primary)" }}
+              >
                 {isRTL ? "هل تحتاج إلى استشارة لمؤسستك أو شركتك؟" : "Need Corporate Procurement in Qatar?"}
               </h3>
-              <p className="text-sm font-medium mb-6" style={{ color: "var(--text-secondary)" }}>
-                {isRTL ? "تواصل مباشرة مع خبرائنا عبر الواتساب للحصول على استشارة فورية" : "Connect directly with our hardware specialists for immediate corporate or personal advice."}
+              <p
+                className="text-xs sm:text-sm font-medium leading-relaxed"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                {isRTL
+                  ? "تواصل مباشرة مع خبرائنا عبر الواتساب للحصول على استشارة فورية"
+                  : "Connect directly with our hardware specialists for immediate corporate or personal advice."}
               </p>
-              <Link href={`/${locale}/contact`} className="btn-primary justify-center w-full shadow-md">
-                {isRTL ? "تواصل معنا" : "Contact Specialists"}
+              <Link
+                href={`/${locale}/contact`}
+                className="btn-primary justify-center w-full shadow-md py-3 text-xs sm:text-sm font-bold font-display"
+              >
+                <span>{isRTL ? "تواصل معنا" : "Contact Specialists"}</span>
                 <ArrowRight className={cn("w-4 h-4", isRTL && "rotate-180")} />
               </Link>
             </div>
