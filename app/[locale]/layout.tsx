@@ -8,9 +8,10 @@ import { CartDrawer } from "@/components/cart/CartDrawer";
 import { WhatsAppWidget } from "@/components/ui/WhatsAppWidget";
 import { ScrollToTop } from "@/components/ui/ScrollToTop";
 import { JsonLd } from "@/components/seo/JsonLd";
+import { ThemeScript } from "@/app/theme-script";
 import { notFound } from "next/navigation";
 
-const locales = ["en"];
+const locales = ["en", "ar"];
 const siteUrl = "https://marjaah.qa";
 
 export const metadata: Metadata = {
@@ -111,7 +112,10 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang="en" dir="ltr" className="light" suppressHydrationWarning>
+    <html lang={locale} dir={locale === "ar" ? "rtl" : "ltr"} suppressHydrationWarning>
+      <head>
+        <ThemeScript />
+      </head>
       <body suppressHydrationWarning>
         <JsonLd locale={locale} />
         <NextIntlClientProvider messages={messages}>

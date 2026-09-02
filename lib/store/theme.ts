@@ -18,7 +18,11 @@ function applyTheme(theme: Theme) {
 }
 
 export const useThemeStore = create<ThemeStore>((set, get) => ({
-  theme: "light",
+  theme:
+    typeof window !== "undefined"
+      ? (localStorage.getItem("theme") as Theme) ||
+        (document.documentElement.classList.contains("dark") ? "dark" : "light")
+      : "dark",
   setTheme: (theme) => {
     applyTheme(theme);
     set({ theme });

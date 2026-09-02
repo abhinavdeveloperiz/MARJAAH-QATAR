@@ -4,6 +4,7 @@ import Link from "next/link";
 import { site } from "@/lib/data/site";
 import { ArrowUpRight } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { useTranslations } from "next-intl";
 
 interface EditorialFooterProps {
   locale: string;
@@ -11,6 +12,8 @@ interface EditorialFooterProps {
 
 export function EditorialFooter({ locale }: EditorialFooterProps) {
   const currentYear = new Date().getFullYear();
+  const t = useTranslations("footer");
+  const tNav = useTranslations("nav");
 
   return (
     <footer
@@ -38,7 +41,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
           </Link>
           <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] sm:text-xs font-sans font-bold tracking-wider uppercase text-emerald-700 dark:text-emerald-400 self-start sm:self-auto">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Doha Showroom Active</span>
+            <span>{t("showroom_active")}</span>
           </div>
         </div>
 
@@ -46,16 +49,16 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
         <div className="space-y-4 sm:space-y-6">
           <div>
             <span className="text-[11px] sm:text-xs font-sans font-bold uppercase tracking-widest block mb-2 sm:mb-4" style={{ color: "var(--text-secondary)" }}>
-              GET IN TOUCH WITH SPECIALISTS
+              {t("get_in_touch_label")}
             </span>
             <h2 className="font-display text-4xl sm:text-6xl md:text-8xl lg:text-9xl font-black leading-none uppercase tracking-tight" style={{ color: "var(--text-primary)" }}>
-              LET&#39;S CONNECT.
+              {t("lets_connect")}
             </h2>
           </div>
 
           <div className="space-y-2 pt-2">
             <p className="text-[11px] sm:text-xs font-sans font-semibold uppercase tracking-widest" style={{ color: "var(--text-secondary)" }}>
-              DIRECT HARDWARE &amp; CORPORATE INQUIRIES
+              {t("hardware_inquiries")}
             </p>
             <a
               href={`mailto:${site.contact.email}`}
@@ -71,7 +74,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
           {/* Location */}
           <div className="space-y-2.5">
             <span className="text-xs font-sans font-bold uppercase tracking-widest block" style={{ color: "var(--text-secondary)" }}>
-              DOHA SHOWROOM
+              {t("showroom")}
             </span>
             <p className="text-sm font-sans font-medium leading-relaxed" style={{ color: "var(--text-primary)" }}>
               {site.contact.location}
@@ -84,7 +87,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
           {/* Direct WhatsApp & Hotline */}
           <div className="space-y-2.5">
             <span className="text-xs font-sans font-bold uppercase tracking-widest block" style={{ color: "var(--text-secondary)" }}>
-              INSTANT HOTLINE
+              {t("hotline")}
             </span>
             <a
               href={`tel:${site.contact.phone}`}
@@ -99,7 +102,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 text-xs font-sans font-bold uppercase tracking-wider text-[#4063B2] hover:text-[#5B7BE8] transition-colors pt-1"
             >
-              <span>CHAT ON WHATSAPP</span>
+              <span>{t("chat_whatsapp")}</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -107,15 +110,15 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
           {/* Quick Navigation Links */}
           <div className="space-y-2.5 sm:col-span-2 lg:col-span-1">
             <span className="text-xs font-sans font-bold uppercase tracking-widest block" style={{ color: "var(--text-secondary)" }}>
-              EXPLORE
+              {t("explore")}
             </span>
             <div className="grid grid-cols-2 gap-x-6 gap-y-2.5 text-xs font-sans font-bold uppercase tracking-wider">
               {[
-                { href: `/${locale}`, label: "HOME" },
-                { href: `/${locale}/shop`, label: "SHOP" },
-                { href: `/${locale}/offers`, label: "OFFERS" },
-                { href: `/${locale}/about`, label: "ABOUT" },
-                { href: `/${locale}/contact`, label: "CONTACT" },
+                { href: `/${locale}`, label: tNav("home") },
+                { href: `/${locale}/shop`, label: tNav("shop") },
+                { href: `/${locale}/offers`, label: tNav("offers") },
+                { href: `/${locale}/about`, label: tNav("about") },
+                { href: `/${locale}/contact`, label: tNav("contact") },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -136,7 +139,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
           style={{ borderTop: "1px solid var(--border-color)", color: "var(--text-secondary)" }}
         >
           <p className="leading-relaxed">
-            © {currentYear} MARJAAH TRADING W.L.L. ALL RIGHTS RESERVED.
+            © {currentYear} MARJAAH TRADING W.L.L. {t("rights").toUpperCase()}
           </p>
 
           {/* Developer Credit */}
@@ -146,7 +149,7 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
             rel="noopener noreferrer"
             className="text-[11px] sm:text-xs font-sans font-semibold text-slate-700 dark:text-slate-300 hover:text-[#4063B2] hover:underline underline-offset-4 tracking-wide transition-all duration-200"
           >
-            Designed &amp; Developed by InspireZest Technologies
+            {t("designed_by")}
           </a>
         </div>
       </div>

@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { ArrowDown } from "lucide-react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useTranslations } from "next-intl";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,6 +18,7 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLDivElement>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const t = useTranslations("hero");
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!containerRef.current) return;
@@ -115,7 +117,7 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
 
         {/* Balanced Subtitle */}
         <p className="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
-          Qatar&apos;s premier destination for high-performance laptops, RTX workstations, OLED monitors, and authentic tech hardware with official GCC warranty.
+          {t("subtitle")}
         </p>
       </div>
 
@@ -124,7 +126,7 @@ export function EditorialHero({ locale }: EditorialHeroProps) {
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#4063B2] flex-shrink-0" />
           <span className="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider text-slate-700 dark:text-white/60 truncate">
-            M.SHOP • QATAR&apos;S HARDWARE AUTHORITY
+            {t("tagline")}
           </span>
         </div>
 

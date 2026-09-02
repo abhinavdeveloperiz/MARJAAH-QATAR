@@ -1,31 +1,34 @@
 "use client";
 
 import { Truck, ShieldCheck, CreditCard, Headphones } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface QatarTrustStripProps {
   locale: string;
 }
 
 export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
+  const t = useTranslations("trust");
+
   const trustFeatures = [
     {
       icon: Truck,
-      title: "Express Delivery",
+      titleKey: "fast_delivery" as const,
       glowColor: "from-blue-500/20 to-[#8D9CF5]/20",
     },
     {
       icon: ShieldCheck,
-      title: "100% Official Warranty",
+      titleKey: "warranty" as const,
       glowColor: "from-emerald-500/20 to-[#8D9CF5]/20",
     },
     {
       icon: CreditCard,
-      title: "Flexible Payment Options",
+      titleKey: "secure_payment" as const,
       glowColor: "from-purple-500/20 to-[#BB9AED]/20",
     },
     {
       icon: Headphones,
-      title: "Dedicated Tech Support",
+      titleKey: "genuine" as const,
       glowColor: "from-[#8D9CF5]/20 to-pink-500/20",
     },
   ];
@@ -58,7 +61,7 @@ export function QatarTrustStrip({ locale }: QatarTrustStripProps) {
 
                   <div className="min-w-0 flex-1">
                     <h3 className="font-bold font-sans text-xs sm:text-sm uppercase tracking-tight transition-colors" style={{ color: "var(--text-primary)" }}>
-                      {item.title}
+                      {t(item.titleKey)}
                     </h3>
                   </div>
                 </div>

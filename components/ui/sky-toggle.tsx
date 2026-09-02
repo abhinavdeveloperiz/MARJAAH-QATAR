@@ -20,10 +20,14 @@ export const Switch = ({ size = "11.5px", className }: SwitchProps) => {
 
   useEffect(() => {
     setMounted(true);
-    const root = document.documentElement;
-    const current = root.classList.contains("light") ? "light" : "dark";
-    if (current !== theme) {
-      setTheme(current);
+    const saved = localStorage.getItem("theme") as "dark" | "light" | null;
+    const initialTheme = saved || (document.documentElement.classList.contains("dark") ? "dark" : "light");
+    if (initialTheme !== theme) {
+      setTheme(initialTheme);
+    } else {
+      const root = document.documentElement;
+      root.classList.remove("dark", "light");
+      root.classList.add(initialTheme);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

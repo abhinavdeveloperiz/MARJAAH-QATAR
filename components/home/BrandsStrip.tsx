@@ -99,8 +99,8 @@ export function BrandsStrip({ locale }: BrandsStripProps) {
           <div className="lg:col-span-8 relative h-[380px] sm:h-[420px] rounded-3xl overflow-hidden p-3 sm:p-4 shadow-sm" style={{ backgroundColor: "var(--bg-surface)", border: "1px solid var(--border-color)" }}>
             
             {/* Top & Bottom Smooth Gradient Fade Masks */}
-            <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-white via-white/80 to-transparent z-20 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white via-white/80 to-transparent z-20 pointer-events-none" />
+            <div className="absolute top-0 left-0 right-0 h-20 z-20 pointer-events-none" style={{ background: "linear-gradient(to bottom, var(--bg-surface) 0%, color-mix(in srgb, var(--bg-surface) 80%, transparent) 60%, transparent 100%)" }} />
+            <div className="absolute bottom-0 left-0 right-0 h-20 z-20 pointer-events-none" style={{ background: "linear-gradient(to top, var(--bg-surface) 0%, color-mix(in srgb, var(--bg-surface) 80%, transparent) 60%, transparent 100%)" }} />
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 h-full">
               

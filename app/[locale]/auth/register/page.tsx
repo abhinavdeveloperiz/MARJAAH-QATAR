@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Eye, EyeOff, UserPlus, ArrowLeft, Zap, Check } from "lucide-react";
 import { useAuthStore } from "@/lib/store/auth";
 import toast from "react-hot-toast";
+import { useTranslations } from "next-intl";
 
 const schema = z
   .object({
@@ -28,13 +29,16 @@ type FormValues = z.infer<typeof schema>;
 
 export default function RegisterPage() {
   const router = useRouter();
+  const params = useParams();
+  const locale = (params?.locale as string) || "en";
   const register_ = useAuthStore((s) => s.register);
   const isLoggedIn = useAuthStore((s) => s.isLoggedIn);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const t = useTranslations("auth");
 
   if (isLoggedIn) {
-    router.replace("/en/account");
+    router.replace(`/${locale}/account`);
     return null;
   }
 
@@ -52,8 +56,8 @@ export default function RegisterPage() {
       password: values.password,
     });
     if (result.success) {
-      toast.success("Account created! Welcome to M.SHOP.");
-      router.push("/en/account");
+      toast.success(t("account_created"));
+      router.push(`/${locale}/account`);
     } else {
       toast.error(result.error ?? "Registration failed");
     }
@@ -63,10 +67,10 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-base flex items-center justify-center px-4 py-20">
       <div className="w-full max-w-md">
         <Link
-          href="/en"
+          href={`/${locale}`}
           className="inline-flex items-center gap-2 text-[#4063B2] text-xs font-sans font-bold uppercase tracking-widest mb-8 hover:text-blue-800 transition-colors"
         >
-          <ArrowLeft className="w-4 h-4" /> Back to Store
+          <ArrowLeft className="w-4 h-4" /> {t("back_to_store")}
         </Link>
 
         <div className="bg-surface border border-border-color rounded-3xl p-8 shadow-sm">
@@ -74,23 +78,27 @@ export default function RegisterPage() {
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#4063B2]/10 border border-[#4063B2]/30 mb-4">
               <Zap className="w-3.5 h-3.5 text-[#4063B2]" />
               <span className="text-[11px] font-sans font-bold uppercase tracking-widest text-[#4063B2]">
-                M.SHOP Qatar
+                {t("badge")}
               </span>
             </div>
-            <h1 className="text-2xl font-tall uppercase mb-2 font-display" style={{ color: "var(--text-primary)" }}>Create Account</h1>
-            <p className="text-xs font-sans" style={{ color: "var(--text-secondary)" }}>Join M.SHOP for faster checkout & order tracking</p>
+            <h1 className="text-2xl font-tall uppercase mb-2 font-display" style={{ color: "var(--text-primary)" }}>
+              {t("create_account")}
+            </h1>
+            <p className="text-xs font-sans" style={{ color: "var(--text-secondary)" }}>
+              {t("create_account_desc")}
+            </p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Name */}
+            {/* Full Name */}
             <div>
               <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                Full Name
+                {t("full_name")}
               </label>
               <input
                 {...register("name")}
                 type="text"
-                placeholder="Your full name"
+                placeholder={t("name_placeholder")}
                 className="w-full px-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
                 style={{ color: "var(--text-primary)" }}
               />
@@ -100,12 +108,12 @@ export default function RegisterPage() {
             {/* Email */}
             <div>
               <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                Email Address
+                {t("email_address")}
               </label>
               <input
                 {...register("email")}
                 type="email"
-                placeholder="you@example.com"
+                placeholder={t("email_placeholder")}
                 className="w-full px-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
                 style={{ color: "var(--text-primary)" }}
               />
@@ -115,12 +123,12 @@ export default function RegisterPage() {
             {/* Phone */}
             <div>
               <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                Phone Number
+                {t("phone")}
               </label>
               <input
                 {...register("phone")}
                 type="tel"
-                placeholder="+974 5000 0000"
+                placeholder={t("phone_placeholder")}
                 className="w-full px-4 py-3.5 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
                 style={{ color: "var(--text-primary)" }}
               />
@@ -130,13 +138,13 @@ export default function RegisterPage() {
             {/* Password */}
             <div>
               <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                Password
+                {t("password")}
               </label>
               <div className="relative">
                 <input
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
-                  placeholder="Min. 8 characters"
+                  placeholder={t("min_password")}
                   className="w-full px-4 py-3.5 pr-12 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
                   style={{ color: "var(--text-primary)" }}
                 />
@@ -154,13 +162,13 @@ export default function RegisterPage() {
             {/* Confirm Password */}
             <div>
               <label className="block text-xs font-sans font-semibold uppercase tracking-wider mb-2" style={{ color: "var(--text-secondary)" }}>
-                Confirm Password
+                {t("confirm_password")}
               </label>
               <div className="relative">
                 <input
                   {...register("confirmPassword")}
                   type={showConfirm ? "text" : "password"}
-                  placeholder="Repeat password"
+                  placeholder={t("confirm_placeholder")}
                   className="w-full px-4 py-3.5 pr-12 rounded-xl bg-surface-2 border border-border-color focus:border-[#4063B2] text-sm focus:outline-none transition-colors"
                   style={{ color: "var(--text-primary)" }}
                 />
@@ -194,9 +202,10 @@ export default function RegisterPage() {
                 </label>
               </div>
               <label htmlFor="terms" className="text-xs font-sans cursor-pointer leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                I agree to M.SHOP&apos;s{" "}
-                <span className="text-[#4063B2] font-semibold">Terms of Service</span> and{" "}
-                <span className="text-[#4063B2] font-semibold">Privacy Policy</span>
+                {t("terms_agree")}{" "}
+                <span className="text-[#4063B2] font-semibold">{t("terms_of_service")}</span>{" "}
+                {t("and")}{" "}
+                <span className="text-[#4063B2] font-semibold">{t("privacy_policy")}</span>
               </label>
             </div>
             {errors.terms && <p className="text-xs text-red-500">{errors.terms.message}</p>}
@@ -207,17 +216,17 @@ export default function RegisterPage() {
               className="w-full py-4 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] text-white text-xs font-sans font-bold uppercase tracking-widest hover:opacity-90 transition-all shadow-md disabled:opacity-50 flex items-center justify-center gap-2 mt-2"
             >
               <UserPlus className="w-4 h-4" />
-              {isSubmitting ? "Creating Account..." : "Create Account"}
+              {isSubmitting ? t("creating") : t("create_account")}
             </button>
           </form>
 
           <p className="text-center text-xs font-sans mt-6" style={{ color: "var(--text-tertiary)" }}>
-            Already have an account?{" "}
+            {t("already_account")}{" "}
             <Link
-              href="/en/auth/login"
+              href={`/${locale}/auth/login`}
               className="text-[#4063B2] hover:text-blue-800 transition-colors font-semibold"
             >
-              Sign in
+              {t("sign_in_link")}
             </Link>
           </p>
         </div>

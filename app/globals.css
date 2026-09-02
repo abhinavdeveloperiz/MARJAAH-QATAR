@@ -101,6 +101,67 @@
   letter-spacing: 0 !important;
 }
 
+/* Flip directional arrow/chevron icons in RTL */
+[dir="rtl"] .lucide-arrow-left,
+[dir="rtl"] .lucide-arrow-right,
+[dir="rtl"] .lucide-arrow-up-right,
+[dir="rtl"] .lucide-chevron-right,
+[dir="rtl"] .lucide-chevron-left {
+  transform: scaleX(-1);
+}
+
+/* Badge positions flip: top-left badge in RTL */
+[dir="rtl"] .absolute.-top-1.-right-1 {
+  right: auto;
+  left: -0.25rem;
+}
+
+/* Dropdown menus flip to left-aligned in RTL */
+[dir="rtl"] .absolute.right-0.top-full {
+  right: auto;
+  left: 0;
+}
+
+/* Input icon positions flip */
+[dir="rtl"] .absolute.left-4 {
+  left: auto;
+  right: 1rem;
+}
+[dir="rtl"] .pl-11 {
+  padding-left: 1rem;
+  padding-right: 2.75rem;
+}
+[dir="rtl"] .pl-12 {
+  padding-left: 1rem;
+  padding-right: 3rem;
+}
+
+/* Scroll-to-top & WhatsApp widget: flip to left side */
+[dir="rtl"] .fixed.bottom-6.right-6,
+[dir="rtl"] .fixed.bottom-8.right-8 {
+  right: auto;
+  left: 1.5rem;
+}
+[dir="rtl"] .fixed.bottom-24.right-6 {
+  right: auto;
+  left: 1.5rem;
+}
+
+/* Text alignment defaults */
+[dir="rtl"] p,
+[dir="rtl"] label,
+[dir="rtl"] span,
+[dir="rtl"] li {
+  text-align: right;
+}
+
+/* Center-aligned items should stay centered */
+[dir="rtl"] .text-center p,
+[dir="rtl"] .text-center label,
+[dir="rtl"] .text-center span {
+  text-align: center;
+}
+
 /* ─── Base Styles ────────────────────────────────────────── */
 @layer base {
   * {

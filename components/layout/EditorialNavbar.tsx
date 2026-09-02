@@ -9,6 +9,8 @@ import { useWishlistStore } from "@/lib/store/wishlist";
 import { useAuthStore } from "@/lib/store/auth";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/ui/Logo";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { useTranslations } from "next-intl";
 
 interface EditorialNavbarProps {
   locale: string;
@@ -17,6 +19,12 @@ interface EditorialNavbarProps {
 export function EditorialNavbar({ locale }: EditorialNavbarProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const t = useTranslations("nav");
+
+  const switchLocale = (next: string) => {
+    const newPath = pathname.replace(/^\/(en|ar)/, `/${next}`);
+    router.push(newPath);
+  };
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -89,11 +97,11 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
   };
 
   const navLinks = [
-    { href: `/${locale}`, label: "HOME" },
-    { href: `/${locale}/shop`, label: "SHOP" },
-    { href: `/${locale}/offers`, label: "OFFERS" },
-    { href: `/${locale}/about`, label: "ABOUT" },
-    { href: `/${locale}/contact`, label: "CONTACT" },
+    { href: `/${locale}`, label: t("home") },
+    { href: `/${locale}/shop`, label: t("shop") },
+    { href: `/${locale}/offers`, label: t("offers") },
+    { href: `/${locale}/about`, label: t("about") },
+    { href: `/${locale}/contact`, label: t("contact") },
   ];
 
   const isHomePage =
@@ -155,16 +163,42 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
 
           {/* Right Actions */}
           <div className="flex items-center gap-1.5 sm:gap-3 md:gap-5 flex-shrink-0">
+
+            {/* Language Switcher (Desktop / Tablet view: md and up) */}
+            <div className={cn(
+              "hidden md:flex items-center gap-0.5 rounded-xl px-1 py-1 border transition-all",
+              isTransparent
+                ? "border-white/30 bg-white/10 backdrop-blur-sm"
+                : "border-border-color bg-surface"
+            )}>
+              {(["en", "ar"] as const).map((loc) => (
+                <button
+                  key={loc}
+                  onClick={() => switchLocale(loc)}
+                  className="px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold uppercase tracking-widest transition-all cursor-pointer"
+                  style={{
+                    backgroundColor: locale === loc ? "#4063B2" : "transparent",
+                    color: locale === loc ? "#ffffff" : isTransparent ? "rgba(255,255,255,0.75)" : "var(--text-secondary)",
+                  }}
+                >
+                  {loc.toUpperCase()}
+                </button>
+              ))}
+            </div>
+
+            {/* Theme Toggle (Desktop / Tablet view: md and up) */}
+            <ThemeToggle size="10px" className="hidden md:flex" />
+
             {/* Search Trigger */}
             <button
               onClick={() => setSearchOpen(true)}
               aria-label="Search Catalog"
               className={cn(
-                "w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
+                "w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0",
                 iconBtnClass
               )}
             >
-              <Search className={cn("w-4 h-4", isTransparent ? "text-white" : "text-[#4063B2]")} />
+              <Search className={cn("w-3.5 h-3.5 sm:w-4 sm:h-4", isTransparent ? "text-white" : "text-[#4063B2]")} />
             </button>
 
             {/* Wishlist Link */}
@@ -236,9 +270,9 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                         <p className="text-[11px] font-sans truncate mt-0.5" style={{ color: "var(--text-tertiary)" }}>{authUser.email}</p>
                       </div>
                       {[
-                        { href: `/${locale}/account`, icon: User, label: "My Account" },
-                        { href: `/${locale}/account/orders`, icon: Package, label: "Orders" },
-                        { href: `/${locale}/account/profile`, icon: Settings, label: "Settings" },
+                        { href: `/${locale}/account`, icon: User, label: t("my_account") },
+                        { href: `/${locale}/account/orders`, icon: Package, label: t("orders") },
+                        { href: `/${locale}/account/profile`, icon: Settings, label: t("settings") },
                       ].map((item) => (
                         <Link
                           key={item.href}
@@ -267,7 +301,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                         className="w-full flex items-center gap-3 px-4 py-3 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-all font-sans"
                       >
                         <LogOut className="w-3.5 h-3.5" />
-                        Sign Out
+                        {t("sign_out")}
                       </button>
                     </div>
                   )}
@@ -278,7 +312,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] hover:from-[#36529A] hover:to-[#7B8BE5] text-xs font-sans font-bold tracking-widest uppercase text-white shadow-md hover:shadow-[0_0_20px_rgba(141,156,245,0.5)] transition-all duration-300 cursor-pointer"
                 >
                   <User className="w-3.5 h-3.5" />
-                  <span>Sign In</span>
+                  <span>{t("login")}</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               )}
@@ -308,7 +342,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
           >
             <div className="flex items-center justify-between pb-4" style={{ borderBottom: "1px solid var(--border-color)" }}>
               <span className="text-xs font-sans font-bold tracking-widest uppercase" style={{ color: "var(--color-accent)" }}>
-                FAST CATALOG SEARCH — QATAR
+                {t("fast_catalog_search")}
               </span>
               <button
                 onClick={() => setSearchOpen(false)}
@@ -343,13 +377,13 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                   type="submit"
                   className="absolute right-2 top-1/2 -translate-y-1/2 btn-primary py-2 px-4 rounded-xl text-xs"
                 >
-                  Search
+                  {t("search")}
                 </button>
               </div>
             </form>
 
             <div className="mt-5 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-sans" style={{ color: "var(--text-tertiary)" }}>Trending:</span>
+              <span className="text-xs font-sans" style={{ color: "var(--text-tertiary)" }}>{t("trending")}</span>
               {["RTX 4090", "ROG Strix", "MacBook Pro M3", "Alienware", "DDR5 RAM", "Samsung Odyssey"].map((term) => (
                 <button
                   key={term}
@@ -383,14 +417,51 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-x-0 top-[96px] bottom-0 p-6 sm:p-8 flex flex-col justify-between z-[100] overflow-y-auto"
+          className="lg:hidden fixed inset-x-0 top-[64px] sm:top-[72px] bottom-0 p-5 sm:p-7 flex flex-col justify-between z-[100] overflow-y-auto"
           style={{
             backgroundColor: "var(--bg-surface)",
             borderTop: "1px solid var(--border-color)",
-            height: "calc(100dvh - 96px)",
+            height: "calc(100dvh - 64px)",
           }}
         >
-          <div className="flex flex-col gap-4 pt-2">
+          <div className="flex flex-col gap-4 pt-1">
+            {/* Dedicated Mobile Quick Controls: Language & Theme Bar */}
+            <div
+              className="flex items-center justify-between p-2.5 sm:p-3 rounded-2xl border shadow-sm"
+              style={{
+                backgroundColor: "var(--bg-surface-2)",
+                borderColor: "var(--border-color)",
+              }}
+            >
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-sans font-semibold uppercase tracking-wider pl-1" style={{ color: "var(--text-tertiary)" }}>
+                  {locale === "ar" ? "اللغة" : "Language"}
+                </span>
+                <div className="flex items-center gap-1 rounded-xl border border-border-color bg-surface px-1 py-0.5">
+                  {(["en", "ar"] as const).map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => { switchLocale(loc); setMobileMenuOpen(false); }}
+                      className="px-3 py-1.5 rounded-lg text-[10px] font-sans font-bold uppercase tracking-wider transition-all cursor-pointer"
+                      style={{
+                        backgroundColor: locale === loc ? "#4063B2" : "transparent",
+                        color: locale === loc ? "#ffffff" : "var(--text-secondary)",
+                      }}
+                    >
+                      {loc.toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-sans font-semibold uppercase tracking-wider" style={{ color: "var(--text-tertiary)" }}>
+                  {locale === "ar" ? "المظهر" : "Theme"}
+                </span>
+                <ThemeToggle size="11px" />
+              </div>
+            </div>
+
             {/* Quick search button on mobile */}
             <button
               onClick={() => {
@@ -405,7 +476,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               }}
             >
               <Search className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
-              <span>Search M.SHOP Catalog...</span>
+              <span>{t("search_catalog")}</span>
             </button>
 
             {navLinks.map((item, idx) => (
@@ -438,7 +509,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>06</span>
                 <span className="inline-flex items-center gap-2">
                   <Heart className="w-4 h-4 text-rose-400" />
-                  <span>WISHLIST</span>
+                  <span>{t("wishlist").toUpperCase()}</span>
                 </span>
               </div>
               {totalWishlistItems > 0 && (
@@ -462,7 +533,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 >
                   <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>07</span>
                   <User className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
-                  <span>MY ACCOUNT</span>
+                  <span>{t("my_account").toUpperCase()}</span>
                 </Link>
                 <button
                   onClick={() => { handleLogout(); setMobileMenuOpen(false); }}
@@ -471,7 +542,7 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
                 >
                   <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>08</span>
                   <LogOut className="w-4 h-4" />
-                  <span>SIGN OUT</span>
+                  <span>{t("sign_out").toUpperCase()}</span>
                 </button>
               </>
             ) : (
@@ -486,19 +557,19 @@ export function EditorialNavbar({ locale }: EditorialNavbarProps) {
               >
                 <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>07</span>
                 <User className="w-4 h-4" style={{ color: "var(--color-accent)" }} />
-                <span>SIGN IN</span>
+                <span>{t("login").toUpperCase()}</span>
               </Link>
             )}
 
           </div>
 
-          <div className="space-y-3 pt-6" style={{ borderTop: "1px solid var(--border-color)" }}>
+          <div className="pt-6" style={{ borderTop: "1px solid var(--border-color)" }}>
             <Link
               href={`/${locale}/contact`}
               onClick={() => setMobileMenuOpen(false)}
               className="w-full py-3.5 text-center btn-primary text-xs font-sans font-bold tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 shadow-lg"
             >
-              GET IN TOUCH <ArrowUpRight className="w-3.5 h-3.5" />
+              {t("get_in_touch").toUpperCase()} <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
