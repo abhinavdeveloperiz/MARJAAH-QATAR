@@ -61,29 +61,6 @@ export default async function ShopPage({
                 </p>
               </div>
             </div>
-
-            {/* Right Trust Stats Strip */}
-            <div className="flex items-center gap-4 sm:gap-6 pt-2 lg:pt-0 border-t border-border-color lg:border-t-0">
-              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-2 border border-border-color shadow-sm">
-                <div className="w-9 h-9 rounded-xl bg-[#4063B2]/10 flex items-center justify-center flex-shrink-0 text-[#4063B2]">
-                  <Cpu className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm font-display leading-tight" style={{ color: "var(--text-primary)" }}>{totalCount}+ {isRTL ? "منتج" : "Units"}</p>
-                  <p className="text-[11px] font-medium" style={{ color: "var(--text-secondary)" }}>{isRTL ? "أجهزة أصلية" : "Genuine Stock"}</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-surface-2 border border-border-color shadow-sm">
-                <div className="w-9 h-9 rounded-xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0 text-emerald-600">
-                  <Truck className="w-4 h-4" />
-                </div>
-                <div>
-                  <p className="font-bold text-sm font-display leading-tight" style={{ color: "var(--text-primary)" }}>{isRTL ? "1-2 يوم" : "1-2 Days"}</p>
-                  <p className="text-[11px] font-medium" style={{ color: "var(--text-secondary)" }}>{isRTL ? "توصيل الدوحة" : "Qatar Express"}</p>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

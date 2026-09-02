@@ -31,18 +31,14 @@ export function EditorialFooter({ locale }: EditorialFooterProps) {
       />
 
       <div className="relative z-10 container-custom space-y-10 sm:space-y-14 md:space-y-16">
-        {/* Brand Banner with Logo & Status */}
+        {/* Brand Banner with Logo */}
         <div
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6 pb-6 sm:pb-8"
+          className="pb-6 sm:pb-8"
           style={{ borderBottom: "1px solid var(--border-color)" }}
         >
           <Link href={`/${locale}`} aria-label="Marjaah Trading" className="inline-block">
             <Logo variant="auto" size="lg" subtext="QATAR'S PREMIER TECH STORE" />
           </Link>
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[11px] sm:text-xs font-sans font-bold tracking-wider uppercase text-emerald-700 dark:text-emerald-400 self-start sm:self-auto">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{t("showroom_active")}</span>
-          </div>
         </div>
 
         {/* Massive 'Let's Connect' Heading & Email */}
