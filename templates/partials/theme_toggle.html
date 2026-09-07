@@ -1,5 +1,5 @@
-﻿{% load static %}
-<label class="theme-switch cursor-pointer" role="switch" aria-label="Toggle day/night theme">
+{% load static %}
+<label class="theme-switch cursor-pointer" role="switch" aria-label="{% if is_rtl %}تبديل المظهر الليلي/النهاري{% else %}Toggle day/night theme{% endif %}">
   <input class="theme-switch__checkbox sr-only" type="checkbox" />
   <div class="theme-switch__container">
     <div class="theme-switch__clouds"></div>

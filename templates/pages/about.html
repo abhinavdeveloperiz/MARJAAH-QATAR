@@ -1,35 +1,47 @@
-﻿{% extends "base.html" %}
-{% block title %}About M.SHOP — Qatar's Tech Store{% endblock %}
+{% extends "base.html" %}
+{% block title %}{% if is_rtl %}من نحن — متجر قطر للتقنية M.SHOP{% else %}About M.SHOP — Qatar's Tech Store{% endif %}{% endblock %}
 {% block content %}
 <div class="pt-[72px] min-h-screen">
   <div class="py-20 text-center relative overflow-hidden" style="background:var(--bg-surface)">
     <div class="absolute inset-0 pointer-events-none"><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] rounded-full opacity-10" style="background:radial-gradient(circle,#4063B2,transparent 70%)"></div></div>
     <div class="relative container-custom max-w-3xl">
-      <div class="section-eyebrow">Our Story</div>
-      <h1 class="text-5xl sm:text-6xl font-display font-black mb-6" style="color:var(--text-primary)">Qatar's Hardware<br/><span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Authority.</span></h1>
-      <p class="text-base leading-relaxed max-w-2xl mx-auto" style="color:var(--text-secondary)">M.SHOP is Qatar's premier destination for high-performance computing hardware. We curate the world's best tech products — from flagship laptops and RTX workstations to OLED monitors and gaming peripherals — backed by official GCC warranties and expert support.</p>
+      <div class="section-eyebrow">{% if is_rtl %}قصتنا{% else %}Our Story{% endif %}</div>
+      <h1 class="text-5xl sm:text-6xl font-display font-black mb-6" style="color:var(--text-primary)">
+        {% if is_rtl %}
+        رائد عتاد الحاسوب<br/><span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">في دولة قطر.</span>
+        {% else %}
+        Qatar's Hardware<br/><span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Authority.</span>
+        {% endif %}
+      </h1>
+      <p class="text-base leading-relaxed max-w-2xl mx-auto" style="color:var(--text-secondary)">
+        {% if is_rtl %}
+        متجر M.SHOP هو وجهتك الأولى في دولة قطر لأحدث أجهزة الحاسوب والعتاد الرقمي عالي الأداء. ننتقي أفضل المنتجات التقنية في العالم — من الحواسيب المحمولة الرائدة ومحطات عمل RTX إلى شاشات OLED وملحقات الألعاب المتطورة — مع ضمان رسمي معتمد في دول الخليج ودعم فني متخصص.
+        {% else %}
+        M.SHOP is Qatar's premier destination for high-performance computing hardware. We curate the world's best tech products — from flagship laptops and RTX workstations to OLED monitors and gaming peripherals — backed by official GCC warranties and expert support.
+        {% endif %}
+      </p>
     </div>
   </div>
   <div class="container-custom py-16">
     <div class="grid sm:grid-cols-3 gap-8 mb-16">
       <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
         <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">500+</div>
-        <p class="text-sm font-bold" style="color:var(--text-primary)">Products Stocked</p>
-        <p class="text-xs mt-1" style="color:var(--text-secondary)">Latest hardware from top brands</p>
+        <p class="text-sm font-bold" style="color:var(--text-primary)">{% if is_rtl %}منتج متوفر بالمخزون{% else %}Products Stocked{% endif %}</p>
+        <p class="text-xs mt-1" style="color:var(--text-secondary)">{% if is_rtl %}أحدث الأجهزة من كبرى الشركات العالمية{% else %}Latest hardware from top brands{% endif %}</p>
       </div>
       <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
         <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">50+</div>
-        <p class="text-sm font-bold" style="color:var(--text-primary)">Global Brands</p>
-        <p class="text-xs mt-1" style="color:var(--text-secondary)">Official authorized reseller</p>
+        <p class="text-sm font-bold" style="color:var(--text-primary)">{% if is_rtl %}علامة تجارية عالمية{% else %}Global Brands{% endif %}</p>
+        <p class="text-xs mt-1" style="color:var(--text-secondary)">{% if is_rtl %}موزع معتمد ورسمي{% else %}Official authorized reseller{% endif %}</p>
       </div>
       <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
         <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">100%</div>
-        <p class="text-sm font-bold" style="color:var(--text-primary)">Genuine Products</p>
-        <p class="text-xs mt-1" style="color:var(--text-secondary)">Authentic with official warranty</p>
+        <p class="text-sm font-bold" style="color:var(--text-primary)">{% if is_rtl %}منتجات أصلية مضمونة{% else %}Genuine Products{% endif %}</p>
+        <p class="text-xs mt-1" style="color:var(--text-secondary)">{% if is_rtl %}أجهزة أصلية مع ضمان رسمي موثوق{% else %}Authentic with official warranty{% endif %}</p>
       </div>
     </div>
     <div class="text-center">
-      <a href="/{{ locale }}/contact/" class="btn-primary">Get In Touch</a>
+      <a href="/{{ locale }}/contact/" class="btn-primary">{% if is_rtl %}تواصل معنا{% else %}Get In Touch{% endif %}</a>
     </div>
   </div>
 </div>

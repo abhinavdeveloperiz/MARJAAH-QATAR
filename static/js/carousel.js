@@ -1,4 +1,4 @@
-﻿// ─── Vanilla Carousel ─────────────────────────────────────────────────────────
+// ─── Vanilla Carousel ─────────────────────────────────────────────────────────
 (function () {
   document.querySelectorAll('[data-carousel]').forEach(function(carousel) {
     const track = carousel.querySelector('[data-carousel-track]');

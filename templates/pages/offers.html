@@ -1,13 +1,17 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
-{% block title %}Flash Deals & Offers — M.SHOP Qatar{% endblock %}
+{% block title %}{% if is_rtl %}العروض والصفقات الحصرية — متجر قطر للتقنية M.SHOP{% else %}Flash Deals & Offers — M.SHOP Qatar{% endif %}{% endblock %}
 {% block content %}
 <div class="pt-[72px] min-h-screen">
   <div class="py-10 border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
     <div class="container-custom">
-      <div class="section-eyebrow">Limited Time</div>
-      <h1 class="text-4xl font-display font-black" style="color:var(--text-primary)">Flash Deals & Offers</h1>
-      <p class="text-sm mt-2" style="color:var(--text-secondary)">Grab them before they're gone!</p>
+      <div class="section-eyebrow">{% if is_rtl %}لفترة محدودة{% else %}Limited Time{% endif %}</div>
+      <h1 class="text-4xl font-display font-black" style="color:var(--text-primary)">
+        {% if is_rtl %}عروض وصفقات خاطفة{% else %}{{ t.flash_deals.title|default:"Flash Deals & Offers" }}{% endif %}
+      </h1>
+      <p class="text-sm mt-2" style="color:var(--text-secondary)">
+        {% if is_rtl %}اغتنم الفرصة قبل نفاد الكمية!{% else %}{{ t.flash_deals.subtitle|default:"Grab them before they're gone!" }}{% endif %}
+      </p>
     </div>
   </div>
   <div class="container-custom py-10">
@@ -16,7 +20,15 @@
       {% for product in deals %}{% include 'partials/product_card.html' %}{% endfor %}
     </div>
     {% else %}
-    <div class="text-center py-24"><p class="font-bold text-xl mb-2" style="color:var(--text-primary)">No deals available right now.</p><p class="text-sm" style="color:var(--text-secondary)">Check back soon for exclusive offers!</p><a href="/{{ locale }}/shop/" class="btn-primary mt-6 inline-flex">Browse All Products</a></div>
+    <div class="text-center py-24">
+      <p class="font-bold text-xl mb-2" style="color:var(--text-primary)">
+        {% if is_rtl %}لا توجد عروض متاحة حالياً.{% else %}No deals available right now.{% endif %}
+      </p>
+      <p class="text-sm" style="color:var(--text-secondary)">
+        {% if is_rtl %}تابعنا قريباً للحصول على عروض حصرية جديدة!{% else %}Check back soon for exclusive offers!{% endif %}
+      </p>
+      <a href="/{{ locale }}/shop/" class="btn-primary mt-6 inline-flex">{{ t.shop.all_products|default:"Browse All Products" }}</a>
+    </div>
     {% endif %}
   </div>
 </div>

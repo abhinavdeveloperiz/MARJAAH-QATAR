@@ -1,4 +1,4 @@
-﻿// ─── Scroll to Top + IntersectionObserver Animations ─────────────────────────
+// ─── Scroll to Top + IntersectionObserver Animations ─────────────────────────
 (function () {
   // Scroll-to-top button
   const btn = document.getElementById('scroll-to-top');

@@ -1,4 +1,4 @@
-﻿// ─── Vanilla Toast Notifications ─────────────────────────────────────────────
+// ─── Vanilla Toast Notifications ─────────────────────────────────────────────
 (function () {
   function createToaster() {
     const el = document.createElement('div');

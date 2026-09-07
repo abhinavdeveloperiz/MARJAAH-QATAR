@@ -1,4 +1,4 @@
-﻿import json
+import json
 from django.test import TestCase, Client
 from django.urls import reverse
 from store.models import User, Category, Brand, Product, Order

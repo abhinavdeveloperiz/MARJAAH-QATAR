@@ -1,4 +1,4 @@
-﻿// ─── Cart System (localStorage + Server AJAX) ─────────────────────────────────
+// ─── Cart System (localStorage + Server AJAX) ─────────────────────────────────
 (function () {
   const LOCALE = document.documentElement.lang || 'en';
 

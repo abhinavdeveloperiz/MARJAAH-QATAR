@@ -1,4 +1,4 @@
-﻿import json
+import json
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
@@ -92,14 +92,15 @@ class Product(models.Model):
     @property
     def images(self):
         try:
-            return json.loads(self.images_json)
+            raw = json.loads(self.images_json)
+            return [f"{img}?v=2" if ('?' not in img) else img for img in raw]
         except Exception:
             return []
 
     @property
     def first_image(self):
         imgs = self.images
-        return imgs[0] if imgs else ''
+        return imgs[0] if (imgs and imgs[0]) else '/static/images/placeholder.svg'
 
     @property
     def specifications(self):

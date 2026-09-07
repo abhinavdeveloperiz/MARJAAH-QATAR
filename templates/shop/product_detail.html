@@ -1,20 +1,20 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
-{% block title %}{{ product.name }} — M.SHOP Qatar{% endblock %}
+{% block title %}{% if is_rtl and product.name_ar %}{{ product.name_ar }}{% else %}{{ product.name }}{% endif %} — {% if is_rtl %}متجر قطر للتقنية M.SHOP{% else %}M.SHOP Qatar{% endif %}{% endblock %}
 {% block content %}
 <div class="pt-[72px]">
   <!-- Breadcrumb -->
   <div class="py-4 border-b" style="border-color:var(--border-color);background:var(--bg-surface)">
     <div class="container-custom flex items-center gap-2 text-xs font-sans" style="color:var(--text-tertiary)">
-      <a href="/{{ locale }}/" class="hover:text-primary-500 transition-colors">Home</a>
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      <a href="/{{ locale }}/shop/" class="hover:text-primary-500 transition-colors">Shop</a>
+      <a href="/{{ locale }}/" class="hover:text-primary-500 transition-colors">{{ t.nav.home|default:"Home" }}</a>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="m9 18 6-6-6-6"/></svg>
+      <a href="/{{ locale }}/shop/" class="hover:text-primary-500 transition-colors">{{ t.nav.shop|default:"Shop" }}</a>
       {% if product.category %}
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      <a href="/{{ locale }}/shop/{{ product.category.slug }}/" class="hover:text-primary-500 transition-colors">{{ product.category.name }}</a>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="m9 18 6-6-6-6"/></svg>
+      <a href="/{{ locale }}/shop/{{ product.category.slug }}/" class="hover:text-primary-500 transition-colors">{% if is_rtl and product.category.name_ar %}{{ product.category.name_ar }}{% else %}{{ product.category.name }}{% endif %}</a>
       {% endif %}
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-      <span style="color:var(--text-primary)" class="truncate max-w-[200px]">{{ product.name }}</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="m9 18 6-6-6-6"/></svg>
+      <span style="color:var(--text-primary)" class="truncate max-w-[200px]">{% if is_rtl and product.name_ar %}{{ product.name_ar }}{% else %}{{ product.name }}{% endif %}</span>
     </div>
   </div>
 
@@ -23,12 +23,12 @@
       <!-- Gallery -->
       <div class="space-y-4">
         <div class="aspect-square rounded-3xl overflow-hidden" style="background:var(--bg-surface-2)">
-          <img id="main-image" src="{{ product.first_image }}" alt="{{ product.name }}"
+          <img id="main-image" src="{{ product.first_image }}" alt="{% if is_rtl and product.name_ar %}{{ product.name_ar }}{% else %}{{ product.name }}{% endif %}"
             class="w-full h-full object-cover transition-opacity duration-300"
             onerror="this.src='{% static "images/placeholder.svg" %}'" />
         </div>
         {% if product.images|length > 1 %}
-        <div class="flex gap-3 overflow-x-auto pb-1">
+        <div class="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
           {% for img in product.images %}
           <button onclick="document.getElementById('main-image').src='{{ img }}'" class="flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all cursor-pointer" style="border-color:transparent" onmouseover="this.style.borderColor='var(--color-accent)'" onmouseout="this.style.borderColor='transparent'">
             <img src="{{ img }}" alt="" class="w-full h-full object-cover" loading="lazy" />
@@ -40,11 +40,13 @@
 
       <!-- Info -->
       <div>
-        <div class="mb-4">
+        <div class="mb-4 flex items-center gap-4">
           {% if product.brand %}<span class="text-xs font-bold uppercase tracking-widest" style="color:var(--color-accent)">{{ product.brand.name }}</span>{% endif %}
-          {% if product.sku %}<span class="ml-4 text-xs font-mono" style="color:var(--text-tertiary)">SKU: {{ product.sku }}</span>{% endif %}
+          {% if product.sku %}<span class="text-xs font-mono" style="color:var(--text-tertiary)">{% if is_rtl %}رمز المنتج: {{ product.sku }}{% else %}SKU: {{ product.sku }}{% endif %}</span>{% endif %}
         </div>
-        <h1 class="text-2xl sm:text-3xl font-display font-black leading-tight mb-4" style="color:var(--text-primary)">{{ product.name }}</h1>
+        <h1 class="text-2xl sm:text-3xl font-display font-black leading-tight mb-4" style="color:var(--text-primary)">
+          {% if is_rtl and product.name_ar %}{{ product.name_ar }}{% else %}{{ product.name }}{% endif %}
+        </h1>
 
         <!-- Rating -->
         {% if product.rating %}
@@ -55,15 +57,19 @@
             {% endfor %}
           </div>
           <span class="text-sm font-bold" style="color:var(--text-primary)">{{ product.rating }}</span>
-          <span class="text-xs" style="color:var(--text-tertiary)">({{ product.review_count }} reviews)</span>
+          <span class="text-xs" style="color:var(--text-tertiary)">{% if is_rtl %}({{ product.review_count }} تقييم){% else %}({{ product.review_count }} reviews){% endif %}</span>
         </div>
         {% endif %}
 
         <!-- Price -->
         <div class="flex items-baseline gap-3 mb-6">
-          <span class="text-4xl font-display font-black" style="color:var(--text-primary)">QAR {{ product.price|floatformat:0 }}</span>
+          <span class="text-4xl font-display font-black" style="color:var(--text-primary)">
+            {% if is_rtl %}{{ product.price|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ product.price|floatformat:0 }}{% endif %}
+          </span>
           {% if product.original_price %}
-          <span class="text-lg line-through" style="color:var(--text-tertiary)">QAR {{ product.original_price|floatformat:0 }}</span>
+          <span class="text-lg line-through" style="color:var(--text-tertiary)">
+            {% if is_rtl %}{{ product.original_price|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ product.original_price|floatformat:0 }}{% endif %}
+          </span>
           {% if product.discount_percent %}
           <span class="px-2 py-0.5 rounded-full text-xs font-bold text-white" style="background:linear-gradient(135deg,#f97316,#ef4444)">-{{ product.discount_percent }}%</span>
           {% endif %}
@@ -71,29 +77,37 @@
         </div>
 
         <!-- Short description -->
-        {% if product.short_description %}
-        <p class="text-sm leading-relaxed mb-6" style="color:var(--text-secondary)">{{ product.short_description }}</p>
+        {% if product.short_description or product.short_description_ar %}
+        <p class="text-sm leading-relaxed mb-6" style="color:var(--text-secondary)">
+          {% if is_rtl and product.short_description_ar %}{{ product.short_description_ar }}{% else %}{{ product.short_description }}{% endif %}
+        </p>
         {% endif %}
 
         <!-- Stock status -->
         <div class="flex items-center gap-2 mb-6">
           {% if product.in_stock %}
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="text-xs font-bold text-emerald-500">In Stock{% if product.stock_count %} ({{ product.stock_count }} left){% endif %}</span>
+          <span class="text-xs font-bold text-emerald-500">
+            {% if is_rtl %}
+              {{ t.product.in_stock|default:"متوفر" }}{% if product.stock_count %} (متبقي {{ product.stock_count }}){% endif %}
+            {% else %}
+              {{ t.product.in_stock|default:"In Stock" }}{% if product.stock_count %} ({{ product.stock_count }} left){% endif %}
+            {% endif %}
+          </span>
           {% else %}
           <span class="w-2 h-2 rounded-full bg-red-400"></span>
-          <span class="text-xs font-bold text-red-400">Out of Stock</span>
+          <span class="text-xs font-bold text-red-400">{{ t.product.out_of_stock|default:"Out of Stock" }}</span>
           {% endif %}
         </div>
 
         <!-- Actions -->
         <div class="flex gap-3 mb-8">
           {% if product.in_stock %}
-          <button data-add-to-cart="{{ product.slug }}" class="btn-primary flex-1 justify-center cursor-pointer">
+          <button data-add-to-cart="{{ product.slug }}" class="btn-primary flex-1 justify-center cursor-pointer flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-            Add to Cart
+            <span>{{ t.product.add_to_cart|default:"Add to Cart" }}</span>
           </button>
-          <button data-wishlist-toggle="{{ product.slug }}" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer {% if in_wishlist %}wishlist-active{% endif %}" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+          <button data-wishlist-toggle="{{ product.slug }}" aria-label="{{ t.product.wishlist|default:'Wishlist' }}" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer {% if in_wishlist %}wishlist-active{% endif %}" style="border-color:var(--border-color);background:var(--bg-surface-2)">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="{% if in_wishlist %}#f87171{% else %}none{% endif %}" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
           {% endif %}
@@ -104,13 +118,17 @@
           {% if product.delivery_days %}
           <div class="flex items-center gap-2 p-3 rounded-xl" style="background:var(--bg-surface-2)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span class="text-xs" style="color:var(--text-secondary)">Delivery in {{ product.delivery_days }} day{% if product.delivery_days != 1 %}s{% endif %}</span>
+            <span class="text-xs" style="color:var(--text-secondary)">
+              {% if is_rtl %}توصيل خلال {{ product.delivery_days }} يوم{% else %}Delivery in {{ product.delivery_days }} day{% if product.delivery_days != 1 %}s{% endif %}{% endif %}
+            </span>
           </div>
           {% endif %}
           {% if product.warranty_months %}
           <div class="flex items-center gap-2 p-3 rounded-xl" style="background:var(--bg-surface-2)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span class="text-xs" style="color:var(--text-secondary)">{{ product.warranty_months }}-month warranty</span>
+            <span class="text-xs" style="color:var(--text-secondary)">
+              {% if is_rtl %}ضمان {{ product.warranty_months }} شهراً{% else %}{{ product.warranty_months }}-month warranty{% endif %}
+            </span>
           </div>
           {% endif %}
         </div>
@@ -119,7 +137,7 @@
         {% if product.specifications %}
         <div class="rounded-2xl overflow-hidden border" style="border-color:var(--border-color)">
           <div class="px-4 py-3 border-b" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <h3 class="text-sm font-bold" style="color:var(--text-primary)">Specifications</h3>
+            <h3 class="text-sm font-bold" style="color:var(--text-primary)">{{ t.product.specifications|default:"Specifications" }}</h3>
           </div>
           <table class="w-full text-xs">
             {% for spec in product.specifications %}
@@ -135,17 +153,19 @@
     </div>
 
     <!-- Description -->
-    {% if product.description %}
+    {% if product.description or product.description_ar %}
     <div class="mt-14 pt-10" style="border-top:1px solid var(--border-color)">
-      <h2 class="text-xl font-display font-bold mb-4" style="color:var(--text-primary)">Description</h2>
-      <p class="text-sm leading-relaxed" style="color:var(--text-secondary)">{{ product.description }}</p>
+      <h2 class="text-xl font-display font-bold mb-4" style="color:var(--text-primary)">{{ t.product.description|default:"Description" }}</h2>
+      <p class="text-sm leading-relaxed" style="color:var(--text-secondary)">
+        {% if is_rtl and product.description_ar %}{{ product.description_ar }}{% else %}{{ product.description }}{% endif %}
+      </p>
     </div>
     {% endif %}
 
     <!-- Related products -->
     {% if related %}
     <div class="mt-16">
-      <h2 class="text-2xl font-display font-black mb-8" style="color:var(--text-primary)">You May Also Like</h2>
+      <h2 class="text-2xl font-display font-black mb-8" style="color:var(--text-primary)">{{ t.product.related|default:"You May Also Like" }}</h2>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {% for product in related %}{% include 'partials/product_card.html' %}{% endfor %}
       </div>
@@ -154,4 +174,3 @@
   </div>
 </div>
 {% endblock %}
-

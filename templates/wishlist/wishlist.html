@@ -1,10 +1,12 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% load static %}
-{% block title %}Wishlist — M.SHOP Qatar{% endblock %}
+{% block title %}{% if is_rtl %}قائمة أمنياتي — متجر قطر للتقنية M.SHOP{% else %}Wishlist — M.SHOP Qatar{% endif %}{% endblock %}
 {% block content %}
 <div class="pt-[72px] min-h-screen">
   <div class="container-custom py-12">
-    <h1 class="text-3xl font-display font-black mb-8" style="color:var(--text-primary)">Wishlist ({{ products.count }})</h1>
+    <h1 class="text-3xl font-display font-black mb-8" style="color:var(--text-primary)">
+      {% if is_rtl %}قائمة المفضلة ({{ products.count }}){% else %}{{ t.nav.wishlist|default:"Wishlist" }} ({{ products.count }}){% endif %}
+    </h1>
     {% if products %}
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
       {% for product in products %}{% include 'partials/product_card.html' %}{% endfor %}
@@ -14,8 +16,11 @@
       <div class="w-24 h-24 rounded-2xl flex items-center justify-center" style="background:var(--bg-surface-2)">
         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
       </div>
-      <div><h3 class="font-display font-bold text-2xl mb-2" style="color:var(--text-primary)">Your wishlist is empty</h3><p class="text-sm" style="color:var(--text-secondary)">Save items you love by clicking the heart icon</p></div>
-      <a href="/{{ locale }}/shop/" class="btn-primary">Browse Products</a>
+      <div>
+        <h3 class="font-display font-bold text-2xl mb-2" style="color:var(--text-primary)">{% if is_rtl %}قائمة المفضلة فارغة{% else %}Your wishlist is empty{% endif %}</h3>
+        <p class="text-sm" style="color:var(--text-secondary)">{% if is_rtl %}احفظ المنتجات التي تنال إعجابك بالنقر على أيقونة القلب{% else %}Save items you love by clicking the heart icon{% endif %}</p>
+      </div>
+      <a href="/{{ locale }}/shop/" class="btn-primary">{% if is_rtl %}تصفح المنتجات{% else %}Browse Products{% endif %}</a>
     </div>
     {% endif %}
   </div>

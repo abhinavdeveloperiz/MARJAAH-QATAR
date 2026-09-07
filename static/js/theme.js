@@ -1,25 +1,27 @@
-﻿// ─── Sky Day/Night Theme Toggle ───────────────────────────────────────────────
+// ─── Sky Day/Night Theme Toggle ───────────────────────────────────────────────
 (function () {
   const STORAGE_KEY = 'marjaah-theme';
 
   function getTheme() {
-    return localStorage.getItem(STORAGE_KEY) || 'light';
+    var stored = localStorage.getItem('marjaah-theme') || localStorage.getItem('theme');
+    return stored || 'dark';
   }
 
   function applyTheme(theme) {
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-      root.classList.remove('light');
-    } else {
+    if (theme === 'light') {
       root.classList.add('light');
       root.classList.remove('dark');
+    } else {
+      root.classList.add('dark');
+      root.classList.remove('light');
     }
     // Sync all toggles on page
     document.querySelectorAll('.theme-switch__checkbox').forEach(function(cb) {
       cb.checked = (theme === 'dark');
     });
     localStorage.setItem(STORAGE_KEY, theme);
+    localStorage.setItem('theme', theme);
   }
 
   function toggleTheme() {

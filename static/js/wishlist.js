@@ -1,4 +1,4 @@
-﻿// ─── Wishlist Toggle (AJAX) ───────────────────────────────────────────────────
+// ─── Wishlist Toggle (AJAX) ───────────────────────────────────────────────────
 (function () {
   const LOCALE = document.documentElement.lang || 'en';
 

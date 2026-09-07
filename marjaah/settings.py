@@ -1,4 +1,4 @@
-﻿"""
+"""
 Django settings for Marjaah Trading — M.SHOP Qatar
 """
 from pathlib import Path

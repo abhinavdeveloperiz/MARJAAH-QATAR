@@ -1,4 +1,4 @@
-﻿// ─── Mobile Menu ──────────────────────────────────────────────────────────────
+// ─── Mobile Menu ──────────────────────────────────────────────────────────────
 (function () {
   const menuBtn = document.getElementById('mobile-menu-btn');
   const closeBtn = document.getElementById('mobile-menu-close');
@@ -27,20 +27,27 @@
 
   // Navbar scroll behavior
   const navbar = document.getElementById('main-navbar');
-  let lastScroll = 0;
-  window.addEventListener('scroll', function() {
-    const y = window.scrollY;
-    if (navbar) {
-      if (y > 20) {
+  const path = window.location.pathname;
+  const isHome = path === '/' || path === '/en/' || path === '/ar/' || path === '/en' || path === '/ar';
+
+  function updateNavbar() {
+    if (!navbar) return;
+    if (isHome) {
+      if (window.scrollY > 20) {
         navbar.classList.add('navbar-scrolled');
         navbar.classList.remove('navbar-transparent');
       } else {
         navbar.classList.remove('navbar-scrolled');
         navbar.classList.add('navbar-transparent');
       }
+    } else {
+      navbar.classList.add('navbar-scrolled');
+      navbar.classList.remove('navbar-transparent');
     }
-    lastScroll = y;
-  }, { passive: true });
+  }
+
+  updateNavbar();
+  window.addEventListener('scroll', updateNavbar, { passive: true });
 
   // Search overlay
   const searchBtn = document.getElementById('search-btn');
@@ -70,11 +77,21 @@
 
   // Language switcher
   document.querySelectorAll('[data-locale-switch]').forEach(btn => {
-    btn.addEventListener('click', function() {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
       const targetLocale = btn.dataset.localeSwitch;
-      const currentPath = window.location.pathname;
-      const newPath = currentPath.replace(/^\/(en|ar)/, '/' + targetLocale);
-      window.location.href = newPath;
+      const pathname = window.location.pathname;
+      let newPath;
+      if (pathname.startsWith('/en/') || pathname.startsWith('/ar/')) {
+        newPath = pathname.replace(/^\/(en|ar)\//, '/' + targetLocale + '/');
+      } else if (pathname === '/en' || pathname === '/ar') {
+        newPath = '/' + targetLocale + '/';
+      } else if (pathname === '/' || !pathname) {
+        newPath = '/' + targetLocale + '/';
+      } else {
+        newPath = '/' + targetLocale + (pathname.startsWith('/') ? pathname : '/' + pathname);
+      }
+      window.location.href = newPath + window.location.search + window.location.hash;
     });
   });
 })();
