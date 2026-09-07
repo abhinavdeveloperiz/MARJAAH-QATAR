@@ -1,0 +1,9 @@
+{
+  "name": "marjaah-qatar",
+  "version": "1.0.0",
+  "description": "M.SHOP Qatar E-Commerce Platform",
+  "scripts": {
+    "build": "./build.sh",
+    "start": "gunicorn marjaah.wsgi:application"
+  }
+}

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: marjaah-qatar
+    runtime: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn marjaah.wsgi:application"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: PORT
+        value: 10000
