@@ -847,3 +847,85 @@ nextjs-portal,
   -webkit-text-stroke: 1.5px rgba(255, 255, 255, 0.35);
   color: transparent;
 }
+
+/* ═══ Dynamic Navbar Colors (Dark vs Light Mode) ═══ */
+html.dark #main-navbar.navbar-transparent {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+html.dark #main-navbar.navbar-scrolled {
+  background: rgba(7, 11, 20, 0.95) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(12px);
+}
+
+html.dark #main-navbar .nav-btn,
+html.dark #main-navbar .nav-link,
+html.dark #main-navbar #user-menu-btn,
+html.dark #main-navbar .user-name {
+  color: #ffffff !important;
+}
+
+html.dark #main-navbar .nav-btn:hover {
+  background-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+html.dark #main-navbar .nav-link:hover {
+  color: #8D9CF5 !important;
+}
+
+html.dark #main-navbar .nav-link-active {
+  color: #ffffff !important;
+  font-weight: 800 !important;
+}
+
+html:not(.dark) #main-navbar {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid rgba(13, 19, 38, 0.10) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+  backdrop-filter: blur(16px);
+}
+
+html:not(.dark) #main-navbar .nav-btn,
+html:not(.dark) #main-navbar #search-btn,
+html:not(.dark) #main-navbar [data-open-cart],
+html:not(.dark) #main-navbar a[aria-label="Wishlist"],
+html:not(.dark) #main-navbar #mobile-menu-btn,
+html:not(.dark) #main-navbar #user-menu-btn,
+html:not(.dark) #main-navbar .user-name {
+  color: #0F172A !important;
+}
+
+html:not(.dark) #main-navbar .nav-btn:hover,
+html:not(.dark) #main-navbar #search-btn:hover,
+html:not(.dark) #main-navbar [data-open-cart]:hover,
+html:not(.dark) #main-navbar #mobile-menu-btn:hover {
+  background-color: rgba(15, 23, 42, 0.07) !important;
+  color: #4063B2 !important;
+}
+
+html:not(.dark) #main-navbar .nav-link {
+  color: #1E293B !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+html:not(.dark) #main-navbar .nav-link:hover {
+  color: #4063B2 !important;
+}
+
+html:not(.dark) #main-navbar .nav-link-active {
+  color: #4063B2 !important;
+  font-weight: 900 !important;
+}
+
+html:not(.dark) #main-navbar .lang-switcher-wrap {
+  border-color: rgba(15, 23, 42, 0.15) !important;
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+html:not(.dark) #main-navbar .lang-switcher-wrap button:not([style*="background:#4063B2"]):not([style*="background: rgb(64, 99, 178)"]) {
+  color: #334155 !important;
+}

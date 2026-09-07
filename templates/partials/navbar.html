@@ -12,14 +12,14 @@
       <!-- Desktop Nav -->
       <nav class="hidden lg:flex items-center gap-8">
         {% for label, href in nav_links %}
-        <a href="{{ href }}" class="text-xs font-sans tracking-widest uppercase transition-all duration-300 {% if current_path == href %}text-white font-black drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]{% else %}text-white/85 hover:text-white hover:tracking-[0.2em] drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] font-bold{% endif %}">{{ label }}</a>
+        <a href="{{ href }}" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 {% if current_path == href %}nav-link-active font-black{% else %}hover:tracking-[0.2em] font-bold{% endif %}">{{ label }}</a>
         {% endfor %}
       </nav>
 
       <!-- Right Actions -->
       <div class="flex items-center gap-1.5 sm:gap-3 md:gap-5 flex-shrink-0">
         <!-- Language Switcher -->
-        <div class="hidden md:flex items-center gap-0.5 rounded-xl px-1 py-1 border transition-all border-white/30 bg-white/10 backdrop-blur-sm">
+        <div class="lang-switcher-wrap hidden md:flex items-center gap-0.5 rounded-xl px-1 py-1 border transition-all border-white/30 bg-white/10 backdrop-blur-sm">
           {% for loc in "en,ar"|split:"," %}
           <button data-locale-switch="{{ loc }}" class="px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold uppercase tracking-widest transition-all cursor-pointer"
             style="background:{% if locale == loc %}#4063B2{% else %}transparent{% endif %};color:{% if locale == loc %}#fff{% else %}rgba(255,255,255,0.75){% endif %}">{{ loc|upper }}</button>
@@ -30,18 +30,18 @@
         <div class="items-center select-none hidden md:flex" style="--toggle-size:10px">{% include 'partials/theme_toggle.html' %}</div>
 
         <!-- Search -->
-        <button id="search-btn" aria-label="Search" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0 bg-transparent hover:bg-white/10 text-white">
+        <button id="search-btn" aria-label="Search" class="nav-btn w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </button>
 
         <!-- Wishlist -->
-        <a href="/{{ locale }}/wishlist/" aria-label="Wishlist" class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 bg-transparent hover:bg-white/10 text-white hover:text-rose-400">
+        <a href="/{{ locale }}/wishlist/" aria-label="Wishlist" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 hover:text-rose-400">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-400"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           <span data-wishlist-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:{% if wishlist_count > 0 %}flex{% else %}none{% endif %}">{{ wishlist_count }}</span>
         </a>
 
         <!-- Cart -->
-        <button data-open-cart aria-label="Open cart" class="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all flex-shrink-0 bg-transparent hover:bg-white/10 text-white">
+        <button data-open-cart aria-label="Open cart" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
           <span data-cart-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:{% if cart_count > 0 %}flex{% else %}none{% endif %}">{{ cart_count }}</span>
         </button>
@@ -50,11 +50,11 @@
         <div class="hidden lg:block relative">
           {% if user.is_authenticated %}
           <div class="relative">
-            <button id="user-menu-btn" class="flex items-center gap-2 px-3 py-2 rounded-xl transition-all cursor-pointer text-white">
+            <button id="user-menu-btn" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-xl transition-all cursor-pointer">
               <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white font-display text-xs" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">
                 {{ user.first_name|first|upper }}{{ user.last_name|first|upper }}
               </div>
-              <span class="text-xs font-sans font-semibold max-w-[80px] truncate text-white">{{ user.first_name }}</span>
+              <span class="user-name text-xs font-sans font-semibold max-w-[80px] truncate">{{ user.first_name }}</span>
             </button>
             <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 w-52 border rounded-2xl shadow-2xl overflow-hidden z-50 animate-fade-in-up" style="background:var(--bg-surface);border-color:var(--border-color)">
               <div class="px-4 py-3" style="border-bottom:1px solid var(--border-color)">
@@ -75,7 +75,7 @@
         </div>
 
         <!-- Mobile menu toggle -->
-        <button id="mobile-menu-btn" aria-label="Open menu" class="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0 bg-transparent hover:bg-white/10 text-white">
+        <button id="mobile-menu-btn" aria-label="Open menu" class="nav-btn lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
         </button>
       </div>
