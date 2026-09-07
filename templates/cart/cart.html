@@ -1,0 +1,82 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}Shopping Cart — M.SHOP Qatar{% endblock %}
+{% block content %}
+<div class="pt-[72px] min-h-screen">
+  <div class="container-custom py-12">
+    <h1 class="text-3xl font-display font-black mb-8" style="color:var(--text-primary)">Shopping Cart</h1>
+    {% if cart_items %}
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Items -->
+      <div class="lg:col-span-2 space-y-4">
+        {% for item in cart_items %}
+        <div class="flex gap-4 p-4 rounded-2xl" style="background:var(--bg-surface);border:1px solid var(--border-color)" data-cart-item>
+          <div class="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
+            <img src="{{ item.image }}" alt="{{ item.name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='{% static "images/placeholder.svg" %}'" />
+          </div>
+          <div class="flex-1">
+            <h4 class="font-semibold text-sm leading-snug mb-1" style="color:var(--text-primary)">{{ item.name }}</h4>
+            <p class="text-xs mb-3" style="color:var(--text-secondary)">{{ item.brand }}</p>
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 rounded-xl p-1" style="background:var(--bg-surface-2)">
+                <button data-cart-qty="{{ item.slug }}" data-delta="-1" class="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-all" style="background:var(--bg-surface);color:var(--text-secondary)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/></svg>
+                </button>
+                <span data-qty-display class="text-sm font-medium w-6 text-center" style="color:var(--text-primary)">{{ item.quantity }}</span>
+                <button data-cart-qty="{{ item.slug }}" data-delta="1" class="w-7 h-7 rounded-lg flex items-center justify-center cursor-pointer transition-all" style="background:var(--bg-surface);color:var(--text-secondary)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                </button>
+              </div>
+              <div class="flex items-center gap-4">
+                <span class="font-bold text-sm" style="color:var(--text-primary)">QAR {{ item.price|floatformat:0 }}</span>
+                <button data-cart-remove="{{ item.slug }}" class="w-8 h-8 flex items-center justify-center rounded-xl cursor-pointer transition-all" style="color:var(--text-secondary)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Summary -->
+      <div class="lg:col-span-1">
+        <div class="rounded-3xl p-6 sticky top-24" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <h2 class="font-bold text-lg mb-6" style="color:var(--text-primary)">Order Summary</h2>
+          {% if subtotal < 500 %}
+          <div class="rounded-xl p-3 mb-5 text-center" style="background:var(--bg-surface-2)">
+            <p class="text-xs" style="color:var(--text-secondary)">Add <strong style="color:var(--color-accent)">QAR {{ 500|add:subtotal|floatformat:0 }}</strong> more for free delivery! 🚚</p>
+            <div class="w-full rounded-full mt-2 h-1.5" style="background:var(--bg-surface-3)">
+              <div class="h-full rounded-full" style="width:{{ subtotal|floatformat:0 }}%;max-width:100%;background:var(--color-accent)"></div>
+            </div>
+          </div>
+          {% endif %}
+          <div class="space-y-3 text-sm">
+            <div class="flex justify-between"><span style="color:var(--text-secondary)">Subtotal</span><span class="font-medium" style="color:var(--text-primary)">QAR {{ subtotal|floatformat:0 }}</span></div>
+            <div class="flex justify-between"><span style="color:var(--text-secondary)">Shipping</span><span {% if shipping == 0 %}class="text-emerald-500 font-medium"{% else %}style="color:var(--text-primary)"{% endif %}>{% if shipping == 0 %}Free 🎉{% else %}QAR {{ shipping }}{% endif %}</span></div>
+            <div class="pt-3 border-t flex justify-between" style="border-color:var(--border-color)">
+              <span class="font-bold" style="color:var(--text-primary)">Total</span>
+              <span class="text-xl font-display font-black" style="color:var(--color-accent)">QAR {{ total|floatformat:0 }}</span>
+            </div>
+          </div>
+          <a href="/{{ locale }}/checkout/" class="btn-primary w-full justify-center mt-6 flex">
+            Proceed to Checkout
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+          <a href="/{{ locale }}/shop/" class="btn-ghost w-full justify-center mt-3 flex text-sm" style="color:var(--text-secondary)">Continue Shopping</a>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-28 gap-6 text-center">
+      <div class="w-24 h-24 rounded-2xl flex items-center justify-center" style="background:var(--bg-surface-2)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-secondary)"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      </div>
+      <div><h3 class="font-display font-bold text-2xl mb-2" style="color:var(--text-primary)">Your cart is empty</h3><p class="text-sm" style="color:var(--text-secondary)">Add some products to get started</p></div>
+      <a href="/{{ locale }}/shop/" class="btn-primary">Start Shopping</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

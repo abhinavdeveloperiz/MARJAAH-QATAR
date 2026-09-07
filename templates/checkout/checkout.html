@@ -1,0 +1,75 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}Checkout — M.SHOP Qatar{% endblock %}
+{% block content %}
+<div class="pt-[72px] min-h-screen">
+  <div class="container-custom py-12 max-w-5xl">
+    <h1 class="text-3xl font-display font-black mb-8" style="color:var(--text-primary)">Checkout</h1>
+    <form method="post" class="grid lg:grid-cols-3 gap-8">
+      {% csrf_token %}
+      <!-- Form -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Delivery Address -->
+        <div class="rounded-3xl p-6" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">Delivery Address</h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div class="col-span-2"><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Full Name</label>{{ form.full_name }}</div>
+            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Phone</label>{{ form.phone }}</div>
+            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Email (optional)</label>{{ form.email }}</div>
+            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Building/Villa No.</label>{{ form.building }}</div>
+            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Street Name</label>{{ form.street }}</div>
+            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Zone / Area</label>{{ form.zone }}</div>
+            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">City</label>{{ form.city }}</div>
+          </div>
+          {% if form.errors %}
+          <div class="mt-4 p-3 rounded-xl border border-red-400/30 bg-red-500/10 text-xs text-red-400">Please fill in all required fields.</div>
+          {% endif %}
+        </div>
+        <!-- Payment -->
+        <div class="rounded-3xl p-6" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">Payment Method</h2>
+          <div class="space-y-3">
+            {% for choice_val, choice_label in form.payment_method.field.choices %}
+            <label class="flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all" style="border-color:var(--border-color);background:var(--bg-surface-2)" onmouseover="this.style.borderColor='var(--color-accent)'" onmouseout="if(!this.querySelector('input').checked)this.style.borderColor='var(--border-color)'">
+              <input type="radio" name="payment_method" value="{{ choice_val }}" {% if choice_val == 'cash' %}checked{% endif %} class="accent-blue-500" />
+              <span class="text-sm font-medium" style="color:var(--text-primary)">{{ choice_label }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Order Summary -->
+      <div class="lg:col-span-1">
+        <div class="rounded-3xl p-6 sticky top-24" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">Order Summary</h2>
+          <div class="space-y-3 mb-5">
+            {% for item in cart_items %}
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
+                <img src="{{ item.image }}" alt="{{ item.name }}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='{% static "images/placeholder.svg" %}'" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium truncate" style="color:var(--text-primary)">{{ item.name }}</p>
+                <p class="text-[10px]" style="color:var(--text-tertiary)">x{{ item.quantity }}</p>
+              </div>
+              <span class="text-xs font-bold" style="color:var(--text-primary)">QAR {{ item.price|floatformat:0 }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          <div class="space-y-2 text-sm pt-4 border-t" style="border-color:var(--border-color)">
+            <div class="flex justify-between"><span style="color:var(--text-secondary)">Subtotal</span><span style="color:var(--text-primary)">QAR {{ subtotal|floatformat:0 }}</span></div>
+            <div class="flex justify-between"><span style="color:var(--text-secondary)">Shipping</span><span {% if shipping == 0 %}class="text-emerald-500"{% else %}style="color:var(--text-primary)"{% endif %}>{% if shipping == 0 %}Free 🎉{% else %}QAR {{ shipping }}{% endif %}</span></div>
+            <div class="flex justify-between pt-3 border-t" style="border-color:var(--border-color)">
+              <span class="font-bold" style="color:var(--text-primary)">Total</span>
+              <span class="text-xl font-display font-black" style="color:var(--color-accent)">QAR {{ total|floatformat:0 }}</span>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary w-full justify-center mt-6 flex">Place Order <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+

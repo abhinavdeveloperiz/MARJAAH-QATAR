@@ -1,0 +1,45 @@
+﻿{% extends "base.html" %}
+{% block title %}Sign In — M.SHOP Qatar{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4" style="background:var(--bg-base);padding-top:72px;padding-bottom:3rem">
+  <!-- Background glow -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] rounded-full opacity-10" style="background:radial-gradient(circle,#4063B2,transparent 70%)"></div>
+  </div>
+  <div class="relative z-10 w-full max-w-md">
+    <div class="rounded-3xl p-8 shadow-2xl border animate-fade-in-up" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <!-- Logo & Badge -->
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6" style="border-color:rgba(141,156,245,0.3);background:rgba(64,99,178,0.1)">
+          <span class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+          <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--color-accent)">M.SHOP Qatar</span>
+        </div>
+        <h1 class="text-2xl font-display font-black mb-1" style="color:var(--text-primary)">Sign In</h1>
+        <p class="text-sm" style="color:var(--text-secondary)">Access your M.SHOP account</p>
+      </div>
+      {% if error %}
+      <div class="mb-5 p-3 rounded-xl border text-xs font-medium" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#f87171">{{ error }}</div>
+      {% endif %}
+      <form method="post" class="space-y-4">
+        {% csrf_token %}
+        <div>
+          <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Email Address</label>
+          {{ form.email }}
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="text-xs font-bold" style="color:var(--text-secondary)">Password</label>
+            <a href="/{{ locale }}/auth/forgot-password/" class="text-xs transition-colors hover:underline" style="color:var(--color-accent)">Forgot password?</a>
+          </div>
+          {{ form.password }}
+        </div>
+        <button type="submit" class="btn-primary w-full justify-center mt-2">Sign In <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+      </form>
+      <p class="text-center text-xs mt-6" style="color:var(--text-tertiary)">New to M.SHOP? <a href="/{{ locale }}/auth/register/" class="font-bold underline" style="color:var(--color-accent)">Create account</a></p>
+      <div class="text-center mt-4">
+        <a href="/{{ locale }}/" class="text-xs transition-colors hover:underline" style="color:var(--text-tertiary)">← Back to Store</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

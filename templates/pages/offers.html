@@ -1,0 +1,23 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}Flash Deals & Offers — M.SHOP Qatar{% endblock %}
+{% block content %}
+<div class="pt-[72px] min-h-screen">
+  <div class="py-10 border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
+    <div class="container-custom">
+      <div class="section-eyebrow">Limited Time</div>
+      <h1 class="text-4xl font-display font-black" style="color:var(--text-primary)">Flash Deals & Offers</h1>
+      <p class="text-sm mt-2" style="color:var(--text-secondary)">Grab them before they're gone!</p>
+    </div>
+  </div>
+  <div class="container-custom py-10">
+    {% if deals %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for product in deals %}{% include 'partials/product_card.html' %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-24"><p class="font-bold text-xl mb-2" style="color:var(--text-primary)">No deals available right now.</p><p class="text-sm" style="color:var(--text-secondary)">Check back soon for exclusive offers!</p><a href="/{{ locale }}/shop/" class="btn-primary mt-6 inline-flex">Browse All Products</a></div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

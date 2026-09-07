@@ -1,0 +1,70 @@
+﻿{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Shop — M.SHOP Qatar Tech Store{% endblock %}
+
+{% block content %}
+<div class="pt-[72px] min-h-screen">
+  <!-- Shop Header -->
+  <div class="py-10 border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
+    <div class="container-custom">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 class="text-3xl font-display font-black" style="color:var(--text-primary)">{% if category %}{{ category.name }}{% else %}All Products{% endif %}</h1>
+          <p class="text-sm mt-1" style="color:var(--text-secondary)">{{ total_count }} results found</p>
+        </div>
+        <!-- Sort -->
+        <div class="flex items-center gap-3">
+          <form method="get" class="flex items-center gap-2">
+            {% if search %}<input type="hidden" name="search" value="{{ search }}" />{% endif %}
+            <select name="sort" onchange="this.form.submit()" class="px-3 py-2 rounded-xl border text-sm focus:outline-none" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
+              <option value="featured" {% if current_sort == "featured" %}selected{% endif %}>Featured</option>
+              <option value="newest" {% if current_sort == "newest" %}selected{% endif %}>Newest</option>
+              <option value="price_asc" {% if current_sort == "price_asc" %}selected{% endif %}>Price: Low to High</option>
+              <option value="price_desc" {% if current_sort == "price_desc" %}selected{% endif %}>Price: High to Low</option>
+              <option value="rating" {% if current_sort == "rating" %}selected{% endif %}>Top Rated</option>
+            </select>
+          </form>
+        </div>
+      </div>
+      <!-- Search bar -->
+      <form method="get" class="mt-6">
+        <div class="relative max-w-lg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--text-tertiary)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" name="search" value="{{ search }}" placeholder="Search products, brands..."
+            class="w-full pl-11 pr-4 py-3 rounded-2xl border text-sm focus:outline-none transition-all"
+            style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)"
+            onfocus="this.style.borderColor='var(--color-accent)'" onblur="this.style.borderColor='var(--border-color)'" />
+        </div>
+      </form>
+      <!-- Category tabs -->
+      <div class="flex gap-2 mt-5 overflow-x-auto pb-1">
+        <a href="/{{ locale }}/shop/" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all {% if not category %}bg-primary-500 text-white{% endif %}" style="{% if not category %}background:#4063B2;color:#fff{% else %}background:var(--bg-surface-2);color:var(--text-secondary){% endif %}">All Products</a>
+        {% for cat in all_categories %}
+        <a href="/{{ locale }}/shop/{{ cat.slug }}/" class="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all" style="{% if category.slug == cat.slug %}background:#4063B2;color:#fff{% else %}background:var(--bg-surface-2);color:var(--text-secondary){% endif %}">{{ cat.name }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="container-custom py-10">
+    {% if products %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for product in products %}{% include 'partials/product_card.html' %}{% endfor %}
+    </div>
+    {% else %}
+    <div class="flex flex-col items-center justify-center py-24 gap-6 text-center">
+      <div class="w-20 h-20 rounded-2xl flex items-center justify-center" style="background:var(--bg-surface-2)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-secondary)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      </div>
+      <div>
+        <h3 class="font-display font-bold text-xl mb-2" style="color:var(--text-primary)">No products found</h3>
+        <p class="text-sm" style="color:var(--text-secondary)">Try adjusting your search or filters</p>
+      </div>
+      <a href="/{{ locale }}/shop/" class="btn-primary">Browse All Products</a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

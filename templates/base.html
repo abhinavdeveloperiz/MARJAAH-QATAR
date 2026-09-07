@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html lang="{{ locale }}" dir="{% if is_rtl %}rtl{% else %}ltr{% endif %}" class="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}M.SHOP Qatar — High-Performance Hardware & Computers{% endblock %}</title>
+  <meta name="description" content="{% block description %}Qatar's premier destination for high-performance laptops, PC components, gaming hardware, and genuine tech accessories with official brand warranties.{% endblock %}" />
+  <link rel="icon" href="/static/favicon.svg" />
+  {% load static %}
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700;800;900&family=Urbanist:wght@600;700;800;900&family=Syne:wght@700;800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN with full custom config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            base: 'var(--bg-base)',
+            surface: { DEFAULT: 'var(--bg-surface)', 2: 'var(--bg-surface-2)', 3: 'var(--bg-surface-3)' },
+            'text-primary': 'var(--text-primary)',
+            'text-secondary': 'var(--text-secondary)',
+            'text-tertiary': 'var(--text-tertiary)',
+            'border-default': 'var(--border-color)',
+            navy: { DEFAULT: '#070B14', 50: '#1A2540', 100: '#151F36', 200: '#10182C', 300: '#0C1222', 400: '#090E1B', 500: '#070B14' },
+            primary: { DEFAULT: '#4063B2', 50: '#EEF2FF', 100: '#E0E7FF', 200: '#C7D2FE', 300: '#A5B4FC', 400: '#8D9CF5', 500: '#4063B2', 600: '#36529A', 700: '#2C427F', 800: '#223363', 900: '#182447' },
+            accent: { DEFAULT: '#8D9CF5', light: '#A8B4F8', dark: '#6F80EB', 500: '#8D9CF5', 400: '#A8B4F8' },
+            violet: { DEFAULT: '#BB9AED', light: '#CEB7F2', dark: '#9E76E4' },
+            dark: { DEFAULT: '#070B14', 50: '#131C32', 100: '#0F172A', 200: '#0B1120', 300: '#070B14' },
+            muted: 'var(--text-secondary)',
+            taupe: '#94A3B8',
+            sage: '#8D9CF5',
+            cyan: { DEFAULT: '#8D9CF5', soft: '#A8B4F8', dark: '#4063B2' },
+            'soft-blue': '#BB9AED',
+            charcoal: '#1E293B',
+            'light-gray': '#F8FAFC',
+            success: '#10B981',
+            error: '#EF4444',
+            qar: '#8D9CF5',
+          },
+          fontFamily: {
+            guminert: ["'Space Grotesk'", 'Outfit', 'Urbanist', 'sans-serif'],
+            tall: ["'Space Grotesk'", 'Outfit', 'sans-serif'],
+            display: ["'Space Grotesk'", 'Outfit', 'sans-serif'],
+            sans: ['Inter', 'Outfit', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            outfit: ['Outfit', 'sans-serif'],
+          },
+          fontSize: { '2xs': ['0.625rem', { lineHeight: '1rem' }], '18vw': ['18vw', { lineHeight: '0.85' }] },
+          transitionTimingFunction: { fluid: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+          animation: {
+            'float': 'float 6s ease-in-out infinite',
+            'float-slow': 'float 9s ease-in-out infinite',
+            'marquee': 'marquee 30s linear infinite',
+            'fade-in': 'fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'fade-in-up': 'fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          },
+          keyframes: {
+            float: { '0%, 100%': { transform: 'translateY(0px)' }, '50%': { transform: 'translateY(-20px)' } },
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            marquee: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } },
+          },
+          boxShadow: {
+            'glow-primary': '0 0 25px rgba(64, 99, 178, 0.35)',
+            'glow-accent': '0 0 25px rgba(141, 156, 245, 0.4)',
+            'view-btn': '0 8px 30px rgba(0, 0, 0, 0.5)',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Global CSS (design tokens + component classes) -->
+  <link rel="stylesheet" href="{% static 'css/globals.css' %}" />
+
+  <!-- Inline anim helpers -->
+  <style>
+    [data-animate] { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+    [data-animate].anim-visible { opacity: 1; transform: none; }
+    .navbar-scrolled { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(13,19,38,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important; }
+    .dark .navbar-scrolled { background: rgba(7,11,20,0.95) !important; }
+    .navbar-transparent { background: transparent !important; border-color: transparent !important; box-shadow: none !important; }
+    .translate-x-full { transform: translateX(100%) !important; }
+    .translate-x-0 { transform: translateX(0) !important; }
+    /* Icon SVG reset for lucide-like icons loaded via CDN */
+    .icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+
+  <!-- Theme init (before render to avoid flash) -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('marjaah-theme') || 'light';
+      document.documentElement.classList.add(t === 'dark' ? 'dark' : 'light');
+    })();
+  </script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body style="background-color:var(--bg-base);color:var(--text-primary);" class="font-sans antialiased">
+
+  <!-- NAVBAR -->
+  {% include 'partials/navbar.html' %}
+
+  <!-- CART DRAWER -->
+  {% include 'partials/cart_drawer.html' %}
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 min-h-screen">
+    {% if messages %}
+      <div class="fixed top-20 right-4 z-[200] space-y-2">
+        {% for message in messages %}
+          <div class="px-4 py-3 rounded-xl text-sm font-sans font-medium shadow-lg border animate-fade-in-up"
+               style="background:var(--bg-surface);color:var(--text-primary);border-color:var(--border-color);">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- FOOTER -->
+  {% include 'partials/footer.html' %}
+
+  <!-- SCROLL TO TOP -->
+  <button id="scroll-to-top" aria-label="Scroll to top"
+    style="opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;"
+    class="fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
+    style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+  </button>
+
+  <!-- WHATSAPP WIDGET -->
+  <a href="https://wa.me/97455667788" target="_blank" rel="noopener noreferrer"
+    class="fixed bottom-20 right-6 z-50 w-12 h-12 rounded-full flex items-center justify-center shadow-xl transition-transform hover:scale-110"
+    style="background:#25D366;" aria-label="Chat on WhatsApp">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  </a>
+
+  <!-- Toast container -->
+  <div id="toast-container" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;"></div>
+
+  <!-- JS -->
+  <script src="{% static 'js/theme.js' %}"></script>
+  <script src="{% static 'js/toast.js' %}"></script>
+  <script src="{% static 'js/cart.js' %}"></script>
+  <script src="{% static 'js/wishlist.js' %}"></script>
+  <script src="{% static 'js/mobile-menu.js' %}"></script>
+  <script src="{% static 'js/scroll.js' %}"></script>
+  <script src="{% static 'js/carousel.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

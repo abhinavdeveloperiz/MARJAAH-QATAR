@@ -1,0 +1,205 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}Admin Dashboard — M.SHOP Qatar{% endblock %}
+
+{% block content %}
+<div class="pt-[72px] min-h-screen" style="background:var(--bg-base);">
+  <div class="container-custom py-10">
+    <!-- Header -->
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2" style="background:rgba(64,99,178,0.15);color:var(--color-accent);border:1px solid rgba(64,99,178,0.3)">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Staff Console
+        </div>
+        <h1 class="text-3xl font-display font-black" style="color:var(--text-primary)">Store Operations Dashboard</h1>
+        <p class="text-sm mt-1" style="color:var(--text-secondary)">Overview of catalogue metrics, inventory levels, and orders</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="/admin/" target="_blank" class="btn-primary text-sm flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+          Django Admin Panel
+        </a>
+        <a href="/{{ locale }}/" class="btn-ghost text-sm">View Storefront</a>
+      </div>
+    </div>
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div class="p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Total Products</span>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-[#4063B2]" style="background:rgba(64,99,178,0.1)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
+          </div>
+        </div>
+        <div class="text-3xl font-display font-black" style="color:var(--text-primary)">{{ total_products }}</div>
+        <p class="text-xs mt-2" style="color:var(--text-tertiary)">In catalogue</p>
+      </div>
+
+      <div class="p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Total Orders</span>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-emerald-500" style="background:rgba(16,185,129,0.1)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          </div>
+        </div>
+        <div class="text-3xl font-display font-black" style="color:var(--text-primary)">{{ total_orders }}</div>
+        <p class="text-xs mt-2 text-emerald-500">Processed to date</p>
+      </div>
+
+      <div class="p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Registered Users</span>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-purple-500" style="background:rgba(168,85,247,0.1)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+        </div>
+        <div class="text-3xl font-display font-black" style="color:var(--text-primary)">{{ total_users }}</div>
+        <p class="text-xs mt-2" style="color:var(--text-tertiary)">Active accounts</p>
+      </div>
+
+      <div class="p-6 rounded-2xl border transition-all duration-300 hover:shadow-lg" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Low Stock Alerts</span>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center text-amber-500" style="background:rgba(245,158,11,0.1)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          </div>
+        </div>
+        <div class="text-3xl font-display font-black text-amber-500">{{ low_stock|length }}</div>
+        <p class="text-xs mt-2 text-amber-500/80">Items &lt; 10 units</p>
+      </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Recent Orders (2 cols) -->
+      <div class="lg:col-span-2 rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="px-6 py-4 flex items-center justify-between border-b" style="border-color:var(--border-color)">
+          <h2 class="font-bold text-base" style="color:var(--text-primary)">Recent Orders</h2>
+          <a href="/admin/store/order/" target="_blank" class="text-xs font-bold hover:underline" style="color:var(--color-accent)">Manage in Admin &rarr;</a>
+        </div>
+        {% if recent_orders %}
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm">
+            <thead>
+              <tr class="border-b text-xs uppercase" style="border-color:var(--border-color);color:var(--text-tertiary)">
+                <th class="px-6 py-3">Order #</th>
+                <th class="px-6 py-3">Customer</th>
+                <th class="px-6 py-3">Date</th>
+                <th class="px-6 py-3">Status</th>
+                <th class="px-6 py-3 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y" style="border-color:var(--border-color)">
+              {% for order in recent_orders %}
+              <tr class="hover:bg-white/[0.02] transition-colors">
+                <td class="px-6 py-4 font-mono font-bold text-xs" style="color:var(--text-primary)">{{ order.order_number }}</td>
+                <td class="px-6 py-4" style="color:var(--text-secondary)">{{ order.user.email|default:"Guest" }}</td>
+                <td class="px-6 py-4 text-xs" style="color:var(--text-tertiary)">{{ order.created_at|date:"M d, Y" }}</td>
+                <td class="px-6 py-4">
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold capitalize" style="background:rgba(64,99,178,0.1);color:var(--color-accent)">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 text-right font-bold" style="color:var(--text-primary)">QAR {{ order.total|floatformat:0 }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="p-8 text-center" style="color:var(--text-tertiary)">
+          <p class="text-sm">No orders recorded yet.</p>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Low Stock Column (1 col) -->
+      <div class="rounded-2xl border overflow-hidden flex flex-col" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="px-6 py-4 flex items-center justify-between border-b" style="border-color:var(--border-color)">
+          <h2 class="font-bold text-base" style="color:var(--text-primary)">Low Stock Attention</h2>
+          <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-400">{{ low_stock|length }} alerts</span>
+        </div>
+        <div class="p-6 flex-1 divide-y" style="border-color:var(--border-color)">
+          {% if low_stock %}
+            {% for item in low_stock %}
+            <div class="py-3.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3">
+              <div class="truncate">
+                <p class="text-sm font-bold truncate" style="color:var(--text-primary)">{{ item.name }}</p>
+                <p class="text-xs" style="color:var(--text-tertiary)">{{ item.brand.name }} &bull; QAR {{ item.price|floatformat:0 }}</p>
+              </div>
+              <div class="text-right shrink-0">
+                <span class="px-2 py-1 rounded-lg text-xs font-bold {% if item.stock_count == 0 %}bg-red-500/20 text-red-400{% else %}bg-amber-500/20 text-amber-400{% endif %}">
+                  {{ item.stock_count }} left
+                </span>
+              </div>
+            </div>
+            {% endfor %}
+          {% else %}
+            <div class="py-8 text-center" style="color:var(--text-tertiary)">
+              <p class="text-sm">All products have sufficient stock levels.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Catalogue Preview -->
+    <div class="mt-8 rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="px-6 py-4 flex items-center justify-between border-b" style="border-color:var(--border-color)">
+        <h2 class="font-bold text-base" style="color:var(--text-primary)">Catalogue Preview (Top 20)</h2>
+        <a href="/admin/store/product/" target="_blank" class="btn-primary text-xs py-1.5 px-3">Add / Edit Products</a>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b text-xs uppercase" style="border-color:var(--border-color);color:var(--text-tertiary)">
+              <th class="px-6 py-3">Product</th>
+              <th class="px-6 py-3">Category</th>
+              <th class="px-6 py-3">Brand</th>
+              <th class="px-6 py-3">Price</th>
+              <th class="px-6 py-3">Stock</th>
+              <th class="px-6 py-3">Status</th>
+              <th class="px-6 py-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y" style="border-color:var(--border-color)">
+            {% for p in all_products %}
+            <tr class="hover:bg-white/[0.02] transition-colors">
+              <td class="px-6 py-4 font-bold" style="color:var(--text-primary)">
+                <div class="flex items-center gap-3">
+                  <div class="w-9 h-9 rounded-lg bg-surface-2 overflow-hidden flex items-center justify-center shrink-0 border" style="border-color:var(--border-color)">
+                    {% if p.images %}
+                      <img src="{{ p.images.0 }}" alt="{{ p.name }}" class="w-full h-full object-contain p-1" onerror="this.src='/static/images/logo-icon.png'"/>
+                    {% else %}
+                      <span class="text-xs font-bold">M</span>
+                    {% endif %}
+                  </div>
+                  <span class="truncate max-w-[200px]">{{ p.name }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-xs" style="color:var(--text-secondary)">{{ p.category.name|default:"-" }}</td>
+              <td class="px-6 py-4 text-xs" style="color:var(--text-secondary)">{{ p.brand.name|default:"-" }}</td>
+              <td class="px-6 py-4 font-bold" style="color:var(--text-primary)">QAR {{ p.price|floatformat:0 }}</td>
+              <td class="px-6 py-4 text-xs font-mono">{{ p.stock_count }}</td>
+              <td class="px-6 py-4">
+                {% if p.in_stock %}
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/20 text-emerald-400">In Stock</span>
+                {% else %}
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-500/20 text-red-400">Out of Stock</span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-right">
+                <a href="/admin/store/product/{{ p.id }}/change/" target="_blank" class="text-xs font-bold hover:underline" style="color:var(--color-accent)">Edit</a>
+                &bull;
+                <a href="/{{ locale }}/product/{{ p.slug }}/" target="_blank" class="text-xs hover:underline" style="color:var(--text-tertiary)">View</a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

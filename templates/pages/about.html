@@ -1,0 +1,36 @@
+﻿{% extends "base.html" %}
+{% block title %}About M.SHOP — Qatar's Tech Store{% endblock %}
+{% block content %}
+<div class="pt-[72px] min-h-screen">
+  <div class="py-20 text-center relative overflow-hidden" style="background:var(--bg-surface)">
+    <div class="absolute inset-0 pointer-events-none"><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] rounded-full opacity-10" style="background:radial-gradient(circle,#4063B2,transparent 70%)"></div></div>
+    <div class="relative container-custom max-w-3xl">
+      <div class="section-eyebrow">Our Story</div>
+      <h1 class="text-5xl sm:text-6xl font-display font-black mb-6" style="color:var(--text-primary)">Qatar's Hardware<br/><span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Authority.</span></h1>
+      <p class="text-base leading-relaxed max-w-2xl mx-auto" style="color:var(--text-secondary)">M.SHOP is Qatar's premier destination for high-performance computing hardware. We curate the world's best tech products — from flagship laptops and RTX workstations to OLED monitors and gaming peripherals — backed by official GCC warranties and expert support.</p>
+    </div>
+  </div>
+  <div class="container-custom py-16">
+    <div class="grid sm:grid-cols-3 gap-8 mb-16">
+      <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+        <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">500+</div>
+        <p class="text-sm font-bold" style="color:var(--text-primary)">Products Stocked</p>
+        <p class="text-xs mt-1" style="color:var(--text-secondary)">Latest hardware from top brands</p>
+      </div>
+      <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+        <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">50+</div>
+        <p class="text-sm font-bold" style="color:var(--text-primary)">Global Brands</p>
+        <p class="text-xs mt-1" style="color:var(--text-secondary)">Official authorized reseller</p>
+      </div>
+      <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+        <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">100%</div>
+        <p class="text-sm font-bold" style="color:var(--text-primary)">Genuine Products</p>
+        <p class="text-xs mt-1" style="color:var(--text-secondary)">Authentic with official warranty</p>
+      </div>
+    </div>
+    <div class="text-center">
+      <a href="/{{ locale }}/contact/" class="btn-primary">Get In Touch</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

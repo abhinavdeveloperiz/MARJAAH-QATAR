@@ -1,0 +1,64 @@
+﻿{% load static %}
+<div data-animate class="card group relative rounded-2xl overflow-hidden flex flex-col" style="transition-delay:{{ forloop.counter0 }}0ms">
+  <!-- Image -->
+  <a href="/{{ locale }}/product/{{ product.slug }}/" class="relative overflow-hidden block" style="aspect-ratio:4/3">
+    {% if product.is_on_sale and product.discount_percent %}
+    <div class="absolute top-3 left-3 z-10 px-2 py-0.5 rounded-full text-[10px] font-bold text-white" style="background:linear-gradient(135deg,#f97316,#ef4444)">-{{ product.discount_percent }}%</div>
+    {% endif %}
+    {% if product.is_new %}
+    <div class="absolute top-3 {% if product.is_on_sale %}left-16{% else %}left-3{% endif %} z-10 px-2 py-0.5 rounded-full text-[10px] font-bold text-white" style="background:linear-gradient(135deg,#10B981,#059669)">NEW</div>
+    {% endif %}
+    <!-- Wishlist -->
+    <button data-wishlist-toggle="{{ product.slug }}" aria-label="Toggle wishlist"
+      class="absolute top-3 right-3 z-10 w-8 h-8 rounded-xl flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 cursor-pointer"
+      style="background:var(--bg-surface);border:1px solid var(--border-color)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+    </button>
+    <!-- Image -->
+    <img src="{{ product.first_image }}" alt="{{ product.name }}"
+      class="w-full h-full object-cover transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
+      loading="lazy"
+      onerror="this.src='{% static "images/placeholder.svg" %}'" />
+  </a>
+
+  <!-- Info -->
+  <div class="p-4 flex flex-col flex-1">
+    <div class="mb-2">
+      {% if product.brand %}
+      <span class="text-[10px] font-bold uppercase tracking-widest" style="color:var(--color-accent)">{{ product.brand.name }}</span>
+      {% endif %}
+      <a href="/{{ locale }}/product/{{ product.slug }}/" class="block text-sm font-semibold leading-snug mt-0.5 line-clamp-2 hover:text-primary-500 transition-colors" style="color:var(--text-primary)">{{ product.name }}</a>
+    </div>
+
+    <!-- Rating -->
+    {% if product.rating %}
+    <div class="flex items-center gap-1.5 mb-3">
+      <div class="flex items-center gap-0.5">
+        {% for i in product.star_range %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" {% if i <= product.rating|floatformat:0|add:"0" %}fill="#f59e0b"{% else %}fill="none"{% endif %} stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        {% endfor %}
+      </div>
+      <span class="text-[10px]" style="color:var(--text-tertiary)">({{ product.review_count }})</span>
+    </div>
+    {% endif %}
+
+    <!-- Price -->
+    <div class="flex items-center gap-2 mb-4 mt-auto">
+      <span class="font-display font-bold text-lg" style="color:var(--text-primary)">QAR {{ product.price|floatformat:0 }}</span>
+      {% if product.original_price %}
+      <span class="text-xs line-through" style="color:var(--text-tertiary)">QAR {{ product.original_price|floatformat:0 }}</span>
+      {% endif %}
+    </div>
+
+    <!-- Add to Cart -->
+    {% if product.in_stock %}
+    <button data-add-to-cart="{{ product.slug }}" class="btn-primary w-full justify-center text-xs cursor-pointer">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+      Add to Cart
+    </button>
+    {% else %}
+    <div class="text-xs text-center py-2 rounded-xl font-bold" style="background:var(--bg-surface-3);color:var(--text-tertiary)">Out of Stock</div>
+    {% endif %}
+  </div>
+</div>
+

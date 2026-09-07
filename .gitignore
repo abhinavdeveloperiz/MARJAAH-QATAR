@@ -1,35 +1,26 @@
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
 
-# testing
-/coverage
+# Django
+*.log
+local_settings.py
+db.sqlite3-journal
 
-# next.js
-/.next/
-/out/
+# Static & Media
+staticfiles/
+media/
 
-# production
-/build
-
-# misc
+# OS & IDE
 .DS_Store
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# local env files
-.env*.local
-.env
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+Thumbs.db
+.idea/
+.vscode/
+*.swp

@@ -1,0 +1,19 @@
+﻿{% extends "base.html" %}
+{% block title %}Order Placed — M.SHOP Qatar{% endblock %}
+{% block content %}
+<div class="pt-[72px] min-h-screen flex items-center justify-center">
+  <div class="text-center max-w-lg mx-auto px-6 py-16">
+    <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl" style="background:linear-gradient(135deg,#10B981,#059669)">
+      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+    </div>
+    <h1 class="text-3xl font-display font-black mb-3" style="color:var(--text-primary)">Order Placed! 🎉</h1>
+    <p class="text-sm leading-relaxed mb-8" style="color:var(--text-secondary)">Thank you for your order! We'll process it shortly and deliver to your address in Qatar within 1-2 business days.</p>
+    <p class="text-2xl font-display font-black mb-8" style="color:var(--color-accent)">Total: QAR {{ total|floatformat:0 }}</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="/{{ locale }}/" class="btn-primary">Back to Store</a>
+      {% if user.is_authenticated %}<a href="/{{ locale }}/account/" class="btn-ghost border" style="border-color:var(--border-color)">View Orders</a>{% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,190 @@
+﻿{% extends "base.html" %}
+{% load static %}
+{% block title %}M.SHOP Qatar — High-Performance Hardware & Computers{% endblock %}
+{% block content %}
+
+<!-- ═══ HERO ══════════════════════════════════════════════════════════════════ -->
+<section id="hero-section" class="relative h-screen min-h-[620px] max-h-[1000px] flex items-center overflow-hidden" style="padding-top:72px">
+  <div class="absolute inset-0 overflow-hidden">
+    <img id="hero-parallax" src="{% static 'images/hero/hero-main.jpg' %}" alt="Hero background" class="absolute inset-0 w-full h-full object-cover scale-[1.08]" onerror="this.parentElement.style.background='linear-gradient(135deg,#070B14 0%,#131C32 50%,#0F172A 100%)'"/>
+    <div class="absolute inset-0" style="background:linear-gradient(135deg,rgba(7,11,20,0.9) 30%,rgba(7,11,20,0.6) 70%,rgba(7,11,20,0.35) 100%)"></div>
+    <div id="hero-glow" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] rounded-full opacity-30 pointer-events-none" style="background:radial-gradient(circle,rgba(64,99,178,0.5),transparent 70%)"></div>
+  </div>
+  <div class="container-custom relative z-10 py-16">
+    <div class="max-w-2xl">
+      <div data-animate class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border mb-6" style="border-color:rgba(141,156,245,0.3);background:rgba(64,99,178,0.15)">
+        <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
+        <span class="text-xs font-bold uppercase tracking-widest" style="color:#8D9CF5">Qatar's Premier Tech Store</span>
+      </div>
+      <h1 data-animate class="text-5xl sm:text-6xl xl:text-7xl font-display font-black text-white leading-tight mb-6" style="transition-delay:0.1s">
+        Power Your<br/>
+        <span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Digital World</span>
+      </h1>
+      <p data-animate class="text-base sm:text-lg leading-relaxed mb-8 font-sans max-w-lg" style="color:rgba(255,255,255,0.7);transition-delay:0.2s">
+        Qatar's premier destination for high-performance laptops, RTX workstations, OLED monitors, and authentic tech hardware with official GCC warranty.
+      </p>
+      <div data-animate class="flex flex-wrap items-center gap-4 mb-12" style="transition-delay:0.3s">
+        <a href="/{{ locale }}/shop/" class="btn-primary text-sm">Shop Now <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a href="/{{ locale }}/offers/" class="btn-ghost text-sm" style="color:rgba(255,255,255,0.8);border-color:rgba(255,255,255,0.2)">View Offers</a>
+      </div>
+      <div data-animate class="grid grid-cols-4 gap-6 pt-8" style="border-top:1px solid rgba(255,255,255,0.1);transition-delay:0.4s">
+        <div><div class="text-2xl font-display font-black text-white">500+</div><div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.4)">Products</div></div>
+        <div><div class="text-2xl font-display font-black text-white">50+</div><div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.4)">Top Brands</div></div>
+        <div><div class="text-2xl font-display font-black text-white">1-2</div><div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.4)">Day Delivery</div></div>
+        <div><div class="text-2xl font-display font-black text-white">2yr</div><div class="text-[11px] uppercase tracking-widest mt-0.5" style="color:rgba(255,255,255,0.4)">Warranty</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 animate-bounce">
+    <span class="text-[10px] uppercase tracking-widest font-sans" style="color:rgba(255,255,255,0.4)">Scroll to explore</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+  </div>
+</section>
+
+<!-- ═══ TRUST BADGES ══════════════════════════════════════════════════════════ -->
+<section class="py-10 border-b" style="border-color:var(--border-color)">
+  <div class="container-custom grid grid-cols-2 sm:grid-cols-4 gap-6">
+    <div data-animate class="flex items-center gap-4">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(64,99,178,0.1)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4063B2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+      <div><p class="text-sm font-bold" style="color:var(--text-primary)">Secure Payment</p><p class="text-xs" style="color:var(--text-secondary)">100% secure checkout</p></div>
+    </div>
+    <div data-animate class="flex items-center gap-4" style="transition-delay:0.1s">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(64,99,178,0.1)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4063B2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <div><p class="text-sm font-bold" style="color:var(--text-primary)">Fast Delivery</p><p class="text-xs" style="color:var(--text-secondary)">Across Qatar in 1-2 days</p></div>
+    </div>
+    <div data-animate class="flex items-center gap-4" style="transition-delay:0.2s">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(64,99,178,0.1)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4063B2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+      <div><p class="text-sm font-bold" style="color:var(--text-primary)">Warranty Support</p><p class="text-xs" style="color:var(--text-secondary)">Official warranty on all products</p></div>
+    </div>
+    <div data-animate class="flex items-center gap-4" style="transition-delay:0.3s">
+      <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(64,99,178,0.1)"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4063B2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></div>
+      <div><p class="text-sm font-bold" style="color:var(--text-primary)">Genuine Products</p><p class="text-xs" style="color:var(--text-secondary)">Authentic items guaranteed</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CATEGORIES ════════════════════════════════════════════════════════════ -->
+<section class="section-padding">
+  <div class="container-custom">
+    <div data-animate class="section-header">
+      <div class="section-eyebrow">Explore</div>
+      <h2 class="section-title">Browse by Category</h2>
+      <p class="section-subtitle">Everything you need for your digital setup</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for cat in categories %}
+      <a data-animate href="/{{ locale }}/shop/{{ cat.slug }}/" class="card group relative overflow-hidden p-6 rounded-2xl flex flex-col items-start gap-4 transition-all duration-300" style="transition-delay:{{ forloop.counter0 }}00ms">
+        <div class="p-3 rounded-xl" style="background:rgba(64,99,178,0.1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        </div>
+        <div>
+          <h3 class="font-bold text-sm" style="color:var(--text-primary)">{{ cat.name }}</h3>
+          <p class="text-xs mt-0.5" style="color:var(--text-secondary)">{{ cat.product_count }} products</p>
+        </div>
+        <div class="flex items-center gap-1 text-xs font-bold mt-auto" style="color:var(--color-accent)">
+          Explore <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-1"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ═══ FEATURED PRODUCTS ═════════════════════════════════════════════════════ -->
+<section class="section-padding" style="background:var(--bg-surface)">
+  <div class="container-custom">
+    <div data-animate class="section-header">
+      <div class="section-eyebrow">Featured</div>
+      <h2 class="section-title">Featured Products</h2>
+      <p class="section-subtitle">Hand-picked tech from the world's best brands</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for product in featured %}{% include 'partials/product_card.html' %}{% endfor %}
+    </div>
+    <div class="text-center mt-10">
+      <a href="/{{ locale }}/shop/" class="btn-ghost border" style="border-color:var(--border-color)">View All Products <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ NEW ARRIVALS ══════════════════════════════════════════════════════════ -->
+{% if new_arrivals %}
+<section class="section-padding">
+  <div class="container-custom">
+    <div data-animate class="section-header">
+      <div class="section-eyebrow">Just In</div>
+      <h2 class="section-title">New Arrivals</h2>
+      <p class="section-subtitle">Fresh off the shelf — just in for you</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      {% for product in new_arrivals %}{% include 'partials/product_card.html' %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══ FLASH DEALS ════════════════════════════════════════════════════════════ -->
+{% if flash_deals %}
+<section class="section-padding" style="background:var(--bg-surface)">
+  <div class="container-custom">
+    <div data-animate class="flex flex-wrap items-center justify-between gap-4 mb-10">
+      <div>
+        <div class="section-eyebrow">Limited Time</div>
+        <h2 class="section-title mb-0">Flash Deals</h2>
+      </div>
+      <div class="flex items-center gap-2" data-countdown="86399">
+        <span class="text-xs uppercase tracking-widest font-sans" style="color:var(--text-tertiary)">Ends in:</span>
+        <div class="px-3 py-1.5 rounded-lg text-sm font-mono font-bold" style="background:var(--bg-surface-2);color:var(--text-primary)"><span data-cd-h>23</span>h</div>
+        <div class="px-3 py-1.5 rounded-lg text-sm font-mono font-bold" style="background:var(--bg-surface-2);color:var(--text-primary)"><span data-cd-m>59</span>m</div>
+        <div class="px-3 py-1.5 rounded-lg text-sm font-mono font-bold" style="background:var(--bg-surface-2);color:var(--text-primary)"><span data-cd-s>00</span>s</div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      {% for product in flash_deals %}{% include 'partials/product_card.html' %}{% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+<!-- ═══ BRANDS MARQUEE ════════════════════════════════════════════════════════ -->
+{% if brands %}
+<section class="py-14 border-y" style="border-color:var(--border-color)">
+  <div class="container-custom">
+    <div data-animate class="text-center mb-10">
+      <div class="section-eyebrow">Our Partners</div>
+      <h2 class="text-2xl font-display font-bold" style="color:var(--text-primary)">Top Brands We Carry</h2>
+    </div>
+    <div class="overflow-hidden">
+      <div class="flex gap-10 items-center w-max" style="animation:marquee 25s linear infinite">
+        {% for brand in brands %}
+        <div class="flex-shrink-0 flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-display font-black text-xs" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">{{ brand.name|first }}</div>
+          <span class="text-sm font-display font-bold whitespace-nowrap" style="color:var(--text-primary)">{{ brand.name }}</span>
+        </div>
+        {% endfor %}
+        {% for brand in brands %}
+        <div class="flex-shrink-0 flex items-center gap-2 opacity-50 hover:opacity-100 transition-opacity">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-display font-black text-xs" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">{{ brand.name|first }}</div>
+          <span class="text-sm font-display font-bold whitespace-nowrap" style="color:var(--text-primary)">{{ brand.name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  var nb=document.getElementById('main-navbar');
+  if(!nb) return;
+  nb.classList.add('navbar-transparent');
+  window.addEventListener('scroll',function(){
+    if(window.scrollY < 20){nb.classList.add('navbar-transparent');nb.classList.remove('navbar-scrolled');}
+  },{passive:true});
+})();
+</script>
+{% endblock %}
