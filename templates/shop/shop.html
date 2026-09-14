@@ -50,19 +50,16 @@
           <p class="text-sm mt-1.5 flex items-center gap-2 font-medium" style="color:var(--text-secondary)">
             <span>
               {% if is_rtl %}
-              عرض <strong style="color:var(--text-primary)">{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
-              من أصل <strong style="color:var(--text-primary)">{{ total_count }}</strong> منتج
+              عرض <strong style="color:var(--text-primary)">{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong> من أصل <strong style="color:var(--text-primary)">{{ total_count }}</strong> منتج
               {% else %}
-              Showing <strong style="color:var(--text-primary)">{{ page_obj.start_index }}–{{ page_obj.end_index
-                }}</strong> of <strong style="color:var(--text-primary)">{{ total_count }}</strong> items
+              Showing <strong style="color:var(--text-primary)">{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong> of <strong style="color:var(--text-primary)">{{ total_count }}</strong> items
               {% endif %}
             </span>
             {% if paginator.num_pages > 1 %}
             <span class="inline-block w-1 h-1 rounded-full bg-slate-300"></span>
             <span class="px-2 py-0.5 rounded-full text-xs font-bold"
               style="background:var(--bg-surface-2);color:var(--color-accent)">
-              {% if is_rtl %}صفحة {{ page_obj.number }} من {{ paginator.num_pages }}{% else %}Page {{ page_obj.number }}
-              of {{ paginator.num_pages }}{% endif %}
+              {% if is_rtl %}صفحة {{ page_obj.number }} من {{ paginator.num_pages }}{% else %}Page {{ page_obj.number }} of {{ paginator.num_pages }}{% endif %}
             </span>
             {% endif %}
           </p>
@@ -73,8 +70,7 @@
           <!-- Items Per Page Toggle -->
           <div class="flex items-center rounded-xl p-1 border text-xs font-semibold"
             style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <span class="px-2 hidden sm:inline" style="color:var(--text-tertiary)">{% if is_rtl %}عرض:{% else %}View:{%
-              endif %}</span>
+            <span class="px-2 hidden sm:inline" style="color:var(--text-tertiary)">{% if is_rtl %}عرض:{% else %}View:{% endif %}</span>
             <a href="?per_page=8{% if search %}&search={{ search }}{% endif %}{% if current_sort %}&sort={{ current_sort }}{% endif %}{% if current_brand %}&brand={{ current_brand }}{% endif %}"
               class="px-2.5 py-1 rounded-lg transition-all {% if per_page == 8 %}bg-white shadow-xs font-bold text-slate-900{% else %}text-slate-500 hover:text-slate-800{% endif %}">
               8 {% if is_rtl %}(صفحتين){% else %}(2 Pages){% endif %}
@@ -94,16 +90,11 @@
             <select name="sort" onchange="this.form.submit()"
               class="px-3.5 py-2 rounded-xl border text-xs font-semibold focus:outline-none cursor-pointer transition-all"
               style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
-              <option value="featured" {% if current_sort=="featured" %}selected{% endif %}>{% if is_rtl %}المميزة
-                أولاً{% else %}Featured First{% endif %}</option>
-              <option value="newest" {% if current_sort=="newest" %}selected{% endif %}>{% if is_rtl %}الأحدث إضافة{%
-                else %}Newest Arrivals{% endif %}</option>
-              <option value="price_asc" {% if current_sort=="price_asc" %}selected{% endif %}>{% if is_rtl %}السعر:
-                الأقل للأعلى{% else %}Price: Low to High{% endif %}</option>
-              <option value="price_desc" {% if current_sort=="price_desc" %}selected{% endif %}>{% if is_rtl %}السعر:
-                الأعلى للأقل{% else %}Price: High to Low{% endif %}</option>
-              <option value="rating" {% if current_sort=="rating" %}selected{% endif %}>{% if is_rtl %}الأعلى تقييماً{%
-                else %}Top Rated{% endif %}</option>
+              <option value="featured" {% if current_sort == "featured" %}selected{% endif %}>{% if is_rtl %}المميزة أولاً{% else %}Featured First{% endif %}</option>
+              <option value="newest" {% if current_sort == "newest" %}selected{% endif %}>{% if is_rtl %}الأحدث إضافة{% else %}Newest Arrivals{% endif %}</option>
+              <option value="price_asc" {% if current_sort == "price_asc" %}selected{% endif %}>{% if is_rtl %}السعر: الأقل للأعلى{% else %}Price: Low to High{% endif %}</option>
+              <option value="price_desc" {% if current_sort == "price_desc" %}selected{% endif %}>{% if is_rtl %}السعر: الأعلى للأقل{% else %}Price: High to Low{% endif %}</option>
+              <option value="rating" {% if current_sort == "rating" %}selected{% endif %}>{% if is_rtl %}الأعلى تقييماً{% else %}Top Rated{% endif %}</option>
             </select>
           </form>
         </div>
@@ -276,13 +267,10 @@
         </svg>
       </div>
       <div>
-        <h3 class="font-display font-black text-xl sm:text-2xl mb-2" style="color:var(--text-primary)">{{
-          t.shop.no_products|default:"No products found" }}</h3>
-        <p class="text-sm max-w-md mx-auto" style="color:var(--text-secondary)">{{ t.shop.no_products_desc|default:"Try
-          adjusting your search query, clearing filters, or browsing other categories." }}</p>
+        <h3 class="font-display font-black text-xl sm:text-2xl mb-2" style="color:var(--text-primary)">{{ t.shop.no_products|default:"No products found" }}</h3>
+        <p class="text-sm max-w-md mx-auto" style="color:var(--text-secondary)">{{ t.shop.no_products_desc|default:"Try adjusting your search query, clearing filters, or browsing other categories." }}</p>
       </div>
-      <a href="/{{ locale }}/shop/" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs">{{
-        t.shop.all_products|default:"Browse All Hardware" }}</a>
+      <a href="/{{ locale }}/shop/" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs">{{ t.shop.all_products|default:"Browse All Hardware" }}</a>
     </div>
     {% endif %}
   </div>
