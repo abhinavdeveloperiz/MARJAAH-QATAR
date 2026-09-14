@@ -1,6 +1,8 @@
 // ─── Cart System (Server AJAX) ────────────────────────────────────────────────
 (function () {
-  const LOCALE = document.documentElement.lang || 'en';
+  function getLocale() {
+    return window.location.pathname.startsWith('/ar') ? 'ar' : (document.documentElement.lang || 'en');
+  }
 
   function getCsrf() {
     if (window.CSRF_TOKEN && window.CSRF_TOKEN !== 'NOTPROVIDED') return window.CSRF_TOKEN;
@@ -68,6 +70,9 @@
       el.textContent = count;
       el.style.display = count > 0 ? 'flex' : 'none';
     });
+    document.querySelectorAll('[data-drawer-count]').forEach(el => {
+      el.textContent = count;
+    });
   }
 
   // ── Add to cart ───────────────────────────────────
@@ -76,23 +81,27 @@
     if (!btn) return;
     e.preventDefault();
     const slug = btn.dataset.addToCart;
+    const locale = getLocale();
+
     // Visual feedback: disable button while request is in flight
     btn.disabled = true;
     const originalText = btn.innerHTML;
-    btn.innerHTML = '<span style="opacity:0.7">Adding…</span>';
-    apiPost(`/${LOCALE}/api/cart/add/`, { slug: slug, quantity: 1 }, function (res) {
+    btn.innerHTML = '<span style="opacity:0.7">' + (locale === 'ar' ? 'جاري الإضافة…' : 'Adding…') + '</span>';
+
+    apiPost(`/${locale}/api/cart/add/`, { slug: slug, quantity: 1 }, function (res) {
       btn.disabled = false;
       btn.innerHTML = originalText;
-      if (res.success) {
+      if (res && res.success) {
         updateCartBadge(res.cart_count);
         if (typeof Toast !== 'undefined') {
-          Toast.success(LOCALE === 'ar' ? 'تمت الإضافة إلى السلة ✓' : 'Added to cart! ✓');
+          Toast.success(locale === 'ar' ? 'تمت الإضافة إلى السلة ✓' : 'Added to cart! ✓');
         }
-        refreshCartDrawer();
-        openCart();
+        refreshCartDrawer(function() {
+          openCart();
+        });
       } else {
         if (typeof Toast !== 'undefined') {
-          Toast.error(res.error || (LOCALE === 'ar' ? 'حدث خطأ' : 'Could not add item.'));
+          Toast.error(res?.error || (locale === 'ar' ? 'حدث خطأ أثناء الإضافة' : 'Could not add item.'));
         }
       }
     });
@@ -107,8 +116,10 @@
     const qtyEl = btn.closest('[data-cart-item]')?.querySelector('[data-qty-display]');
     const currentQty = parseInt(qtyEl?.textContent || '1');
     const newQty = currentQty + delta;
-    apiPost(`/${LOCALE}/api/cart/update/`, { slug: slug, quantity: newQty }, function (res) {
-      if (res.success) {
+    const locale = getLocale();
+
+    apiPost(`/${locale}/api/cart/update/`, { slug: slug, quantity: newQty }, function (res) {
+      if (res && res.success) {
         updateCartBadge(res.cart_count);
         refreshCartDrawer();
       }
@@ -120,11 +131,13 @@
     const btn = e.target.closest('[data-cart-remove]');
     if (!btn) return;
     const slug = btn.dataset.cartRemove;
-    apiPost(`/${LOCALE}/api/cart/remove/`, { slug: slug }, function (res) {
-      if (res.success) {
+    const locale = getLocale();
+
+    apiPost(`/${locale}/api/cart/remove/`, { slug: slug }, function (res) {
+      if (res && res.success) {
         updateCartBadge(res.cart_count);
         if (typeof Toast !== 'undefined') {
-          Toast.info(LOCALE === 'ar' ? 'تمت الإزالة من السلة' : 'Removed from cart');
+          Toast.info(locale === 'ar' ? 'تمت الإزالة من السلة' : 'Removed from cart');
         }
         refreshCartDrawer();
       }
@@ -132,17 +145,21 @@
   });
 
   // ── Refresh cart drawer via AJAX partial ──────────
-  function refreshCartDrawer() {
+  function refreshCartDrawer(callback) {
     const drawerContent = document.getElementById('cart-drawer-content');
-    if (!drawerContent) return;
-    // Fetch the standalone partial — cart_view detects ?partial=1
-    fetch(`/${LOCALE}/cart/?partial=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+    if (!drawerContent) {
+      if (callback) callback();
+      return;
+    }
+    const locale = getLocale();
+    fetch(`/${locale}/cart/?partial=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
       .then(r => r.text())
       .then(html => {
         drawerContent.innerHTML = html;
+        if (callback) callback();
       })
       .catch(() => {
-        // Silently fail — cart state is still correct, page reload will sync UI
+        if (callback) callback();
       });
   }
 

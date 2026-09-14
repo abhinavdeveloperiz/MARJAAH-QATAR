@@ -1,43 +1,48 @@
 {% load static %}
-{% comment %}
-  This is the AJAX-partial version of the cart drawer content.
-  It is returned by cart_view when ?partial=1 is in the query string.
-  The JavaScript in cart.js fetches this to refresh #cart-drawer-content
-  without a full page reload.
-{% endcomment %}
 {% if cart_items %}
-<div class="space-y-4">
+<div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
   {% for item in cart_items %}
-  <div class="flex gap-4 p-4 rounded-2xl" style="background:var(--bg-surface-2);border:1px solid var(--bg-surface-3)" data-cart-item>
-    <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-3)">
+  <div class="flex gap-3.5 p-3.5 rounded-2xl transition-all" style="background:var(--bg-surface-2);border:1px solid var(--border-color, rgba(255,255,255,0.06))" data-cart-item>
+    <!-- Item Image -->
+    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden flex-shrink-0 relative" style="background:var(--bg-surface-3)">
       <img src="{{ item.image }}" alt="{% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}"
            class="w-full h-full object-cover" loading="lazy"
            onerror="this.src='/static/images/placeholder.svg'" />
     </div>
-    <div class="flex-1 min-w-0">
-      <h4 class="text-sm font-medium leading-tight mb-1 line-clamp-2" style="color:var(--text-primary)">
-        {% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}
-      </h4>
-      <p class="text-sm font-bold mb-3" style="color:var(--color-accent)">
-        {% if is_rtl %}{{ item.price|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ item.price|floatformat:0 }}{% endif %}
-      </p>
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2 rounded-xl p-1" style="background:var(--bg-surface-3)">
-          <button data-cart-qty="{{ item.slug }}" data-delta="-1"
-                  class="w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+
+    <!-- Item Info -->
+    <div class="flex-1 min-w-0 flex flex-col justify-between">
+      <div>
+        {% if item.brand %}
+        <span class="inline-block text-[10px] font-bold uppercase tracking-wider text-primary-400 mb-0.5">{{ item.brand }}</span>
+        {% endif %}
+        <h4 class="text-xs sm:text-sm font-semibold leading-snug line-clamp-2 text-start" style="color:var(--text-primary)">
+          {% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}
+        </h4>
+        <div class="text-xs sm:text-sm font-bold mt-1 text-start" style="color:var(--color-accent, #6366f1)">
+          {% if is_rtl %}{{ item.price|floatformat:0 }} {{ currency|default:"ر.ق" }}{% else %}{{ currency|default:"QAR" }} {{ item.price|floatformat:0 }}{% endif %}
+        </div>
+      </div>
+
+      <!-- Stepper and Remove Actions -->
+      <div class="flex items-center justify-between mt-2 pt-1 border-t border-white/5">
+        <div class="inline-flex items-center rounded-lg p-0.5" style="background:var(--bg-surface-3)">
+          <button data-cart-qty="{{ item.slug }}" data-delta="-1" aria-label="Decrease quantity"
+                  class="w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center transition-all cursor-pointer hover:bg-white/10 active:scale-95"
                   style="background:var(--bg-surface-2);color:var(--text-secondary)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>
           </button>
-          <span data-qty-display class="text-sm font-medium w-6 text-center" style="color:var(--text-primary)">{{ item.quantity }}</span>
-          <button data-cart-qty="{{ item.slug }}" data-delta="1"
-                  class="w-7 h-7 rounded-lg flex items-center justify-center transition-all cursor-pointer"
+          <span data-qty-display class="text-xs sm:text-sm font-bold w-7 text-center select-none" style="color:var(--text-primary)">{{ item.quantity }}</span>
+          <button data-cart-qty="{{ item.slug }}" data-delta="1" aria-label="Increase quantity"
+                  class="w-6 h-6 sm:w-7 sm:h-7 rounded-md flex items-center justify-center transition-all cursor-pointer hover:bg-white/10 active:scale-95"
                   style="background:var(--bg-surface-2);color:var(--text-secondary)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
           </button>
         </div>
-        <button data-cart-remove="{{ item.slug }}" aria-label="Remove"
-                class="w-8 h-8 rounded-xl flex items-center justify-center transition-all cursor-pointer hover:text-red-500"
-                style="color:var(--text-secondary)">
+
+        <button data-cart-remove="{{ item.slug }}" aria-label="Remove item"
+                class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all cursor-pointer hover:bg-red-500/10 hover:text-red-400"
+                style="color:var(--text-tertiary, #94a3b8)">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
         </button>
       </div>
@@ -45,15 +50,62 @@
   </div>
   {% endfor %}
 </div>
+
+<!-- Instant Order Placement & Checkout Footer -->
+<div class="p-4 sm:p-5 space-y-3 flex-shrink-0" style="border-top:1px solid var(--border-color, rgba(255,255,255,0.08));background:var(--bg-surface-2)">
+  <!-- Price Breakdown -->
+  <div class="space-y-1.5">
+    <div class="flex items-center justify-between text-xs sm:text-sm">
+      <span style="color:var(--text-secondary)">{% if is_rtl %}المجموع الفرعي{% else %}Subtotal{% endif %}</span>
+      <span class="font-bold text-sm sm:text-base" style="color:var(--text-primary)">
+        {% if is_rtl %}{{ subtotal|floatformat:0 }} {{ currency|default:"ر.ق" }}{% else %}{{ currency|default:"QAR" }} {{ subtotal|floatformat:0 }}{% endif %}
+      </span>
+    </div>
+    <div class="flex items-center justify-between text-[11px] sm:text-xs" style="color:var(--text-tertiary)">
+      <span>{% if is_rtl %}الشحن والتوصيل{% else %}Delivery{% endif %}</span>
+      <span>
+        {% if subtotal >= 500 or shipping == 0 %}
+        <span class="text-emerald-400 font-bold">{% if is_rtl %}توصيل مجاني ✓{% else %}FREE Express ✓{% endif %}</span>
+        {% else %}
+        <span>{% if is_rtl %}{{ shipping|default:"20" }} ر.ق{% else %}QAR {{ shipping|default:"20" }}{% endif %}</span>
+        {% endif %}
+      </span>
+    </div>
+  </div>
+
+  <!-- Primary CTA: Proceed to Checkout / Place Order -->
+  <a href="/{{ locale }}/checkout/" class="w-full py-3 sm:py-3.5 px-4 rounded-xl bg-gradient-to-r from-primary-600 via-primary-500 to-indigo-600 hover:from-primary-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 active:scale-[0.99] transition-all cursor-pointer">
+    <span>{% if is_rtl %}إتمام الطلب والدفع{% else %}Proceed to Checkout / Place Order{% endif %}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  </a>
+
+  <!-- Secondary Buttons: View Cart & Continue Shopping -->
+  <div class="flex items-center gap-2 pt-1">
+    <a href="/{{ locale }}/cart/" class="flex-1 py-2 sm:py-2.5 rounded-xl text-center text-xs font-semibold transition-all hover:bg-white/5 active:scale-98" style="color:var(--text-secondary);border:1px solid var(--border-color, rgba(255,255,255,0.1))">
+      {% if is_rtl %}عرض السلة كاملة{% else %}View Full Cart{% endif %}
+    </a>
+    <button data-close-cart class="flex-1 py-2 sm:py-2.5 rounded-xl text-center text-xs font-semibold transition-all hover:bg-white/5 active:scale-98 cursor-pointer" style="color:var(--text-secondary);border:1px solid var(--border-color, rgba(255,255,255,0.1))">
+      {% if is_rtl %}متابعة التسوق{% else %}Continue Shopping{% endif %}
+    </button>
+  </div>
+</div>
 {% else %}
-<div class="flex flex-col items-center justify-center h-full gap-4 text-center py-8">
-  <div class="w-20 h-20 rounded-2xl flex items-center justify-center" style="background:var(--bg-surface-2)">
-    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-secondary)"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+<!-- Empty Cart State -->
+<div class="flex-1 flex flex-col items-center justify-center p-6 text-center space-y-4">
+  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center bg-primary-500/10 text-primary-400">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
   </div>
   <div>
-    <p class="font-semibold mb-1" style="color:var(--text-primary)">{% if is_rtl %}سلة التسوق فارغة{% else %}Your cart is empty{% endif %}</p>
-    <p class="text-sm" style="color:var(--text-secondary)">{% if is_rtl %}أضف منتجات للبدء{% else %}Add some products to get started{% endif %}</p>
+    <h4 class="font-bold text-base mb-1" style="color:var(--text-primary)">
+      {% if is_rtl %}سلة التسوق فارغة{% else %}Your cart is empty{% endif %}
+    </h4>
+    <p class="text-xs sm:text-sm max-w-[240px] mx-auto leading-relaxed" style="color:var(--text-secondary)">
+      {% if is_rtl %}تصفح أحدث عتاد الكمبيوتر وملحقات الألعاب وابدأ التسوق الآن.{% else %}Discover high-performance hardware and gaming rigs to get started.{% endif %}
+    </p>
   </div>
-  <button data-close-cart class="btn-primary mt-2 cursor-pointer">{% if is_rtl %}تصفح المتجر{% else %}Start Shopping{% endif %}</button>
+  <a href="/{{ locale }}/shop/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
+    <span>{% if is_rtl %}تصفح المتجر الآن{% else %}Explore Shop{% endif %}</span>
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  </a>
 </div>
 {% endif %}
