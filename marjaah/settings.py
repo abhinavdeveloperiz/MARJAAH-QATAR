@@ -5,23 +5,36 @@ Supports: local development (SQLite) + Render staging (PostgreSQL) + cPanel prod
 import os
 from pathlib import Path
 
-# Load .env file if present (local development)
-try:
-    from dotenv import load_dotenv
-    load_dotenv()
-except ImportError:
-    pass
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# ─── SECURITY ─────────────────────────────────────────────────────────────────
-SECRET_KEY = os.environ.get(
-    'SECRET_KEY',
-    'django-insecure-marjaah-local-dev-only-abc123xyz-change-in-production'
-)
+# Load .env file if present
+_env_file = BASE_DIR / '.env'
+if _env_file.exists():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv(_env_file)
+    except ImportError:
+        with open(_env_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    k, v = line.split('=', 1)
+                    k, v = k.strip(), v.strip().strip("'\"")
+                    if k and k not in os.environ:
+                        os.environ[k] = v
 
+# ─── SECURITY ─────────────────────────────────────────────────────────────────
 # DEBUG is False on Render and cPanel (set DEBUG=True in .env for local dev)
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
+
+SECRET_KEY = os.environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        # Fallback only for non-production local development if .env is missing
+        SECRET_KEY = 'django-insecure-local-dev-fallback-key'
+    else:
+        from django.core.exceptions import ImproperlyConfigured
+        raise ImproperlyConfigured("SECRET_KEY environment variable is required in production.")
 
 # Dynamic ALLOWED_HOSTS — automatically supports Render and custom domains
 _ALLOWED_HOST = os.environ.get('ALLOWED_HOST', '')
