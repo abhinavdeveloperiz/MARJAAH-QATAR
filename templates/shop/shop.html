@@ -124,14 +124,12 @@
         <!-- Category Pills -->
         <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center">
           <a href="/{{ locale }}/shop/{% if per_page != 8 %}?per_page={{ per_page }}{% endif %}"
-            class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs"
-            style="{% if not category %}background:#4063B2;color:#fff;box-shadow:0 4px 12px rgba(64,99,178,0.25);{% else %}background:var(--bg-surface-2);color:var(--text-secondary);border:1px solid var(--border-color);{% endif %}">
+            class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs {% if not category %}bg-[#4063B2] text-white shadow-[0_4px_12px_rgba(64,99,178,0.25)]{% else %}border text-[var(--text-secondary)] bg-[var(--bg-surface-2)] border-[var(--border-color)]{% endif %}">
             {{ t.shop.all_products|default:"All" }} ({{ total_count }})
           </a>
           {% for cat in all_categories %}
           <a href="/{{ locale }}/shop/{{ cat.slug }}/{% if per_page != 8 %}?per_page={{ per_page }}{% endif %}"
-            class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs"
-            style="{% if category.slug == cat.slug %}background:#4063B2;color:#fff;box-shadow:0 4px 12px rgba(64,99,178,0.25);{% else %}background:var(--bg-surface-2);color:var(--text-secondary);border:1px solid var(--border-color);{% endif %}">
+            class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs {% if category.slug == cat.slug %}bg-[#4063B2] text-white shadow-[0_4px_12px_rgba(64,99,178,0.25)]{% else %}border text-[var(--text-secondary)] bg-[var(--bg-surface-2)] border-[var(--border-color)]{% endif %}">
             {% if is_rtl and cat.name_ar %}{{ cat.name_ar }}{% else %}{{ cat.name }}{% endif %}
           </a>
           {% endfor %}
