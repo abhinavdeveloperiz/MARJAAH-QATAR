@@ -23,11 +23,13 @@ SECRET_KEY = os.environ.get(
 # DEBUG is False on Render and cPanel (set DEBUG=True in .env for local dev)
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-# Dynamic ALLOWED_HOSTS — add your domains here via env var
+# Dynamic ALLOWED_HOSTS — automatically supports Render and custom domains
 _ALLOWED_HOST = os.environ.get('ALLOWED_HOST', '')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com']
 if _ALLOWED_HOST:
-    ALLOWED_HOSTS.append(_ALLOWED_HOST)
+    for host in _ALLOWED_HOST.split(','):
+        if host.strip():
+            ALLOWED_HOSTS.append(host.strip())
 if DEBUG:
     ALLOWED_HOSTS.append('*')
 
