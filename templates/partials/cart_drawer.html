@@ -1,8 +1,8 @@
 <!-- Cart Drawer Overlay -->
-<div id="cart-overlay" class="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"></div>
+<div id="cart-overlay" class="fixed inset-0 z-[105] bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(window.closeCart)window.closeCart();"></div>
 
 <!-- Cart Drawer -->
-<div id="cart-drawer" class="fixed top-0 right-0 bottom-0 z-[70] w-full max-w-[420px] flex flex-col shadow-2xl transition-transform duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)] translate-x-full"
+<div id="cart-drawer" class="fixed top-0 {% if is_rtl %}left-0 -translate-x-full{% else %}right-0 translate-x-full{% endif %} bottom-0 z-[110] w-full max-w-[420px] flex flex-col shadow-2xl transition-transform duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
      style="background:var(--bg-surface)">
 
   <!-- Header -->
@@ -11,7 +11,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
       <span class="font-bold text-sm" style="color:var(--text-primary)">{{ t.cart.title|default:"Cart" }} (<span data-cart-count>{{ cart_count }}</span>)</span>
     </div>
-    <button data-close-cart aria-label="{{ t.common.close|default:'Close' }}" class="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all hover:bg-white/5" style="color:var(--text-secondary)">
+    <button data-close-cart onclick="if(window.closeCart)window.closeCart();" aria-label="{{ t.common.close|default:'Close' }}" class="w-8 h-8 rounded-lg flex items-center justify-center cursor-pointer transition-all hover:bg-white/5" style="color:var(--text-secondary)">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
     </button>
   </div>

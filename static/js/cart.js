@@ -21,28 +21,47 @@
   }
 
   // ── Cart Drawer open/close ─────────────────────────
-  const overlay = document.getElementById('cart-overlay');
-  const drawer = document.getElementById('cart-drawer');
-
   function openCart() {
-    if (!overlay || !drawer) return;
-    overlay.classList.remove('pointer-events-none', 'opacity-0');
-    overlay.classList.add('opacity-100');
+    const overlay = document.getElementById('cart-overlay');
+    const drawer = document.getElementById('cart-drawer');
+    if (!drawer) return;
+    if (overlay) {
+      overlay.classList.remove('pointer-events-none', 'opacity-0');
+      overlay.classList.add('opacity-100');
+    }
     drawer.style.transform = 'translateX(0)';
     document.body.style.overflow = 'hidden';
   }
 
   function closeCart() {
-    if (!overlay || !drawer) return;
-    overlay.classList.add('opacity-0', 'pointer-events-none');
-    overlay.classList.remove('opacity-100');
-    drawer.style.transform = 'translateX(100%)';
+    const overlay = document.getElementById('cart-overlay');
+    const drawer = document.getElementById('cart-drawer');
+    if (!drawer) return;
+    if (overlay) {
+      overlay.classList.add('opacity-0', 'pointer-events-none');
+      overlay.classList.remove('opacity-100');
+    }
+    const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
+    drawer.style.transform = isRtl ? 'translateX(-100%)' : 'translateX(100%)';
     document.body.style.overflow = '';
   }
 
-  if (overlay) overlay.addEventListener('click', closeCart);
-  document.querySelectorAll('[data-open-cart]').forEach(btn => btn.addEventListener('click', openCart));
-  document.querySelectorAll('[data-close-cart]').forEach(btn => btn.addEventListener('click', closeCart));
+  // Expose globally for inline onclick triggers
+  window.openCart = openCart;
+  window.closeCart = closeCart;
+
+  // Delegated click listeners
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('[data-open-cart]')) {
+      e.preventDefault();
+      openCart();
+    } else if (e.target.closest('[data-close-cart]')) {
+      e.preventDefault();
+      closeCart();
+    } else if (e.target.id === 'cart-overlay') {
+      closeCart();
+    }
+  });
 
   // ── Cart badge update ──────────────────────────────
   function updateCartBadge(count) {
