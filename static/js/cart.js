@@ -3,6 +3,9 @@
   const LOCALE = document.documentElement.lang || 'en';
 
   function getCsrf() {
+    if (window.CSRF_TOKEN && window.CSRF_TOKEN !== 'NOTPROVIDED') return window.CSRF_TOKEN;
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta && meta.content) return meta.content;
     return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1] || '';
   }
 

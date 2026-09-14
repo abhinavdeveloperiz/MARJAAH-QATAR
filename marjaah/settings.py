@@ -50,11 +50,17 @@ if DEBUG:
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
     'https://marjaah-qatar.onrender.com',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
 _SITE_URL = os.environ.get('SITE_URL', '')
 if _SITE_URL:
     CSRF_TRUSTED_ORIGINS.append(_SITE_URL)
 
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
+SESSION_SAVE_EVERY_REQUEST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ─── APPLICATIONS ─────────────────────────────────────────────────────────────
