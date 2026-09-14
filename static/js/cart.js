@@ -26,10 +26,10 @@
     const drawer = document.getElementById('cart-drawer');
     if (!drawer) return;
     if (overlay) {
+      overlay.classList.add('is-active');
       overlay.classList.remove('pointer-events-none', 'opacity-0');
-      overlay.classList.add('opacity-100');
     }
-    drawer.style.transform = 'translateX(0)';
+    drawer.classList.add('is-open');
     document.body.style.overflow = 'hidden';
   }
 
@@ -38,11 +38,10 @@
     const drawer = document.getElementById('cart-drawer');
     if (!drawer) return;
     if (overlay) {
-      overlay.classList.add('opacity-0', 'pointer-events-none');
-      overlay.classList.remove('opacity-100');
+      overlay.classList.remove('is-active');
+      overlay.classList.add('pointer-events-none', 'opacity-0');
     }
-    const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
-    drawer.style.transform = isRtl ? 'translateX(-100%)' : 'translateX(100%)';
+    drawer.classList.remove('is-open');
     document.body.style.overflow = '';
   }
 

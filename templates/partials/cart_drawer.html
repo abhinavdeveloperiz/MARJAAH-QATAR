@@ -1,9 +1,41 @@
+<style>
+  #cart-overlay {
+    transition: opacity 0.3s ease;
+  }
+  #cart-overlay.is-active {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  #cart-drawer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    z-index: 120;
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg-surface);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  html:not([dir="rtl"]) #cart-drawer {
+    right: 0 !important;
+    left: auto !important;
+    transform: translateX(100%);
+  }
+  html[dir="rtl"] #cart-drawer {
+    left: 0 !important;
+    right: auto !important;
+    transform: translateX(-100%);
+  }
+  #cart-drawer.is-open {
+    transform: translateX(0) !important;
+  }
+</style>
+
 <!-- Cart Drawer Overlay -->
-<div id="cart-overlay" class="fixed inset-0 z-[105] bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(window.closeCart)window.closeCart();"></div>
+<div id="cart-overlay" class="fixed inset-0 z-[115] bg-black/70 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300" onclick="if(window.closeCart)window.closeCart();"></div>
 
 <!-- Cart Drawer -->
-<div id="cart-drawer" class="fixed top-0 {% if is_rtl %}left-0 -translate-x-full{% else %}right-0 translate-x-full{% endif %} bottom-0 z-[110] w-full max-w-[420px] flex flex-col shadow-2xl transition-transform duration-[350ms] ease-[cubic-bezier(0.16,1,0.3,1)]"
-     style="background:var(--bg-surface)">
+<div id="cart-drawer" class="flex flex-col shadow-2xl">
 
   <!-- Header -->
   <div class="flex items-center justify-between p-5" style="border-bottom:1px solid var(--bg-surface-2)">
