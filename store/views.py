@@ -493,7 +493,7 @@ def login_view(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             try:
-                user_obj = User.objects.get(email=email)
+                user_obj = User.objects.get(email__iexact=email)
                 user = authenticate(request, username=user_obj.username, password=password)
                 if user:
                     login(request, user)
@@ -516,13 +516,14 @@ def register_view(request):
         form = RegisterForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            if User.objects.filter(email=cd['email']).exists():
+            email = cd['email']
+            if User.objects.filter(email__iexact=email).exists() or User.objects.filter(username__iexact=email).exists():
                 error = 'An account with this email already exists.' if locale != 'ar' else 'يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل.'
             else:
                 names = cd['full_name'].strip().split(' ', 1)
                 user = User.objects.create_user(
-                    username=cd['email'],
-                    email=cd['email'],
+                    username=email,
+                    email=email,
                     password=cd['password'],
                     first_name=names[0],
                     last_name=names[1] if len(names) > 1 else '',

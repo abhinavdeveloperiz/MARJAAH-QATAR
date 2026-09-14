@@ -11,6 +11,9 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={'class': 'input', 'placeholder': '••••••••', 'id': 'id_password'})
     )
 
+    def clean_email(self):
+        return self.cleaned_data.get('email', '').strip().lower()
+
 
 class RegisterForm(forms.Form):
     full_name = forms.CharField(
@@ -31,6 +34,9 @@ class RegisterForm(forms.Form):
     confirm_password = forms.CharField(
         widget=forms.PasswordInput(attrs={'class': 'input', 'placeholder': 'Repeat password', 'id': 'id_confirm_password'})
     )
+
+    def clean_email(self):
+        return self.cleaned_data.get('email', '').strip().lower()
 
     def clean(self):
         cleaned_data = super().clean()
