@@ -15,13 +15,26 @@
           <span class="text-xs font-bold uppercase tracking-widest" style="color:var(--color-accent)">{% if is_rtl %}متجر قطر للتقنية M.SHOP{% else %}M.SHOP Qatar{% endif %}</span>
         </div>
         <h1 class="text-2xl font-display font-black mb-1" style="color:var(--text-primary)">{{ t.auth.sign_in|default:"Sign In" }}</h1>
-        <p class="text-sm" style="color:var(--text-secondary)">{{ t.auth.sign_in_desc|default:"Access your M.SHOP account" }}</p>
+        <p class="text-sm" style="color:var(--text-secondary)">
+          {% if 'checkout' in next %}
+            {% if is_rtl %}يرجى تسجيل الدخول أو إنشاء حساب لإتمام عملية الشراء{% else %}Please sign in or create an account to complete your purchase{% endif %}
+          {% else %}
+            {{ t.auth.sign_in_desc|default:"Access your M.SHOP account" }}
+          {% endif %}
+        </p>
       </div>
+      {% if 'checkout' in next %}
+      <div class="mb-5 p-3.5 rounded-2xl border text-xs font-medium flex items-center gap-2.5" style="border-color:rgba(64,99,178,0.3);background:rgba(64,99,178,0.1);color:var(--color-accent)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+        <span>{% if is_rtl %}تسجيل الدخول مطلوب لإتمام طلبك{% else %}Sign-in is required to place and track your order{% endif %}</span>
+      </div>
+      {% endif %}
       {% if error %}
       <div class="mb-5 p-3 rounded-xl border text-xs font-medium" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#f87171">{{ error }}</div>
       {% endif %}
       <form method="post" class="space-y-4">
         {% csrf_token %}
+        {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
         <div>
           <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.auth.email_address|default:"Email Address" }}</label>
           {{ form.email }}
@@ -40,9 +53,9 @@
       </form>
       <p class="text-center text-xs mt-6" style="color:var(--text-tertiary)">
         {% if is_rtl %}
-          جديد في M.SHOP؟ <a href="/{{ locale }}/auth/register/" class="font-bold underline" style="color:var(--color-accent)">إنشاء حساب جديد</a>
+          جديد في M.SHOP؟ <a href="/{{ locale }}/auth/register/{% if next %}?next={{ next }}{% endif %}" class="font-bold underline" style="color:var(--color-accent)">إنشاء حساب جديد</a>
         {% else %}
-          New to M.SHOP? <a href="/{{ locale }}/auth/register/" class="font-bold underline" style="color:var(--color-accent)">Create account</a>
+          New to M.SHOP? <a href="/{{ locale }}/auth/register/{% if next %}?next={{ next }}{% endif %}" class="font-bold underline" style="color:var(--color-accent)">Create account</a>
         {% endif %}
       </p>
       <div class="text-center mt-4">

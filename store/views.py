@@ -299,6 +299,10 @@ def checkout_view(request):
     if not items:
         return redirect(f'/{locale}/')
 
+    # Purchase requires sign in / sign up
+    if not request.user.is_authenticated:
+        return redirect(f'/{locale}/auth/login/?next=/{locale}/checkout/')
+
     # Validate stock availability before showing checkout
     stock_errors = []
     for item in items:
@@ -313,10 +317,25 @@ def checkout_view(request):
         except Product.DoesNotExist:
             stock_errors.append(f"'{item['name']}' is no longer available.")
 
-    form = CheckoutForm()
-    saved_addresses = []
-    if request.user.is_authenticated:
-        saved_addresses = request.user.addresses.all()
+    # Pre-fill user data & default address
+    default_address = request.user.addresses.filter(is_default=True).first() or request.user.addresses.first()
+    initial_data = {
+        'full_name': request.user.get_full_name() or request.user.username,
+        'email': request.user.email,
+        'phone': getattr(request.user, 'phone', ''),
+    }
+    if default_address:
+        initial_data.update({
+            'full_name': default_address.full_name or initial_data['full_name'],
+            'phone': default_address.phone or initial_data['phone'],
+            'building': default_address.building,
+            'street': default_address.street,
+            'zone': default_address.zone,
+            'city': default_address.city,
+        })
+
+    form = CheckoutForm(initial=initial_data)
+    saved_addresses = request.user.addresses.all()
 
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
@@ -445,8 +464,9 @@ def checkout_success(request, order_pk):
 # ─── AUTH ───────────────────────────────────────────────────────
 def login_view(request):
     locale = _get_locale(request)
+    next_url = request.POST.get('next') or request.GET.get('next') or f'/{locale}/'
     if request.user.is_authenticated:
-        return redirect(f'/{locale}/')
+        return redirect(next_url)
     form = LoginForm()
     error = None
     if request.method == 'POST':
@@ -459,19 +479,19 @@ def login_view(request):
                 user = authenticate(request, username=user_obj.username, password=password)
                 if user:
                     login(request, user)
-                    next_url = request.GET.get('next', f'/{locale}/')
                     return redirect(next_url)
                 else:
-                    error = 'Invalid password.'
+                    error = 'Invalid password.' if locale != 'ar' else 'كلمة المرور غير صحيحة.'
             except User.DoesNotExist:
-                error = 'No account found with that email.'
-    return render(request, 'auth/login.html', {'form': form, 'error': error, 'locale': locale})
+                error = 'No account found with that email.' if locale != 'ar' else 'لم يتم العثور على حساب بهذا البريد الإلكتروني.'
+    return render(request, 'auth/login.html', {'form': form, 'error': error, 'locale': locale, 'next': next_url})
 
 
 def register_view(request):
     locale = _get_locale(request)
+    next_url = request.POST.get('next') or request.GET.get('next') or f'/{locale}/'
     if request.user.is_authenticated:
-        return redirect(f'/{locale}/')
+        return redirect(next_url)
     form = RegisterForm()
     error = None
     if request.method == 'POST':
@@ -479,7 +499,7 @@ def register_view(request):
         if form.is_valid():
             cd = form.cleaned_data
             if User.objects.filter(email=cd['email']).exists():
-                error = 'An account with this email already exists.'
+                error = 'An account with this email already exists.' if locale != 'ar' else 'يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل.'
             else:
                 names = cd['full_name'].strip().split(' ', 1)
                 user = User.objects.create_user(
@@ -491,8 +511,8 @@ def register_view(request):
                     phone=cd.get('phone', ''),
                 )
                 login(request, user)
-                return redirect(f'/{locale}/')
-    return render(request, 'auth/register.html', {'form': form, 'error': error, 'locale': locale})
+                return redirect(next_url)
+    return render(request, 'auth/register.html', {'form': form, 'error': error, 'locale': locale, 'next': next_url})
 
 
 def forgot_password_view(request):
