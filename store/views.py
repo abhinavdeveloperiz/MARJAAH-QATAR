@@ -367,6 +367,24 @@ def checkout_view(request):
                     city=cd['city'],
                 )
 
+            # Format payment details cleanly for records
+            pm = cd['payment_method']
+            pm_detail = ''
+            if pm == 'card':
+                card_num = cd.get('card_number', '').replace(' ', '').replace('-', '')
+                masked = f"•••• {card_num[-4:]}" if len(card_num) >= 4 else "Card"
+                pm_detail = f"[Card Payment: {masked} | Holder: {cd.get('card_holder', '')}]"
+            elif pm in ('qr', 'qpay'):
+                qr_ref = cd.get('qr_ref', '').strip()
+                pm_detail = f"[QR / Fawran Transfer Ref: {qr_ref if qr_ref else 'Direct QR Scan'}]"
+            elif pm == 'cash':
+                change_req = cd.get('cash_change_req', '').strip()
+                if change_req:
+                    pm_detail = f"[Cash On Delivery - Change requested for: {change_req}]"
+
+            user_notes = cd.get('notes', '').strip()
+            final_notes = f"{pm_detail}\n{user_notes}".strip() if pm_detail else user_notes
+
             # Create the Order — works for both guests and members
             order = Order.objects.create(
                 user=request.user if request.user.is_authenticated else None,
@@ -379,7 +397,7 @@ def checkout_view(request):
                 total=total,
                 address=addr,
                 payment_method=cd['payment_method'],
-                notes=cd.get('notes', ''),
+                notes=final_notes,
                 **delivery_data,
             )
 

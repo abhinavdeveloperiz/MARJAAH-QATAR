@@ -132,18 +132,51 @@ class CheckoutForm(forms.Form):
         widget=forms.TextInput(attrs={'class': 'input'})
     )
     payment_method = forms.ChoiceField(
-        choices=[('cash', 'Cash on Delivery'), ('card', 'Credit / Debit Card'), ('qpay', 'QPay')],
+        choices=[
+            ('cash', 'Cash on Delivery'),
+            ('card', 'Credit / Debit Card'),
+            ('qr', 'QR / QPay / Fawran Instant Payment'),
+            ('qpay', 'QPay'),
+        ],
+        initial='cash',
         widget=forms.RadioSelect
     )
+    # Card Payment Channel Fields
+    card_holder = forms.CharField(required=False, max_length=150)
+    card_number = forms.CharField(required=False, max_length=30)
+    card_expiry = forms.CharField(required=False, max_length=10)
+    card_cvv = forms.CharField(required=False, max_length=10)
+
+    # QR / Instant Bank Payment Channel Fields
+    qr_ref = forms.CharField(required=False, max_length=100)
+
+    # Cash on Delivery Channel Fields
+    cash_change_req = forms.CharField(required=False, max_length=100)
+
     notes = forms.CharField(
         required=False,
         label='Delivery notes (optional)',
         widget=forms.Textarea(attrs={
             'class': 'input',
-            'rows': 3,
+            'rows': 2,
             'placeholder': 'E.g. Ring bell on arrival, leave at reception, etc.',
         })
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        pm = cleaned_data.get('payment_method')
+        if pm == 'card':
+            num = cleaned_data.get('card_number', '').replace(' ', '').replace('-', '')
+            if not num or len(num) < 13:
+                self.add_error('card_number', 'Please enter a valid 16-digit card number.')
+            if not cleaned_data.get('card_holder'):
+                self.add_error('card_holder', 'Cardholder name is required.')
+            if not cleaned_data.get('card_expiry'):
+                self.add_error('card_expiry', 'Expiration date is required.')
+            if not cleaned_data.get('card_cvv') or len(cleaned_data.get('card_cvv', '')) < 3:
+                self.add_error('card_cvv', 'Please enter a valid 3-digit CVV code.')
+        return cleaned_data
 
 
 class ProfileForm(forms.Form):

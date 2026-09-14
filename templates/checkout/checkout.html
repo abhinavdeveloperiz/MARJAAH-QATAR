@@ -1,67 +1,347 @@
 {% extends "base.html" %}
 {% load static %}
 {% block title %}{% if is_rtl %}إتمام الطلب — متجر قطر للتقنية M.SHOP{% else %}Checkout — M.SHOP Qatar{% endif %}{% endblock %}
+
 {% block content %}
 <div class="pt-[72px] min-h-screen">
-  <div class="container-custom py-12 max-w-5xl">
-    <h1 class="text-3xl font-display font-black mb-8" style="color:var(--text-primary)">{{ t.checkout.title|default:"Checkout" }}</h1>
-    <form method="post" class="grid lg:grid-cols-3 gap-8">
+  <div class="container-custom py-10 max-w-5xl">
+    <!-- Breadcrumb / Header -->
+    <div class="mb-8">
+      <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary-400 mb-2">
+        <a href="/{{ locale }}/cart/" class="hover:underline flex items-center gap-1">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if not is_rtl %}rotate-180{% endif %}"><path d="m9 18 6-6-6-6"/></svg>
+          {% if is_rtl %}العودة إلى السلة{% else %}Back to Cart{% endif %}
+        </a>
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-display font-black" style="color:var(--text-primary)">
+        {{ t.checkout.title|default:"Secure Checkout" }}
+      </h1>
+    </div>
+
+    <form method="post" id="checkout-form" class="grid lg:grid-cols-3 gap-8">
       {% csrf_token %}
-      <!-- Form -->
+
+      <!-- Left Column: Delivery & Payment Details -->
       <div class="lg:col-span-2 space-y-6">
-        <!-- Delivery Address -->
-        <div class="rounded-3xl p-6" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-          <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">{{ t.checkout.step_address|default:"Delivery Address" }}</h2>
-          <div class="grid grid-cols-2 gap-4">
-            <div class="col-span-2"><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.full_name|default:"Full Name" }}</label>{{ form.full_name }}</div>
-            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.phone|default:"Phone" }}</label>{{ form.phone }}</div>
-            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{% if is_rtl %}البريد الإلكتروني (اختياري){% else %}Email (optional){% endif %}</label>{{ form.email }}</div>
-            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.building|default:"Building/Villa No." }}</label>{{ form.building }}</div>
-            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.street|default:"Street Name" }}</label>{{ form.street }}</div>
-            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.area|default:"Zone / Area" }}</label>{{ form.zone }}</div>
-            <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.city|default:"City" }}</label>{{ form.city }}</div>
+
+        <!-- 1. Delivery Address -->
+        <div class="rounded-3xl p-5 sm:p-6 shadow-sm" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-primary-500/10 text-primary-400 font-bold text-sm">1</div>
+            <h2 class="font-bold text-base sm:text-lg" style="color:var(--text-primary)">{{ t.checkout.step_address|default:"Delivery Address (Qatar)" }}</h2>
           </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.full_name|default:"Full Name" }} *</label>
+              {{ form.full_name }}
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.phone|default:"Phone Number (Qatar)" }} *</label>
+              {{ form.phone }}
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{% if is_rtl %}البريد الإلكتروني (اختياري){% else %}Email Address (optional){% endif %}</label>
+              {{ form.email }}
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.building|default:"Building / Villa No." }}</label>
+              {{ form.building }}
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.street|default:"Street Name / Number" }}</label>
+              {{ form.street }}
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.area|default:"Zone / Area (e.g. Lusail, Al Sadd)" }} *</label>
+              {{ form.zone }}
+            </div>
+            <div>
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.city|default:"City" }} *</label>
+              {{ form.city }}
+            </div>
+          </div>
+
           {% if form.errors %}
-          <div class="mt-4 p-3 rounded-xl border border-red-400/30 bg-red-500/10 text-xs text-red-400">
-            {% if is_rtl %}يرجى تعبئة جميع الحقول المطلوبة بشكل صحيح.{% else %}Please fill in all required fields.{% endif %}
+          <div class="mt-4 p-3.5 rounded-xl border border-red-500/30 bg-red-500/10 text-xs text-red-400 space-y-1">
+            {% for field, errors in form.errors.items %}
+              {% for error in errors %}
+                <p>• {{ error }}</p>
+              {% endfor %}
+            {% endfor %}
           </div>
           {% endif %}
         </div>
-        <!-- Payment -->
-        <div class="rounded-3xl p-6" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-          <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">{{ t.checkout.payment_method|default:"Payment Method" }}</h2>
-          <div class="space-y-3">
-            {% for choice_val, choice_label in form.payment_method.field.choices %}
-            <label class="flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all" style="border-color:var(--border-color);background:var(--bg-surface-2)" onmouseover="this.style.borderColor='var(--color-accent)'" onmouseout="if(!this.querySelector('input').checked)this.style.borderColor='var(--border-color)'">
-              <input type="radio" name="payment_method" value="{{ choice_val }}" {% if choice_val == 'cash' %}checked{% endif %} class="accent-blue-500" />
-              <span class="text-sm font-medium" style="color:var(--text-primary)">
-                {% if is_rtl %}
-                  {% if choice_val == 'cash' %}الدفع عند الاستلام (كاش){% elif choice_val == 'card' %}بطاقة بنكية / بطاقة ائتمان{% else %}{{ choice_label }}{% endif %}
-                {% else %}
-                  {{ choice_label }}
-                {% endif %}
-              </span>
+
+        <!-- 2. Payment Method & Step-by-Step Channel -->
+        <div class="rounded-3xl p-5 sm:p-6 shadow-sm" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <div class="flex items-center gap-3 mb-5">
+            <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-primary-500/10 text-primary-400 font-bold text-sm">2</div>
+            <h2 class="font-bold text-base sm:text-lg" style="color:var(--text-primary)">{{ t.checkout.payment_method|default:"Payment Method" }}</h2>
+          </div>
+
+          <!-- Payment Options Tabs -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" id="payment-method-selector">
+            <!-- 1. Cash on Delivery -->
+            <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option" data-method="cash" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+              <div class="flex items-center justify-between mb-2">
+                <input type="radio" name="payment_method" value="cash" {% if form.payment_method.value == 'cash' or not form.payment_method.value %}checked{% endif %} class="accent-primary-500 w-4 h-4 cursor-pointer" />
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">{% if is_rtl %}عند الاستلام{% else %}Doorstep{% endif %}</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400 flex-shrink-0"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">{% if is_rtl %}الدفع عند الاستلام{% else %}Cash on Delivery{% endif %}</span>
+              </div>
+              <p class="text-[11px] mt-1.5" style="color:var(--text-secondary)">{% if is_rtl %}كاش أو بالبطاقة عند وصول المندوب{% else %}Pay cash or card to courier on delivery{% endif %}</p>
             </label>
-            {% endfor %}
+
+            <!-- 2. Credit / Debit Card -->
+            <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option" data-method="card" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+              <div class="flex items-center justify-between mb-2">
+                <input type="radio" name="payment_method" value="card" {% if form.payment_method.value == 'card' %}checked{% endif %} class="accent-primary-500 w-4 h-4 cursor-pointer" />
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-primary-500/10 text-primary-400 border border-primary-500/20">Visa / MC</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400 flex-shrink-0"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">{% if is_rtl %}بطاقة بنكية / ائتمان{% else %}Credit / Debit Card{% endif %}</span>
+              </div>
+              <p class="text-[11px] mt-1.5" style="color:var(--text-secondary)">{% if is_rtl %}دفع آمن وفوري عبر البطاقة{% else %}Instant & secure card checkout{% endif %}</p>
+            </label>
+
+            <!-- 3. Qatar QR / QPay / Fawran -->
+            <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option" data-method="qr" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+              <div class="flex items-center justify-between mb-2">
+                <input type="radio" name="payment_method" value="qr" {% if form.payment_method.value == 'qr' or form.payment_method.value == 'qpay' %}checked{% endif %} class="accent-primary-500 w-4 h-4 cursor-pointer" />
+                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">{% if is_rtl %}فَوْرًا / QR{% else %}Fawran / QR{% endif %}</span>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400 flex-shrink-0"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
+                <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">{% if is_rtl %}دفع فَوْرًا / رمز QR{% else %}QR / QPay / Fawran{% endif %}</span>
+              </div>
+              <p class="text-[11px] mt-1.5" style="color:var(--text-secondary)">{% if is_rtl %}تحويل مباشر عبر تطبيقات البنوك القطرية{% else %}Instant scan via any Qatar Bank App{% endif %}</p>
+            </label>
+          </div>
+
+          <!-- Channel 1: Cash on Delivery Sub-Panel -->
+          <div id="channel-panel-cash" class="payment-channel-pane p-5 rounded-2xl border space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+              <div>
+                <h4 class="font-bold text-sm" style="color:var(--text-primary)">
+                  {% if is_rtl %}الدفع عند الاستلام في جميع مناطق قطر{% else %}Cash or Card on Delivery across Qatar{% endif %}
+                </h4>
+                <p class="text-xs mt-1 leading-relaxed" style="color:var(--text-secondary)">
+                  {% if is_rtl %}
+                  سيصلك مندوب التوصيل ومعه جهاز نقاط البيع POS المتنقل لدفع المبلغ كاش أو باستخدام البطاقة البنكية / Apple Pay بكل راحة عند باب منزلك.
+                  {% else %}
+                  Our delivery courier will bring your order along with a portable POS card machine. You can pay with cash, Apple Pay, or credit/debit card upon arrival.
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">
+                {% if is_rtl %}طلب فكة / تعليمات الدفع للمندوب (اختياري){% else %}Change required / Payment note for courier (optional){% endif %}
+              </label>
+              <input type="text" name="cash_change_req" value="{{ form.cash_change_req.value|default:'' }}" placeholder="{% if is_rtl %}مثال: يرجى إحضار فكة لـ 500 ر.ق{% else %}e.g. Need change for QAR 500 note{% endif %}" class="input w-full text-xs" />
+            </div>
+          </div>
+
+          <!-- Channel 2: Credit / Debit Card Sub-Panel -->
+          <div id="channel-panel-card" class="payment-channel-pane hidden p-5 rounded-2xl border space-y-5" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            <!-- Interactive Live Card Mockup -->
+            <div class="relative w-full max-w-sm mx-auto p-5 rounded-2xl text-white shadow-xl overflow-hidden" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);border:1px solid rgba(255,255,255,0.15)">
+              <div class="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-primary-500/20 blur-2xl pointer-events-none"></div>
+              <div class="flex items-center justify-between mb-6">
+                <!-- Gold EMV Chip -->
+                <div class="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-400 via-amber-200 to-amber-500 border border-amber-600/40 shadow-inner flex items-center justify-center">
+                  <div class="w-6 h-4 border border-amber-700/30 rounded-sm"></div>
+                </div>
+                <!-- Card Brand Icon -->
+                <div id="card-brand-logo" class="font-display font-black text-sm tracking-wider text-white/90">
+                  <span>VISA / MASTERCARD</span>
+                </div>
+              </div>
+              <div class="font-mono text-base sm:text-lg tracking-widest mb-4 select-none drop-shadow" id="preview-card-number">
+                •••• •••• •••• ••••
+              </div>
+              <div class="flex items-end justify-between text-xs">
+                <div>
+                  <div class="text-[9px] uppercase tracking-wider text-slate-400">Cardholder</div>
+                  <div class="font-semibold uppercase tracking-wide truncate max-w-[170px]" id="preview-card-holder">
+                    {% if user.get_full_name %}{{ user.get_full_name|upper }}{% else %}YOUR NAME{% endif %}
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[9px] uppercase tracking-wider text-slate-400">Expires</div>
+                  <div class="font-mono font-semibold" id="preview-card-expiry">MM/YY</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Entry Form Fields -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
+                  {% if is_rtl %}اسم حامل البطاقة (كما هو مكتوب على البطاقة){% else %}Cardholder Name (as printed on card){% endif %} *
+                </label>
+                <input type="text" id="input-card-holder" name="card_holder" value="{{ form.card_holder.value|default:'' }}" placeholder="{% if user.get_full_name %}{{ user.get_full_name }}{% else %}e.g. MOHAMMED AL-KUWARI{% endif %}" class="input w-full text-xs sm:text-sm" />
+              </div>
+
+              <div class="sm:col-span-2">
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
+                  {% if is_rtl %}رقم البطاقة (16 رقم){% else %}Card Number (16 digits){% endif %} *
+                </label>
+                <div class="relative">
+                  <input type="text" id="input-card-number" name="card_number" value="{{ form.card_number.value|default:'' }}" maxlength="19" placeholder="4000 1234 5678 9010" class="input w-full font-mono text-xs sm:text-sm tracking-wider pr-10" />
+                  <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" id="card-input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
+                  {% if is_rtl %}تاريخ الانتهاء{% else %}Expiry Date (MM/YY){% endif %} *
+                </label>
+                <input type="text" id="input-card-expiry" name="card_expiry" value="{{ form.card_expiry.value|default:'' }}" maxlength="5" placeholder="MM/YY" class="input w-full font-mono text-xs sm:text-sm text-center" />
+              </div>
+
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
+                  {% if is_rtl %}رمز الأمان (CVV / CVC){% else %}Security Code (CVV){% endif %} *
+                </label>
+                <div class="relative">
+                  <input type="password" id="input-card-cvv" name="card_cvv" value="{{ form.card_cvv.value|default:'' }}" maxlength="4" placeholder="123" class="input w-full font-mono text-xs sm:text-sm text-center tracking-widest" />
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold" title="3 digits on back of card">?</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Security Assurance Badge -->
+            <div class="flex items-center gap-2 text-[11px] pt-2" style="color:var(--text-tertiary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400 flex-shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              <span>{% if is_rtl %}معاملة آمنة ومحمية بتشفير 256-Bit SSL ومعايير الأمان المصرفي QCB / PCI-DSS.{% else %}Protected with 256-Bit SSL Encryption & QCB / PCI-DSS compliant gateway.{% endif %}</span>
+            </div>
+          </div>
+
+          <!-- Channel 3: Qatar Instant QR / Fawran Sub-Panel -->
+          <div id="channel-panel-qr" class="payment-channel-pane hidden p-5 rounded-2xl border space-y-5" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 items-center">
+              <!-- QR Code Display Box -->
+              <div class="flex flex-col items-center justify-center p-5 rounded-2xl border text-center shadow-inner" style="background:var(--bg-surface);border-color:var(--border-color)">
+                <!-- Visual Qatar QR Canvas/SVG -->
+                <div class="p-3 bg-white rounded-xl shadow-md border-2 border-primary-500/30 inline-block mb-3 relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="140" height="140" viewBox="0 0 140 140" class="mx-auto">
+                    <!-- QR Pattern Background & Alignment Squares -->
+                    <rect width="140" height="140" fill="#ffffff"/>
+                    <!-- Top-Left Corner -->
+                    <rect x="10" y="10" width="35" height="35" fill="#0f172a" rx="4"/>
+                    <rect x="15" y="15" width="25" height="25" fill="#ffffff" rx="2"/>
+                    <rect x="20" y="20" width="15" height="15" fill="#4f46e5" rx="2"/>
+                    <!-- Top-Right Corner -->
+                    <rect x="95" y="10" width="35" height="35" fill="#0f172a" rx="4"/>
+                    <rect x="100" y="15" width="25" height="25" fill="#ffffff" rx="2"/>
+                    <rect x="105" y="20" width="15" height="15" fill="#4f46e5" rx="2"/>
+                    <!-- Bottom-Left Corner -->
+                    <rect x="10" y="95" width="35" height="35" fill="#0f172a" rx="4"/>
+                    <rect x="15" y="100" width="25" height="25" fill="#ffffff" rx="2"/>
+                    <rect x="20" y="105" width="15" height="15" fill="#4f46e5" rx="2"/>
+                    <!-- QR Data Dots & Grid -->
+                    <rect x="52" y="12" width="8" height="8" fill="#0f172a"/>
+                    <rect x="68" y="12" width="8" height="8" fill="#0f172a"/>
+                    <rect x="80" y="12" width="8" height="8" fill="#0f172a"/>
+                    <rect x="52" y="28" width="16" height="8" fill="#4f46e5"/>
+                    <rect x="76" y="28" width="8" height="8" fill="#0f172a"/>
+                    <rect x="12" y="52" width="8" height="16" fill="#0f172a"/>
+                    <rect x="28" y="52" width="16" height="8" fill="#4f46e5"/>
+                    <rect x="52" y="52" width="12" height="12" fill="#0f172a"/>
+                    <rect x="72" y="52" width="8" height="8" fill="#0f172a"/>
+                    <rect x="88" y="52" width="16" height="8" fill="#0f172a"/>
+                    <rect x="112" y="52" width="16" height="8" fill="#4f46e5"/>
+                    <rect x="12" y="76" width="16" height="8" fill="#0f172a"/>
+                    <rect x="36" y="76" width="8" height="8" fill="#4f46e5"/>
+                    <rect x="52" y="72" width="8" height="16" fill="#0f172a"/>
+                    <rect x="68" y="72" width="16" height="8" fill="#4f46e5"/>
+                    <rect x="92" y="76" width="8" height="16" fill="#0f172a"/>
+                    <rect x="108" y="76" width="20" height="8" fill="#0f172a"/>
+                    <rect x="52" y="96" width="16" height="8" fill="#0f172a"/>
+                    <rect x="76" y="96" width="8" height="16" fill="#4f46e5"/>
+                    <rect x="92" y="100" width="16" height="8" fill="#0f172a"/>
+                    <rect x="116" y="100" width="12" height="12" fill="#0f172a"/>
+                    <rect x="52" y="116" width="8" height="12" fill="#0f172a"/>
+                    <rect x="68" y="116" width="16" height="12" fill="#0f172a"/>
+                    <rect x="92" y="120" width="12" height="8" fill="#4f46e5"/>
+                    <rect x="112" y="120" width="16" height="8" fill="#0f172a"/>
+                    <!-- Logo Badge Overlay -->
+                    <circle cx="70" cy="70" r="14" fill="#1e1b4b"/>
+                    <text x="70" y="74" fill="#ffffff" font-size="9" font-family="sans-serif" font-weight="900" text-anchor="middle">M</text>
+                  </svg>
+                </div>
+                <div class="text-xs font-bold" style="color:var(--text-primary)">MARJAAH TECH QATAR</div>
+                <div class="text-[11px] font-mono text-primary-400 font-bold mt-0.5">QAR {{ total|floatformat:0 }}</div>
+              </div>
+
+              <!-- Steps to Pay & Fawran Identifier -->
+              <div class="space-y-3">
+                <div class="p-3 rounded-xl border" style="background:var(--bg-surface);border-color:var(--border-color)">
+                  <div class="text-[10px] uppercase font-bold text-slate-400">{% if is_rtl %}معرف التحويل السريع فَوْرًا (Fawran Alias){% else %}Fawran Instant Alias / Mobile{% endif %}</div>
+                  <div class="flex items-center justify-between mt-1">
+                    <span class="font-mono font-bold text-xs sm:text-sm text-primary-400" id="fawran-id-text">MARJAAH-QATAR</span>
+                    <button type="button" id="btn-copy-fawran" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 transition-all cursor-pointer">
+                      {% if is_rtl %}نسخ{% else %}Copy{% endif %}
+                    </button>
+                  </div>
+                </div>
+
+                <div class="text-xs space-y-1.5 leading-relaxed" style="color:var(--text-secondary)">
+                  <p class="font-bold" style="color:var(--text-primary)">
+                    {% if is_rtl %}طريقة الدفع في 3 خطوات بسيطة:{% else %}Quick 3-step payment:{% endif %}
+                  </p>
+                  <p>1. {% if is_rtl %}افتح تطبيق البنك القطري الخاص بك (QNB, CBQ, الريان, دخان...).{% else %}Open your Qatar Banking app (QNB, CBQ, Dukhan, Al Rayan...).{% endif %}</p>
+                  <p>2. {% if is_rtl %}اختر خدمة فَوْرًا (Fawran) وامسح الرمز أو حوّل لـ <strong class="text-primary-400">MARJAAH-QATAR</strong>.{% else %}Select Fawran / QPay, scan QR or enter <strong class="text-primary-400">MARJAAH-QATAR</strong>.{% endif %}</p>
+                  <p>3. {% if is_rtl %}أدخل رقم الحوالة في الحقل أدناه لتأكيد الطلب.{% else %}Paste your Bank Transaction Ref # below to confirm.{% endif %}</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Transaction Reference Input -->
+            <div class="pt-2">
+              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
+                {% if is_rtl %}رقم مرجع الحوالة البنكية (Bank Transaction Ref # / UTR){% else %}Bank Transaction Reference # / UTR (optional / receipt){% endif %}
+              </label>
+              <input type="text" name="qr_ref" value="{{ form.qr_ref.value|default:'' }}" placeholder="{% if is_rtl %}مثال: TXN-89347291 أو رقم إيصال التحويل{% else %}e.g. TXN-98234123 or transfer confirmation code{% endif %}" class="input w-full text-xs sm:text-sm font-mono" />
+            </div>
+          </div>
+
+          <!-- General Delivery Notes -->
+          <div class="mt-5">
+            <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{{ t.checkout.notes|default:"Special Delivery Instructions (optional)" }}</label>
+            {{ form.notes }}
           </div>
         </div>
       </div>
 
-      <!-- Order Summary -->
+      <!-- Right Column: Order Summary & Place Order Button -->
       <div class="lg:col-span-1">
-        <div class="rounded-3xl p-6 sticky top-24" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-          <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">{{ t.checkout.order_summary|default:"Order Summary" }}</h2>
-          <div class="space-y-3 mb-5">
+        <div class="rounded-3xl p-5 sm:p-6 sticky top-24 shadow-sm" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <h2 class="font-bold text-base sm:text-lg mb-5" style="color:var(--text-primary)">{{ t.checkout.order_summary|default:"Order Summary" }}</h2>
+
+          <!-- Items List -->
+          <div class="space-y-3 mb-5 max-h-60 overflow-y-auto pr-1">
             {% for item in cart_items %}
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
+              <div class="w-11 h-11 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
                 <img src="{{ item.image }}" alt="{% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}" class="w-full h-full object-cover" loading="lazy" onerror="this.src='{% static "images/placeholder.svg" %}'" />
               </div>
               <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium truncate" style="color:var(--text-primary)">
+                <p class="text-xs font-semibold truncate leading-tight" style="color:var(--text-primary)">
                   {% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}
                 </p>
-                <p class="text-[10px]" style="color:var(--text-tertiary)">x{{ item.quantity }}</p>
+                <p class="text-[11px] mt-0.5" style="color:var(--text-tertiary)">x{{ item.quantity }}</p>
               </div>
               <span class="text-xs font-bold" style="color:var(--text-primary)">
                 {% if is_rtl %}{{ item.price|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ item.price|floatformat:0 }}{% endif %}
@@ -69,29 +349,179 @@
             </div>
             {% endfor %}
           </div>
+
+          <!-- Pricing Breakdown -->
           <div class="space-y-2 text-sm pt-4 border-t" style="border-color:var(--border-color)">
             <div class="flex justify-between">
               <span style="color:var(--text-secondary)">{{ t.cart.subtotal|default:"Subtotal" }}</span>
-              <span style="color:var(--text-primary)">{% if is_rtl %}{{ subtotal|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ subtotal|floatformat:0 }}{% endif %}</span>
+              <span class="font-medium" style="color:var(--text-primary)">{% if is_rtl %}{{ subtotal|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ subtotal|floatformat:0 }}{% endif %}</span>
             </div>
             <div class="flex justify-between">
               <span style="color:var(--text-secondary)">{{ t.cart.shipping|default:"Shipping" }}</span>
-              <span {% if shipping == 0 %}class="text-emerald-500"{% else %}style="color:var(--text-primary)"{% endif %}>
-                {% if shipping == 0 %}{% if is_rtl %}مجاني 🎉{% else %}Free 🎉{% endif %}{% else %}{% if is_rtl %}{{ shipping }} {{ currency }}{% else %}{{ currency }} {{ shipping }}{% endif %}{% endif %}
+              <span {% if shipping == 0 %}class="text-emerald-400 font-bold"{% else %}style="color:var(--text-primary)"{% endif %}>
+                {% if shipping == 0 %}{% if is_rtl %}توصيل مجاني 🎉{% else %}FREE Express 🎉{% endif %}{% else %}{% if is_rtl %}{{ shipping }} {{ currency }}{% else %}{{ currency }} {{ shipping }}{% endif %}{% endif %}
               </span>
             </div>
-            <div class="flex justify-between pt-3 border-t" style="border-color:var(--border-color)">
+            <div class="flex justify-between pt-3 border-t items-center" style="border-color:var(--border-color)">
               <span class="font-bold" style="color:var(--text-primary)">{{ t.cart.total|default:"Total" }}</span>
-              <span class="text-xl font-display font-black" style="color:var(--color-accent)">{% if is_rtl %}{{ total|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ total|floatformat:0 }}{% endif %}</span>
+              <span class="text-xl font-display font-black" style="color:var(--color-accent, #6366f1)">
+                {% if is_rtl %}{{ total|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ total|floatformat:0 }}{% endif %}
+              </span>
             </div>
           </div>
-          <button type="submit" class="btn-primary w-full justify-center mt-6 flex items-center gap-2">
-            <span>{{ t.checkout.place_order|default:"Place Order" }}</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+
+          <!-- Submit Button -->
+          <button type="submit" id="btn-submit-order" class="btn-primary w-full py-3.5 rounded-xl justify-center mt-6 flex items-center gap-2 font-bold text-sm shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all cursor-pointer">
+            <span id="submit-btn-text">
+              {% if is_rtl %}تأكيد وإتمام الطلب{% else %}Place Order Now{% endif %}
+            </span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </button>
+
+          <div class="mt-4 text-center">
+            <p class="text-[11px]" style="color:var(--text-tertiary)">
+              {% if is_rtl %}بالضغط على تأكيد الطلب، فإنك توافق على شروط الخدمة والضمان الرسمي.{% else %}By placing this order you agree to our authorized GCC warranty & terms.{% endif %}
+            </p>
+          </div>
         </div>
       </div>
     </form>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const radioOptions = document.querySelectorAll('input[name="payment_method"]');
+  const cardPanels = {
+    'cash': document.getElementById('channel-panel-cash'),
+    'card': document.getElementById('channel-panel-card'),
+    'qr': document.getElementById('channel-panel-qr'),
+    'qpay': document.getElementById('channel-panel-qr'),
+  };
+  const cardOptionLabels = document.querySelectorAll('.payment-card-option');
+  const submitBtnText = document.getElementById('submit-btn-text');
+  const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
+
+  function updatePaymentChannel(selectedVal) {
+    // Hide all channel panels
+    Object.values(cardPanels).forEach(panel => {
+      if (panel) panel.classList.add('hidden');
+    });
+
+    // Show active panel
+    const activePanel = cardPanels[selectedVal] || cardPanels['cash'];
+    if (activePanel) {
+      activePanel.classList.remove('hidden');
+    }
+
+    // Highlight selected card container
+    cardOptionLabels.forEach(label => {
+      const radio = label.querySelector('input');
+      if (radio && (radio.value === selectedVal || (selectedVal === 'qpay' && radio.value === 'qr'))) {
+        label.style.borderColor = 'var(--color-accent, #6366f1)';
+        label.style.background = 'var(--bg-surface-3, rgba(99,102,241,0.06))';
+      } else {
+        label.style.borderColor = 'var(--border-color, rgba(255,255,255,0.08))';
+        label.style.background = 'var(--bg-surface-2)';
+      }
+    });
+
+    // Update CTA button label context
+    if (submitBtnText) {
+      if (selectedVal === 'card') {
+        submitBtnText.textContent = isRtl ? 'دفع آمن بالبطاقة وتأكيد الطلب' : 'Pay with Card & Place Order';
+      } else if (selectedVal === 'qr' || selectedVal === 'qpay') {
+        submitBtnText.textContent = isRtl ? 'تأكيد الدفع عبر فَوْرًا / QR' : 'Confirm Fawran / QR Order';
+      } else {
+        submitBtnText.textContent = isRtl ? 'تأكيد وإتمام الطلب (عند الاستلام)' : 'Place Order (Cash on Delivery)';
+      }
+    }
+  }
+
+  // Radio change listeners
+  radioOptions.forEach(radio => {
+    radio.addEventListener('change', function () {
+      if (this.checked) {
+        updatePaymentChannel(this.value);
+      }
+    });
+  });
+
+  // Initial channel trigger
+  const checkedRadio = document.querySelector('input[name="payment_method"]:checked');
+  if (checkedRadio) {
+    updatePaymentChannel(checkedRadio.value);
+  }
+
+  // Live Card Preview formatting
+  const inputCardNumber = document.getElementById('input-card-number');
+  const inputCardHolder = document.getElementById('input-card-holder');
+  const inputCardExpiry = document.getElementById('input-card-expiry');
+  const previewNumber = document.getElementById('preview-card-number');
+  const previewHolder = document.getElementById('preview-card-holder');
+  const previewExpiry = document.getElementById('preview-card-expiry');
+  const cardBrandLogo = document.getElementById('card-brand-logo');
+
+  if (inputCardNumber) {
+    inputCardNumber.addEventListener('input', function (e) {
+      let val = e.target.value.replace(/\D/g, '').substring(0, 16);
+      let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+      e.target.value = formatted;
+
+      if (previewNumber) {
+        previewNumber.textContent = formatted.padEnd(19, '•');
+      }
+
+      // Detect Brand
+      if (cardBrandLogo) {
+        if (val.startsWith('4')) {
+          cardBrandLogo.innerHTML = '<span class="text-blue-400 font-black tracking-widest text-base">VISA</span>';
+        } else if (val.startsWith('51') || val.startsWith('52') || val.startsWith('53') || val.startsWith('54') || val.startsWith('55')) {
+          cardBrandLogo.innerHTML = '<span class="text-amber-400 font-black tracking-widest text-base">MASTERCARD</span>';
+        } else if (val.startsWith('34') || val.startsWith('37')) {
+          cardBrandLogo.innerHTML = '<span class="text-cyan-300 font-black tracking-widest text-base">AMEX</span>';
+        } else {
+          cardBrandLogo.innerHTML = '<span>VISA / MASTERCARD</span>';
+        }
+      }
+    });
+  }
+
+  if (inputCardHolder) {
+    inputCardHolder.addEventListener('input', function (e) {
+      if (previewHolder) {
+        previewHolder.textContent = e.target.value.toUpperCase() || (isRtl ? 'اسم العميل' : 'YOUR NAME');
+      }
+    });
+  }
+
+  if (inputCardExpiry) {
+    inputCardExpiry.addEventListener('input', function (e) {
+      let val = e.target.value.replace(/\D/g, '').substring(0, 4);
+      if (val.length >= 3) {
+        val = val.substring(0, 2) + '/' + val.substring(2);
+      }
+      e.target.value = val;
+      if (previewExpiry) {
+        previewExpiry.textContent = val || 'MM/YY';
+      }
+    });
+  }
+
+  // Copy Fawran ID
+  const btnCopyFawran = document.getElementById('btn-copy-fawran');
+  if (btnCopyFawran) {
+    btnCopyFawran.addEventListener('click', function () {
+      const text = document.getElementById('fawran-id-text')?.textContent || 'MARJAAH-QATAR';
+      navigator.clipboard.writeText(text).then(() => {
+        const originalText = btnCopyFawran.textContent;
+        btnCopyFawran.textContent = isRtl ? 'تم النسخ ✓' : 'Copied! ✓';
+        setTimeout(() => {
+          btnCopyFawran.textContent = originalText;
+        }, 2000);
+      });
+    });
+  }
+});
+</script>
 {% endblock %}
