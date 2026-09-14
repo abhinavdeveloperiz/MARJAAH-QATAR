@@ -15,7 +15,6 @@ urlpatterns = [
     re_path(r'^favicon\.ico$', serve, {'document_root': settings.BASE_DIR / 'static', 'path': 'favicon.ico'}),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
-
+# Serve media files in both debug and non-debug mode
+# (In production on cPanel, Apache serves /media/ directly — this fallback is for Render/demo)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

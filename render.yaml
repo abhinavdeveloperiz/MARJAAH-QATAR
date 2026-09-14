@@ -3,9 +3,27 @@ services:
     name: marjaah-qatar
     runtime: python
     buildCommand: "./build.sh"
-    startCommand: "gunicorn marjaah.wsgi:application"
+    startCommand: "gunicorn marjaah.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120"
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.0
-      - key: PORT
-        value: 10000
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_HOST
+        value: marjaah-qatar.onrender.com
+      - key: SITE_URL
+        value: https://marjaah-qatar.onrender.com
+      - key: HTTPS_ENABLED
+        value: "True"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: marjaah-db
+          property: connectionString
+      - key: EMAIL_BACKEND
+        value: django.core.mail.backends.smtp.EmailBackend
+
+databases:
+  - name: marjaah-db
+    plan: free

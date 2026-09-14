@@ -1,0 +1,41 @@
+# ─── M.SHOP Qatar — Apache .htaccess for cPanel ─────────────────────────────
+# Place in the public_html directory (or the app root cPanel points to).
+# This routes requests through Phusion Passenger for Django,
+# while serving /static/ and /media/ directly via Apache for performance.
+# ─────────────────────────────────────────────────────────────────────────────
+
+Options -MultiViews
+PassengerEnabled on
+PassengerPython /path/to/virtualenv/bin/python3
+
+# ── Route static files through Apache directly (bypass Python/Passenger) ──────
+# Adjust /home/USERNAME/marjaah-trading/ to your actual cPanel home path.
+<IfModule mod_alias.c>
+    Alias /static/ /home/USERNAME/marjaah-trading/staticfiles/
+    Alias /media/  /home/USERNAME/marjaah-trading/media/
+</IfModule>
+
+<Directory /home/USERNAME/marjaah-trading/staticfiles>
+    Require all granted
+    Options -Indexes
+</Directory>
+
+<Directory /home/USERNAME/marjaah-trading/media>
+    Require all granted
+    Options -Indexes
+</Directory>
+
+# ── Redirect HTTP to HTTPS ────────────────────────────────────────────────────
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{HTTPS} off
+    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+</IfModule>
+
+# ── Security headers ──────────────────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header always set X-Frame-Options "DENY"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

@@ -1,19 +1,130 @@
 {% extends "base.html" %}
-{% block title %}Order Placed — M.SHOP Qatar{% endblock %}
+{% load static %}
+{% block title %}{% if is_rtl %}تم تقديم الطلب — متجر قطر للتقنية M.SHOP{% else %}Order Confirmed — M.SHOP Qatar{% endif %}{% endblock %}
 {% block content %}
-<div class="pt-[72px] min-h-screen flex items-center justify-center">
-  <div class="text-center max-w-lg mx-auto px-6 py-16">
-    <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl" style="background:linear-gradient(135deg,#10B981,#059669)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+<div class="pt-[72px] min-h-screen" style="background:var(--bg-base)">
+  <div class="container-custom py-16 max-w-2xl">
+
+    <!-- Success Hero -->
+    <div class="text-center mb-10">
+      <div class="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl" style="background:linear-gradient(135deg,#10B981,#059669)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+      </div>
+      <h1 class="text-3xl font-display font-black mb-2" style="color:var(--text-primary)">
+        {% if is_rtl %}تم تقديم طلبك! 🎉{% else %}Order Confirmed! 🎉{% endif %}
+      </h1>
+      <p class="text-sm" style="color:var(--text-secondary)">
+        {% if is_rtl %}
+          شكراً لطلبك. سنبدأ في معالجته قريباً وسيتم التوصيل إلى عنوانك في قطر خلال 1-2 يوم عمل.
+        {% else %}
+          Thank you for your order! We'll process it shortly and deliver to your address in Qatar within 1–2 business days.
+        {% endif %}
+      </p>
     </div>
-    <h1 class="text-3xl font-display font-black mb-3" style="color:var(--text-primary)">Order Placed! 🎉</h1>
-    <p class="text-sm leading-relaxed mb-8" style="color:var(--text-secondary)">Thank you for your order! We'll process it shortly and deliver to your address in Qatar within 1-2 business days.</p>
-    <p class="text-2xl font-display font-black mb-8" style="color:var(--color-accent)">Total: QAR {{ total|floatformat:0 }}</p>
+
+    <!-- Order Card -->
+    {% if order %}
+    <div class="rounded-3xl overflow-hidden border mb-6" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <!-- Order Header -->
+      <div class="flex items-center justify-between p-6 border-b" style="border-color:var(--border-color)">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--text-tertiary)">
+            {% if is_rtl %}رقم الطلب{% else %}Order Number{% endif %}
+          </p>
+          <p class="text-xl font-display font-black" style="color:var(--color-accent)">{{ order.order_number }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--text-tertiary)">
+            {% if is_rtl %}حالة الطلب{% else %}Status{% endif %}
+          </p>
+          <span class="px-3 py-1 rounded-full text-xs font-bold" style="background:#F59E0B22;color:#F59E0B">
+            {% if is_rtl %}قيد المعالجة{% else %}Processing{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Items -->
+      <div class="p-6 space-y-3">
+        <p class="text-xs font-bold uppercase tracking-widest mb-4" style="color:var(--text-tertiary)">
+          {% if is_rtl %}المنتجات المطلوبة{% else %}Items Ordered{% endif %}
+        </p>
+        {% for item in order_items %}
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
+            <img src="{{ item.image }}" alt="{% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}"
+                 class="w-full h-full object-cover" loading="lazy"
+                 onerror="this.src='{% static 'images/placeholder.svg' %}'" />
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium truncate" style="color:var(--text-primary)">
+              {% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}
+            </p>
+            <p class="text-xs" style="color:var(--text-tertiary)">
+              x{{ item.quantity }}
+            </p>
+          </div>
+          <span class="text-sm font-bold flex-shrink-0" style="color:var(--text-primary)">
+            {% if is_rtl %}{{ item.price|floatformat:0 }} QAR{% else %}QAR {{ item.price|floatformat:0 }}{% endif %}
+          </span>
+        </div>
+        {% empty %}
+        <p class="text-sm" style="color:var(--text-secondary)">—</p>
+        {% endfor %}
+      </div>
+
+      <!-- Totals -->
+      <div class="p-6 space-y-2 border-t" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+        <div class="flex justify-between text-sm">
+          <span style="color:var(--text-secondary)">{% if is_rtl %}المجموع الفرعي{% else %}Subtotal{% endif %}</span>
+          <span style="color:var(--text-primary)">{% if is_rtl %}{{ order.subtotal|floatformat:0 }} QAR{% else %}QAR {{ order.subtotal|floatformat:0 }}{% endif %}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span style="color:var(--text-secondary)">{% if is_rtl %}الشحن{% else %}Shipping{% endif %}</span>
+          <span {% if order.shipping == 0 %}class="text-emerald-500 font-bold"{% else %}style="color:var(--text-primary)"{% endif %}>
+            {% if order.shipping == 0 %}{% if is_rtl %}مجاني 🎉{% else %}Free 🎉{% endif %}{% else %}{% if is_rtl %}{{ order.shipping|floatformat:0 }} QAR{% else %}QAR {{ order.shipping|floatformat:0 }}{% endif %}{% endif %}
+          </span>
+        </div>
+        <div class="flex justify-between pt-3 border-t" style="border-color:var(--border-color)">
+          <span class="font-bold text-base" style="color:var(--text-primary)">{% if is_rtl %}الإجمالي{% else %}Total{% endif %}</span>
+          <span class="text-2xl font-display font-black" style="color:var(--color-accent)">
+            {% if is_rtl %}{{ order.total|floatformat:0 }} QAR{% else %}QAR {{ order.total|floatformat:0 }}{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Delivery address snapshot -->
+      {% if order.delivery_address_display %}
+      <div class="p-6 border-t" style="border-color:var(--border-color)">
+        <p class="text-xs font-bold uppercase tracking-widest mb-2" style="color:var(--text-tertiary)">
+          {% if is_rtl %}عنوان التوصيل{% else %}Delivery Address{% endif %}
+        </p>
+        <p class="text-sm" style="color:var(--text-secondary)">{{ order.delivery_address_display }}</p>
+        {% if order.notes %}
+        <p class="text-xs mt-2 italic" style="color:var(--text-tertiary)">{{ order.notes }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% else %}
+    <!-- Fallback if order not passed -->
+    <div class="text-center mb-8">
+      <p class="text-2xl font-display font-black" style="color:var(--color-accent)">
+        {% if is_rtl %}الإجمالي: {{ total|floatformat:0 }} QAR{% else %}Total: QAR {{ total|floatformat:0 }}{% endif %}
+      </p>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="/{{ locale }}/" class="btn-primary">Back to Store</a>
-      {% if user.is_authenticated %}<a href="/{{ locale }}/account/" class="btn-ghost border" style="border-color:var(--border-color)">View Orders</a>{% endif %}
+      <a href="/{{ locale }}/" class="btn-primary flex items-center gap-2 justify-center">
+        {% if is_rtl %}العودة للمتجر{% else %}Continue Shopping{% endif %}
+      </a>
+      {% if user.is_authenticated %}
+      <a href="/{{ locale }}/account/" class="btn-ghost border flex items-center gap-2 justify-center" style="border-color:var(--border-color)">
+        {% if is_rtl %}عرض طلباتي{% else %}View My Orders{% endif %}
+      </a>
+      {% endif %}
     </div>
   </div>
 </div>
 {% endblock %}
-

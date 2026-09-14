@@ -364,7 +364,18 @@ PRODUCTS_DATA = [
 class Command(BaseCommand):
     help = 'Seeds the database with initial Marjaah Trading product data'
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--safe',
+            action='store_true',
+            help='Skip seeding if products already exist in the database.',
+        )
+
     def handle(self, *args, **options):
+        from store.models import Product as P
+        if options.get('safe') and P.objects.exists():
+            self.stdout.write(self.style.WARNING('Products already exist — skipping seed (--safe mode).'))
+            return
         self.stdout.write('Seeding categories...')
         cat_map = {}
         sub_map = {}

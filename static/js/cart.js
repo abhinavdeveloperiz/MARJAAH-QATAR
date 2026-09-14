@@ -1,4 +1,4 @@
-// ─── Cart System (localStorage + Server AJAX) ─────────────────────────────────
+// ─── Cart System (Server AJAX) ────────────────────────────────────────────────
 (function () {
   const LOCALE = document.documentElement.lang || 'en';
 
@@ -11,7 +11,10 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
       body: JSON.stringify(data),
-    }).then(r => r.json()).then(cb).catch(console.error);
+    })
+      .then(r => r.json())
+      .then(cb)
+      .catch(console.error);
   }
 
   // ── Cart Drawer open/close ─────────────────────────
@@ -38,7 +41,7 @@
   document.querySelectorAll('[data-open-cart]').forEach(btn => btn.addEventListener('click', openCart));
   document.querySelectorAll('[data-close-cart]').forEach(btn => btn.addEventListener('click', closeCart));
 
-  // ── Add to cart ───────────────────────────────────
+  // ── Cart badge update ──────────────────────────────
   function updateCartBadge(count) {
     document.querySelectorAll('[data-cart-count]').forEach(el => {
       el.textContent = count;
@@ -46,22 +49,36 @@
     });
   }
 
-  document.addEventListener('click', function(e) {
+  // ── Add to cart ───────────────────────────────────
+  document.addEventListener('click', function (e) {
     const btn = e.target.closest('[data-add-to-cart]');
     if (!btn) return;
     e.preventDefault();
     const slug = btn.dataset.addToCart;
-    apiPost(`/${LOCALE}/api/cart/add/`, { slug: slug, quantity: 1 }, function(res) {
+    // Visual feedback: disable button while request is in flight
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<span style="opacity:0.7">Adding…</span>';
+    apiPost(`/${LOCALE}/api/cart/add/`, { slug: slug, quantity: 1 }, function (res) {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
       if (res.success) {
         updateCartBadge(res.cart_count);
-        Toast.success(LOCALE === 'ar' ? 'تمت الإضافة إلى السلة' : 'Added to cart!');
+        if (typeof Toast !== 'undefined') {
+          Toast.success(LOCALE === 'ar' ? 'تمت الإضافة إلى السلة ✓' : 'Added to cart! ✓');
+        }
         refreshCartDrawer();
+        openCart();
+      } else {
+        if (typeof Toast !== 'undefined') {
+          Toast.error(res.error || (LOCALE === 'ar' ? 'حدث خطأ' : 'Could not add item.'));
+        }
       }
     });
   });
 
   // ── Update quantity ───────────────────────────────
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     const btn = e.target.closest('[data-cart-qty]');
     if (!btn) return;
     const slug = btn.dataset.cartQty;
@@ -69,7 +86,7 @@
     const qtyEl = btn.closest('[data-cart-item]')?.querySelector('[data-qty-display]');
     const currentQty = parseInt(qtyEl?.textContent || '1');
     const newQty = currentQty + delta;
-    apiPost(`/${LOCALE}/api/cart/update/`, { slug: slug, quantity: newQty }, function(res) {
+    apiPost(`/${LOCALE}/api/cart/update/`, { slug: slug, quantity: newQty }, function (res) {
       if (res.success) {
         updateCartBadge(res.cart_count);
         refreshCartDrawer();
@@ -78,33 +95,35 @@
   });
 
   // ── Remove item ───────────────────────────────────
-  document.addEventListener('click', function(e) {
+  document.addEventListener('click', function (e) {
     const btn = e.target.closest('[data-cart-remove]');
     if (!btn) return;
     const slug = btn.dataset.cartRemove;
-    apiPost(`/${LOCALE}/api/cart/remove/`, { slug: slug }, function(res) {
+    apiPost(`/${LOCALE}/api/cart/remove/`, { slug: slug }, function (res) {
       if (res.success) {
         updateCartBadge(res.cart_count);
-        Toast.success(LOCALE === 'ar' ? 'تمت الإزالة من السلة' : 'Removed from cart');
+        if (typeof Toast !== 'undefined') {
+          Toast.info(LOCALE === 'ar' ? 'تمت الإزالة من السلة' : 'Removed from cart');
+        }
         refreshCartDrawer();
       }
     });
   });
 
-  // ── Refresh cart drawer content via fetch ─────────
+  // ── Refresh cart drawer via AJAX partial ──────────
   function refreshCartDrawer() {
     const drawerContent = document.getElementById('cart-drawer-content');
     if (!drawerContent) return;
-    fetch(`/${LOCALE}/cart/?partial=1`).then(r => r.text()).then(html => {
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(html, 'text/html');
-      const newContent = doc.getElementById('cart-drawer-content');
-      if (newContent) drawerContent.innerHTML = newContent.innerHTML;
-    }).catch(() => {
-      // Silently fail — page reload will sync
-    });
+    // Fetch the standalone partial — cart_view detects ?partial=1
+    fetch(`/${LOCALE}/cart/?partial=1`, { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(r => r.text())
+      .then(html => {
+        drawerContent.innerHTML = html;
+      })
+      .catch(() => {
+        // Silently fail — cart state is still correct, page reload will sync UI
+      });
   }
 
-  window.CartSystem = { open: openCart, close: closeCart };
+  window.CartSystem = { open: openCart, close: closeCart, refresh: refreshCartDrawer };
 })();
-

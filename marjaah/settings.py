@@ -1,17 +1,50 @@
 """
 Django settings for Marjaah Trading — M.SHOP Qatar
+Supports: local development (SQLite) + Render staging (PostgreSQL) + cPanel production
 """
+import os
 from pathlib import Path
+
+# Load .env file if present (local development)
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-marjaah-change-in-production-abc123xyz'
+# ─── SECURITY ─────────────────────────────────────────────────────────────────
+SECRET_KEY = os.environ.get(
+    'SECRET_KEY',
+    'django-insecure-marjaah-local-dev-only-abc123xyz-change-in-production'
+)
 
-DEBUG = True
+# DEBUG is False on Render and cPanel (set DEBUG=True in .env for local dev)
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = ['*']
+# Dynamic ALLOWED_HOSTS — add your domains here via env var
+_ALLOWED_HOST = os.environ.get('ALLOWED_HOST', '')
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+if _ALLOWED_HOST:
+    ALLOWED_HOSTS.append(_ALLOWED_HOST)
+if DEBUG:
+    ALLOWED_HOSTS.append('*')
 
+# CSRF trusted origins for HTTPS deployments (Render, cPanel)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.onrender.com',
+    'https://marjaah-qatar.onrender.com',
+]
+_SITE_URL = os.environ.get('SITE_URL', '')
+if _SITE_URL:
+    CSRF_TRUSTED_ORIGINS.append(_SITE_URL)
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# ─── APPLICATIONS ─────────────────────────────────────────────────────────────
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -56,13 +89,28 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'marjaah.wsgi.application'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+# ─── DATABASE ─────────────────────────────────────────────────────────────────
+# Uses PostgreSQL on Render/cPanel (via DATABASE_URL env var), SQLite locally
+_DATABASE_URL = os.environ.get('DATABASE_URL', '')
 
+if _DATABASE_URL:
+    import dj_database_url
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=_DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# ─── PASSWORD VALIDATION ──────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -70,6 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# ─── INTERNATIONALIZATION ─────────────────────────────────────────────────────
 LANGUAGE_CODE = 'en'
 LANGUAGES = [
     ('en', 'English'),
@@ -83,6 +132,7 @@ USE_TZ = True
 
 LOCALE_PATHS = [BASE_DIR / 'locale']
 
+# ─── STATIC & MEDIA FILES ────────────────────────────────────────────────────
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
@@ -93,6 +143,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# ─── AUTHENTICATION ───────────────────────────────────────────────────────────
 AUTH_USER_MODEL = 'store.User'
 
 LOGIN_URL = '/en/auth/login/'
@@ -101,3 +152,135 @@ LOGOUT_REDIRECT_URL = '/en/'
 
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
 
+# ─── EMAIL CONFIGURATION ──────────────────────────────────────────────────────
+# In development: emails are printed to the console
+# In production: set EMAIL_BACKEND + SMTP credentials via environment variables
+EMAIL_BACKEND = os.environ.get(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.console.EmailBackend'
+)
+EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'M.SHOP Qatar <noreply@marjaah.qa>')
+CONTACT_NOTIFICATION_EMAIL = os.environ.get('CONTACT_NOTIFICATION_EMAIL', EMAIL_HOST_USER)
+
+# ─── PASSWORD RESET ───────────────────────────────────────────────────────────
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
+
+# ─── PRODUCTION SECURITY (only active when DEBUG=False) ─────────────────────
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    # Only enable HTTPS-strict cookies if you have HTTPS (Render does)
+    if os.environ.get('HTTPS_ENABLED', 'False').lower() in ('true', '1'):
+        SESSION_COOKIE_SECURE = True
+        CSRF_COOKIE_SECURE = True
+        SECURE_HSTS_SECONDS = 31536000
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+# ─── JAZZMIN ADMIN SETTINGS ──────────────────────────────────────────────────
+JAZZMIN_SETTINGS = {
+    # Title & Branding
+    "site_title": "Marjaah Trading Admin",
+    "site_header": "Marjaah Trading",
+    "site_brand": "M.SHOP Qatar",
+    "site_logo": "logo.png",
+    "login_logo": "logo.png",
+    "site_logo_classes": "img-fluid",
+    "site_icon": "favicon.png",
+    "welcome_sign": "Welcome to Marjaah Trading Portal",
+    "copyright": "Marjaah Trading / M.SHOP Qatar",
+
+    # Search & Quick Links
+    "search_model": ["store.Product", "store.Order"],
+    "user_avatar": None,
+    "topmenu_links": [
+        {"name": "Live Store", "url": "/", "new_window": True},
+        {"name": "Staff Dashboard", "url": "/admin-dashboard/", "new_window": True},
+        {"model": "store.Order"},
+        {"model": "store.Product"},
+    ],
+
+    # Navigation & Sidebar
+    "show_sidebar": True,
+    "navigation_expanded": True,
+    "hide_apps": [],
+    "hide_models": [],
+    "order_with_respect_to": [
+        "store.Order",
+        "store.OrderItem",
+        "store.Product",
+        "store.Category",
+        "store.Subcategory",
+        "store.Brand",
+        "store.ContactMessage",
+        "store.User",
+        "store.Address",
+        "auth",
+    ],
+
+    # Custom Icons (FontAwesome 5)
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.Group": "fas fa-users",
+        "store.User": "fas fa-user-shield",
+        "store.Category": "fas fa-th-large",
+        "store.Subcategory": "fas fa-tags",
+        "store.Brand": "fas fa-copyright",
+        "store.Product": "fas fa-box-open",
+        "store.Address": "fas fa-map-marker-alt",
+        "store.Order": "fas fa-shopping-bag",
+        "store.OrderItem": "fas fa-receipt",
+        "store.ContactMessage": "fas fa-envelope-open-text",
+    },
+    "default_icon_parents": "fas fa-chevron-circle-right",
+    "default_icon_children": "fas fa-circle",
+
+    # UI Options
+    "related_modal_active": True,
+    "custom_css": "css/admin-jazzmin.css",
+    "custom_js": None,
+    "use_google_fonts_cdn": True,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+    "changeform_format_overrides": {
+        "store.order": "collapsible",
+        "store.product": "horizontal_tabs",
+    },
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-dark",
+    "accent": "accent-indigo",
+    "navbar": "navbar-dark",
+    "no_navbar_border": True,
+    "navbar_fixed": True,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": True,
+    "sidebar": "sidebar-dark-indigo",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": True,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "darkly",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success",
+    },
+}

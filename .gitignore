@@ -24,3 +24,10 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Environment — keep .env.example but never commit .env
+.env
+!.env.example
+
+# SQLite database (committed for initial data, but not journal)
+db.sqlite3-journal

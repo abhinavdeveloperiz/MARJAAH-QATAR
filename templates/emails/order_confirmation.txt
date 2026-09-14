@@ -1,0 +1,31 @@
+M.SHOP Qatar — Order Confirmed ✅
+
+Thank you for your order!
+
+Order Number: {{ order.order_number }}
+Date: {{ order.created_at|date:"d M Y, H:i" }}
+
+ITEMS ORDERED:
+{% for item in items %}
+  • {{ item.name }}{% if item.name_ar %} / {{ item.name_ar }}{% endif %}
+    Qty: {{ item.quantity }} × QAR {{ item.price|floatformat:0 }} = QAR {{ item.line_total|floatformat:0 }}
+{% endfor %}
+
+Subtotal: QAR {{ order.subtotal|floatformat:0 }}
+Shipping: {% if order.shipping == 0 %}FREE 🎉{% else %}QAR {{ order.shipping|floatformat:0 }}{% endif %}
+TOTAL: QAR {{ order.total|floatformat:0 }}
+
+Payment Method: {{ order.get_payment_method_display|default:order.payment_method }}
+
+DELIVERY ADDRESS:
+{{ order.delivery_address_display }}
+{% if order.notes %}
+Delivery Notes: {{ order.notes }}
+{% endif %}
+
+We'll keep you updated on your order status. For support, reply to this email or contact us at +974 XXXX XXXX.
+
+Thank you for shopping with M.SHOP Qatar! 🛍️
+
+—
+M.SHOP Qatar | Qatar's Hardware Authority
