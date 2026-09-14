@@ -778,3 +778,42 @@ def admin_order_status_update(request):
         return JsonResponse({'success': True, 'status': order.status, 'display': order.get_status_display()})
     except Order.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Order not found'}, status=404)
+
+
+@login_required
+@require_POST
+def customer_order_cancel(request):
+    """Allow customer to cancel their own pending/processing order."""
+    locale = _get_locale(request)
+    try:
+        data = json.loads(request.body)
+        order_id = data.get('order_id')
+        order = Order.objects.get(pk=order_id, user=request.user)
+
+        if order.status not in ('pending', 'processing'):
+            return JsonResponse({
+                'success': False,
+                'error': f'Order cannot be cancelled as it is already {order.get_status_display()}.' if locale != 'ar' else f'لا يمكن إلغاء الطلب لأنه بحالة {order.get_status_display()}.'
+            }, status=400)
+
+        order.status = 'cancelled'
+        order.save(update_fields=['status'])
+
+        # Restock product quantities
+        for oi in order.order_items.all():
+            if oi.product and oi.product.stock_count is not None:
+                oi.product.stock_count += oi.quantity
+                if oi.product.stock_count > 0:
+                    oi.product.in_stock = True
+                oi.product.save(update_fields=['stock_count', 'in_stock'])
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Your order has been cancelled successfully.' if locale != 'ar' else 'تم إلغاء طلبك بنجاح.',
+            'status': order.status,
+            'status_display': order.get_status_display() if locale != 'ar' else 'ملغي',
+        })
+    except Order.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Order not found.' if locale != 'ar' else 'الطلب غير موجود.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)

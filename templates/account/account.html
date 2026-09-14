@@ -50,28 +50,138 @@
 
         <!-- Orders Tab -->
         <div id="tab-orders" class="tab-panel hidden">
-          <div class="rounded-2xl overflow-hidden" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-            <div class="px-6 py-4" style="border-bottom:1px solid var(--border-color)"><h2 class="font-bold" style="color:var(--text-primary)">{% if is_rtl %}طلباتي{% else %}My Orders{% endif %}</h2></div>
+          <div class="space-y-6">
+            <div class="flex items-center justify-between">
+              <h2 class="font-display font-black text-xl" style="color:var(--text-primary)">{% if is_rtl %}سجل الطلبات{% else %}Order History{% endif %} ({{ orders.count }})</h2>
+              <a href="/{{ locale }}/shop/" class="text-xs font-bold transition-colors hover:underline" style="color:var(--color-accent)">{% if is_rtl %}متابعة التسوق ←{% else %}Continue Shopping →{% endif %}</a>
+            </div>
+
             {% if orders %}
-            <div class="divide-y" style="--tw-divide-opacity:1;">
+            <div class="space-y-5">
               {% for order in orders %}
-              <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p class="text-sm font-bold" style="color:var(--text-primary)">{{ order.order_number }}</p>
-                  <p class="text-xs mt-0.5" style="color:var(--text-tertiary)">{{ order.created_at|date:"N j, Y" }}</p>
+              <div id="order-card-{{ order.pk }}" class="rounded-3xl p-6 transition-all border" style="background:var(--bg-surface);border-color:var(--border-color);box-shadow:0 4px 20px rgba(0,0,0,0.03);">
+                <!-- Order Header -->
+                <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b" style="border-color:var(--border-color);">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-2xl flex items-center justify-center font-mono font-black text-xs" style="background:var(--bg-surface-2);color:var(--color-accent);border:1px solid var(--border-color);">
+                      #{{ forloop.counter }}
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="font-display font-black text-sm sm:text-base tracking-wide" style="color:var(--text-primary)">{{ order.order_number }}</span>
+                        <!-- Status Badge -->
+                        <span id="order-status-badge-{{ order.pk }}" class="px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider
+                          {% if order.status == 'pending' %}bg-amber-500/10 text-amber-500 border border-amber-500/20
+                          {% elif order.status == 'processing' %}bg-blue-500/10 text-blue-500 border border-blue-500/20
+                          {% elif order.status == 'shipped' %}bg-purple-500/10 text-purple-500 border border-purple-500/20
+                          {% elif order.status == 'delivered' %}bg-emerald-500/10 text-emerald-500 border border-emerald-500/20
+                          {% elif order.status == 'cancelled' %}bg-red-500/10 text-red-400 border border-red-500/20
+                          {% else %}bg-slate-500/10 text-slate-400 border border-slate-500/20{% endif %}">
+                          {% if is_rtl %}
+                            {% if order.status == 'pending' %}قيد الانتظار
+                            {% elif order.status == 'processing' %}قيد المعالجة
+                            {% elif order.status == 'shipped' %}تم الشحن
+                            {% elif order.status == 'delivered' %}تم التوصيل
+                            {% elif order.status == 'cancelled' %}ملغي
+                            {% else %}{{ order.get_status_display }}{% endif %}
+                          {% else %}
+                            {{ order.get_status_display }}
+                          {% endif %}
+                        </span>
+                      </div>
+                      <p class="text-xs mt-0.5" style="color:var(--text-tertiary)">{{ order.created_at|date:"F j, Y — g:i A" }}</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-center gap-4">
+                    <div class="text-right {% if is_rtl %}text-left{% endif %}">
+                      <span class="text-[10px] block font-bold uppercase tracking-wider" style="color:var(--text-tertiary)">{% if is_rtl %}المجموع{% else %}Total Amount{% endif %}</span>
+                      <span class="font-display font-black text-base sm:text-lg" style="color:var(--color-accent)">
+                        {% if is_rtl %}{{ order.total|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ order.total|floatformat:0 }}{% endif %}
+                      </span>
+                    </div>
+
+                    <!-- Cancel Order Action Button -->
+                    {% if order.status == 'pending' or order.status == 'processing' %}
+                    <button id="cancel-btn-{{ order.pk }}" onclick="cancelOrder({{ order.pk }})" class="px-3.5 py-1.5 rounded-xl border text-xs font-bold text-red-400 hover:bg-red-500/10 transition-all cursor-pointer flex items-center gap-1.5" style="border-color:rgba(239,68,68,0.3)">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+                      <span>{% if is_rtl %}إلغاء الطلب{% else %}Cancel Order{% endif %}</span>
+                    </button>
+                    {% endif %}
+                  </div>
                 </div>
-                <div class="flex items-center gap-4">
-                  <span class="px-2.5 py-1 rounded-full text-xs font-bold capitalize" style="background:rgba(64,99,178,0.1);color:var(--color-accent)">{{ order.status }}</span>
-                  <span class="font-bold text-sm" style="color:var(--text-primary)">{% if is_rtl %}{{ order.total|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ order.total|floatformat:0 }}{% endif %}</span>
+
+                <!-- Product Items with Images -->
+                <div class="py-4 divide-y" style="border-color:var(--border-color);">
+                  {% for item in order.items %}
+                  <div class="py-3 flex items-center justify-between gap-4 {% if not forloop.first %}pt-3{% endif %}">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden flex-shrink-0 border p-1" style="background:var(--bg-surface-2);border-color:var(--border-color);">
+                        <img src="{{ item.image }}" alt="{% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}" class="w-full h-full object-contain" loading="lazy" onerror="this.src='/static/images/placeholder.svg'" />
+                      </div>
+                      <div class="min-w-0">
+                        <a href="/{{ locale }}/product/{{ item.slug }}/" class="text-xs sm:text-sm font-semibold truncate block hover:text-primary transition-colors" style="color:var(--text-primary)">
+                          {% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}
+                        </a>
+                        <div class="flex items-center gap-2 mt-1">
+                          {% if item.brand %}
+                          <span class="text-[10px] px-2 py-0.5 rounded-md font-bold uppercase tracking-wider" style="background:var(--bg-surface-3);color:var(--text-secondary)">{{ item.brand }}</span>
+                          {% endif %}
+                          <span class="text-xs font-medium" style="color:var(--text-tertiary)">Qty: <strong style="color:var(--text-primary)">{{ item.quantity }}</strong></span>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="text-right {% if is_rtl %}text-left{% endif %} flex-shrink-0">
+                      <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">
+                        {% if is_rtl %}{{ item.price|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ item.price|floatformat:0 }}{% endif %}
+                      </span>
+                      {% if item.quantity > 1 %}
+                      <span class="text-[10px] block" style="color:var(--text-tertiary)">({{ item.quantity }} × {% if is_rtl %}{{ item.price|floatformat:0 }} {{ currency }}{% else %}{{ currency }} {{ item.price|floatformat:0 }}{% endif %})</span>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Order Footer Details -->
+                <div class="pt-3 border-t flex flex-wrap items-center justify-between gap-3 text-xs" style="border-color:var(--border-color);color:var(--text-secondary);">
+                  <div class="flex flex-wrap items-center gap-4">
+                    <!-- Payment badge -->
+                    <div class="flex items-center gap-1.5">
+                      <span style="color:var(--text-tertiary)">{% if is_rtl %}طريقة الدفع:{% else %}Payment:{% endif %}</span>
+                      <span class="px-2.5 py-0.5 rounded-lg font-bold text-[10px] uppercase tracking-wider" style="background:var(--bg-surface-2);color:var(--text-primary);border:1px solid var(--border-color)">
+                        {% if order.payment_method == 'cash' %}{% if is_rtl %}الدفع عند الاستلام{% else %}Cash on Delivery{% endif %}
+                        {% elif order.payment_method == 'card' %}{% if is_rtl %}بطاقة بنكية{% else %}Credit / Debit Card{% endif %}
+                        {% elif order.payment_method == 'qpay' %}QPay
+                        {% else %}{{ order.payment_method|upper }}{% endif %}
+                      </span>
+                    </div>
+
+                    <!-- Delivery address summary -->
+                    {% if order.delivery_address_display %}
+                    <div class="flex items-center gap-1.5 truncate max-w-xs sm:max-w-md">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0" style="color:var(--text-tertiary)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                      <span class="truncate" style="color:var(--text-tertiary)">{{ order.delivery_address_display }}</span>
+                    </div>
+                    {% endif %}
+                  </div>
+
+                  <a href="/{{ locale }}/checkout/success/{{ order.pk }}/" class="text-xs font-bold transition-colors hover:underline flex items-center gap-1" style="color:var(--color-accent)">
+                    <span>{% if is_rtl %}عرض تفاصيل الفاتورة{% else %}View Invoice Details{% endif %}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="m9 18 6-6-6-6"/></svg>
+                  </a>
                 </div>
               </div>
               {% endfor %}
             </div>
             {% else %}
-            <div class="flex flex-col items-center justify-center py-16 gap-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-secondary)"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-              <div class="text-center"><p class="font-bold mb-1" style="color:var(--text-primary)">{% if is_rtl %}لا توجد طلبات حتى الآن{% else %}No orders yet{% endif %}</p><p class="text-sm" style="color:var(--text-secondary)">{% if is_rtl %}ابدأ التسوق لتظهر طلباتك هنا{% else %}Start shopping to see your orders here{% endif %}</p></div>
-              <a href="/{{ locale }}/shop/" class="btn-primary">{% if is_rtl %}تصفح المنتجات{% else %}Browse Products{% endif %}</a>
+            <div class="rounded-3xl p-12 text-center border" style="background:var(--bg-surface);border-color:var(--border-color)">
+              <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4" style="background:var(--bg-surface-2);color:var(--text-secondary)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <h3 class="font-display font-bold text-lg mb-1" style="color:var(--text-primary)">{% if is_rtl %}لا توجد لديك طلبات حتى الآن{% else %}No orders found{% endif %}</h3>
+              <p class="text-xs mb-6 max-w-sm mx-auto" style="color:var(--text-secondary)">{% if is_rtl %}تصفح متجرنا واختر أفضل منتجات التقنية والكمبيوتر بضمان رسمي.{% else %}Browse our catalog of genuine high-performance computer hardware and peripherals.{% endif %}</p>
+              <a href="/{{ locale }}/shop/" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs">{% if is_rtl %}تصفح المنتجات{% else %}Browse Hardware Store{% endif %}</a>
             </div>
             {% endif %}
           </div>
@@ -110,6 +220,79 @@ function showTab(id) {
   if(panel) panel.classList.remove('hidden');
   if(btn) { btn.style.background='var(--bg-surface-2)'; btn.style.color='var(--color-accent)'; }
 }
-showTab('overview');
+
+// Check URL params for initial tab
+const urlParams = new URLSearchParams(window.location.search);
+const initialTab = urlParams.get('tab') || 'overview';
+showTab(initialTab);
+
+// Interactive Order Cancellation
+function cancelOrder(orderId) {
+  const isAr = document.documentElement.lang === 'ar' || document.documentElement.dir === 'rtl';
+  const confirmMsg = isAr ? 'هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟' : 'Are you sure you want to cancel this order?';
+  if (!confirm(confirmMsg)) return;
+
+  const btn = document.getElementById('cancel-btn-' + orderId);
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.innerText = isAr ? 'جاري الإلغاء…' : 'Cancelling…';
+  }
+
+  function getCsrf() {
+    if (window.CSRF_TOKEN && window.CSRF_TOKEN !== 'NOTPROVIDED') return window.CSRF_TOKEN;
+    const meta = document.querySelector('meta[name="csrf-token"]');
+    if (meta && meta.content) return meta.content;
+    return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1] || '';
+  }
+
+  const locale = document.documentElement.lang || 'en';
+  fetch('/' + locale + '/api/order/cancel/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCsrf(),
+    },
+    body: JSON.stringify({ order_id: orderId }),
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      if (typeof Toast !== 'undefined') {
+        Toast.success(res.message || (isAr ? 'تم إلغاء الطلب بنجاح' : 'Order cancelled successfully!'));
+      }
+      // Update badge
+      const badge = document.getElementById('order-status-badge-' + orderId);
+      if (badge) {
+        badge.className = 'px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20';
+        badge.innerText = isAr ? 'ملغي' : 'Cancelled';
+      }
+      // Remove cancel button
+      if (btn) btn.remove();
+    } else {
+      if (btn) {
+        btn.disabled = false;
+        btn.style.opacity = '1';
+        btn.innerText = isAr ? 'إلغاء الطلب' : 'Cancel Order';
+      }
+      if (typeof Toast !== 'undefined') {
+        Toast.error(res.error || (isAr ? 'تعذر إلغاء الطلب' : 'Could not cancel order.'));
+      } else {
+        alert(res.error || 'Could not cancel order.');
+      }
+    }
+  })
+  .catch(err => {
+    console.error(err);
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.innerText = isAr ? 'إلغاء الطلب' : 'Cancel Order';
+    }
+    if (typeof Toast !== 'undefined') {
+      Toast.error(isAr ? 'حدث خطأ في الاتصال' : 'Network error. Please try again.');
+    }
+  });
+}
 </script>
 {% endblock %}

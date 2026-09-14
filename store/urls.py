@@ -33,5 +33,6 @@ urlpatterns = [
     path('api/cart/remove/', views.cart_remove, name='cart_remove'),
     path('api/wishlist/toggle/', views.wishlist_toggle, name='wishlist_toggle'),
     path('api/address/delete/', views.address_delete, name='address_delete'),
+    path('api/order/cancel/', views.customer_order_cancel, name='order_cancel'),
     path('api/order/update-status/', views.admin_order_status_update, name='order_status_update'),
 ]
