@@ -208,7 +208,7 @@ JAZZMIN_SETTINGS = {
     # Title & Branding
     "site_title": "Marjaah Trading Admin",
     "site_header": "Marjaah Trading",
-    "site_brand": "M.SHOP Qatar",
+    "site_brand": None,
     "site_logo": "logo.png",
     "login_logo": "logo.png",
     "site_logo_classes": "img-fluid",
