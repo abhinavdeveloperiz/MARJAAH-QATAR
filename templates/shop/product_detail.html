@@ -114,19 +114,19 @@
         </div>
 
         <!-- Delivery/Warranty chips -->
-        <div class="grid grid-cols-2 gap-3 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
           {% if product.delivery_days %}
-          <div class="flex items-center gap-2 p-3 rounded-xl" style="background:var(--bg-surface-2)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span class="text-xs" style="color:var(--text-secondary)">
+          <div class="flex items-center gap-2.5 p-3 rounded-xl" style="background:var(--bg-surface-2)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <span class="text-xs font-medium" style="color:var(--text-secondary)">
               {% if is_rtl %}توصيل خلال {{ product.delivery_days }} يوم{% else %}Delivery in {{ product.delivery_days }} day{% if product.delivery_days != 1 %}s{% endif %}{% endif %}
             </span>
           </div>
           {% endif %}
           {% if product.warranty_months %}
-          <div class="flex items-center gap-2 p-3 rounded-xl" style="background:var(--bg-surface-2)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span class="text-xs" style="color:var(--text-secondary)">
+          <div class="flex items-center gap-2.5 p-3 rounded-xl" style="background:var(--bg-surface-2)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span class="text-xs font-medium" style="color:var(--text-secondary)">
               {% if is_rtl %}ضمان {{ product.warranty_months }} شهراً{% else %}{{ product.warranty_months }}-month warranty{% endif %}
             </span>
           </div>
@@ -135,14 +135,14 @@
 
         <!-- Specs table -->
         {% if product.specifications %}
-        <div class="rounded-2xl overflow-hidden border" style="border-color:var(--border-color)">
+        <div class="rounded-2xl overflow-hidden border overflow-x-auto" style="border-color:var(--border-color)">
           <div class="px-4 py-3 border-b" style="background:var(--bg-surface-2);border-color:var(--border-color)">
             <h3 class="text-sm font-bold" style="color:var(--text-primary)">{{ t.product.specifications|default:"Specifications" }}</h3>
           </div>
-          <table class="w-full text-xs">
+          <table class="w-full text-xs min-w-[280px]">
             {% for spec in product.specifications %}
             <tr style="border-bottom:1px solid var(--border-color)">
-              <td class="px-4 py-3 font-medium w-40" style="color:var(--text-secondary)">{{ spec.key }}</td>
+              <td class="px-4 py-3 font-medium w-36 sm:w-44" style="color:var(--text-secondary)">{{ spec.key }}</td>
               <td class="px-4 py-3 font-bold" style="color:var(--text-primary)">{{ spec.value }}</td>
             </tr>
             {% endfor %}
@@ -165,8 +165,8 @@
     <!-- Related products -->
     {% if related %}
     <div class="mt-16">
-      <h2 class="text-2xl font-display font-black mb-8" style="color:var(--text-primary)">{{ t.product.related|default:"You May Also Like" }}</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <h2 class="text-xl sm:text-2xl font-display font-black mb-6 sm:mb-8" style="color:var(--text-primary)">{{ t.product.related|default:"You May Also Like" }}</h2>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {% for product in related %}{% include 'partials/product_card.html' %}{% endfor %}
       </div>
     </div>

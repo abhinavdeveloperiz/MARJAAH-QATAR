@@ -18,7 +18,8 @@ class Category(models.Model):
     slug = models.SlugField(unique=True)
     name = models.CharField(max_length=120)
     name_ar = models.CharField(max_length=120, blank=True)
-    image = models.CharField(max_length=255, blank=True)
+    image_file = models.ImageField(upload_to='categories/', blank=True, null=True, help_text='Upload category image file')
+    image = models.CharField(max_length=255, blank=True, help_text='External image URL (optional fallback)')
     product_count = models.IntegerField(default=0)
     is_featured = models.BooleanField(default=False)
     order = models.IntegerField(default=0)
@@ -29,6 +30,15 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def image_url(self):
+        if self.image_file:
+            try:
+                return self.image_file.url
+            except Exception:
+                pass
+        return self.image or '/static/images/placeholder.svg'
 
 
 class Subcategory(models.Model):
@@ -46,11 +56,21 @@ class Subcategory(models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
-    logo = models.CharField(max_length=255, blank=True)
+    logo_file = models.ImageField(upload_to='brands/', blank=True, null=True, help_text='Upload brand logo file')
+    logo = models.CharField(max_length=255, blank=True, help_text='External logo URL (optional fallback)')
     website = models.URLField(blank=True)
 
     def __str__(self):
         return self.name
+
+    @property
+    def logo_url(self):
+        if self.logo_file:
+            try:
+                return self.logo_file.url
+            except Exception:
+                pass
+        return self.logo or ''
 
 
 class Product(models.Model):
@@ -62,7 +82,8 @@ class Product(models.Model):
     subcategory = models.ForeignKey(Subcategory, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     price = models.DecimalField(max_digits=10, decimal_places=2)
     original_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    images_json = models.TextField(default='[]')
+    primary_image = models.ImageField(upload_to='products/', blank=True, null=True, help_text='Upload primary product photo directly from your device')
+    images_json = models.TextField(default='[]', help_text='JSON array of image URLs or paths, e.g. ["/static/images/hero.jpg"]')
     short_description = models.TextField(blank=True)
     short_description_ar = models.TextField(blank=True)
     description = models.TextField(blank=True)
@@ -91,11 +112,29 @@ class Product(models.Model):
 
     @property
     def images(self):
+        imgs = []
+        if self.primary_image:
+            try:
+                imgs.append(self.primary_image.url)
+            except Exception:
+                pass
+        try:
+            for gi in self.gallery_images.all():
+                if gi.image:
+                    try:
+                        imgs.append(gi.image.url)
+                    except Exception:
+                        pass
+        except Exception:
+            pass
         try:
             raw = json.loads(self.images_json)
-            return [f"{img}?v=2" if ('?' not in img) else img for img in raw]
+            for img in raw:
+                if img and img not in imgs:
+                    imgs.append(f"{img}?v=2" if ('?' not in img) else img)
         except Exception:
-            return []
+            pass
+        return imgs
 
     @property
     def first_image(self):
@@ -125,6 +164,21 @@ class Product(models.Model):
     @property
     def star_range(self):
         return range(1, 6)
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery_images')
+    image = models.ImageField(upload_to='products/gallery/', help_text='Upload extra gallery photo')
+    caption = models.CharField(max_length=150, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'id']
+        verbose_name = 'Gallery Photo'
+        verbose_name_plural = 'Gallery Photos'
+
+    def __str__(self):
+        return f"Photo for {self.product.name}"
 
 
 class Address(models.Model):

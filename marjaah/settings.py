@@ -217,7 +217,7 @@ JAZZMIN_SETTINGS = {
     "copyright": "Marjaah Trading / M.SHOP Qatar",
 
     # Search & Quick Links
-    "search_model": ["store.Product", "store.Order"],
+    "search_model": ["store.Product"],
     "user_avatar": None,
     "topmenu_links": [
         {"name": "Live Store", "url": "/", "new_window": True},

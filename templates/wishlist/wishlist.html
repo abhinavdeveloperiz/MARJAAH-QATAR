@@ -8,7 +8,7 @@
       {% if is_rtl %}قائمة المفضلة ({{ products.count }}){% else %}{{ t.nav.wishlist|default:"Wishlist" }} ({{ products.count }}){% endif %}
     </h1>
     {% if products %}
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
       {% for product in products %}{% include 'partials/product_card.html' %}{% endfor %}
     </div>
     {% else %}

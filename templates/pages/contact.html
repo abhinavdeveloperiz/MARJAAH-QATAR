@@ -64,7 +64,7 @@
         <h2 class="font-bold text-lg mb-5" style="color:var(--text-primary)">{% if is_rtl %}أرسل لنا رسالة{% else %}Send a Message{% endif %}</h2>
         <form method="post" class="space-y-4">
           {% csrf_token %}
-          <div class="grid grid-cols-2 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{% if is_rtl %}الاسم{% else %}Name{% endif %}</label>{{ form.name }}</div>
             <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{% if is_rtl %}البريد الإلكتروني{% else %}Email{% endif %}</label>{{ form.email }}</div>
             <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">{% if is_rtl %}رقم الهاتف{% else %}Phone{% endif %}</label>{{ form.phone }}</div>

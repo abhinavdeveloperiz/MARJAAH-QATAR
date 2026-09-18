@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html, mark_safe
-from .models import User, Category, Subcategory, Brand, Product, Address, Order, OrderItem, ContactMessage
+from .models import User, Category, Subcategory, Brand, Product, ProductImage, Address, Order, OrderItem, ContactMessage
 
 
 @admin.register(User)
@@ -29,17 +29,19 @@ class CategoryAdmin(admin.ModelAdmin):
     search_fields = ('name', 'name_ar', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ('category_thumb_large',)
-    fields = ('category_thumb_large', 'name', 'name_ar', 'slug', 'image', 'is_featured', 'order')
+    fields = ('category_thumb_large', 'name', 'name_ar', 'slug', 'image_file', 'image', 'is_featured', 'order')
 
     def category_thumb(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" class="admin-thumb" onerror="this.src=\'/static/images/placeholder.svg\'" />', obj.image)
+        img_url = obj.image_url
+        if img_url:
+            return format_html('<img src="{}" class="admin-thumb" onerror="this.src=\'/static/images/placeholder.svg\'" />', img_url)
         return format_html('<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-folder fa-lg"></i></div>')
     category_thumb.short_description = 'Cover'
 
     def category_thumb_large(self, obj):
-        if obj.image:
-            return format_html('<img src="{}" style="max-height:120px;border-radius:8px;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />', obj.image)
+        img_url = obj.image_url
+        if img_url:
+            return format_html('<img src="{}" style="max-height:120px;border-radius:8px;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />', img_url)
         return 'No image provided'
     category_thumb_large.short_description = 'Preview'
 
@@ -57,18 +59,20 @@ class BrandAdmin(admin.ModelAdmin):
     list_display = ('brand_logo_thumb', 'name', 'products_count', 'website_link')
     list_display_links = ('brand_logo_thumb', 'name')
     search_fields = ('name',)
-    fields = ('brand_logo_thumb_large', 'name', 'logo', 'website')
+    fields = ('brand_logo_thumb_large', 'name', 'logo_file', 'logo', 'website')
     readonly_fields = ('brand_logo_thumb_large',)
 
     def brand_logo_thumb(self, obj):
-        if obj.logo:
-            return format_html('<img src="{}" class="admin-thumb" style="background:#fff;" onerror="this.src=\'/static/images/placeholder.svg\'" />', obj.logo)
+        logo_url = obj.logo_url
+        if logo_url:
+            return format_html('<img src="{}" class="admin-thumb" style="background:#fff;" onerror="this.src=\'/static/images/placeholder.svg\'" />', logo_url)
         return format_html('<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-tag fa-lg"></i></div>')
     brand_logo_thumb.short_description = 'Logo'
 
     def brand_logo_thumb_large(self, obj):
-        if obj.logo:
-            return format_html('<img src="{}" style="max-height:100px;border-radius:8px;padding:8px;background:#fff;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />', obj.logo)
+        logo_url = obj.logo_url
+        if logo_url:
+            return format_html('<img src="{}" style="max-height:100px;border-radius:8px;padding:8px;background:#fff;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />', logo_url)
         return 'No logo provided'
     brand_logo_thumb_large.short_description = 'Logo Preview'
 
@@ -84,6 +88,19 @@ class BrandAdmin(admin.ModelAdmin):
     website_link.short_description = 'Website'
 
 
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+    fields = ('image_preview', 'image', 'caption', 'order')
+    readonly_fields = ('image_preview',)
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="height:45px;border-radius:6px;border:1px solid #cbd5e1;" />', obj.image.url)
+        return format_html('<span style="color:#94a3b8;font-size:11px;">No photo</span>')
+    image_preview.short_description = 'Preview'
+
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = (
@@ -97,10 +114,15 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     readonly_fields = ('created_at', 'thumbnail_large')
     date_hierarchy = 'created_at'
+    inlines = [ProductImageInline]
 
     fieldsets = (
         ('General Info', {
-            'fields': ('thumbnail_large', 'name', 'name_ar', 'slug', 'brand', 'category', 'subcategory', 'sku')
+            'fields': ('name', 'name_ar', 'slug', 'brand', 'category', 'subcategory', 'sku')
+        }),
+        ('Product Photo & Media Upload', {
+            'description': 'Upload the primary image file directly from your computer or provide image URLs below.',
+            'fields': ('thumbnail_large', 'primary_image', 'images_json')
         }),
         ('Pricing & Inventory', {
             'fields': ('price', 'original_price', 'in_stock', 'stock_count')
@@ -109,7 +131,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('is_featured', 'is_new', 'is_best_seller', 'is_on_sale', 'rating', 'review_count')
         }),
         ('Content & Specifications', {
-            'fields': ('images_json', 'short_description', 'short_description_ar', 'description', 'description_ar', 'specifications_json', 'tags_json')
+            'fields': ('short_description', 'short_description_ar', 'description', 'description_ar', 'specifications_json', 'tags_json')
         }),
         ('Shipping & Dimensions', {
             'fields': ('weight', 'delivery_days', 'warranty_months', 'created_at')
@@ -130,16 +152,18 @@ class ProductAdmin(admin.ModelAdmin):
             '<img src="{}" style="max-height:160px;border-radius:10px;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />',
             img_url
         )
-    thumbnail_large.short_description = 'Primary Image'
+    thumbnail_large.short_description = 'Primary Image Preview'
 
     def price_display(self, obj):
+        price_str = f"{float(obj.price):,.2f}"
         if obj.original_price and obj.original_price > obj.price:
+            orig_str = f"{float(obj.original_price):,.2f}"
             discount = obj.discount_percent
             return format_html(
-                '<div><strong style="color:#0f172a;">QAR {:.2f}</strong><br><span style="text-decoration:line-through;color:#94a3b8;font-size:11px;">QAR {:.2f}</span> <span class="badge badge-danger" style="font-size:10px;">-{}%</span></div>',
-                obj.price, obj.original_price, discount
+                '<div><strong style="color:#0f172a;">QAR {}</strong><br><span style="text-decoration:line-through;color:#94a3b8;font-size:11px;">QAR {}</span> <span class="badge badge-danger" style="font-size:10px;">-{}%</span></div>',
+                price_str, orig_str, discount
             )
-        return format_html('<strong style="color:#0f172a;">QAR {:.2f}</strong>', obj.price)
+        return format_html('<strong style="color:#0f172a;">QAR {}</strong>', price_str)
     price_display.short_description = 'Price'
     price_display.admin_order_field = 'price'
 
@@ -188,7 +212,8 @@ class OrderItemInline(admin.TabularInline):
     item_preview.short_description = 'Item'
 
     def line_total(self, obj):
-        return format_html('<strong>QAR {:.2f}</strong>', obj.line_total)
+        total_str = f"{float(obj.line_total):,.2f}"
+        return format_html('<strong>QAR {}</strong>', total_str)
     line_total.short_description = 'Line Total'
 
 
@@ -283,7 +308,8 @@ class OrderAdmin(admin.ModelAdmin):
     customer_info_panel.short_description = 'Customer Dispatch Hub'
 
     def total_display(self, obj):
-        return format_html('<strong style="font-size:1.05em;color:#0f172a;">QAR {:.2f}</strong>', obj.total)
+        total_str = f"{float(obj.total):,.2f}"
+        return format_html('<strong style="font-size:1.05em;color:#0f172a;">QAR {}</strong>', total_str)
     total_display.short_description = 'Total'
     total_display.admin_order_field = 'total'
 
@@ -334,7 +360,8 @@ class OrderItemAdmin(admin.ModelAdmin):
     item_preview_large.short_description = 'Item Photo'
 
     def line_total_display(self, obj):
-        return format_html('<strong>QAR {:.2f}</strong>', obj.line_total)
+        total_str = f"{float(obj.line_total):,.2f}"
+        return format_html('<strong>QAR {}</strong>', total_str)
     line_total_display.short_description = 'Line Total'
 
 

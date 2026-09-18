@@ -176,7 +176,7 @@
     .marquee-ltr {
       display: flex !important;
       width: max-content !important;
-      animation: marqueeLTR 25s linear infinite !important;
+      animation: marqueeLTR 65s linear infinite !important;
       will-change: transform;
     }
     .marquee-ltr:hover {
@@ -185,49 +185,49 @@
     /* Icon SVG reset for lucide-like icons loaded via CDN */
     .icon { width: 1em; height: 1em; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
     
-    /* Strict Container Spacing - Guarantees proper left/right margins & centering across all viewports */
+    /* Containers - responsive margins and max-width */
     .container-custom,
     .container-wide {
       width: 100% !important;
       max-width: 1440px !important;
       margin-left: auto !important;
       margin-right: auto !important;
-      padding-left: 1.5rem !important;
-      padding-right: 1.5rem !important;
+      padding-left: 1rem !important;
+      padding-right: 1rem !important;
     }
     @media (min-width: 640px) {
+      .container-custom,
+      .container-wide {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+      }
+    }
+    @media (min-width: 768px) {
       .container-custom,
       .container-wide {
         padding-left: 2rem !important;
         padding-right: 2rem !important;
       }
     }
-    @media (min-width: 768px) {
+    @media (min-width: 1024px) {
       .container-custom,
       .container-wide {
         padding-left: 2.5rem !important;
         padding-right: 2.5rem !important;
       }
     }
-    @media (min-width: 1024px) {
-      .container-custom,
-      .container-wide {
-        padding-left: 3.5rem !important;
-        padding-right: 3.5rem !important;
-      }
-    }
     @media (min-width: 1280px) {
       .container-custom,
       .container-wide {
-        padding-left: 4.5rem !important;
-        padding-right: 4.5rem !important;
+        padding-left: 3rem !important;
+        padding-right: 3rem !important;
       }
     }
     @media (min-width: 1536px) {
       .container-custom,
       .container-wide {
-        padding-left: 5.5rem !important;
-        padding-right: 5.5rem !important;
+        padding-left: 4rem !important;
+        padding-right: 4rem !important;
       }
     }
     

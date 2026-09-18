@@ -153,12 +153,12 @@
           <!-- Channel 2: Credit / Debit Card Sub-Panel -->
           <div id="channel-panel-card" class="payment-channel-pane hidden p-5 rounded-2xl border space-y-5" style="background:var(--bg-surface-2);border-color:var(--border-color)">
             <!-- Interactive Live Card Mockup -->
-            <div class="relative w-full max-w-sm mx-auto p-5 rounded-2xl text-white shadow-xl overflow-hidden" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);border:1px solid rgba(255,255,255,0.15)">
+            <div class="relative w-full max-w-[320px] sm:max-w-sm mx-auto p-4 sm:p-5 rounded-2xl text-white shadow-xl overflow-hidden" style="background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);border:1px solid rgba(255,255,255,0.15)">
               <div class="absolute -right-10 -bottom-10 w-40 h-40 rounded-full bg-primary-500/20 blur-2xl pointer-events-none"></div>
-              <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center justify-between mb-5 sm:mb-6">
                 <!-- Gold EMV Chip -->
-                <div class="w-10 h-7 rounded-md bg-gradient-to-tr from-amber-400 via-amber-200 to-amber-500 border border-amber-600/40 shadow-inner flex items-center justify-center">
-                  <div class="w-6 h-4 border border-amber-700/30 rounded-sm"></div>
+                <div class="w-9 h-6 sm:w-10 sm:h-7 rounded-md bg-gradient-to-tr from-amber-400 via-amber-200 to-amber-500 border border-amber-600/40 shadow-inner flex items-center justify-center">
+                  <div class="w-5 h-3.5 sm:w-6 sm:h-4 border border-amber-700/30 rounded-sm"></div>
                 </div>
                 <!-- Card Brand Icon -->
                 <div id="card-brand-logo" class="font-display font-black text-sm tracking-wider text-white/90">
@@ -188,7 +188,7 @@
                 <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
                   {% if is_rtl %}اسم حامل البطاقة (كما هو مكتوب على البطاقة){% else %}Cardholder Name (as printed on card){% endif %} *
                 </label>
-                <input type="text" id="input-card-holder" name="card_holder" value="{{ form.card_holder.value|default:'' }}" placeholder="{% if user.get_full_name %}{{ user.get_full_name }}{% else %}e.g. MOHAMMED AL-KUWARI{% endif %}" class="input w-full text-xs sm:text-sm" />
+                <input type="text" id="input-card-holder" name="card_holder" value="{{ form.card_holder.value|default:'' }}" placeholder="{% if user.get_full_name %}{{ user.get_full_name }}{% else %}e.g. MOHAMMED AL-KUWARI{% endif %}" class="input w-full text-xs sm:text-sm px-4 py-3 rounded-xl" />
               </div>
 
               <div class="sm:col-span-2">
@@ -196,9 +196,9 @@
                   {% if is_rtl %}رقم البطاقة (16 رقم){% else %}Card Number (16 digits){% endif %} *
                 </label>
                 <div class="relative">
-                  <input type="text" id="input-card-number" name="card_number" value="{{ form.card_number.value|default:'' }}" maxlength="19" placeholder="4000 1234 5678 9010" class="input w-full font-mono text-xs sm:text-sm tracking-wider pr-10" />
-                  <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" id="card-input-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                  <input type="text" id="input-card-number" name="card_number" value="{{ form.card_number.value|default:'' }}" maxlength="19" placeholder="4000 1234 5678 9010" class="input w-full font-mono text-xs sm:text-sm tracking-wider px-4 py-3 pr-11 rounded-xl" />
+                  <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" id="card-input-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
                   </div>
                 </div>
               </div>
@@ -207,7 +207,7 @@
                 <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">
                   {% if is_rtl %}تاريخ الانتهاء{% else %}Expiry Date (MM/YY){% endif %} *
                 </label>
-                <input type="text" id="input-card-expiry" name="card_expiry" value="{{ form.card_expiry.value|default:'' }}" maxlength="5" placeholder="MM/YY" class="input w-full font-mono text-xs sm:text-sm text-center" />
+                <input type="text" id="input-card-expiry" name="card_expiry" value="{{ form.card_expiry.value|default:'' }}" maxlength="5" placeholder="MM/YY" class="input w-full font-mono text-xs sm:text-sm text-center px-4 py-3 rounded-xl" />
               </div>
 
               <div>
@@ -215,8 +215,8 @@
                   {% if is_rtl %}رمز الأمان (CVV / CVC){% else %}Security Code (CVV){% endif %} *
                 </label>
                 <div class="relative">
-                  <input type="password" id="input-card-cvv" name="card_cvv" value="{{ form.card_cvv.value|default:'' }}" maxlength="4" placeholder="123" class="input w-full font-mono text-xs sm:text-sm text-center tracking-widest" />
-                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-slate-400 font-bold" title="3 digits on back of card">?</span>
+                  <input type="password" id="input-card-cvv" name="card_cvv" value="{{ form.card_cvv.value|default:'' }}" maxlength="4" placeholder="123" class="input w-full font-mono text-xs sm:text-sm text-center tracking-widest px-4 py-3 pr-9 rounded-xl" />
+                  <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-bold cursor-help" title="3 or 4 digits on back of card">?</span>
                 </div>
               </div>
             </div>

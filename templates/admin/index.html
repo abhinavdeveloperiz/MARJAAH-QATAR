@@ -2,6 +2,11 @@
 {% load i18n static jazzmin store_tags %}
 {% get_jazzmin_ui_tweaks as jazzmin_ui %}
 
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'css/admin-jazzmin.css' %}?v=2.3">
+{% endblock %}
+
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
 {% block content_title %}{% endblock %}
@@ -14,214 +19,317 @@
 {% endblock %}
 
 {% block content %}
-    {% get_admin_metrics as metrics %}
     {% get_side_menu using="app_list" as dashboard_list %}
-    {% if dashboard_list %}
-        {% widthratio dashboard_list|length 2 1 as middle %}
-    {% endif %}
 
-    <!-- ─── EXECUTIVE KPI OVERVIEW ─────────────────────────────────────────── -->
+    <!-- ─── EXECUTIVE BANNER ──────────────────────────────────────────────── -->
     <div class="col-12 px-0 mb-4">
-        <!-- Welcome Banner -->
-        <div class="luxury-banner p-4 mb-4 d-flex flex-wrap align-items-center justify-content-between">
+        <div class="luxury-banner p-4 d-flex flex-wrap align-items-center justify-content-between">
             <div class="mb-3 mb-md-0">
-                <div class="d-flex align-items-center gap-2 mb-1">
-                    <span class="pulse-indicator"></span>
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="pulse-indicator mr-2"></span>
                     <span class="luxury-tag">MARJAAH TRADING — QATAR</span>
                 </div>
-                <h2 class="luxury-title mb-1 font-weight-bold">Executive Control Center</h2>
-                <p class="luxury-subtitle mb-0">Live operational overview of store inventory, orders, and customer engagement.</p>
+                <h2 class="luxury-title mb-1">Executive Control Center</h2>
+                <p class="luxury-subtitle mb-0">Central management portal for store orders, catalogue inventory, customer relations, and staff access.</p>
             </div>
             <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'admin:store_product_add' %}" class="btn btn-luxury-primary">
+                <a href="{% url 'admin:store_product_add' %}" class="btn btn-luxury-primary mr-2 mb-1">
                     <i class="fas fa-plus mr-1"></i> Add Product
                 </a>
-                <a href="{% url 'admin:store_order_changelist' %}" class="btn btn-luxury-secondary">
+                <a href="{% url 'admin:store_order_changelist' %}" class="btn btn-luxury-secondary mb-1">
                     <i class="fas fa-shopping-bag mr-1"></i> Orders
                 </a>
-                <a href="/admin-dashboard/" target="_blank" class="btn btn-luxury-secondary">
-                    <i class="fas fa-chart-pie mr-1"></i> Staff Metrics
-                </a>
-                <a href="/en/" target="_blank" class="btn btn-luxury-outline">
-                    <i class="fas fa-external-link-alt mr-1"></i> Live Store
-                </a>
-            </div>
-        </div>
-
-        <!-- 4 KPI Stat Cards -->
-        <div class="row">
-            <!-- Metric 1: Revenue -->
-            <div class="col-xl-3 col-md-6 col-12 mb-3">
-                <div class="kpi-card card-revenue h-100">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <span class="kpi-label">TOTAL STORE REVENUE</span>
-                            <h3 class="kpi-value font-weight-bold mt-2 mb-1">QAR {{ metrics.revenue|floatformat:2 }}</h3>
-                            <span class="kpi-badge badge-emerald">
-                                <i class="fas fa-shield-alt mr-1"></i> Confirmed & Settled
-                            </span>
-                        </div>
-                        <div class="kpi-icon-wrap icon-indigo">
-                            <i class="fas fa-coins"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Metric 2: Orders -->
-            <div class="col-xl-3 col-md-6 col-12 mb-3">
-                <div class="kpi-card card-orders h-100">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <span class="kpi-label">ORDERS FULFILLMENT</span>
-                            <h3 class="kpi-value font-weight-bold mt-2 mb-1">{{ metrics.total_orders }}</h3>
-                            <span class="kpi-badge badge-blue">
-                                <i class="fas fa-truck mr-1"></i> {{ metrics.active_orders }} active in pipeline
-                            </span>
-                        </div>
-                        <div class="kpi-icon-wrap icon-blue">
-                            <i class="fas fa-shopping-cart"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Metric 3: Products & Stock -->
-            <div class="col-xl-3 col-md-6 col-12 mb-3">
-                <div class="kpi-card card-inventory h-100">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <span class="kpi-label">CATALOG & INVENTORY</span>
-                            <h3 class="kpi-value font-weight-bold mt-2 mb-1">{{ metrics.total_products }}</h3>
-                            {% if metrics.low_stock > 0 %}
-                                <span class="kpi-badge badge-amber">
-                                    <i class="fas fa-exclamation-triangle mr-1"></i> {{ metrics.low_stock }} low on stock
-                                </span>
-                            {% else %}
-                                <span class="kpi-badge badge-emerald">
-                                    <i class="fas fa-check mr-1"></i> Healthy Inventory
-                                </span>
-                            {% endif %}
-                        </div>
-                        <div class="kpi-icon-wrap icon-amber">
-                            <i class="fas fa-boxes"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Metric 4: Customer Support -->
-            <div class="col-xl-3 col-md-6 col-12 mb-3">
-                <div class="kpi-card card-support h-100">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <span class="kpi-label">CUSTOMER INQUIRIES</span>
-                            <h3 class="kpi-value font-weight-bold mt-2 mb-1">{{ metrics.new_messages }}</h3>
-                            <span class="kpi-badge badge-purple">
-                                <i class="fas fa-envelope-open mr-1"></i> {{ metrics.total_messages }} total received
-                            </span>
-                        </div>
-                        <div class="kpi-icon-wrap icon-purple">
-                            <i class="fas fa-headset"></i>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
 
-    <!-- ─── DATABASE TABLES & ENTITIES ────────────────────────────────────── -->
-    <div class="col-lg-9 col-12 px-0 pr-lg-3">
+    <!-- ─── BALANCED 3-COLUMN EXECUTIVE HUBS ───────────────────────────────── -->
+    <div class="col-12 px-0">
         <div class="row">
-            <div class="col-md-6 col-sm-12">
-                {% for app in dashboard_list %}
-                    <div class="card luxury-model-card mb-4">
-                        <div class="card-header luxury-card-header d-flex justify-content-between align-items-center">
-                            <h5 class="m-0 font-weight-bold">{{ app.name }}</h5>
-                            <span class="badge badge-light px-2 py-1" style="font-size: 11px; border-radius: 8px;">{{ app.models|length }} models</span>
+            <!-- Hub 1: Orders & Sales -->
+            <div class="col-xl-4 col-md-6 col-12 mb-4">
+                <div class="card luxury-model-card h-100 mb-0">
+                    <div class="card-header luxury-card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-shopping-bag text-primary mr-2"></i>
+                            <h5 class="m-0 font-weight-bold">Orders & Sales</h5>
                         </div>
-                        <div class="card-body p-0">
-                            <table class="table table-hover mb-0">
-                                <tbody>
-                                {% for model in app.models %}
-                                    <tr>
-                                        <td class="font-weight-600 align-middle py-3">
-                                            {% if model.url %}
-                                                <a href="{{ model.url }}" class="model-name-link">
-                                                    {{ model.name }}
-                                                </a>
-                                            {% else %}
-                                                {{ model.name }}
-                                            {% endif %}
-                                        </td>
-                                        <td class="text-right align-middle py-3 pr-3">
-                                            <div class="btn-group">
-                                                {% if model.add_url %}
-                                                    <a href="{{ model.add_url }}" class="btn btn-xs btn-outline-primary rounded-pill px-2 mr-1">
-                                                        <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                                    </a>
-                                                {% endif %}
-                                                {% if model.url %}
-                                                    <a href="{{ model.url }}" class="btn btn-xs btn-primary rounded-pill px-2">
-                                                        Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                                    </a>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                        <span class="badge badge-primary px-3 py-1">3 models</span>
                     </div>
-
-                    {% if forloop.counter == middle|add:"0" %}
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                                <!-- Orders -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-shopping-bag" style="color: #38bdf8;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_order_changelist' %}" class="model-name-link">
+                                                Orders
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_order_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_order_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Order items -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-receipt" style="color: #818cf8;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_orderitem_changelist' %}" class="model-name-link">
+                                                Order items
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_orderitem_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_orderitem_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Contact Messages -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-envelope-open-text" style="color: #fda4af;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_contactmessage_changelist' %}" class="model-name-link">
+                                                Contact Messages
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_contactmessage_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_contactmessage_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-                    <div class="col-md-6 col-sm-12">
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- ─── RECENT ACTIONS SIDEBAR ────────────────────────────────────────── -->
-    <div class="col-lg-3 col-12 px-0 pl-lg-2">
-        <div id="content-related">
-            <div class="module card luxury-model-card mb-4" id="recent-actions-module">
-                <div class="card-header luxury-card-header">
-                    <h5 class="m-0 font-weight-bold"><i class="fas fa-history mr-2 text-primary"></i> {% trans 'Recent Audit Activity' %}</h5>
                 </div>
-                <div class="card-body p-3">
-                    {% load log %}
-                    {% get_admin_log 8 as admin_log for_user user %}
-                    {% if not admin_log %}
-                        <p class="text-muted small mb-0">{% trans 'None available' %}</p>
-                    {% else %}
-                        <div class="timeline timeline-inverse">
-                            {% for entry in admin_log %}
-                                <div class="mb-3 pb-2 border-bottom">
-                                    <div class="small font-weight-bold text-dark">
-                                        {% if entry.is_addition %}
-                                            <span class="badge badge-success px-2 py-1 mr-1"><i class="fas fa-plus"></i></span>
-                                        {% elif entry.is_change %}
-                                            <span class="badge badge-info px-2 py-1 mr-1"><i class="fas fa-edit"></i></span>
-                                        {% elif entry.is_deletion %}
-                                            <span class="badge badge-danger px-2 py-1 mr-1"><i class="fas fa-trash"></i></span>
-                                        {% endif %}
-                                        {{ entry.content_type }}
-                                    </div>
-                                    <div class="small text-muted mt-1">
-                                        {% if entry.is_deletion or not entry.get_admin_url %}
-                                            {{ entry.object_repr }}
-                                        {% else %}
-                                            <a href="{{ entry.get_admin_url }}" class="text-primary font-weight-500">{{ entry.object_repr }}</a>
-                                        {% endif %}
-                                    </div>
-                                    <div class="text-muted" style="font-size: 11px;">{{ entry.action_time|timesince }} ago</div>
-                                </div>
-                            {% endfor %}
+            </div>
+
+            <!-- Hub 2: Catalog & Inventory -->
+            <div class="col-xl-4 col-md-6 col-12 mb-4">
+                <div class="card luxury-model-card h-100 mb-0">
+                    <div class="card-header luxury-card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-boxes text-success mr-2"></i>
+                            <h5 class="m-0 font-weight-bold">Catalog & Inventory</h5>
                         </div>
-                    {% endif %}
+                        <span class="badge badge-success px-3 py-1">4 models</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                                <!-- Products -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-box-open" style="color: #34d399;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_product_changelist' %}" class="model-name-link">
+                                                Products
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_product_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_product_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Categories -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-th-large" style="color: #f59e0b;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_category_changelist' %}" class="model-name-link">
+                                                Categories
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_category_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_category_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Subcategories -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-tags" style="color: #fbbf24;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_subcategory_changelist' %}" class="model-name-link">
+                                                Subcategories
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_subcategory_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_subcategory_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Brands -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-copyright" style="color: #c084fc;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_brand_changelist' %}" class="model-name-link">
+                                                Brands
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_brand_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_brand_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hub 3: Accounts & Security -->
+            <div class="col-xl-4 col-md-12 col-12 mb-4">
+                <div class="card luxury-model-card h-100 mb-0">
+                    <div class="card-header luxury-card-header d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-user-shield text-warning mr-2"></i>
+                            <h5 class="m-0 font-weight-bold">Accounts & Access</h5>
+                        </div>
+                        <span class="badge badge-warning px-3 py-1">3 models</span>
+                    </div>
+                    <div class="card-body p-0">
+                        <table class="table table-hover mb-0">
+                            <tbody>
+                                <!-- Users -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-user-shield" style="color: #22d3ee;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_user_changelist' %}" class="model-name-link">
+                                                Users
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_user_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_user_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Addresses -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-map-marker-alt" style="color: #818cf8;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:store_address_changelist' %}" class="model-name-link">
+                                                Addresses
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:store_address_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:store_address_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- Groups -->
+                                <tr>
+                                    <td class="font-weight-600 align-middle py-3 pl-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="model-icon-pill">
+                                                <i class="fas fa-users" style="color: #fbbf24;"></i>
+                                            </span>
+                                            <a href="{% url 'admin:auth_group_changelist' %}" class="model-name-link">
+                                                Groups
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="text-right align-middle py-3 pr-3">
+                                        <div class="btn-group">
+                                            <a href="{% url 'admin:auth_group_add' %}" class="btn btn-outline-primary mr-1">
+                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
+                                            </a>
+                                            <a href="{% url 'admin:auth_group_changelist' %}" class="btn btn-primary">
+                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
