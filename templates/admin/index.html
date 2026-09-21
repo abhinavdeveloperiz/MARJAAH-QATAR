@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/admin-jazzmin.css' %}?v=2.5">
+    <link rel="stylesheet" href="{% static 'css/admin-jazzmin.css' %}?v=2.6">
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
@@ -32,12 +32,14 @@
                 <h2 class="luxury-title mb-1">Executive Control Center</h2>
                 <p class="luxury-subtitle mb-0">Central management portal for store orders, catalogue inventory, customer relations, and staff access.</p>
             </div>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'admin:store_product_add' %}" class="btn btn-luxury-primary mr-2 mb-1">
-                    <i class="fas fa-plus mr-1"></i> Add Product
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <a href="{% url 'admin:store_product_add' %}" class="btn btn-luxury-primary mb-1">
+                    <i class="fas fa-plus mr-1"></i>
+                    <span>Add Product</span>
                 </a>
                 <a href="{% url 'admin:store_order_changelist' %}" class="btn btn-luxury-secondary mb-1">
-                    <i class="fas fa-shopping-bag mr-1"></i> Orders
+                    <i class="fas fa-shopping-bag mr-1"></i>
+                    <span>Orders</span>
                 </a>
             </div>
         </div>
@@ -57,79 +59,65 @@
                         <span class="badge badge-primary px-3 py-1">3 models</span>
                     </div>
                     <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <tbody>
-                                <!-- Orders -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-shopping-bag" style="color: #38bdf8;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_order_changelist' %}" class="model-name-link">
-                                                Orders
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_order_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_order_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Order items -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-receipt" style="color: #818cf8;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_orderitem_changelist' %}" class="model-name-link">
-                                                Order items
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_orderitem_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_orderitem_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Contact Messages -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-envelope-open-text" style="color: #fda4af;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_contactmessage_changelist' %}" class="model-name-link">
-                                                Contact Messages
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_contactmessage_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_contactmessage_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="model-list">
+                            <!-- Orders -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-shopping-bag" style="color: #38bdf8;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_order_changelist' %}" class="model-name-link" title="Orders">
+                                        Orders
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_order_add' %}" class="btn-action-add" title="Add Order">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_order_changelist' %}" class="btn-action-manage" title="Manage Orders">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Order items -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-receipt" style="color: #818cf8;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_orderitem_changelist' %}" class="model-name-link" title="Order items">
+                                        Order items
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_orderitem_add' %}" class="btn-action-add" title="Add Order item">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_orderitem_changelist' %}" class="btn-action-manage" title="Manage Order items">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Contact Messages -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-envelope-open-text" style="color: #fda4af;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_contactmessage_changelist' %}" class="model-name-link" title="Contact Messages">
+                                        Contact Messages
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_contactmessage_add' %}" class="btn-action-add" title="Add Contact Message">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_contactmessage_changelist' %}" class="btn-action-manage" title="Manage Contact Messages">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -145,102 +133,84 @@
                         <span class="badge badge-success px-3 py-1">4 models</span>
                     </div>
                     <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <tbody>
-                                <!-- Products -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-box-open" style="color: #34d399;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_product_changelist' %}" class="model-name-link">
-                                                Products
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_product_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_product_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Categories -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-th-large" style="color: #f59e0b;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_category_changelist' %}" class="model-name-link">
-                                                Categories
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_category_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_category_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Subcategories -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-tags" style="color: #fbbf24;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_subcategory_changelist' %}" class="model-name-link">
-                                                Subcategories
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_subcategory_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_subcategory_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Brands -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-copyright" style="color: #c084fc;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_brand_changelist' %}" class="model-name-link">
-                                                Brands
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_brand_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_brand_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="model-list">
+                            <!-- Products -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-box-open" style="color: #34d399;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_product_changelist' %}" class="model-name-link" title="Products">
+                                        Products
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_product_add' %}" class="btn-action-add" title="Add Product">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_product_changelist' %}" class="btn-action-manage" title="Manage Products">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Categories -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-th-large" style="color: #f59e0b;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_category_changelist' %}" class="model-name-link" title="Categories">
+                                        Categories
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_category_add' %}" class="btn-action-add" title="Add Category">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_category_changelist' %}" class="btn-action-manage" title="Manage Categories">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Subcategories -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-tags" style="color: #fbbf24;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_subcategory_changelist' %}" class="model-name-link" title="Subcategories">
+                                        Subcategories
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_subcategory_add' %}" class="btn-action-add" title="Add Subcategory">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_subcategory_changelist' %}" class="btn-action-manage" title="Manage Subcategories">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Brands -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-copyright" style="color: #c084fc;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_brand_changelist' %}" class="model-name-link" title="Brands">
+                                        Brands
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_brand_add' %}" class="btn-action-add" title="Add Brand">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_brand_changelist' %}" class="btn-action-manage" title="Manage Brands">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -256,79 +226,65 @@
                         <span class="badge badge-warning px-3 py-1">3 models</span>
                     </div>
                     <div class="card-body p-0">
-                        <table class="table table-hover mb-0">
-                            <tbody>
-                                <!-- Users -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-user-shield" style="color: #22d3ee;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_user_changelist' %}" class="model-name-link">
-                                                Users
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_user_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_user_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Addresses -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-map-marker-alt" style="color: #818cf8;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:store_address_changelist' %}" class="model-name-link">
-                                                Addresses
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:store_address_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:store_address_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- Groups -->
-                                <tr>
-                                    <td class="font-weight-600 align-middle py-3 pl-3">
-                                        <div class="d-flex align-items-center">
-                                            <span class="model-icon-pill">
-                                                <i class="fas fa-users" style="color: #fbbf24;"></i>
-                                            </span>
-                                            <a href="{% url 'admin:auth_group_changelist' %}" class="model-name-link">
-                                                Groups
-                                            </a>
-                                        </div>
-                                    </td>
-                                    <td class="text-right align-middle py-3 pr-3">
-                                        <div class="btn-group">
-                                            <a href="{% url 'admin:auth_group_add' %}" class="btn btn-outline-primary mr-1">
-                                                <i class="fas fa-plus fa-xs mr-1"></i> Add
-                                            </a>
-                                            <a href="{% url 'admin:auth_group_changelist' %}" class="btn btn-primary">
-                                                Manage <i class="fas fa-arrow-right fa-xs ml-1"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div class="model-list">
+                            <!-- Users -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-user-shield" style="color: #22d3ee;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_user_changelist' %}" class="model-name-link" title="Users">
+                                        Users
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_user_add' %}" class="btn-action-add" title="Add User">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_user_changelist' %}" class="btn-action-manage" title="Manage Users">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Addresses -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-map-marker-alt" style="color: #818cf8;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:store_address_changelist' %}" class="model-name-link" title="Addresses">
+                                        Addresses
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:store_address_add' %}" class="btn-action-add" title="Add Address">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:store_address_changelist' %}" class="btn-action-manage" title="Manage Addresses">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Groups -->
+                            <div class="model-row">
+                                <div class="model-info">
+                                    <span class="model-icon-pill">
+                                        <i class="fas fa-users" style="color: #fbbf24;"></i>
+                                    </span>
+                                    <a href="{% url 'admin:auth_group_changelist' %}" class="model-name-link" title="Groups">
+                                        Groups
+                                    </a>
+                                </div>
+                                <div class="model-actions-wrap">
+                                    <a href="{% url 'admin:auth_group_add' %}" class="btn-action-add" title="Add Group">
+                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                    </a>
+                                    <a href="{% url 'admin:auth_group_changelist' %}" class="btn-action-manage" title="Manage Groups">
+                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

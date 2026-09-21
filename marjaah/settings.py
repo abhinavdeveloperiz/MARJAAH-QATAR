@@ -52,6 +52,10 @@ CSRF_TRUSTED_ORIGINS = [
     'https://marjaah-qatar.onrender.com',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'http://localhost:8001',
+    'http://127.0.0.1:8001',
+    'http://localhost:8080',
+    'http://127.0.0.1:8080',
 ]
 _SITE_URL = os.environ.get('SITE_URL', '')
 if _SITE_URL:

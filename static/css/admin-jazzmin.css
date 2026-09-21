@@ -368,6 +368,7 @@ body .text-muted,
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
+  gap: 8px !important;
 }
 
 .btn-luxury-primary:hover {
@@ -387,6 +388,7 @@ body .text-muted,
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
+  gap: 8px !important;
   backdrop-filter: blur(8px) !important;
 }
 
@@ -408,6 +410,7 @@ body .text-muted,
   transition: all 0.2s ease !important;
   display: inline-flex !important;
   align-items: center !important;
+  gap: 8px !important;
 }
 
 .btn-luxury-outline:hover {
@@ -595,55 +598,180 @@ body .text-muted,
   color: var(--text-main) !important;
 }
 
-/* Model Name Link - High Contrast & Smooth Hover */
-.model-name-link {
-  color: #f8fafc !important;
-  font-weight: 600 !important;
-  font-size: 0.92rem !important;
-  text-decoration: none !important;
-  transition: all 0.2s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
+/* ─── MODEL ROWS & ACTIONS (EXECUTIVE CONTROL HUB) ────────────────────── */
+.model-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
 }
 
-.model-name-link:hover {
-  color: var(--text-accent) !important;
-  transform: translateX(3px) !important;
+.model-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background 0.15s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.model-row:last-child {
+  border-bottom: none;
+}
+
+.model-row:hover {
+  background: var(--bg-hover);
+}
+
+.model-row:hover .model-icon-pill {
+  transform: scale(1.06);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.35);
+}
+
+.model-info {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-right: 8px;
 }
 
 /* Model Icon Mini Capsule */
 .model-icon-pill {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right: 12px;
-  font-size: 0.9rem;
-  background: rgba(99, 102, 241, 0.15);
+  margin-right: 10px;
+  font-size: 0.86rem;
+  background: rgba(99, 102, 241, 0.14);
   color: #a5b4fc;
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  border: 1px solid rgba(99, 102, 241, 0.22);
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
-.table tbody tr:hover .model-icon-pill {
-  transform: scale(1.08);
-  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+/* Model Name Link - High Contrast & Ellipsis Safe */
+.model-name-link {
+  color: #f8fafc !important;
+  font-weight: 600 !important;
+  font-size: 0.90rem !important;
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-/* ─── MODEL ACTION BUTTONS ──────────────────────────────────────────────── */
-.btn-outline-primary {
+.model-name-link:hover {
+  color: var(--text-accent) !important;
+  transform: translateX(2px) !important;
+}
+
+/* Model Actions Container */
+.model-actions-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Model Action Button: Add */
+.btn-action-add {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
   border: 1px solid rgba(99, 102, 241, 0.4) !important;
   background: rgba(99, 102, 241, 0.1) !important;
   color: #a5b4fc !important;
   border-radius: 20px !important;
   font-weight: 600 !important;
-  font-size: 0.78rem !important;
-  padding: 4px 12px !important;
-  transition: all 0.2s ease !important;
+  font-size: 0.73rem !important;
+  line-height: 1 !important;
+  padding: 5px 10px !important;
+  transition: all 0.18s ease !important;
   text-decoration: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.btn-action-add:hover {
+  background: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.45) !important;
+}
+
+.btn-action-add i {
+  font-size: 0.68rem !important;
+}
+
+/* Model Action Button: Manage */
+.btn-action-manage {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  border-radius: 20px !important;
+  font-weight: 600 !important;
+  font-size: 0.73rem !important;
+  line-height: 1 !important;
+  padding: 5px 12px !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35) !important;
+  transition: all 0.18s ease !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+}
+
+.btn-action-manage:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.55) !important;
+  color: #ffffff !important;
+}
+
+.btn-action-manage i {
+  font-size: 0.68rem !important;
+  transition: transform 0.18s ease;
+}
+
+.btn-action-manage:hover i {
+  transform: translateX(2px);
+}
+
+/* ─── GLOBAL LUXURY ADMIN BUTTONS ───────────────────────────────────────── */
+.btn-primary {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.5) !important;
+  color: #ffffff !important;
+}
+
+.btn-outline-primary {
+  border: 1px solid rgba(99, 102, 241, 0.4) !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+  color: #a5b4fc !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
 }
 
 .btn-outline-primary:hover {
@@ -654,24 +782,71 @@ body .text-muted,
   box-shadow: 0 3px 12px rgba(99, 102, 241, 0.4) !important;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+.btn-success {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%) !important;
   border: none !important;
   color: #ffffff !important;
-  border-radius: 20px !important;
+  border-radius: var(--radius-sm) !important;
   font-weight: 600 !important;
-  font-size: 0.78rem !important;
-  padding: 4px 14px !important;
-  box-shadow: 0 2px 10px rgba(79, 70, 229, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3) !important;
   transition: all 0.2s ease !important;
-  text-decoration: none !important;
 }
 
-.btn-primary:hover {
-  background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
+.btn-success:hover {
+  background: linear-gradient(135deg, #047857 0%, #059669 100%) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 16px rgba(79, 70, 229, 0.5) !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45) !important;
   color: #ffffff !important;
+}
+
+.btn-info {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  border: 1px solid var(--border-mid) !important;
+  color: #e2e8f0 !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-info:hover {
+  background: linear-gradient(135deg, #334155 0%, #475569 100%) !important;
+  border-color: var(--border-strong) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, #dc2626 0%, #f43f5e 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.5) !important;
+  color: #ffffff !important;
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border: 1px solid var(--border-mid) !important;
+  color: var(--text-main) !important;
+  border-radius: var(--radius-sm) !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.14) !important;
+  border-color: var(--border-strong) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px) !important;
 }
 
 /* ─── RECENT AUDIT ACTIVITY TIMELINE ────────────────────────────────────── */
