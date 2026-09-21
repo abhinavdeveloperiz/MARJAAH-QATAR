@@ -346,3 +346,61 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} — {self.subject} ({self.created_at.strftime('%Y-%m-%d')})"
+
+
+class Banner(models.Model):
+    BANNER_TYPES = [
+        ('hero', 'Store Homepage Hero Banner'),
+        ('promo', 'Store Promotional / Offer Banner'),
+        ('admin', 'Admin Panel Executive Banner'),
+    ]
+
+    title = models.CharField(max_length=200, help_text='Internal banner title / heading')
+    title_ar = models.CharField(max_length=200, blank=True, help_text='Arabic title (optional)')
+    subtitle = models.TextField(blank=True, help_text='Banner subtitle / description (optional)')
+    subtitle_ar = models.TextField(blank=True, help_text='Arabic subtitle (optional)')
+    image = models.ImageField(
+        upload_to='banners/',
+        blank=True,
+        null=True,
+        help_text='Upload the banner image directly from your device'
+    )
+    image_url = models.CharField(
+        max_length=500,
+        blank=True,
+        help_text='Or provide an external/static image path (e.g. /images/hero-station.jpg)'
+    )
+    banner_type = models.CharField(
+        max_length=20,
+        choices=BANNER_TYPES,
+        default='hero',
+        help_text='Location where this banner is displayed'
+    )
+    link_url = models.CharField(
+        max_length=255,
+        blank=True,
+        help_text='Destination link URL when banner or button is clicked (e.g. /en/shop/)'
+    )
+    button_text = models.CharField(max_length=80, blank=True, help_text='Button label text (optional)')
+    button_text_ar = models.CharField(max_length=80, blank=True, help_text='Arabic button label text (optional)')
+    is_active = models.BooleanField(default=True, help_text='Check to activate this banner on the site')
+    order = models.IntegerField(default=0, help_text='Display ordering priority (lowest number first)')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['order', '-created_at']
+        verbose_name = 'Banner & Promotion'
+        verbose_name_plural = 'Banners & Promotions'
+
+    def __str__(self):
+        return f"{self.title} ({self.get_banner_type_display()})"
+
+    @property
+    def image_display_url(self):
+        if self.image:
+            try:
+                return self.image.url
+            except Exception:
+                pass
+        return self.image_url or '/images/hero-station.jpg'

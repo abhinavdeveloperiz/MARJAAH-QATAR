@@ -16,7 +16,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Product, Category, Brand, Address, Order, OrderItem, ContactMessage, User
+from .models import Product, Category, Brand, Address, Order, OrderItem, ContactMessage, User, Banner
 from .forms import (LoginForm, RegisterForm, ForgotPasswordForm, SetNewPasswordForm,
                     AddressForm, CheckoutForm, ProfileForm, ContactForm)
 
@@ -36,6 +36,7 @@ def home(request):
     categories = Category.objects.filter(is_featured=True).order_by('order')
     brands = Brand.objects.all()
     best_sellers = Product.objects.filter(is_best_seller=True, in_stock=True)[:4]
+    hero_banner = Banner.objects.filter(banner_type='hero', is_active=True).first()
     return render(request, 'home/index.html', {
         'featured': featured,
         'new_arrivals': new_arrivals,
@@ -43,6 +44,7 @@ def home(request):
         'categories': categories,
         'brands': brands,
         'best_sellers': best_sellers,
+        'hero_banner': hero_banner,
         'locale': locale,
     })
 

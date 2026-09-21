@@ -1,5 +1,5 @@
 import json
-from .models import Category, Brand
+from .models import Category, Brand, Banner
 from .translations import get_translations
 
 
@@ -8,6 +8,17 @@ def site_context(request):
     locale = 'ar' if request.path.startswith('/ar/') else 'en'
     is_rtl = (locale == 'ar')
     t = get_translations(locale)
+
+    # Active banners
+    try:
+        hero_banner = Banner.objects.filter(banner_type='hero', is_active=True).first()
+    except Exception:
+        hero_banner = None
+
+    try:
+        admin_banner = Banner.objects.filter(banner_type='admin', is_active=True).first()
+    except Exception:
+        admin_banner = None
 
     # Cart & Wishlist from session safely
     session = getattr(request, 'session', {})
@@ -46,5 +57,7 @@ def site_context(request):
         'featured_categories': featured_categories,
         'current_path': request.path,
         'nav_links': nav_links,
+        'hero_banner': hero_banner,
+        'admin_banner': admin_banner,
     }
 

@@ -6,7 +6,7 @@
 <!-- ═══ HERO (MARJAAH) ═══════════════════════════════════════════════════════ -->
 <section id="hero-section" class="relative min-h-[580px] sm:min-h-[660px] lg:h-[90vh] max-h-[960px] overflow-hidden flex flex-col justify-between pt-[72px] sm:pt-[84px] pb-8 sm:pb-12 select-none text-white" style="background-color:#060913">
   <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-    <div id="hero-bg-img" class="absolute -top-[15%] -left-[10%] -right-[10%] -bottom-[15%] bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out" style="background-image:url('/images/hero-station.jpg');transform:translate(0px, 0px) scale(1.08);filter:brightness(0.65) contrast(1.2) saturate(1.1)"></div>
+    <div id="hero-bg-img" class="absolute -top-[15%] -left-[10%] -right-[10%] -bottom-[15%] bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out" style="background-image:url('{{ hero_banner.image_display_url|default:'/images/hero-station.jpg' }}');transform:translate(0px, 0px) scale(1.08);filter:brightness(0.65) contrast(1.2) saturate(1.1)"></div>
     <div id="hero-glow" class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[600px] lg:w-[800px] h-[350px] sm:h-[500px] bg-gradient-to-tr from-[#4063B2]/25 via-[#8D9CF5]/20 to-[#BB9AED]/15 rounded-full blur-[120px] sm:blur-[150px] transition-transform duration-1000 ease-out pointer-events-none" style="transform:translate(0px, 0px)"></div>
     <div class="absolute inset-0 bg-[linear-gradient(to_right,rgba(141,156,245,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(141,156,245,0.03)_1px,transparent_1px)] bg-[size:3rem_3rem] sm:bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_40%,#000_70%,transparent_100%)] pointer-events-none"></div>
     <div class="absolute inset-0 bg-gradient-to-b from-[#060913]/90 via-[#060913]/55 to-[#060913] pointer-events-none"></div>
@@ -18,11 +18,11 @@
     <div id="hero-title-box" class="flex-1 flex flex-col items-center justify-center text-center max-w-6xl mx-auto w-full py-8 sm:py-12 md:py-16 pt-16 sm:pt-20 transition-transform duration-300 ease-out" style="transform:perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(10px)">
       <div class="relative inline-flex items-center justify-center my-auto select-none px-2 sm:px-6">
         <h1 class="font-guminert text-[18vw] sm:text-[15vw] md:text-[13vw] lg:text-[11vw] xl:text-[10vw] font-bold leading-[0.92] tracking-[-0.03em] uppercase drop-shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
-          <span class="bg-gradient-to-b from-white via-[#E0E7FF] to-[#8D9CF5] bg-clip-text text-transparent transition-all duration-300 hover:brightness-125 cursor-default font-extrabold">{{ t.hero.marjaah_title }}</span>
+          <span class="bg-gradient-to-b from-white via-[#E0E7FF] to-[#8D9CF5] bg-clip-text text-transparent transition-all duration-300 hover:brightness-125 cursor-default font-extrabold">{% if is_rtl and hero_banner.title_ar %}{{ hero_banner.title_ar }}{% elif not is_rtl and hero_banner.title and hero_banner.title != 'Homepage Hero Banner' %}{{ hero_banner.title }}{% else %}{{ t.hero.marjaah_title }}{% endif %}</span>
         </h1>
       </div>
       <p class="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
-        {{ t.hero.subtitle }}
+        {% if is_rtl and hero_banner.subtitle_ar %}{{ hero_banner.subtitle_ar }}{% elif hero_banner.subtitle %}{{ hero_banner.subtitle }}{% else %}{{ t.hero.subtitle }}{% endif %}
       </p>
     </div>
     

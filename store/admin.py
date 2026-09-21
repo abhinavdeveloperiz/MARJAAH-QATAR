@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html, mark_safe
-from .models import User, Category, Subcategory, Brand, Product, ProductImage, Address, Order, OrderItem, ContactMessage
+from .models import (User, Category, Subcategory, Brand, Product,
+                     ProductImage, Address, Order, OrderItem, ContactMessage, Banner)
 
 
 @admin.register(User)
@@ -404,3 +405,71 @@ class ContactMessageAdmin(admin.ModelAdmin):
             obj.email, subject
         )
     quick_reply.short_description = 'Action'
+
+
+@admin.register(Banner)
+class BannerAdmin(admin.ModelAdmin):
+    list_display = ('banner_preview', 'title', 'banner_type_badge', 'is_active', 'order', 'link_preview', 'updated_at')
+    list_display_links = ('banner_preview', 'title')
+    list_editable = ('is_active', 'order')
+    list_filter = ('banner_type', 'is_active')
+    search_fields = ('title', 'title_ar', 'subtitle', 'subtitle_ar', 'link_url')
+    readonly_fields = ('banner_preview_large', 'created_at', 'updated_at')
+
+    fieldsets = (
+        ('Banner Image & Upload', {
+            'description': 'Upload your new banner photo directly from your device (PC, tablet, or phone), or specify an existing image URL.',
+            'fields': ('banner_preview_large', 'image', 'image_url')
+        }),
+        ('Banner Content & Type', {
+            'fields': ('title', 'title_ar', 'subtitle', 'subtitle_ar', 'banner_type')
+        }),
+        ('Target Link & Action (Optional)', {
+            'fields': ('link_url', 'button_text', 'button_text_ar')
+        }),
+        ('Display Settings', {
+            'fields': ('is_active', 'order', 'created_at', 'updated_at')
+        }),
+    )
+
+    def banner_preview(self, obj):
+        img_url = obj.image_display_url
+        return format_html(
+            '<img src="{}" style="width:72px;height:42px;object-fit:cover;border-radius:6px;border:1px solid #cbd5e1;" onerror="this.src=\'/static/images/placeholder.svg\'" />',
+            img_url
+        )
+    banner_preview.short_description = 'Banner'
+
+    def banner_preview_large(self, obj):
+        img_url = obj.image_display_url
+        if img_url:
+            return format_html(
+                '<div style="margin-bottom:12px;">'
+                '<img src="{}" style="max-width:100%;max-height:220px;object-fit:cover;border-radius:12px;border:1px solid #cbd5e1;box-shadow:0 4px 14px rgba(0,0,0,0.06);" onerror="this.src=\'/static/images/placeholder.svg\'" />'
+                '</div>',
+                img_url
+            )
+        return 'No banner image uploaded yet.'
+    banner_preview_large.short_description = 'Current Banner Preview'
+
+    def banner_type_badge(self, obj):
+        badges = {
+            'hero': ('#eff6ff', '#1d4ed8', 'fas fa-desktop', 'Hero Banner'),
+            'promo': ('#fef3c7', '#b45309', 'fas fa-fire', 'Promo Banner'),
+            'admin': ('#f5f3ff', '#6d28d9', 'fas fa-user-shield', 'Admin Banner'),
+        }
+        bg, fg, icon, label = badges.get(obj.banner_type, ('#f8fafc', '#475569', 'fas fa-image', obj.banner_type))
+        return format_html(
+            '<span style="background:{};color:{};border:1px solid {};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">'
+            '<i class="{}"></i> {}'
+            '</span>',
+            bg, fg, fg, icon, label
+        )
+    banner_type_badge.short_description = 'Placement'
+    banner_type_badge.admin_order_field = 'banner_type'
+
+    def link_preview(self, obj):
+        if obj.link_url:
+            return format_html('<a href="{}" target="_blank" class="text-primary"><i class="fas fa-external-link-alt"></i> Link</a>', obj.link_url)
+        return '-'
+    link_preview.short_description = 'Destination Link'
