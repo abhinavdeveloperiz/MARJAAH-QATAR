@@ -96,3 +96,78 @@ class StoreViewsTestCase(TestCase):
         self.client.force_login(self.staff_user)
         res = self.client.get('/en/admin-dashboard/')
         self.assertEqual(res.status_code, 200)
+
+
+from unittest.mock import patch
+from store.fatoorah import clean_phone_number, execute_payment, get_payment_status
+
+class MyFatoorahIntegrationTestCase(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.order = Order.objects.create(
+            guest_name='Ahmad Al-Kuwari',
+            guest_email='ahmad@example.qa',
+            guest_phone='+97455123456',
+            subtotal=500.00,
+            shipping=0.00,
+            total=500.00,
+            payment_method='card',
+            payment_status='pending',
+        )
+
+    def test_phone_number_cleaner(self):
+        code, num = clean_phone_number('+974 5512 3456')
+        self.assertEqual(code, '974')
+        self.assertEqual(num, '55123456')
+
+        code, num = clean_phone_number('55123456')
+        self.assertEqual(code, '974')
+        self.assertEqual(num, '55123456')
+
+        code, num = clean_phone_number('0097455123456')
+        self.assertEqual(code, '974')
+        self.assertEqual(num, '55123456')
+
+    @patch('store.fatoorah.requests.post')
+    def test_execute_payment_success(self, mock_post):
+        mock_post.return_value.status_code = 200
+        mock_post.return_value.json.return_value = {
+            'IsSuccess': True,
+            'Data': {
+                'InvoiceId': 987654,
+                'PaymentURL': 'https://demo.myfatoorah.com/pay/mockurl'
+            }
+        }
+        with patch('store.fatoorah._get_api_token', return_value='fake_token_123'):
+            res = execute_payment(self.order, 'http://test/cb/', 'http://test/err/')
+            self.assertTrue(res['success'])
+            self.assertEqual(res['invoice_id'], '987654')
+            self.assertEqual(res['payment_url'], 'https://demo.myfatoorah.com/pay/mockurl')
+
+    @patch('store.views.get_payment_status')
+    def test_fatoorah_callback_success(self, mock_status):
+        mock_status.return_value = {
+            'success': True,
+            'is_paid': True,
+            'invoice_id': '987654',
+            'amount': 500.00,
+            'transaction_id': 'TXN_QAT_123',
+            'raw': {
+                'CustomerReference': str(self.order.pk),
+                'InvoiceStatus': 'Paid',
+            }
+        }
+        res = self.client.get(f'/en/checkout/fatoorah/callback/?paymentId=PID_123')
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.url.endswith(f'/checkout/success/{self.order.pk}/'))
+
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.payment_status, 'paid')
+        self.assertEqual(self.order.status, 'confirmed')
+        self.assertEqual(self.order.fatoorah_payment_id, 'PID_123')
+        self.assertEqual(self.order.fatoorah_transaction_id, 'TXN_QAT_123')
+
+    def test_fatoorah_error_view(self):
+        res = self.client.get(f'/en/checkout/fatoorah/error/?order_id={self.order.pk}')
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, self.order.order_number)

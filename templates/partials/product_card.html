@@ -64,9 +64,13 @@
         {% endfor %}
       </div>
       <span class="text-[11px] font-medium" style="color:var(--text-tertiary)">★ {{ product.rating|floatformat:1 }} ({{ product.review_count }})</span>
-      {% else %}
+      {% elif product.in_stock %}
       <span class="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
         {% if is_rtl %}متوفر{% else %}In Stock{% endif %}
+      </span>
+      {% else %}
+      <span class="text-[10px] uppercase font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">
+        {% if is_rtl %}غير متوفر{% else %}Out of Stock{% endif %}
       </span>
       {% endif %}
     </div>

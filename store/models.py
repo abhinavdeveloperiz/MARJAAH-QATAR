@@ -215,7 +215,16 @@ class Order(models.Model):
     guest_email = models.EmailField(blank=True)
     guest_phone = models.CharField(max_length=30, blank=True)
 
+    PAYMENT_STATUS_CHOICES = [
+        ('pending', 'Pending Payment'),
+        ('paid', 'Paid'),
+        ('failed', 'Payment Failed'),
+        ('cancelled', 'Cancelled'),
+        ('cod', 'Cash on Delivery'),
+    ]
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
+    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     # Legacy JSON snapshot (kept for read-only backward compatibility)
     items_json = models.TextField(default='[]')
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
@@ -232,6 +241,11 @@ class Order(models.Model):
     delivery_country = models.CharField(max_length=100, default='Qatar')
 
     payment_method = models.CharField(max_length=50, default='cash')
+    fatoorah_invoice_id = models.CharField(max_length=100, blank=True, help_text='MyFatoorah Invoice ID')
+    fatoorah_payment_id = models.CharField(max_length=100, blank=True, help_text='MyFatoorah Payment ID')
+    fatoorah_transaction_id = models.CharField(max_length=100, blank=True, help_text='Bank transaction reference')
+    fatoorah_gateway_link = models.TextField(blank=True, help_text='Direct hosted invoice payment link')
+    payment_response_json = models.TextField(blank=True, default='{}', help_text='Raw verification payload')
     notes = models.TextField(blank=True, help_text='Delivery instructions or special requests')
     tracking_number = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -285,6 +299,12 @@ class Order(models.Model):
         return self.guest_email
 
     @property
+    def customer_phone(self):
+        if self.user and getattr(self.user, 'phone', None):
+            return self.user.phone
+        return self.guest_phone or self.delivery_phone or ''
+
+    @property
     def delivery_address_display(self):
         parts = [
             self.delivery_full_name,
@@ -319,7 +339,9 @@ class OrderItem(models.Model):
 
     @property
     def line_total(self):
-        return self.unit_price * self.quantity
+        if self.unit_price is None:
+            return 0
+        return self.unit_price * (self.quantity or 1)
 
 
 class ContactMessage(models.Model):

@@ -312,3 +312,12 @@ JAZZMIN_UI_TWEAKS = {
         "success": "btn-success",
     },
 }
+
+# ─── MYFATOORAH PAYMENT GATEWAY ───────────────────────────────────────────────
+MYFATOORAH_API_TOKEN = os.environ.get('MYFATOORAH_API_TOKEN', '')
+MYFATOORAH_IS_SANDBOX = os.environ.get('MYFATOORAH_IS_SANDBOX', 'True').lower() in ('true', '1', 'yes')
+# Qatar Live URL is https://api-qa.myfatoorah.com, Sandbox URL is https://apitest.myfatoorah.com
+_default_api_url = 'https://apitest.myfatoorah.com' if MYFATOORAH_IS_SANDBOX else 'https://api-qa.myfatoorah.com'
+MYFATOORAH_API_URL = os.environ.get('MYFATOORAH_API_URL', _default_api_url).rstrip('/')
+MYFATOORAH_WEBHOOK_SECRET = os.environ.get('MYFATOORAH_WEBHOOK_SECRET', '')
+MYFATOORAH_CURRENCY = os.environ.get('MYFATOORAH_CURRENCY', 'QAR')

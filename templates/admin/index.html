@@ -4,7 +4,7 @@
 
 {% block extrastyle %}
     {{ block.super }}
-    <link rel="stylesheet" href="{% static 'css/admin-jazzmin.css' %}?v=4.0">
+    <link rel="stylesheet" href="{% static 'css/admin-jazzmin.css' %}?v=4.1">
 {% endblock %}
 
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
@@ -76,10 +76,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_order_add' %}" class="btn-action-add" title="Add Order">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_order_changelist' %}" class="btn-action-manage" title="Manage Orders">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -95,10 +95,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_orderitem_add' %}" class="btn-action-add" title="Add Order item">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_orderitem_changelist' %}" class="btn-action-manage" title="Manage Order items">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -114,10 +114,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_contactmessage_add' %}" class="btn-action-add" title="Add Contact Message">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_contactmessage_changelist' %}" class="btn-action-manage" title="Manage Contact Messages">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -150,10 +150,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_product_add' %}" class="btn-action-add" title="Add Product">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_product_changelist' %}" class="btn-action-manage" title="Manage Products">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -169,10 +169,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_category_add' %}" class="btn-action-add" title="Add Category">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_category_changelist' %}" class="btn-action-manage" title="Manage Categories">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -188,10 +188,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_subcategory_add' %}" class="btn-action-add" title="Add Subcategory">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_subcategory_changelist' %}" class="btn-action-manage" title="Manage Subcategories">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -207,10 +207,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_brand_add' %}" class="btn-action-add" title="Add Brand">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_brand_changelist' %}" class="btn-action-manage" title="Manage Brands">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -262,10 +262,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_user_add' %}" class="btn-action-add" title="Add User">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_user_changelist' %}" class="btn-action-manage" title="Manage Users">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -281,10 +281,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:store_address_add' %}" class="btn-action-add" title="Add Address">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:store_address_changelist' %}" class="btn-action-manage" title="Manage Addresses">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>
@@ -300,10 +300,10 @@
                                 </div>
                                 <div class="model-actions-wrap">
                                     <a href="{% url 'admin:auth_group_add' %}" class="btn-action-add" title="Add Group">
-                                        <i class="fas fa-plus"></i> <span>Add</span>
+                                        <i class="fas fa-plus"></i> <span class="action-label">Add</span>
                                     </a>
                                     <a href="{% url 'admin:auth_group_changelist' %}" class="btn-action-manage" title="Manage Groups">
-                                        <span>Manage</span> <i class="fas fa-arrow-right"></i>
+                                        <span class="action-label">Manage</span> <i class="fas fa-arrow-right"></i>
                                     </a>
                                 </div>
                             </div>

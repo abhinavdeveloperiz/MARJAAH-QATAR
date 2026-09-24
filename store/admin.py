@@ -213,7 +213,11 @@ class OrderItemInline(admin.TabularInline):
     item_preview.short_description = 'Item'
 
     def line_total(self, obj):
-        total_str = f"{float(obj.line_total):,.2f}"
+        try:
+            total_val = float(obj.line_total) if obj.line_total is not None else 0.0
+        except (ValueError, TypeError):
+            total_val = 0.0
+        total_str = f"{total_val:,.2f}"
         return format_html('<strong>QAR {}</strong>', total_str)
     line_total.short_description = 'Line Total'
 
@@ -237,18 +241,21 @@ mark_cancelled.short_description = '✕ Mark selected orders as Cancelled'
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('order_number', 'customer_display', 'status_badge', 'total_display', 'payment_method_badge', 'created_at')
+    list_display = ('order_number', 'customer_display', 'status_badge', 'payment_status_badge', 'total_display', 'payment_method_badge', 'created_at')
     list_display_links = ('order_number',)
-    list_filter = ('status', 'payment_method', 'created_at')
-    search_fields = ('id', 'user__username', 'user__email', 'guest_name', 'guest_email', 'guest_phone', 'delivery_phone', 'tracking_number')
-    readonly_fields = ('order_number', 'created_at', 'updated_at', 'customer_info_panel', 'delivery_address_display')
+    list_filter = ('status', 'payment_status', 'payment_method', 'created_at')
+    search_fields = ('id', 'user__username', 'user__email', 'guest_name', 'guest_email', 'guest_phone', 'delivery_phone', 'tracking_number', 'fatoorah_invoice_id', 'fatoorah_payment_id', 'fatoorah_transaction_id')
+    readonly_fields = ('order_number', 'created_at', 'updated_at', 'customer_info_panel', 'delivery_address_display', 'fatoorah_gateway_link')
     inlines = [OrderItemInline]
     actions = [mark_confirmed, mark_shipped, mark_delivered, mark_cancelled]
     date_hierarchy = 'created_at'
 
     fieldsets = (
         ('Order Overview', {
-            'fields': ('order_number', 'status', 'payment_method', 'tracking_number', 'notes', 'created_at', 'updated_at')
+            'fields': ('order_number', 'status', 'tracking_number', 'notes', 'created_at', 'updated_at')
+        }),
+        ('Payment & MyFatoorah Gateway', {
+            'fields': ('payment_status', 'payment_method', 'fatoorah_invoice_id', 'fatoorah_payment_id', 'fatoorah_transaction_id', 'fatoorah_gateway_link')
         }),
         ('Customer & Quick Actions', {
             'fields': ('customer_info_panel', 'user', 'guest_name', 'guest_email', 'guest_phone')
@@ -316,12 +323,43 @@ class OrderAdmin(admin.ModelAdmin):
 
     def payment_method_badge(self, obj):
         pm = obj.payment_method.lower()
-        if pm in ('card', 'online'):
-            return format_html('<span class="badge badge-primary"><i class="fas fa-credit-card"></i> Card</span>')
-        elif pm == 'qpay':
-            return format_html('<span class="badge badge-info"><i class="fas fa-wallet"></i> QPay</span>')
+        if pm in ('card', 'online', 'fatoorah'):
+            return format_html('<span class="badge badge-primary"><i class="fas fa-credit-card"></i> Online / Card</span>')
+        elif pm in ('qr', 'qpay'):
+            return format_html('<span class="badge badge-info"><i class="fas fa-qrcode"></i> QR / QPay</span>')
         return format_html('<span class="badge badge-secondary"><i class="fas fa-money-bill-wave"></i> Cash</span>')
-    payment_method_badge.short_description = 'Payment'
+    payment_method_badge.short_description = 'Payment Method'
+
+    def payment_status_badge(self, obj):
+        st = (obj.payment_status or 'pending').lower()
+        badges = {
+            'paid': ('#ecfdf5', '#047857', 'fas fa-check-circle', 'Paid (Verified)'),
+            'pending': ('#fffbeb', '#b45309', 'fas fa-hourglass-half', 'Pending'),
+            'failed': ('#fef2f2', '#b91c1c', 'fas fa-times-circle', 'Failed'),
+            'cancelled': ('#f8fafc', '#475569', 'fas fa-ban', 'Cancelled'),
+            'cod': ('#eff6ff', '#1d4ed8', 'fas fa-hand-holding-usd', 'Cash on Delivery'),
+        }
+        bg, fg, icon, label = badges.get(st, ('#f8fafc', '#475569', 'fas fa-circle', st.title()))
+        return format_html(
+            '<span style="background:{};color:{};border:1px solid {};padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;display:inline-flex;align-items:center;gap:4px;">'
+            '<i class="{}"></i> {}'
+            '</span>',
+            bg, fg, fg, icon, label
+        )
+    payment_status_badge.short_description = 'Payment Status'
+    payment_status_badge.admin_order_field = 'payment_status'
+
+    def fatoorah_gateway_link(self, obj):
+        if obj.fatoorah_invoice_id:
+            portal_url = 'https://portal.myfatoorah.com' if not getattr(settings, 'MYFATOORAH_IS_SANDBOX', True) else 'https://demo.myfatoorah.com'
+            return format_html(
+                '<a href="{}" target="_blank" class="admin-action-btn admin-btn-phone" style="background:#0284c7;color:white;text-decoration:none;">'
+                '<i class="fas fa-external-link-alt"></i> Open MyFatoorah Portal (Invoice #{})'
+                '</a>',
+                portal_url, obj.fatoorah_invoice_id
+            )
+        return format_html('<span style="color:#94a3b8;font-size:12px;">No MyFatoorah invoice generated yet.</span>')
+    fatoorah_gateway_link.short_description = 'Portal Quick Link'
 
     def status_badge(self, obj):
         colours = {

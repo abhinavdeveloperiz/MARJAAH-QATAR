@@ -19,6 +19,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Product, Category, Brand, Address, Order, OrderItem, ContactMessage, User, Banner
 from .forms import (LoginForm, RegisterForm, ForgotPasswordForm, SetNewPasswordForm,
                     AddressForm, CheckoutForm, ProfileForm, ContactForm)
+from .fatoorah import execute_payment, get_payment_status, generate_qr_base64
 
 logger = logging.getLogger(__name__)
 
@@ -372,13 +373,10 @@ def checkout_view(request):
             # Format payment details cleanly for records
             pm = cd['payment_method']
             pm_detail = ''
-            if pm == 'card':
-                card_num = cd.get('card_number', '').replace(' ', '').replace('-', '')
-                masked = f"•••• {card_num[-4:]}" if len(card_num) >= 4 else "Card"
-                pm_detail = f"[Card Payment: {masked} | Holder: {cd.get('card_holder', '')}]"
+            if pm in ('card', 'fatoorah'):
+                pm_detail = "[Online Payment: Credit / Debit Card / Apple Pay via MyFatoorah]"
             elif pm in ('qr', 'qpay'):
-                qr_ref = cd.get('qr_ref', '').strip()
-                pm_detail = f"[QR / Fawran Transfer Ref: {qr_ref if qr_ref else 'Direct QR Scan'}]"
+                pm_detail = "[Online Payment: QR Code / Mobile Scan via MyFatoorah]"
             elif pm == 'cash':
                 change_req = cd.get('cash_change_req', '').strip()
                 if change_req:
@@ -386,6 +384,8 @@ def checkout_view(request):
 
             user_notes = cd.get('notes', '').strip()
             final_notes = f"{pm_detail}\n{user_notes}".strip() if pm_detail else user_notes
+
+            initial_payment_status = 'pending' if pm in ('card', 'fatoorah', 'qr', 'qpay') else 'cod'
 
             # Create the Order — works for both guests and members
             order = Order.objects.create(
@@ -399,11 +399,12 @@ def checkout_view(request):
                 total=total,
                 address=addr,
                 payment_method=cd['payment_method'],
+                payment_status=initial_payment_status,
                 notes=final_notes,
                 **delivery_data,
             )
 
-            # Create relational OrderItem records & deduct stock
+            # Create relational OrderItem records
             for item in items:
                 try:
                     product = Product.objects.get(slug=item['slug'])
@@ -419,14 +420,51 @@ def checkout_view(request):
                         original_price=item.get('original_price'),
                         quantity=item['quantity'],
                     )
-                    # Deduct stock if tracked
+                except Product.DoesNotExist:
+                    logger.warning(f"Product {item['slug']} not found during order creation.")
+
+            # If online payment via MyFatoorah (Card or QR Code scan), initiate payment session
+            if pm in ('card', 'fatoorah', 'qr', 'qpay'):
+                domain = request.build_absolute_uri('/')[:-1]
+                callback_url = f"{domain}/{locale}/checkout/fatoorah/callback/"
+                error_url = f"{domain}/{locale}/checkout/fatoorah/error/?order_id={order.pk}"
+
+                fatoorah_res = execute_payment(
+                    order=order,
+                    callback_url=callback_url,
+                    error_url=error_url,
+                    language=locale
+                )
+
+                if fatoorah_res.get('success'):
+                    order.fatoorah_invoice_id = str(fatoorah_res.get('invoice_id', ''))
+                    order.fatoorah_gateway_link = fatoorah_res.get('payment_url', '')
+                    order.save(update_fields=['fatoorah_invoice_id', 'fatoorah_gateway_link'])
+                    request.session['pending_order_id'] = order.pk
+                    if pm in ('qr', 'qpay'):
+                        return redirect(f'/{locale}/checkout/qr/{order.pk}/')
+                    else:
+                        return redirect(fatoorah_res['payment_url'])
+                else:
+                    order.payment_status = 'failed'
+                    order.save(update_fields=['payment_status'])
+                    err_msg = fatoorah_res.get('error') or "Unable to initiate payment with MyFatoorah gateway."
+                    logger.error(f"MyFatoorah initiation error for Order #{order.pk}: {err_msg}")
+                    messages.error(request, f"Payment Gateway Error: {err_msg}")
+                    return redirect(f'/{locale}/checkout/')
+
+            # For Cash on Delivery or offline payments:
+            # Deduct stock immediately
+            for item in items:
+                try:
+                    product = Product.objects.get(slug=item['slug'])
                     if product.stock_count is not None:
                         product.stock_count = max(0, product.stock_count - item['quantity'])
                         if product.stock_count == 0:
                             product.in_stock = False
                         product.save(update_fields=['stock_count', 'in_stock'])
                 except Product.DoesNotExist:
-                    logger.warning(f"Product {item['slug']} not found during order creation.")
+                    pass
 
             # Clear cart
             request.session['cart'] = {}
@@ -463,13 +501,109 @@ def checkout_view(request):
     })
 
 
+def checkout_qr_view(request, order_pk):
+    """
+    Renders the dedicated Qatar Dynamic QR Code Payment screen for an order.
+    Displays a high-resolution dynamic QR Code linked to the MyFatoorah gateway invoice.
+    """
+    locale = _get_locale(request)
+    order = get_object_or_404(Order, pk=order_pk)
+
+    # Security check: ensure user owns order or is in active session
+    if order.user and request.user.is_authenticated and order.user != request.user:
+        return redirect(f'/{locale}/')
+
+    # If already paid, redirect straight to success page
+    if order.payment_status == 'paid':
+        return redirect(f'/{locale}/checkout/success/{order.pk}/')
+
+    payment_url = order.fatoorah_gateway_link
+    if not payment_url:
+        domain = request.build_absolute_uri('/')[:-1]
+        callback_url = f"{domain}/{locale}/checkout/fatoorah/callback/"
+        error_url = f"{domain}/{locale}/checkout/fatoorah/error/?order_id={order.pk}"
+        fatoorah_res = execute_payment(
+            order=order,
+            callback_url=callback_url,
+            error_url=error_url,
+            language=locale
+        )
+        if fatoorah_res.get('success'):
+            payment_url = fatoorah_res['payment_url']
+            order.fatoorah_invoice_id = str(fatoorah_res.get('invoice_id', ''))
+            order.fatoorah_gateway_link = payment_url
+            order.save(update_fields=['fatoorah_invoice_id', 'fatoorah_gateway_link'])
+
+    qr_base64 = generate_qr_base64(payment_url) if payment_url else ''
+
+    return render(request, 'checkout/payment_qr.html', {
+        'order': order,
+        'payment_url': payment_url,
+        'qr_base64': qr_base64,
+        'total': order.total,
+        'locale': locale,
+        'is_rtl': locale == 'ar',
+    })
+
+
+def order_status_check_api(request, order_pk):
+    """
+    AJAX endpoint called periodically by the QR payment screen to check
+    whether the customer has completed payment on their mobile device.
+    """
+    locale = _get_locale(request)
+    order = Order.objects.filter(pk=order_pk).first()
+    if not order:
+        return JsonResponse({'paid': False, 'error': 'Order not found'}, status=404)
+
+    if order.payment_status == 'paid':
+        return JsonResponse({
+            'paid': True,
+            'redirect_url': f'/{locale}/checkout/success/{order.pk}/'
+        })
+
+    # If pending, query MyFatoorah gateway server-to-server to check if customer paid
+    invoice_id = order.fatoorah_invoice_id
+    if invoice_id:
+        status_res = get_payment_status(invoice_id, key_type="InvoiceId")
+        if status_res.get('success') and status_res.get('is_paid'):
+            order.payment_status = 'paid'
+            order.status = 'confirmed'
+            order.fatoorah_payment_id = str(status_res.get('invoice_id', ''))
+            order.fatoorah_transaction_id = str(status_res.get('transaction_id', ''))
+            order.payment_response_json = json.dumps(status_res.get('raw', {}))
+            order.save(update_fields=['payment_status', 'status', 'fatoorah_payment_id', 'fatoorah_transaction_id', 'payment_response_json'])
+
+            # Deduct stock for confirmed order
+            for item in order.order_items.all():
+                if item.product and item.product.stock_count is not None:
+                    item.product.stock_count = max(0, item.product.stock_count - item.quantity)
+                    if item.product.stock_count == 0:
+                        item.product.in_stock = False
+                    item.product.save(update_fields=['stock_count', 'in_stock'])
+
+            # Clear cart from session
+            request.session['cart'] = {}
+            request.session.modified = True
+
+            return JsonResponse({
+                'paid': True,
+                'redirect_url': f'/{locale}/checkout/success/{order.pk}/'
+            })
+
+    return JsonResponse({
+        'paid': False,
+        'status': order.status,
+        'payment_status': order.payment_status
+    })
+
+
 def checkout_success(request, order_pk):
     """Display order confirmation page."""
     locale = _get_locale(request)
     order = get_object_or_404(Order, pk=order_pk)
 
     # Security: only show to the order owner or guest who just placed it
-    # We allow access within the same session (cart was cleared = legitimate)
     if order.user and request.user.is_authenticated and order.user != request.user:
         return redirect(f'/{locale}/')
 
@@ -479,6 +613,188 @@ def checkout_success(request, order_pk):
         'total': order.total,
         'order_items': order.items,
     })
+
+
+def fatoorah_callback_view(request):
+    """
+    Handles customer return from MyFatoorah after completing online payment.
+    Query parameters provided by gateway: ?paymentId=... (or ?Id=...)
+    """
+    locale = _get_locale(request)
+    payment_id = request.GET.get('paymentId') or request.GET.get('Id')
+
+    if not payment_id:
+        messages.error(request, "No payment identifier received from the payment gateway.")
+        return redirect(f'/{locale}/checkout/')
+
+    # Query MyFatoorah API server-to-server to verify genuine status
+    status_res = get_payment_status(payment_id, key_type="PaymentId")
+    if not status_res.get('success'):
+        logger.error(f"MyFatoorah verification failed for PaymentId {payment_id}: {status_res.get('error')}")
+        messages.error(request, "Could not verify payment status with MyFatoorah. Please contact support.")
+        return redirect(f'/{locale}/checkout/')
+
+    raw_data = status_res.get('raw', {})
+    cust_ref = raw_data.get('CustomerReference')
+    invoice_id = status_res.get('invoice_id')
+    is_paid = status_res.get('is_paid')
+    amount_paid = status_res.get('amount')
+    tx_id = status_res.get('transaction_id')
+
+    # Match order via CustomerReference (Order PK) or invoice_id or session
+    order = None
+    if cust_ref:
+        try:
+            order = Order.objects.filter(pk=int(cust_ref)).first()
+        except (ValueError, TypeError):
+            pass
+    if not order and invoice_id:
+        order = Order.objects.filter(fatoorah_invoice_id=str(invoice_id)).first()
+    if not order:
+        pending_id = request.session.get('pending_order_id')
+        if pending_id:
+            order = Order.objects.filter(pk=pending_id).first()
+
+    if not order:
+        logger.error(f"Order not found for MyFatoorah callback: cust_ref={cust_ref}, invoice_id={invoice_id}")
+        messages.error(request, "Order record could not be matched. If debited, please contact store support.")
+        return redirect(f'/{locale}/')
+
+    # Security check: verify paid amount matches order total (tolerance 0.10 QAR)
+    if abs(float(order.total) - float(amount_paid)) > 0.10:
+        logger.error(f"Payment amount mismatch for Order #{order.pk}: expected {order.total}, paid {amount_paid}")
+        messages.error(request, "Security alert: Paid amount did not match order total.")
+        return redirect(f'/{locale}/')
+
+    if is_paid:
+        # Idempotency check: process order confirmation only once
+        if order.payment_status != 'paid':
+            order.payment_status = 'paid'
+            order.status = 'confirmed'
+            order.fatoorah_payment_id = str(payment_id)
+            order.fatoorah_transaction_id = str(tx_id)
+            order.payment_response_json = json.dumps(raw_data)
+            order.save()
+
+            # Deduct stock for the confirmed order
+            for item in order.order_items.all():
+                if item.product and item.product.stock_count is not None:
+                    item.product.stock_count = max(0, item.product.stock_count - item.quantity)
+                    if item.product.stock_count == 0:
+                        item.product.in_stock = False
+                    item.product.save(update_fields=['stock_count', 'in_stock'])
+
+            # Send confirmation email
+            customer_email = order.customer_email
+            if customer_email:
+                try:
+                    send_mail(
+                        subject=f'Payment Confirmed — {order.order_number} | M.SHOP Qatar',
+                        message=render_to_string('emails/order_confirmation.txt', {
+                            'order': order,
+                            'items': order.items,
+                        }),
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[customer_email],
+                        fail_silently=True,
+                    )
+                except Exception as exc:
+                    logger.error(f"Order confirmation email failed: {exc}")
+
+        # Clear cart and pending session
+        request.session['cart'] = {}
+        request.session.pop('pending_order_id', None)
+        request.session.modified = True
+
+        return redirect(f'/{locale}/checkout/success/{order.pk}/')
+    else:
+        # Payment was declined, failed, or cancelled by user
+        order.payment_status = 'failed'
+        order.fatoorah_payment_id = str(payment_id)
+        order.payment_response_json = json.dumps(raw_data)
+        order.save(update_fields=['payment_status', 'fatoorah_payment_id', 'payment_response_json'])
+
+        return redirect(f'/{locale}/checkout/fatoorah/error/?order_id={order.pk}')
+
+
+def fatoorah_error_view(request):
+    """
+    Displays payment failure page and allows customer to retry without losing cart.
+    """
+    locale = _get_locale(request)
+    order_id = request.GET.get('order_id')
+    error_msg = request.GET.get('msg') or (
+        "تم إلغاء عملية الدفع أو رفضها من البنك المصدر للبطاقة. لم يتم خصم أي مبلغ."
+        if locale == 'ar'
+        else "The payment was cancelled or declined by the issuing bank. No funds have been deducted."
+    )
+
+    order = None
+    if order_id:
+        try:
+            order = Order.objects.filter(pk=int(order_id)).first()
+        except (ValueError, TypeError):
+            pass
+
+    if order and order.payment_status != 'paid':
+        order.payment_status = 'failed'
+        order.save(update_fields=['payment_status'])
+
+    return render(request, 'checkout/payment_error.html', {
+        'order': order,
+        'locale': locale,
+        'error_message': error_msg,
+    })
+
+
+@csrf_exempt
+@require_POST
+def fatoorah_webhook_view(request):
+    """
+    Instant Payment Notification (IPN) webhook handler.
+    Receives async event notifications directly from MyFatoorah servers.
+    """
+    try:
+        payload = json.loads(request.body.decode('utf-8'))
+    except Exception:
+        return JsonResponse({'status': 'invalid json'}, status=400)
+
+    event_type = payload.get('Event')
+    data = payload.get('Data', {})
+    invoice_id = data.get('InvoiceId')
+    payment_id = data.get('PaymentId')
+
+    logger.info(f"MyFatoorah IPN Webhook: Event={event_type}, InvoiceId={invoice_id}, PaymentId={payment_id}")
+
+    if payment_id:
+        status_res = get_payment_status(payment_id, key_type="PaymentId")
+        if status_res.get('success') and status_res.get('is_paid'):
+            cust_ref = status_res.get('raw', {}).get('CustomerReference')
+            order = None
+            if cust_ref:
+                try:
+                    order = Order.objects.filter(pk=int(cust_ref)).first()
+                except Exception:
+                    pass
+            if not order and invoice_id:
+                order = Order.objects.filter(fatoorah_invoice_id=str(invoice_id)).first()
+
+            if order and order.payment_status != 'paid':
+                order.payment_status = 'paid'
+                order.status = 'confirmed'
+                order.fatoorah_payment_id = str(payment_id)
+                order.fatoorah_transaction_id = str(status_res.get('transaction_id', ''))
+                order.payment_response_json = json.dumps(status_res.get('raw', {}))
+                order.save()
+
+                for item in order.order_items.all():
+                    if item.product and item.product.stock_count is not None:
+                        item.product.stock_count = max(0, item.product.stock_count - item.quantity)
+                        if item.product.stock_count == 0:
+                            item.product.in_stock = False
+                        item.product.save(update_fields=['stock_count', 'in_stock'])
+
+    return JsonResponse({'status': 'received'})
 
 
 # ─── AUTH ───────────────────────────────────────────────────────

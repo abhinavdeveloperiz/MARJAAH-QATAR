@@ -617,12 +617,12 @@ body .text-muted,
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 11px 16px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--border-subtle);
-  transition: background 0.15s ease;
+  transition: all 0.15s ease;
   width: 100%;
   box-sizing: border-box;
-  background: #ffffff;
+  gap: 8px;
 }
 
 .model-row:last-child {
@@ -634,74 +634,76 @@ body .text-muted,
 }
 
 .model-row:hover .model-icon-pill {
-  transform: scale(1.06);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
 }
 
 .model-info {
   display: flex;
   align-items: center;
+  flex: 1 1 auto;
   min-width: 0;
-  padding-right: 8px;
+  padding-right: 4px;
 }
 
 /* Model Icon Mini Capsule */
 .model-icon-pill {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
-  font-size: 0.88rem;
-  background: #f1f5f9;
-  color: #4f46e5;
-  border: 1px solid #e2e8f0;
+  margin-right: 9px;
+  font-size: 0.82rem;
+  background: rgba(99, 102, 241, 0.12);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.2);
   flex-shrink: 0;
   transition: all 0.2s ease;
 }
 
-/* Model Name Link - High Contrast & Ellipsis Safe */
+/* Model Name Link - High Contrast & Safe Layout */
 .model-name-link {
-  color: #0f172a !important;
+  color: #f8fafc !important;
   font-weight: 600 !important;
-  font-size: 0.90rem !important;
+  font-size: 0.86rem !important;
   text-decoration: none !important;
   transition: all 0.15s ease !important;
-  display: inline-flex !important;
-  align-items: center !important;
+  display: inline-block !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
 }
 
 .model-name-link:hover {
   color: var(--text-accent) !important;
-  transform: translateX(2px) !important;
 }
 
 /* Model Actions Container */
 .model-actions-wrap {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 /* Model Action Button: Add */
 .btn-action-add {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 4px !important;
-  border: 1px solid #c7d2fe !important;
-  background: #eef2ff !important;
-  color: #4338ca !important;
+  gap: 3px !important;
+  border: 1px solid rgba(99, 102, 241, 0.35) !important;
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #a5b4fc !important;
   border-radius: 20px !important;
   font-weight: 600 !important;
-  font-size: 0.73rem !important;
+  font-size: 0.70rem !important;
   line-height: 1 !important;
-  padding: 5px 11px !important;
+  padding: 4px 8px !important;
   transition: all 0.18s ease !important;
   text-decoration: none !important;
   cursor: pointer !important;
@@ -713,7 +715,7 @@ body .text-muted,
   border-color: #4f46e5 !important;
   color: #ffffff !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 3px 10px rgba(99, 102, 241, 0.35) !important;
+  box-shadow: 0 3px 8px rgba(99, 102, 241, 0.4) !important;
 }
 
 .btn-action-add i {
@@ -724,16 +726,16 @@ body .text-muted,
 .btn-action-manage {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 5px !important;
+  gap: 4px !important;
   background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
   border: none !important;
   color: #ffffff !important;
   border-radius: 20px !important;
   font-weight: 600 !important;
-  font-size: 0.73rem !important;
+  font-size: 0.70rem !important;
   line-height: 1 !important;
-  padding: 5px 12px !important;
-  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3) !important;
+  padding: 4px 9px !important;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3) !important;
   transition: all 0.18s ease !important;
   text-decoration: none !important;
   cursor: pointer !important;
@@ -743,12 +745,12 @@ body .text-muted,
 .btn-action-manage:hover {
   background: linear-gradient(135deg, #4338ca 0%, #4f46e5 100%) !important;
   transform: translateY(-1px) !important;
-  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45) !important;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.5) !important;
   color: #ffffff !important;
 }
 
 .btn-action-manage i {
-  font-size: 0.68rem !important;
+  font-size: 0.65rem !important;
   transition: transform 0.18s ease;
 }
 
@@ -756,7 +758,24 @@ body .text-muted,
   transform: translateX(2px);
 }
 
-/* ─── GLOBAL LIGHT ADMIN BUTTONS ─────────────────────────────────────────── */
+/* Responsive Action Buttons: hide text labels on dense screens to protect model name visibility */
+@media (max-width: 1420px) and (min-width: 1200px) {
+  .btn-action-add .action-label,
+  .btn-action-manage .action-label {
+    display: none !important;
+  }
+  .btn-action-add {
+    padding: 5px 8px !important;
+  }
+  .btn-action-manage {
+    padding: 5px 8px !important;
+  }
+  .model-name-link {
+    font-size: 0.84rem !important;
+  }
+}
+
+/* ─── GLOBAL LUXURY ADMIN BUTTONS ───────────────────────────────────────── */
 .btn-primary {
   background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
   border: none !important;
