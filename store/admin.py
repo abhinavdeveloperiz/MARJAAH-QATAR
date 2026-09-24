@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html, mark_safe
 from .models import (User, Category, Subcategory, Brand, Product,
-                     ProductImage, Address, Order, OrderItem, ContactMessage, Banner, LoginOTP)
+                     ProductImage, Address, Order, OrderItem, ContactMessage, Banner)
 
 
 @admin.register(User)
@@ -511,27 +511,3 @@ class BannerAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank" class="text-primary"><i class="fas fa-external-link-alt"></i> Link</a>', obj.link_url)
         return '-'
     link_preview.short_description = 'Destination Link'
-
-
-@admin.register(LoginOTP)
-class LoginOTPAdmin(admin.ModelAdmin):
-    list_display = ('user_email', 'code_badge', 'status_badge', 'attempts', 'created_at', 'expires_at')
-    list_filter = ('is_used', 'created_at')
-    search_fields = ('user__email', 'user__username', 'code')
-    readonly_fields = ('user', 'code', 'created_at', 'expires_at', 'is_used', 'attempts')
-
-    def user_email(self, obj):
-        return obj.user.email or obj.user.username
-    user_email.short_description = 'User'
-
-    def code_badge(self, obj):
-        return format_html('<code style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;padding:2px 8px;border-radius:6px;font-weight:700;letter-spacing:2px;">{}</code>', obj.code)
-    code_badge.short_description = 'OTP Code'
-
-    def status_badge(self, obj):
-        if obj.is_used:
-            return format_html('<span class="badge badge-success" style="font-size:11px;">Verified / Used</span>')
-        elif obj.is_expired:
-            return format_html('<span class="badge badge-secondary" style="font-size:11px;">Expired</span>')
-        return format_html('<span class="badge badge-warning" style="font-size:11px;">Active / Pending</span>')
-    status_badge.short_description = 'Status'

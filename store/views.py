@@ -19,8 +19,8 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from .models import Product, Category, Brand, Address, Order, OrderItem, ContactMessage, User, Banner, LoginOTP
-from .forms import (LoginForm, RegisterForm, VerifyOTPForm, ForgotPasswordForm, SetNewPasswordForm,
+from .models import Product, Category, Brand, Address, Order, OrderItem, ContactMessage, User, Banner
+from .forms import (LoginForm, RegisterForm, ForgotPasswordForm, SetNewPasswordForm,
                     AddressForm, CheckoutForm, ProfileForm, ContactForm)
 from .fatoorah import execute_payment, get_payment_status, generate_qr_base64
 
@@ -800,68 +800,7 @@ def fatoorah_webhook_view(request):
     return JsonResponse({'status': 'received'})
 
 
-# ─── AUTH & OTP ──────────────────────────────────────────────────
-def _mask_email(email):
-    if not email or '@' not in email:
-        return email
-    user_part, domain_part = email.split('@', 1)
-    if len(user_part) <= 2:
-        masked_user = user_part[0] + '*'
-    else:
-        masked_user = user_part[0] + ('*' * (len(user_part) - 2)) + user_part[-1]
-    return f"{masked_user}@{domain_part}"
-
-
-def _send_otp_email(email, code, user_name='', purpose='login', locale='en'):
-    if purpose in ('registration', 'register'):
-        subject = 'M.SHOP Qatar — Email Verification Code' if locale != 'ar' else 'متجر قطر للتقنية M.SHOP — رمز تأكيد الحساب البريدي'
-    else:
-        subject = 'M.SHOP Qatar — Login Verification Code' if locale != 'ar' else 'متجر قطر للتقنية M.SHOP — رمز التحقق لتسجيل الدخول'
-
-    ctx = {
-        'user_name': user_name,
-        'otp_code': code,
-        'purpose': purpose,
-        'locale': locale,
-        'is_rtl': locale == 'ar',
-    }
-    text_content = render_to_string('emails/login_otp.txt', ctx)
-    html_content = render_to_string('emails/login_otp.html', ctx)
-
-    try:
-        msg = EmailMultiAlternatives(
-            subject=subject,
-            body=text_content,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            to=[email],
-        )
-        msg.attach_alternative(html_content, "text/html")
-        msg.send(fail_silently=False)
-        logger.info(f"📧 [OTP SENT] {purpose} OTP sent to {email} (code: {code})")
-        return True
-    except Exception as e:
-        logger.error(f"Failed to send {purpose} OTP email to {email}: {e}")
-        return False
-
-
-def _generate_and_send_login_otp(user, request, locale='en'):
-    # Invalidate previous unused OTPs for this user
-    LoginOTP.objects.filter(user=user, is_used=False).update(is_used=True)
-
-    # Generate 6-digit cryptographic security code
-    code = ''.join(secrets.choice('0123456789') for _ in range(6))
-    expires_at = timezone.now() + timedelta(minutes=10)
-
-    LoginOTP.objects.create(
-        user=user,
-        code=code,
-        expires_at=expires_at,
-    )
-
-    user_name = user.get_full_name() or user.username
-    return _send_otp_email(user.email, code, user_name=user_name, purpose='login', locale=locale)
-
-
+# ─── AUTH ────────────────────────────────────────────────────────
 def login_view(request):
     locale = _get_locale(request)
     next_url = request.POST.get('next') or request.GET.get('next') or f'/{locale}/'
@@ -878,197 +817,13 @@ def login_view(request):
                 user_obj = User.objects.get(email__iexact=email)
                 user = authenticate(request, username=user_obj.username, password=password)
                 if user:
-                    # Generate OTP and send email
-                    _generate_and_send_login_otp(user, request, locale=locale)
-                    request.session['pre_otp_mode'] = 'login'
-                    request.session['pre_otp_user_id'] = user.pk
-                    request.session['pre_otp_email'] = user.email
-                    request.session['pre_otp_next_url'] = next_url
-                    request.session['otp_last_sent'] = timezone.now().timestamp()
-                    request.session.pop('pending_registration', None)
-                    return redirect(f'/{locale}/auth/verify-otp/')
+                    login(request, user)
+                    return redirect(next_url)
                 else:
                     error = 'Invalid password.' if locale != 'ar' else 'كلمة المرور غير صحيحة.'
             except User.DoesNotExist:
                 error = 'No account found with that email.' if locale != 'ar' else 'لم يتم العثور على حساب بهذا البريد الإلكتروني.'
     return render(request, 'auth/login.html', {'form': form, 'error': error, 'locale': locale, 'next': next_url})
-
-
-def verify_otp_view(request):
-    locale = _get_locale(request)
-    mode = request.session.get('pre_otp_mode')
-    if not mode:
-        if request.session.get('pending_registration'):
-            mode = 'register'
-        elif request.session.get('pre_otp_user_id'):
-            mode = 'login'
-        else:
-            return redirect(f'/{locale}/auth/login/')
-
-    next_url = request.session.get('pre_otp_next_url') or f'/{locale}/'
-    error = None
-
-    if mode == 'register':
-        pending = request.session.get('pending_registration')
-        if not pending or not pending.get('email'):
-            request.session.pop('pending_registration', None)
-            request.session.pop('pre_otp_mode', None)
-            return redirect(f'/{locale}/auth/register/')
-
-        masked_email = _mask_email(pending['email'])
-
-        if request.method == 'POST':
-            form = VerifyOTPForm(request.POST)
-            if form.is_valid():
-                submitted_code = form.cleaned_data['otp'].strip()
-                now_ts = timezone.now().timestamp()
-
-                if now_ts > float(pending.get('expires_at', 0)):
-                    error = 'This verification code has expired. Please request a new code.' if locale != 'ar' else 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.'
-                elif int(pending.get('attempts', 0)) >= 5:
-                    error = 'Too many failed attempts. Please request a new code.' if locale != 'ar' else 'تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.'
-                elif pending.get('otp_code') != submitted_code:
-                    pending['attempts'] = int(pending.get('attempts', 0)) + 1
-                    request.session['pending_registration'] = pending
-                    request.session.modified = True
-                    remaining = max(0, 5 - pending['attempts'])
-                    if locale != 'ar':
-                        error = f'Invalid verification code. ({remaining} attempt{"s" if remaining != 1 else ""} remaining)'
-                    else:
-                        error = f'رمز التحقق غير صحيح. (متبقي {remaining} محاولات)'
-                else:
-                    # OTP is valid! Check uniqueness before saving to DB
-                    email = pending['email']
-                    if User.objects.filter(email__iexact=email).exists() or User.objects.filter(username__iexact=email).exists():
-                        error = 'An account with this email was already registered. Please sign in.' if locale != 'ar' else 'تم تسجيل هذا الحساب مسبقاً. يرجى تسجيل الدخول.'
-                    else:
-                        # CREATE AND SAVE USER IN DATABASE & ADMIN PANEL (Only after OTP is verified!)
-                        user = User.objects.create_user(
-                            username=email,
-                            email=email,
-                            password=pending['password'],
-                            first_name=pending.get('first_name', ''),
-                            last_name=pending.get('last_name', ''),
-                            phone=pending.get('phone', ''),
-                        )
-                        # Authenticate and log in
-                        login(request, user)
-                        # Clean up session
-                        request.session.pop('pending_registration', None)
-                        request.session.pop('pre_otp_mode', None)
-                        request.session.pop('pre_otp_email', None)
-                        request.session.pop('pre_otp_next_url', None)
-                        request.session.pop('otp_last_sent', None)
-                        welcome_msg = 'Welcome to M.SHOP Qatar! Your email has been verified.' if locale != 'ar' else 'مرحباً بك في متجر M.SHOP! تم تأكيد بريدك الإلكتروني بنجاح.'
-                        messages.success(request, welcome_msg)
-                        return redirect(next_url)
-            else:
-                error = 'Please enter a valid 6-digit code.' if locale != 'ar' else 'يرجى إدخال رمز تحقق صحيح مكون من 6 أرقام.'
-
-    else:  # mode == 'login'
-        user_id = request.session.get('pre_otp_user_id')
-        if not user_id:
-            return redirect(f'/{locale}/auth/login/')
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            request.session.pop('pre_otp_user_id', None)
-            request.session.pop('pre_otp_mode', None)
-            return redirect(f'/{locale}/auth/login/')
-
-        masked_email = _mask_email(user.email)
-
-        if request.method == 'POST':
-            form = VerifyOTPForm(request.POST)
-            if form.is_valid():
-                submitted_code = form.cleaned_data['otp'].strip()
-                otp_obj = LoginOTP.objects.filter(user=user, is_used=False).order_by('-created_at').first()
-
-                if not otp_obj:
-                    error = 'No active verification code found. Please click Resend Code.' if locale != 'ar' else 'لا يوجد رمز تحقق نشط. يرجى النقر على إعادة إرسال الرمز.'
-                elif otp_obj.is_expired:
-                    error = 'This verification code has expired. Please request a new code.' if locale != 'ar' else 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.'
-                elif otp_obj.attempts >= 5:
-                    error = 'Too many failed attempts. Please request a new code.' if locale != 'ar' else 'تم تجاوز الحد الأقصى للمحاولات. يرجى طلب رمز جديد.'
-                elif otp_obj.code != submitted_code:
-                    otp_obj.attempts += 1
-                    otp_obj.save(update_fields=['attempts'])
-                    remaining = max(0, 5 - otp_obj.attempts)
-                    if locale != 'ar':
-                        error = f'Invalid verification code. ({remaining} attempt{"s" if remaining != 1 else ""} remaining)'
-                    else:
-                        error = f'رمز التحقق غير صحيح. (متبقي {remaining} محاولات)'
-                else:
-                    otp_obj.is_used = True
-                    otp_obj.save(update_fields=['is_used'])
-                    login(request, user)
-                    request.session.pop('pre_otp_user_id', None)
-                    request.session.pop('pre_otp_mode', None)
-                    request.session.pop('pre_otp_email', None)
-                    request.session.pop('pre_otp_next_url', None)
-                    request.session.pop('otp_last_sent', None)
-                    return redirect(next_url)
-            else:
-                error = 'Please enter a valid 6-digit code.' if locale != 'ar' else 'يرجى إدخال رمز تحقق صحيح مكون من 6 أرقام.'
-
-    return render(request, 'auth/verify_otp.html', {
-        'masked_email': masked_email,
-        'error': error,
-        'locale': locale,
-        'is_rtl': locale == 'ar',
-        'next': next_url,
-        'mode': mode,
-    })
-
-
-@require_POST
-def resend_otp_view(request):
-    locale = _get_locale(request)
-    mode = request.session.get('pre_otp_mode')
-    if not mode:
-        if request.session.get('pending_registration'):
-            mode = 'register'
-        elif request.session.get('pre_otp_user_id'):
-            mode = 'login'
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Session expired. Please sign in or register again.'}, status=401)
-
-    last_sent = request.session.get('otp_last_sent')
-    now_ts = timezone.now().timestamp()
-    if last_sent and (now_ts - float(last_sent)) < 30:
-        msg = 'Please wait a moment before requesting another code.' if locale != 'ar' else 'يرجى الانتظار قليلاً قبل طلب رمز جديد.'
-        return JsonResponse({'status': 'error', 'message': msg}, status=429)
-
-    if mode == 'register':
-        pending = request.session.get('pending_registration')
-        if not pending or not pending.get('email'):
-            return JsonResponse({'status': 'error', 'message': 'Registration session expired.'}, status=401)
-        code = ''.join(secrets.choice('0123456789') for _ in range(6))
-        expires_at = timezone.now() + timedelta(minutes=10)
-        pending['otp_code'] = code
-        pending['expires_at'] = expires_at.timestamp()
-        pending['attempts'] = 0
-        request.session['pending_registration'] = pending
-        request.session['otp_last_sent'] = now_ts
-        request.session.modified = True
-        success = _send_otp_email(pending['email'], code, user_name=pending.get('full_name', ''), purpose='registration', locale=locale)
-    else:  # login
-        user_id = request.session.get('pre_otp_user_id')
-        if not user_id:
-            return JsonResponse({'status': 'error', 'message': 'Session expired. Please sign in again.'}, status=401)
-        try:
-            user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'User not found.'}, status=404)
-        success = _generate_and_send_login_otp(user, request, locale=locale)
-        request.session['otp_last_sent'] = now_ts
-
-    if success:
-        msg = 'A new 6-digit verification code has been sent to your email.' if locale != 'ar' else 'تم إرسال رمز تحقق جديد مكون من 6 أرقام إلى بريدك الإلكتروني.'
-        return JsonResponse({'status': 'ok', 'message': msg})
-    else:
-        msg = 'Verification code has been generated. (Check your email inbox or console)' if locale != 'ar' else 'تم إنشاء رمز التحقق. يرجى التحقق من بريدك الإلكتروني.'
-        return JsonResponse({'status': 'ok', 'message': msg})
 
 
 def register_view(request):
@@ -1087,31 +842,18 @@ def register_view(request):
                 error = 'An account with this email already exists.' if locale != 'ar' else 'يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل.'
             else:
                 names = cd['full_name'].strip().split(' ', 1)
-                code = ''.join(secrets.choice('0123456789') for _ in range(6))
-                expires_at = timezone.now() + timedelta(minutes=10)
-                
-                # Store pending registration in session (Account is NOT created in DB yet!)
-                request.session['pending_registration'] = {
-                    'email': email,
-                    'password': cd['password'],
-                    'first_name': names[0],
-                    'last_name': names[1] if len(names) > 1 else '',
-                    'phone': cd.get('phone', ''),
-                    'full_name': cd['full_name'].strip(),
-                    'otp_code': code,
-                    'expires_at': expires_at.timestamp(),
-                    'attempts': 0,
-                    'next_url': next_url,
-                }
-                request.session['pre_otp_mode'] = 'register'
-                request.session['pre_otp_email'] = email
-                request.session['pre_otp_next_url'] = next_url
-                request.session['otp_last_sent'] = timezone.now().timestamp()
-                request.session.pop('pre_otp_user_id', None)
-
-                # Send email verification code
-                _send_otp_email(email, code, user_name=cd['full_name'].strip(), purpose='registration', locale=locale)
-                return redirect(f'/{locale}/auth/verify-otp/')
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=cd['password'],
+                    first_name=names[0],
+                    last_name=names[1] if len(names) > 1 else '',
+                    phone=cd.get('phone', ''),
+                )
+                login(request, user)
+                welcome_msg = 'Welcome to M.SHOP Qatar! Your account has been created.' if locale != 'ar' else 'مرحباً بك في متجر M.SHOP! تم إنشاء حسابك بنجاح.'
+                messages.success(request, welcome_msg)
+                return redirect(next_url)
     return render(request, 'auth/register.html', {'form': form, 'error': error, 'locale': locale, 'next': next_url})
 
 
