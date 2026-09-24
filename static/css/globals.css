@@ -945,3 +945,105 @@ html:not(.dark) #main-navbar .lang-switcher-wrap {
 html:not(.dark) #main-navbar .lang-switcher-wrap button:not([style*="background:#4063B2"]):not([style*="background: rgb(64, 99, 178)"]) {
   color: #334155 !important;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   STOREFRONT RESPONSIVE DESIGN SYSTEM (MOBILE, TABLET, LAPTOP, DESKTOP)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. MOBILE PHONES (< 640px) ─────────────────────────────────────────── */
+@media (max-width: 639.98px) {
+  /* Fluid Hero Typography */
+  h1.hero-title,
+  .hero-headline {
+    font-size: clamp(1.85rem, 7.5vw, 2.75rem) !important;
+    line-height: 1.15 !important;
+  }
+
+  /* Compact Product Grid Cards on Phone (2 Columns) */
+  .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  .product-card {
+    padding: 0.75rem !important;
+    border-radius: 1rem !important;
+  }
+
+  .product-card .product-title {
+    font-size: 0.82rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .product-card .price-tag {
+    font-size: 0.95rem !important;
+  }
+
+  /* Category Scroll Container */
+  .category-scroll-strip {
+    display: flex !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    scroll-snap-type: x mandatory;
+    gap: 0.75rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+
+  .category-scroll-strip > * {
+    flex: 0 0 130px !important;
+    scroll-snap-align: start;
+  }
+
+  /* Mobile Checkout Stepper & Summary */
+  .checkout-container {
+    flex-direction: column !important;
+  }
+
+  .checkout-sidebar {
+    width: 100% !important;
+    margin-top: 1.5rem !important;
+  }
+
+  /* Payment Method Options Grid */
+  .payment-method-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Touch-friendly Action Buttons */
+  button,
+  .btn-primary,
+  .btn-secondary,
+  a.btn {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
+/* ─── 2. TABLETS & SMALL LAPTOPS (640px to 1023.98px) ─────────────────────── */
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .product-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  .product-detail-layout {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ─── 3. LAPTOPS & DESKTOPS (1024px to 1535.98px) ─────────────────────────── */
+@media (min-width: 1024px) and (max-width: 1535.98px) {
+  .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 1.25rem !important;
+  }
+}
+
+/* ─── 4. ULTRA-WIDE SCREENS (min-width: 1536px) ───────────────────────────── */
+@media (min-width: 1536px) {
+  .product-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+}

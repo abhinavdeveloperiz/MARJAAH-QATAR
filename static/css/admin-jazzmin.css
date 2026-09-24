@@ -1538,3 +1538,313 @@ fieldset h2 {
 .app-footer .footer-right b {
   color: var(--text-secondary) !important;
 }
+
+/* ==========================================================================
+   MULTI-DEVICE RESPONSIVE DESIGN SYSTEM (MOBILE, TABLET, LAPTOP, DESKTOP)
+   ========================================================================== */
+
+/* ─── 1. SMALL MOBILE PHONES (max-width: 575.98px) ────────────────────────── */
+@media (max-width: 575.98px) {
+  /* Layout & Spacing */
+  .content-wrapper,
+  .app-main,
+  .app-content {
+    padding: 0.85rem !important;
+  }
+
+  /* Top Navbar */
+  .app-header,
+  .main-header.navbar {
+    padding: 0.4rem 0.75rem !important;
+  }
+
+  .app-header .nav-link,
+  .main-header .nav-link {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Navbar Search on Mobile */
+  .form-inline {
+    display: none !important;
+  }
+
+  /* Executive Banner */
+  .luxury-banner {
+    padding: 1.25rem 1rem !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  .luxury-title {
+    font-size: 1.35rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .luxury-subtitle {
+    font-size: 0.8rem !important;
+  }
+
+  .luxury-banner .d-flex.gap-2 {
+    width: 100% !important;
+    margin-top: 1rem !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .luxury-banner .btn {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 8px 14px !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* Dashboard Cards */
+  .luxury-model-card {
+    border-radius: var(--radius-md) !important;
+    margin-bottom: 1rem !important;
+  }
+
+  .luxury-card-header {
+    padding: 12px 14px !important;
+  }
+
+  .model-row {
+    padding: 10px 12px !important;
+  }
+
+  .model-name-link {
+    font-size: 0.86rem !important;
+  }
+
+  .btn-action-add,
+  .btn-action-manage {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.82rem !important;
+  }
+
+  /* Changelist & Table Overrides */
+  #changelist-search .form-group {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  #changelist-search input[type="text"] {
+    width: 100% !important;
+    border-radius: var(--radius-md) !important;
+    margin-bottom: 6px !important;
+  }
+
+  #changelist-search input[type="submit"] {
+    width: 100% !important;
+    border-radius: var(--radius-md) !important;
+  }
+
+  #changelist .actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    padding: 10px 12px !important;
+  }
+
+  #changelist .actions select {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  #changelist .actions button.button,
+  #changelist .actions input.button,
+  #changelist .actions .btn-primary {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .object-tools {
+    width: 100% !important;
+    margin-bottom: 0.75rem !important;
+  }
+
+  .object-tools a,
+  .object-tools a.btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Tables: Smooth Touch Scroll on Phone */
+  .table-responsive,
+  #changelist .results {
+    border-radius: var(--radius-md) !important;
+    -webkit-overflow-scrolling: touch !important;
+    overflow-x: auto !important;
+  }
+
+  .table tbody td,
+  #result_list tbody td {
+    padding: 10px 12px !important;
+    font-size: 0.82rem !important;
+    white-space: nowrap !important;
+  }
+
+  .table thead th,
+  #result_list thead th {
+    padding: 10px 12px !important;
+    font-size: 0.68rem !important;
+  }
+
+  /* Change Forms on Mobile */
+  .form-row, .form-group {
+    padding: 10px 14px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .form-row label,
+  .form-group label {
+    margin-bottom: 6px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .form-row input[type="text"],
+  .form-row input[type="password"],
+  .form-row input[type="email"],
+  .form-row input[type="number"],
+  .form-row select,
+  .form-row textarea {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .submit-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+    padding: 12px 14px !important;
+  }
+
+  .submit-row input,
+  .submit-row .btn,
+  .submit-row a {
+    width: 100% !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
+
+  /* Footer on Mobile */
+  .main-footer .footer-inner,
+  .app-footer .footer-inner {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 8px !important;
+  }
+
+  .main-footer .footer-left,
+  .main-footer .footer-right,
+  .app-footer .footer-left,
+  .app-footer .footer-right {
+    white-space: normal !important;
+    font-size: 0.78rem !important;
+  }
+}
+
+/* ─── 2. TABLETS & LARGE PHONES (576px to 991.98px) ───────────────────────── */
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .content-wrapper,
+  .app-main,
+  .app-content {
+    padding: 1.15rem !important;
+  }
+
+  .luxury-banner {
+    padding: 1.5rem 1.25rem !important;
+  }
+
+  .luxury-title {
+    font-size: 1.6rem !important;
+  }
+
+  /* Form inline search input */
+  .form-inline .form-control {
+    width: 130px !important;
+  }
+
+  .form-inline .form-control:focus {
+    width: 170px !important;
+  }
+
+  /* Responsive Table touch scrolling */
+  .table-responsive,
+  #changelist .results {
+    -webkit-overflow-scrolling: touch !important;
+    overflow-x: auto !important;
+  }
+
+  /* Actions bar wrapping */
+  #changelist .actions {
+    flex-wrap: wrap !important;
+  }
+
+  /* Form labels & inputs */
+  .form-row {
+    padding: 12px 16px !important;
+  }
+}
+
+/* ─── 3. LAPTOPS & SMALL DESKTOPS (992px to 1399.98px) ────────────────────── */
+@media (min-width: 992px) and (max-width: 1399.98px) {
+  .content-wrapper,
+  .app-main,
+  .app-content {
+    padding: 1.5rem !important;
+  }
+
+  .form-inline .form-control {
+    width: 160px !important;
+  }
+
+  .form-inline .form-control:focus {
+    width: 210px !important;
+  }
+}
+
+/* ─── 4. ULTRA-WIDE & LARGE DESKTOPS (min-width: 1400px) ──────────────────── */
+@media (min-width: 1400px) {
+  .content-wrapper,
+  .app-main,
+  .app-content {
+    padding: 2rem !important;
+    max-width: 1800px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .luxury-banner {
+    padding: 2rem 2.5rem !important;
+  }
+
+  .luxury-title {
+    font-size: 2rem !important;
+  }
+
+  .luxury-subtitle {
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ─── 5. HIGH-DPI & TOUCH SCREENS ─────────────────────────────────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Enlarge touch targets for mobile and tablet fingers */
+  .btn,
+  .nav-link,
+  .btn-action-add,
+  .btn-action-manage,
+  .page-link,
+  .object-tools a,
+  #changelist .actions button.button {
+    min-height: 38px !important;
+    touch-action: manipulation !important;
+  }
+
+  .sidebar .nav-link,
+  .app-sidebar .nav-link {
+    padding: 11px 14px !important;
+  }
+}
