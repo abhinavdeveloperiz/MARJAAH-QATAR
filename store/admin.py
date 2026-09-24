@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.html import format_html, mark_safe
 from .models import (User, Category, Subcategory, Brand, Product,
-                     ProductImage, Address, Order, OrderItem, ContactMessage, Banner)
+                     ProductImage, Address, Order, OrderItem, ContactMessage, Banner, LoginOTP)
 
 
 @admin.register(User)
@@ -35,8 +35,8 @@ class CategoryAdmin(admin.ModelAdmin):
     def category_thumb(self, obj):
         img_url = obj.image_url
         if img_url:
-            return format_html('<img src="{}" class="admin-thumb" onerror="this.src=\'/static/images/placeholder.svg\'" />', img_url)
-        return format_html('<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-folder fa-lg"></i></div>')
+            return format_html('<img src="{}" class="admin-thumb" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />', img_url)
+        return format_html('<div class="admin-thumb" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f1f5f9;border-radius:8px;border:1px solid #e2e8f0;"><i class="fas fa-folder fa-lg"></i></div>')
     category_thumb.short_description = 'Cover'
 
     def category_thumb_large(self, obj):
@@ -66,8 +66,8 @@ class BrandAdmin(admin.ModelAdmin):
     def brand_logo_thumb(self, obj):
         logo_url = obj.logo_url
         if logo_url:
-            return format_html('<img src="{}" class="admin-thumb" style="background:#fff;" onerror="this.src=\'/static/images/placeholder.svg\'" />', logo_url)
-        return format_html('<div class="admin-thumb" style="display:flex;align-items:center;justify-content:center;color:#94a3b8;"><i class="fas fa-tag fa-lg"></i></div>')
+            return format_html('<img src="{}" class="admin-thumb" style="width:48px;height:48px;object-fit:contain;background:#fff;border-radius:8px;border:1px solid #e2e8f0;padding:3px;" onerror="this.src=\'/static/images/placeholder.svg\'" />', logo_url)
+        return format_html('<div class="admin-thumb" style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;color:#94a3b8;background:#f1f5f9;border-radius:8px;border:1px solid #e2e8f0;"><i class="fas fa-tag fa-lg"></i></div>')
     brand_logo_thumb.short_description = 'Logo'
 
     def brand_logo_thumb_large(self, obj):
@@ -142,7 +142,7 @@ class ProductAdmin(admin.ModelAdmin):
     def thumbnail_preview(self, obj):
         img_url = obj.first_image
         return format_html(
-            '<img src="{}" class="admin-thumb" alt="{}" onerror="this.src=\'/static/images/placeholder.svg\'" />',
+            '<img src="{}" class="admin-thumb" alt="{}" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #e2e8f0;" onerror="this.src=\'/static/images/placeholder.svg\'" />',
             img_url, obj.name
         )
     thumbnail_preview.short_description = 'Photo'
@@ -511,3 +511,27 @@ class BannerAdmin(admin.ModelAdmin):
             return format_html('<a href="{}" target="_blank" class="text-primary"><i class="fas fa-external-link-alt"></i> Link</a>', obj.link_url)
         return '-'
     link_preview.short_description = 'Destination Link'
+
+
+@admin.register(LoginOTP)
+class LoginOTPAdmin(admin.ModelAdmin):
+    list_display = ('user_email', 'code_badge', 'status_badge', 'attempts', 'created_at', 'expires_at')
+    list_filter = ('is_used', 'created_at')
+    search_fields = ('user__email', 'user__username', 'code')
+    readonly_fields = ('user', 'code', 'created_at', 'expires_at', 'is_used', 'attempts')
+
+    def user_email(self, obj):
+        return obj.user.email or obj.user.username
+    user_email.short_description = 'User'
+
+    def code_badge(self, obj):
+        return format_html('<code style="background:#eef2ff;color:#4f46e5;border:1px solid #c7d2fe;padding:2px 8px;border-radius:6px;font-weight:700;letter-spacing:2px;">{}</code>', obj.code)
+    code_badge.short_description = 'OTP Code'
+
+    def status_badge(self, obj):
+        if obj.is_used:
+            return format_html('<span class="badge badge-success" style="font-size:11px;">Verified / Used</span>')
+        elif obj.is_expired:
+            return format_html('<span class="badge badge-secondary" style="font-size:11px;">Expired</span>')
+        return format_html('<span class="badge badge-warning" style="font-size:11px;">Active / Pending</span>')
+    status_badge.short_description = 'Status'

@@ -180,10 +180,13 @@ SESSION_COOKIE_AGE = 60 * 60 * 24 * 30  # 30 days
 # ─── EMAIL CONFIGURATION ──────────────────────────────────────────────────────
 # In development: emails are printed to the console
 # In production: set EMAIL_BACKEND + SMTP credentials via environment variables
-EMAIL_BACKEND = os.environ.get(
-    'EMAIL_BACKEND',
-    'django.core.mail.backends.console.EmailBackend'
-)
+_email_backend_env = os.environ.get('EMAIL_BACKEND')
+if _email_backend_env:
+    EMAIL_BACKEND = _email_backend_env
+elif os.environ.get('EMAIL_HOST_USER') and os.environ.get('EMAIL_HOST_PASSWORD'):
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' if DEBUG else 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
 EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
 EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1')
@@ -302,6 +305,7 @@ JAZZMIN_UI_TWEAKS = {
     "sidebar_nav_legacy_style": False,
     "sidebar_nav_flat_style": False,
     "theme": "default",
+    "default_theme_mode": "light",
     "dark_mode_theme": None,
     "button_classes": {
         "primary": "btn-primary",

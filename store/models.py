@@ -2,6 +2,7 @@ import json
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.text import slugify
+from django.utils import timezone
 
 
 class User(AbstractUser):
@@ -426,3 +427,28 @@ class Banner(models.Model):
             except Exception:
                 pass
         return self.image_url or '/images/hero-station.jpg'
+
+
+class LoginOTP(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='login_otps')
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    attempts = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'Login OTP'
+        verbose_name_plural = 'Login OTPs'
+
+    def __str__(self):
+        return f"OTP for {self.user.email} ({'Used' if self.is_used else 'Active'})"
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    @property
+    def is_valid(self):
+        return not self.is_used and not self.is_expired and self.attempts < 5

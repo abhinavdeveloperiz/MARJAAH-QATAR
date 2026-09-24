@@ -200,7 +200,13 @@
     "reset_arrive": "It may take a minute to arrive.",
     "welcome_back": "Welcome back!",
     "account_created": "Account created! Welcome to M.SHOP.",
-    "reset_sent_toast": "Reset link sent (demo — check your inbox)"
+    "reset_sent_toast": "Reset link sent (demo — check your inbox)",
+    "two_step_verification": "Two-Step Verification",
+    "verify_code": "Enter Security Code",
+    "otp_desc": "We've sent a 6-digit security code to your email",
+    "verify_btn": "Verify & Sign In",
+    "resend_code": "Resend Code",
+    "didnt_receive_code": "Didn't receive the code?"
   },
   "account": {
     "my_account": "My Account",

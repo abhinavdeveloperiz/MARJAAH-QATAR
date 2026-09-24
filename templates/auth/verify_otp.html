@@ -1,0 +1,302 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{% if is_rtl %}التحقق من رمز الدخول — متجر قطر للتقنية M.SHOP{% else %}Verify Login Code — M.SHOP Qatar{% endif %}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center px-4" style="background:var(--bg-base);padding-top:72px;padding-bottom:3rem">
+  <!-- Background glow -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] rounded-full opacity-10" style="background:radial-gradient(circle,#4063B2,transparent 70%)"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-md">
+    <div class="rounded-3xl p-8 shadow-2xl border animate-fade-in-up" style="background:var(--bg-surface);border-color:var(--border-color)">
+      
+      <!-- Icon & Header -->
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center border shadow-lg" style="background:rgba(64,99,178,0.12);border-color:rgba(141,156,245,0.3);color:var(--color-accent)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border mb-3" style="border-color:rgba(141,156,245,0.3);background:rgba(64,99,178,0.1)">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span class="text-[11px] font-bold uppercase tracking-widest" style="color:var(--color-accent)">
+            {% if is_rtl %}
+              {% if mode == 'register' %}تأكيد البريد الإلكتروني{% else %}التحقق بخطوتين{% endif %}
+            {% else %}
+              {% if mode == 'register' %}Email Verification{% else %}Two-Step Verification{% endif %}
+            {% endif %}
+          </span>
+        </div>
+
+        <h1 class="text-2xl font-display font-black mb-1.5" style="color:var(--text-primary)">
+          {% if is_rtl %}
+            {% if mode == 'register' %}تأكيد الحساب{% else %}رمز التحقق{% endif %}
+          {% else %}
+            {% if mode == 'register' %}Verify Your Email{% else %}Enter Security Code{% endif %}
+          {% endif %}
+        </h1>
+        <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">
+          {% if is_rtl %}
+            تم إرسال رمز أمان مكون من 6 أرقام إلى بريدك الإلكتروني<br>
+            <strong class="text-white font-mono text-xs">{{ masked_email }}</strong>
+          {% else %}
+            We've sent a 6-digit security code to your email<br>
+            <strong class="text-white font-mono text-xs">{{ masked_email }}</strong>
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Error / Success feedback -->
+      <div id="otp-status-message" class="hidden mb-5 p-3 rounded-xl border text-xs font-medium"></div>
+      {% if error %}
+      <div class="mb-5 p-3 rounded-xl border text-xs font-medium flex items-center gap-2" style="border-color:rgba(239,68,68,0.3);background:rgba(239,68,68,0.1);color:#f87171">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        <span>{{ error }}</span>
+      </div>
+      {% endif %}
+      {% if success_msg %}
+      <div class="mb-5 p-3 rounded-xl border text-xs font-medium flex items-center gap-2" style="border-color:rgba(34,197,94,0.3);background:rgba(34,197,94,0.1);color:#4ade80">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M20 6 9 17l-5-5"/></svg>
+        <span>{{ success_msg }}</span>
+      </div>
+      {% endif %}
+
+      <!-- Verification Form -->
+      <form method="post" id="otp-form" class="space-y-6">
+        {% csrf_token %}
+        <input type="hidden" name="otp" id="real-otp-input" value="" />
+
+        <!-- 6 Segmented Digit Inputs -->
+        <div>
+          <label class="block text-center text-xs font-bold mb-3 uppercase tracking-wider" style="color:var(--text-secondary)">
+            {% if is_rtl %}أدخل الرمز المكون من 6 أرقام{% else %}6-Digit Verification Code{% endif %}
+          </label>
+          <div class="flex justify-center gap-2 sm:gap-3" dir="ltr" id="otp-boxes">
+            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit-box w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500" style="background:var(--bg-base);border-color:var(--border-color);color:var(--text-primary)" data-index="0" autofocus />
+            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit-box w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500" style="background:var(--bg-base);border-color:var(--border-color);color:var(--text-primary)" data-index="1" />
+            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit-box w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500" style="background:var(--bg-base);border-color:var(--border-color);color:var(--text-primary)" data-index="2" />
+            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit-box w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500" style="background:var(--bg-base);border-color:var(--border-color);color:var(--text-primary)" data-index="3" />
+            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit-box w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500" style="background:var(--bg-base);border-color:var(--border-color);color:var(--text-primary)" data-index="4" />
+            <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-digit-box w-11 h-14 sm:w-12 sm:h-16 text-center text-2xl font-bold font-mono rounded-xl border transition-all duration-200 outline-none focus:ring-2 focus:ring-blue-500" style="background:var(--bg-base);border-color:var(--border-color);color:var(--text-primary)" data-index="5" />
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn-primary w-full justify-center py-3.5 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+          <span>
+            {% if is_rtl %}
+              {% if mode == 'register' %}تأكيد وإنشاء الحساب{% else %}تأكيد ومتابعة الدخول{% endif %}
+            {% else %}
+              {% if mode == 'register' %}Verify & Create Account{% else %}Verify & Sign In{% endif %}
+            {% endif %}
+          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </form>
+
+      <!-- Resend OTP / Timer -->
+      <div class="mt-6 pt-6 border-t text-center" style="border-color:var(--border-color)">
+        <p class="text-xs mb-3" style="color:var(--text-secondary)">
+          {% if is_rtl %}لم تستلم الرمز؟{% else %}Didn't receive the code?{% endif %}
+        </p>
+        <div class="flex items-center justify-center gap-2">
+          <button type="button" id="resend-btn" class="text-xs font-bold transition-all px-3 py-1.5 rounded-lg border flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/5" style="color:var(--color-accent);border-color:rgba(141,156,245,0.3)" disabled>
+            <svg id="resend-spinner" class="hidden animate-spin h-3.5 w-3.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span id="resend-label">{% if is_rtl %}إعادة إرسال الرمز{% else %}Resend Code{% endif %}</span>
+          </button>
+          <span id="timer-display" class="text-xs font-mono font-bold px-2.5 py-1 rounded-md" style="background:rgba(255,255,255,0.05);color:var(--text-tertiary)">60s</span>
+        </div>
+      </div>
+
+      <!-- Back to login / switch account -->
+      <div class="text-center mt-6">
+        {% if mode == 'register' %}
+        <a href="/{{ locale }}/auth/register/" class="text-xs font-medium transition-colors hover:underline inline-flex items-center gap-1.5" style="color:var(--text-tertiary)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if not is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <span>{% if is_rtl %}العودة لتعديل بيانات التسجيل{% else %}Back to Registration{% endif %}</span>
+        </a>
+        {% else %}
+        <a href="/{{ locale }}/auth/login/" class="text-xs font-medium transition-colors hover:underline inline-flex items-center gap-1.5" style="color:var(--text-tertiary)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="{% if not is_rtl %}rotate-180{% endif %}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          <span>{% if is_rtl %}العودة لتسجيل الدخول أو تغيير الحساب{% else %}Back to Login / Change Account{% endif %}</span>
+        </a>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const boxes = document.querySelectorAll('.otp-digit-box');
+  const realInput = document.getElementById('real-otp-input');
+  const otpForm = document.getElementById('otp-form');
+  const resendBtn = document.getElementById('resend-btn');
+  const resendLabel = document.getElementById('resend-label');
+  const resendSpinner = document.getElementById('resend-spinner');
+  const timerDisplay = document.getElementById('timer-display');
+  const statusMsg = document.getElementById('otp-status-message');
+
+  function updateRealInput() {
+    let code = '';
+    boxes.forEach(b => { code += b.value.trim(); });
+    realInput.value = code;
+    return code;
+  }
+
+  // Handle Box Inputs
+  boxes.forEach((box, idx) => {
+    box.addEventListener('input', (e) => {
+      const val = e.target.value.replace(/[^0-9]/g, '');
+      box.value = val ? val.slice(-1) : '';
+      
+      const code = updateRealInput();
+      if (box.value && idx < boxes.length - 1) {
+        boxes[idx + 1].focus();
+      }
+
+      // Auto submit when all 6 digits entered
+      if (code.length === 6) {
+        otpForm.submit();
+      }
+    });
+
+    box.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        if (!box.value && idx > 0) {
+          boxes[idx - 1].focus();
+          boxes[idx - 1].value = '';
+          updateRealInput();
+        }
+      } else if (e.key === 'ArrowLeft' && idx > 0) {
+        boxes[idx - 1].focus();
+      } else if (e.key === 'ArrowRight' && idx < boxes.length - 1) {
+        boxes[idx + 1].focus();
+      }
+    });
+
+    box.addEventListener('paste', (e) => {
+      e.preventDefault();
+      const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+      if (pasted) {
+        pasted.split('').forEach((char, i) => {
+          if (boxes[i]) boxes[i].value = char;
+        });
+        const code = updateRealInput();
+        const nextFocus = Math.min(pasted.length, boxes.length - 1);
+        boxes[nextFocus].focus();
+        if (code.length === 6) {
+          otpForm.submit();
+        }
+      }
+    });
+
+    box.addEventListener('focus', () => {
+      box.select();
+      box.style.borderColor = 'var(--color-accent)';
+    });
+
+    box.addEventListener('blur', () => {
+      box.style.borderColor = 'var(--border-color)';
+    });
+  });
+
+  // Focus first input automatically
+  if (boxes.length > 0) {
+    boxes[0].focus();
+  }
+
+  // Form submission check
+  otpForm.addEventListener('submit', function(e) {
+    const code = updateRealInput();
+    if (code.length !== 6) {
+      e.preventDefault();
+      showMessage('{% if is_rtl %}يرجى إدخال جميع أرقام الرمز الـ 6{% else %}Please enter all 6 digits of the code{% endif %}', 'error');
+      boxes[Math.min(code.length, boxes.length - 1)].focus();
+    }
+  });
+
+  // Countdown timer for Resend button
+  let countdown = 60;
+  let timerInterval = null;
+
+  function startCountdown(duration) {
+    countdown = duration;
+    resendBtn.disabled = true;
+    timerDisplay.classList.remove('hidden');
+    timerDisplay.textContent = countdown + 's';
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      countdown--;
+      timerDisplay.textContent = countdown + 's';
+      if (countdown <= 0) {
+        clearInterval(timerInterval);
+        resendBtn.disabled = false;
+        timerDisplay.classList.add('hidden');
+      }
+    }, 1000);
+  }
+
+  startCountdown(60);
+
+  function showMessage(text, type) {
+    statusMsg.classList.remove('hidden');
+    if (type === 'error') {
+      statusMsg.style.borderColor = 'rgba(239,68,68,0.3)';
+      statusMsg.style.background = 'rgba(239,68,68,0.1)';
+      statusMsg.style.color = '#f87171';
+    } else {
+      statusMsg.style.borderColor = 'rgba(34,197,94,0.3)';
+      statusMsg.style.background = 'rgba(34,197,94,0.1)';
+      statusMsg.style.color = '#4ade80';
+    }
+    statusMsg.textContent = text;
+  }
+
+  // AJAX Resend Handler
+  resendBtn.addEventListener('click', function() {
+    if (resendBtn.disabled) return;
+    resendBtn.disabled = true;
+    resendSpinner.classList.remove('hidden');
+    resendLabel.textContent = '{% if is_rtl %}جارٍ الإرسال...{% else %}Sending...{% endif %}';
+
+    fetch('/{{ locale }}/auth/resend-otp/', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      resendSpinner.classList.add('hidden');
+      resendLabel.textContent = '{% if is_rtl %}إعادة إرسال الرمز{% else %}Resend Code{% endif %}';
+      if (data.status === 'ok') {
+        showMessage(data.message || '{% if is_rtl %}تم إرسال رمز جديد بنجاح{% else %}New verification code sent successfully{% endif %}', 'success');
+        boxes.forEach(b => b.value = '');
+        updateRealInput();
+        boxes[0].focus();
+        startCountdown(60);
+      } else {
+        showMessage(data.message || '{% if is_rtl %}تعذر إرسال الرمز، يرجى المحاولة لاحقاً{% else %}Failed to resend code, please try again{% endif %}', 'error');
+        resendBtn.disabled = false;
+      }
+    })
+    .catch(err => {
+      resendSpinner.classList.add('hidden');
+      resendLabel.textContent = '{% if is_rtl %}إعادة إرسال الرمز{% else %}Resend Code{% endif %}';
+      showMessage('{% if is_rtl %}حدث خطأ في الشبكة، يرجى المحاولة مرة أخرى{% else %}Network error, please try again{% endif %}', 'error');
+      resendBtn.disabled = false;
+    });
+  });
+});
+</script>
+{% endblock %}

@@ -15,6 +15,29 @@ class LoginForm(forms.Form):
         return self.cleaned_data.get('email', '').strip().lower()
 
 
+class VerifyOTPForm(forms.Form):
+    otp = forms.CharField(
+        max_length=6,
+        min_length=6,
+        widget=forms.TextInput(attrs={
+            'class': 'input text-center text-2xl font-mono tracking-widest',
+            'placeholder': '••••••',
+            'id': 'id_otp',
+            'inputmode': 'numeric',
+            'pattern': '[0-9]*',
+            'maxlength': '6',
+            'autocomplete': 'one-time-code',
+            'autofocus': True,
+        })
+    )
+
+    def clean_otp(self):
+        otp = self.cleaned_data.get('otp', '').strip()
+        if not otp.isdigit() or len(otp) != 6:
+            raise forms.ValidationError('Please enter a valid 6-digit verification code.')
+        return otp
+
+
 class RegisterForm(forms.Form):
     full_name = forms.CharField(
         max_length=150,

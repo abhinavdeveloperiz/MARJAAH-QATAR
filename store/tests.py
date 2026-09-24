@@ -97,6 +97,119 @@ class StoreViewsTestCase(TestCase):
         res = self.client.get('/en/admin-dashboard/')
         self.assertEqual(res.status_code, 200)
 
+    def test_login_otp_flow(self):
+        from django.core import mail
+        from store.models import LoginOTP
+
+        # Step 1: Submit login credentials
+        res = self.client.post('/en/auth/login/', {
+            'email': 'test@example.com',
+            'password': 'TestPassword123!'
+        })
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.url.endswith('/en/auth/verify-otp/'))
+
+        # Check email sent
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Login Verification Code', mail.outbox[0].subject)
+
+        # Check LoginOTP record created
+        otp_record = LoginOTP.objects.filter(user=self.user, is_used=False).first()
+        self.assertIsNotNone(otp_record)
+        code = otp_record.code
+        self.assertEqual(len(code), 6)
+
+        # Step 2: Test invalid OTP code
+        res_fail = self.client.post('/en/auth/verify-otp/', {'otp': '000000'})
+        self.assertEqual(res_fail.status_code, 200)
+        self.assertContains(res_fail, 'Invalid verification code')
+
+        # Step 3: Test valid OTP code
+        res_success = self.client.post('/en/auth/verify-otp/', {'otp': code})
+        self.assertEqual(res_success.status_code, 302)
+        self.assertTrue(res_success.url.endswith('/en/'))
+
+        # Check user is logged in
+        res_acc = self.client.get('/en/account/')
+        self.assertEqual(res_acc.status_code, 200)
+
+        # Check OTP is marked as used
+        otp_record.refresh_from_db()
+        self.assertTrue(otp_record.is_used)
+
+    def test_resend_otp_api(self):
+        from store.models import LoginOTP
+        # Start login
+        self.client.post('/en/auth/login/', {
+            'email': 'test@example.com',
+            'password': 'TestPassword123!'
+        })
+
+        # Resend OTP
+        res = self.client.post('/en/auth/resend-otp/', content_type='application/json')
+        # Rate limit or ok depending on timestamp
+        self.assertIn(res.status_code, [200, 429])
+
+    def test_register_otp_flow(self):
+        from django.core import mail
+        from store.models import User
+
+        # Register new account
+        res = self.client.post('/en/auth/register/', {
+            'full_name': 'New Registered User',
+            'email': 'newuser@example.qa',
+            'phone': '+974 5500 1122',
+            'password': 'SecurePassword123!',
+            'confirm_password': 'SecurePassword123!'
+        })
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.url.endswith('/en/auth/verify-otp/'))
+
+        # CRITICAL ASSERTION: Account MUST NOT be saved to database or admin yet!
+        self.assertFalse(User.objects.filter(email='newuser@example.qa').exists())
+
+        # Check email sent
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('Email Verification Code', mail.outbox[0].subject)
+
+        # Get pending OTP from session
+        session = self.client.session
+        pending = session.get('pending_registration')
+        self.assertIsNotNone(pending)
+        otp_code = pending.get('otp_code')
+        self.assertEqual(len(otp_code), 6)
+
+        # Step 2: Invalid OTP should NOT create user
+        res_bad = self.client.post('/en/auth/verify-otp/', {'otp': '999999'})
+        self.assertEqual(res_bad.status_code, 200)
+        self.assertFalse(User.objects.filter(email='newuser@example.qa').exists())
+
+        # Step 3: Valid OTP creates and saves the user to DB & admin, then logs them in
+        res_v = self.client.post('/en/auth/verify-otp/', {'otp': otp_code})
+        self.assertEqual(res_v.status_code, 302)
+
+        # Account is now in database & admin!
+        self.assertTrue(User.objects.filter(email='newuser@example.qa').exists())
+        new_u = User.objects.get(email='newuser@example.qa')
+        self.assertEqual(new_u.first_name, 'New')
+        self.assertEqual(new_u.last_name, 'Registered User')
+
+        # User is authenticated
+        res_acc = self.client.get('/en/account/')
+        self.assertEqual(res_acc.status_code, 200)
+
+    def test_register_duplicate_email(self):
+        # Registering with existing email should show error and not overwrite
+        res = self.client.post('/en/auth/register/', {
+            'full_name': 'Duplicate User',
+            'email': 'test@example.com',
+            'phone': '+974 5500 1122',
+            'password': 'SecurePassword123!',
+            'confirm_password': 'SecurePassword123!'
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertContains(res, 'already exists')
+
 
 from unittest.mock import patch
 from store.fatoorah import clean_phone_number, execute_payment, get_payment_status
