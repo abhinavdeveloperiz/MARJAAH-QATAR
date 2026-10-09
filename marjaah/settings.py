@@ -38,7 +38,7 @@ if not SECRET_KEY:
 
 # Dynamic ALLOWED_HOSTS — automatically supports Render and custom domains
 _ALLOWED_HOST = os.environ.get('ALLOWED_HOST', '')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.web.app', '.firebaseapp.com', '.run.app']
 if _ALLOWED_HOST:
     for host in _ALLOWED_HOST.split(','):
         if host.strip():
@@ -50,6 +50,9 @@ if DEBUG:
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
     'https://marjaah-qatar.onrender.com',
+    'https://*.web.app',
+    'https://*.firebaseapp.com',
+    'https://*.run.app',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://localhost:8001',
