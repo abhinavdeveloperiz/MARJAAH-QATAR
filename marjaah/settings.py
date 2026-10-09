@@ -68,6 +68,9 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SAMESITE = 'Lax'
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_SAVE_EVERY_REQUEST = True
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_COOKIE_NAME = '__session'
+CSRF_USE_SESSIONS = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ─── APPLICATIONS ─────────────────────────────────────────────────────────────
