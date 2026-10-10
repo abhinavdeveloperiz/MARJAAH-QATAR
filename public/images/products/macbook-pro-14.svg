@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1E1E28" />
+      <stop offset="100%" stop-color="#08080C" />
+    </radialGradient>
+    <linearGradient id="macScreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#060A17" />
+      <stop offset="40%" stop-color="#1B1E38" />
+      <stop offset="80%" stop-color="#4F3B78" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+    <linearGradient id="aluminum" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#475569" />
+      <stop offset="50%" stop-color="#94A3B8" />
+      <stop offset="100%" stop-color="#334155" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bg)" rx="24" />
+
+  <!-- Ambient Glow -->
+  <circle cx="400" cy="270" r="170" fill="#9333EA" opacity="0.12" />
+  <circle cx="430" cy="290" r="140" fill="#F59E0B" opacity="0.08" />
+
+  <!-- Screen Lid -->
+  <rect x="230" y="110" width="340" height="230" rx="12" fill="#18181B" stroke="url(#aluminum)" stroke-width="2" />
+  <rect x="238" y="118" width="324" height="214" rx="6" fill="url(#macScreen)" />
+  
+  <!-- Notch -->
+  <path d="M380 118 L420 118 L416 127 L384 127 Z" fill="#18181B" />
+  <circle cx="400" cy="122" r="1.5" fill="#38BDF8" />
+
+  <!-- macOS Wallpaper Wave Graphic -->
+  <path d="M238 270 Q 320 200 400 280 T 562 210 L 562 332 L 238 332 Z" fill="#6366F1" opacity="0.35" />
+  <path d="M238 290 Q 360 220 440 300 T 562 250 L 562 332 L 238 332 Z" fill="#EC4899" opacity="0.25" />
+
+  <!-- Shadow Base -->
+  <ellipse cx="400" cy="460" rx="270" ry="16" fill="#000000" opacity="0.6" />
+
+  <!-- Laptop Base (Space Black Aluminum) -->
+  <polygon points="170,440 220,340 580,340 630,440" fill="#18181B" stroke="#3F3F46" stroke-width="1.5" />
+  <polygon points="166,440 634,440 626,452 174,452" fill="#09090B" stroke="#27272A" stroke-width="1.5" />
+  
+  <!-- Opening Notch Cutout -->
+  <rect x="375" y="440" width="50" height="4" rx="2" fill="#27272A" />
+
+  <!-- Magic Keyboard Well (All Black) -->
+  <polygon points="240,350 560,350 545,410 255,410" fill="#09090B" stroke="#27272A" stroke-width="1" />
+  
+  <!-- Keyboard Keys grid representation -->
+  <g fill="#18181B" stroke="#27272A" stroke-width="0.75">
+    <rect x="260" y="355" width="22" height="8" rx="1.5" />
+    <rect x="286" y="355" width="22" height="8" rx="1.5" />
+    <rect x="312" y="355" width="22" height="8" rx="1.5" />
+    <rect x="338" y="355" width="22" height="8" rx="1.5" />
+    <rect x="364" y="355" width="22" height="8" rx="1.5" />
+    <rect x="390" y="355" width="22" height="8" rx="1.5" />
+    <rect x="416" y="355" width="22" height="8" rx="1.5" />
+    <rect x="442" y="355" width="22" height="8" rx="1.5" />
+    <rect x="468" y="355" width="22" height="8" rx="1.5" />
+    <rect x="494" y="355" width="22" height="8" rx="1.5" />
+    <rect x="520" y="355" width="22" height="8" rx="1.5" fill="#27272A" /> <!-- Touch ID -->
+
+    <!-- Middle Keys -->
+    <rect x="262" y="367" width="24" height="9" rx="1.5" />
+    <rect x="290" y="367" width="22" height="9" rx="1.5" />
+    <rect x="316" y="367" width="22" height="9" rx="1.5" />
+    <rect x="342" y="367" width="22" height="9" rx="1.5" />
+    <rect x="368" y="367" width="22" height="9" rx="1.5" />
+    <rect x="394" y="367" width="22" height="9" rx="1.5" />
+    <rect x="420" y="367" width="22" height="9" rx="1.5" />
+    <rect x="446" y="367" width="22" height="9" rx="1.5" />
+    <rect x="472" y="367" width="22" height="9" rx="1.5" />
+    <rect x="498" y="367" width="42" height="9" rx="1.5" />
+
+    <!-- Space bar -->
+    <rect x="330" y="395" width="140" height="10" rx="2" fill="#27272A" />
+  </g>
+
+  <!-- Giant Force Touch Trackpad -->
+  <rect x="340" y="415" width="120" height="22" rx="3" fill="#18181B" stroke="#27272A" stroke-width="1" />
+
+  <!-- Apple Badge -->
+  <rect x="660" y="40" width="100" height="28" rx="14" fill="#18181B" stroke="#52525B" stroke-width="1" />
+  <text x="710" y="58" fill="#E4E4E7" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="1">M3 PRO</text>
+</svg>

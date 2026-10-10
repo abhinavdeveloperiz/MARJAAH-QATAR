@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product to Firebase</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f5; padding: 2rem; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
+        input, textarea, select { padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        button { background: #4f46e5; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
+        button:hover { background: #4338ca; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Add Product to Firebase (NestJS)</h2>
+        <p>This form directly saves the product into your Firebase Firestore through your NestJS backend.</p>
+        <form id="productForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Product Slug (Unique ID)</label>
+                <input type="text" name="slug" required>
+            </div>
+            <div class="form-group">
+                <label>Product Name (English)</label>
+                <input type="text" name="name" required>
+            </div>
+            <div class="form-group">
+                <label>Product Name (Arabic)</label>
+                <input type="text" name="name_ar">
+            </div>
+            <div class="form-group">
+                <label>Price</label>
+                <input type="number" name="price" required>
+            </div>
+            <div class="form-group">
+                <label>Original Price</label>
+                <input type="number" name="original_price">
+            </div>
+            <div class="form-group">
+                <label>Category ID</label>
+                <input type="text" name="category" value="1">
+            </div>
+            <div class="form-group">
+                <label>In Stock</label>
+                <select name="in_stock">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Product Image</label>
+                <input type="file" name="image" accept="image/*" required>
+            </div>
+            <button type="submit">Upload Product to Firebase</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.textContent = 'Uploading...';
+            btn.disabled = true;
+
+            const formData = new FormData(e.target);
+            // Convert strings to boolean/numbers where needed
+            formData.set('price', parseFloat(formData.get('price')));
+            if(formData.get('original_price')) formData.set('original_price', parseFloat(formData.get('original_price')));
+            formData.set('in_stock', formData.get('in_stock') === 'true');
+
+            try {
+                const res = await fetch('http://localhost:3000/api/products', {
+                    method: 'POST',
+                    body: formData // sending as multipart/form-data so multer can process the image
+                });
+                const data = await res.json();
+                alert('Success! Product saved to Firebase Firestore and Image saved to Storage!');
+                e.target.reset();
+            } catch (err) {
+                console.error(err);
+                alert('Error uploading product.');
+            } finally {
+                btn.textContent = 'Upload Product to Firebase';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

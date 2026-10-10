@@ -203,8 +203,9 @@ class Address(models.Model):
 
 class Order(models.Model):
     STATUS_CHOICES = [
+        ('pending', 'Pending Payment'),
+        ('placed', 'Order Placed'),
         ('processing', 'Processing'),
-        ('confirmed', 'Confirmed'),
         ('shipped', 'Shipped'),
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
@@ -224,7 +225,7 @@ class Order(models.Model):
         ('cod', 'Cash on Delivery'),
     ]
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='processing')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS_CHOICES, default='pending')
     # Legacy JSON snapshot (kept for read-only backward compatibility)
     items_json = models.TextField(default='[]')

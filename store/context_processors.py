@@ -22,9 +22,12 @@ def site_context(request):
 
     # Cart & Wishlist from session safely
     session = getattr(request, 'session', {})
+    user_id = session.get('firebase_id', 'anonymous') if hasattr(session, 'get') else 'anonymous'
+    
     cart = session.get('cart', {}) if hasattr(session, 'get') else {}
-    cart_count = sum(item['quantity'] for item in cart.values()) if cart else 0
-    cart_subtotal = sum(float(item.get('price', 0)) * int(item.get('quantity', 1)) for item in cart.values()) if cart else 0
+    cart_items = list(cart.values())
+    cart_count = sum(item.get('quantity', 1) for item in cart_items)
+    cart_subtotal = sum(item.get('price', 0) * item.get('quantity', 1) for item in cart_items)
 
     wishlist = session.get('wishlist', []) if hasattr(session, 'get') else []
     wishlist_count = len(wishlist)
@@ -53,7 +56,7 @@ def site_context(request):
         'cart_count': cart_count,
         'cart_subtotal': cart_subtotal,
         'wishlist_count': wishlist_count,
-        'cart_items': list(cart.values()),
+        'cart_items': cart_items,
         'featured_categories': featured_categories,
         'current_path': request.path,
         'nav_links': nav_links,

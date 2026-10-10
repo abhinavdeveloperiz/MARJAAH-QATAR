@@ -53,68 +53,102 @@ def home(request):
     })
 
 
+import requests
+
+class MockPageObj:
+    def __init__(self, items, page, num_pages):
+        self.object_list = items
+        self.number = page
+        self.num_pages = num_pages
+    def __iter__(self):
+        return iter(self.object_list)
+    def has_previous(self): return self.number > 1
+    def has_next(self): return self.number < self.num_pages
+    def previous_page_number(self): return self.number - 1
+    def next_page_number(self): return self.number + 1
+
+class MockPaginator:
+    def __init__(self, num_pages):
+        self.num_pages = num_pages
+        self.page_range = range(1, num_pages + 1) if num_pages > 0 else []
+
+def _enrich_product(p):
+    p['first_image'] = p.get('first_image') or p.get('image') or '/static/images/placeholder.svg'
+    if p.get('original_price') and p.get('original_price') > p.get('price', 0):
+        p['discount_percent'] = round((1 - float(p['price']) / float(p['original_price'])) * 100)
+    else:
+        p['discount_percent'] = None
+    p['star_range'] = range(1, 6)
+    p['review_count'] = p.get('review_count', 0)
+    p['rating'] = float(p.get('rating', 0.0))
+    p['in_stock'] = p.get('in_stock', True)
+    
+    # Mock related models for Django templates
+    if 'brand' in p:
+        p['brand'] = {'name': p.get('brand_name') or 'Brand'}
+    return p
+
 # ─── SHOP ───────────────────────────────────────────────────────
 def shop(request, category_slug=None):
     locale = _get_locale(request)
-    qs = Product.objects.select_related('brand', 'category')
-    category = None
-
-    if category_slug:
-        category = get_object_or_404(Category, slug=category_slug)
-        qs = qs.filter(category=category)
-
+    
     search = request.GET.get('search', '').strip()
-    if search:
-        qs = qs.filter(Q(name__icontains=search) | Q(name_ar__icontains=search) | Q(brand__name__icontains=search))
-
     brand_filter = request.GET.get('brand', '')
-    if brand_filter:
-        qs = qs.filter(brand__name=brand_filter)
-
     in_stock_only = request.GET.get('in_stock', '')
-    if in_stock_only:
-        qs = qs.filter(in_stock=True)
-
     on_sale = request.GET.get('on_sale', '')
-    if on_sale:
-        qs = qs.filter(is_on_sale=True)
-
     min_price = request.GET.get('min_price', '')
     max_price = request.GET.get('max_price', '')
-    if min_price:
-        qs = qs.filter(price__gte=min_price)
-    if max_price:
-        qs = qs.filter(price__lte=max_price)
-
     sort = request.GET.get('sort', 'featured')
-    sort_map = {
-        'price_asc': 'price',
-        'price_desc': '-price',
-        'newest': '-created_at',
-        'rating': '-rating',
-        'featured': '-is_featured',
+    
+    per_page_raw = request.GET.get('per_page', '8')
+    try:
+        per_page = int(per_page_raw)
+        if per_page not in [8, 12, 16, 24, 48]: per_page = 8
+    except (ValueError, TypeError):
+        per_page = 8
+        
+    page_number = request.GET.get('page', 1)
+
+    # Fetch from NestJS
+    params = {
+        'page': page_number,
+        'per_page': per_page,
+        'sort': sort
     }
-    qs = qs.order_by(sort_map.get(sort, '-is_featured'))
+    if search: params['search'] = search
+    if brand_filter: params['brand'] = brand_filter
+    if in_stock_only: params['in_stock'] = in_stock_only
+    if on_sale: params['on_sale'] = on_sale
+    if min_price: params['min_price'] = min_price
+    if max_price: params['max_price'] = max_price
+
+    category = None
+    if category_slug:
+        try:
+            category = Category.objects.get(slug=category_slug)
+            params['category'] = str(category.id)
+        except Category.DoesNotExist:
+            pass
+
+    try:
+        res = requests.get('http://localhost:3001/api/products', params=params, timeout=5)
+        data = res.json()
+        items = [_enrich_product(p) for p in data.get('items', [])]
+        total_count = data.get('total_count', 0)
+        total_pages = data.get('total_pages', 1)
+        current_page = data.get('page', 1)
+    except Exception as e:
+        print(f"NestJS API Error: {e}")
+        items = []
+        total_count = 0
+        total_pages = 1
+        current_page = 1
 
     all_brands = Brand.objects.all()
     all_categories = Category.objects.filter(is_featured=True)
 
-    # ─── PAGINATION (Default 8 items/page = 2 balanced pages for 13 items) ────
-    total_count = qs.count()
-    per_page_raw = request.GET.get('per_page', '8')
-    try:
-        per_page = int(per_page_raw)
-        if per_page not in [8, 12, 16, 24, 48]:
-            per_page = 8
-    except (ValueError, TypeError):
-        per_page = 8
-
-    paginator = Paginator(qs, per_page)
-    page_number = request.GET.get('page', 1)
-    try:
-        page_obj = paginator.get_page(page_number)
-    except (PageNotAnInteger, EmptyPage):
-        page_obj = paginator.get_page(1)
+    page_obj = MockPageObj(items, current_page, total_pages)
+    paginator = MockPaginator(total_pages)
 
     # Preserve query string (without 'page') for pagination links
     query_dict = request.GET.copy()
@@ -141,13 +175,69 @@ def shop(request, category_slug=None):
     })
 
 
+import requests
+
 # ─── PRODUCT DETAIL ─────────────────────────────────────────────
 def product_detail(request, slug):
     locale = _get_locale(request)
-    product = get_object_or_404(Product, slug=slug)
-    related = Product.objects.filter(
-        category=product.category, in_stock=True
-    ).exclude(pk=product.pk)[:4]
+    
+    # Fetch from NestJS Firebase API
+    try:
+        api_res = requests.get(f'http://localhost:3001/api/products/{slug}')
+        if api_res.status_code == 200:
+            product_data = api_res.json()
+        else:
+            product_data = None
+    except Exception as e:
+        logger.error(f"Error fetching product from NestJS: {e}")
+        product_data = None
+        
+    if not product_data:
+        # Fallback to local 404 if API fails
+        from django.http import Http404
+        raise Http404("Product not found")
+
+    # Map Firebase product data to an object-like dictionary for the template
+    class MockProduct:
+        def __init__(self, data):
+            self.id = data.get('id', '')
+            self.slug = data.get('slug', data.get('id', ''))
+            self.name = data.get('name', '')
+            self.name_ar = data.get('name_ar', self.name)
+            self.price = float(data.get('price', 0))
+            self.original_price = data.get('original_price')
+            if self.original_price: self.original_price = float(self.original_price)
+            self.first_image = data.get('image', data.get('first_image', '/static/images/placeholder.svg'))
+            self.images = [self.first_image] # can expand if more images in db
+            self.brand = type('MockBrand', (), {'name': data.get('brand', '')}) if data.get('brand') else None
+            self.category = type('MockCat', (), {'name': data.get('category', ''), 'name_ar': data.get('category', '')}) if data.get('category') else None
+            self.rating = data.get('rating', 0)
+            self.review_count = data.get('review_count', 0)
+            self.star_range = range(1, 6)
+            self.short_description = data.get('short_description', '')
+            self.short_description_ar = data.get('short_description_ar', '')
+            self.description = data.get('description', '')
+            self.description_ar = data.get('description_ar', '')
+            self.in_stock = data.get('in_stock', True)
+            self.stock_count = data.get('stock_count', None)
+            self.delivery_days = data.get('delivery_days', None)
+            self.warranty_months = data.get('warranty_months', None)
+            self.specifications = data.get('specifications', [])
+            self.sku = data.get('sku', '')
+
+    product = MockProduct(product_data)
+    
+    # Try fetching related products from API
+    related = []
+    try:
+        rel_res = requests.get(f'http://localhost:3001/api/products?limit=4&category={product_data.get("category","")}')
+        if rel_res.status_code == 200:
+            rel_data = rel_res.json()
+            items = rel_data if isinstance(rel_data, list) else rel_data.get('items', [])
+            related = [MockProduct(item) for item in items if item.get('slug') != slug][:4]
+    except Exception:
+        pass
+
     wishlist = request.session.get('wishlist', [])
     in_wishlist = product.slug in wishlist
     return render(request, 'shop/product_detail.html', {
@@ -161,10 +251,14 @@ def product_detail(request, slug):
 # ─── CART ───────────────────────────────────────────────────────
 def cart_view(request):
     locale = _get_locale(request)
+    
     cart = request.session.get('cart', {})
     items = list(cart.values())
-    subtotal = sum(item['price'] * item['quantity'] for item in items)
+
+    subtotal = sum(float(item.get('price', 0)) * int(item.get('quantity', 1)) for item in items)
     shipping = 0 if subtotal >= 500 else 20
+    if len(items) == 0:
+        shipping = 0
     total = subtotal + shipping
 
     # Support AJAX partial render for cart drawer refresh
@@ -186,39 +280,54 @@ def cart_view(request):
     })
 
 
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
 @require_POST
 def cart_add(request):
     data = json.loads(request.body)
     product_slug = data.get('slug')
-    product = get_object_or_404(Product, slug=product_slug)
+    
+    # Fetch product from NestJS API instead of SQLite
+    try:
+        res = requests.get(f'http://localhost:3001/api/products/{product_slug}', timeout=5)
+        if res.status_code == 404:
+            return JsonResponse({'success': False, 'error': 'Product not found.'}, status=404)
+        product_data = _enrich_product(res.json())
+    except Exception as e:
+        logger.error(f"Error fetching product for cart: {e}")
+        return JsonResponse({'success': False, 'error': 'Failed to add to cart.'}, status=500)
 
     # Validate stock before adding
-    if not product.in_stock:
+    in_stock = product_data.get('in_stock', True)
+    if not in_stock:
         return JsonResponse({'success': False, 'error': 'This product is currently out of stock.'}, status=400)
 
     cart = request.session.get('cart', {})
     qty_to_add = data.get('quantity', 1)
 
     # Check stock quantity if tracked
-    if product.stock_count is not None:
+    stock_count = product_data.get('stock_count')
+    if stock_count is not None:
         current_qty = cart.get(product_slug, {}).get('quantity', 0)
-        if (current_qty + qty_to_add) > product.stock_count:
+        if (current_qty + qty_to_add) > stock_count:
             return JsonResponse({
                 'success': False,
-                'error': f'Only {product.stock_count} unit(s) available in stock.'
+                'error': f'Only {stock_count} unit(s) available in stock.'
             }, status=400)
 
     if product_slug in cart:
         cart[product_slug]['quantity'] += qty_to_add
     else:
+        brand_name = product_data.get('brand_name') or (product_data.get('brand', {}).get('name') if isinstance(product_data.get('brand'), dict) else product_data.get('brand'))
         cart[product_slug] = {
-            'slug': product.slug,
-            'name': product.name,
-            'name_ar': product.name_ar,
-            'price': float(product.price),
-            'original_price': float(product.original_price) if product.original_price else None,
-            'image': product.first_image,
-            'brand': product.brand.name if product.brand else '',
+            'slug': product_slug,
+            'name': product_data.get('name', ''),
+            'name_ar': product_data.get('name_ar', ''),
+            'price': float(product_data.get('price', 0)),
+            'original_price': float(product_data.get('original_price')) if product_data.get('original_price') else None,
+            'image': product_data.get('first_image', ''),
+            'brand': brand_name or '',
             'quantity': qty_to_add,
         }
     request.session['cart'] = cart
@@ -227,6 +336,7 @@ def cart_add(request):
     return JsonResponse({'success': True, 'cart_count': cart_count})
 
 
+@csrf_exempt
 @require_POST
 def cart_update(request):
     data = json.loads(request.body)
@@ -254,6 +364,7 @@ def cart_update(request):
     return JsonResponse({'success': True, 'cart_count': cart_count, 'subtotal': subtotal})
 
 
+@csrf_exempt
 @require_POST
 def cart_remove(request):
     data = json.loads(request.body)
@@ -313,15 +424,21 @@ def checkout_view(request):
     stock_errors = []
     for item in items:
         try:
-            product = Product.objects.get(slug=item['slug'])
-            if not product.in_stock:
-                stock_errors.append(f"'{item['name']}' is no longer in stock.")
-            elif product.stock_count is not None and item['quantity'] > product.stock_count:
-                stock_errors.append(
-                    f"Only {product.stock_count} unit(s) of '{item['name']}' are available."
-                )
-        except Product.DoesNotExist:
-            stock_errors.append(f"'{item['name']}' is no longer available.")
+            res = requests.get(f"http://localhost:3001/api/products/{item['slug']}", timeout=5)
+            if res.status_code == 404:
+                stock_errors.append(f"'{item['name']}' is no longer available.")
+            else:
+                product_data = res.json()
+                if not product_data.get('in_stock', True):
+                    stock_errors.append(f"'{item['name']}' is no longer in stock.")
+                else:
+                    stock_count = product_data.get('stock_count')
+                    if stock_count is not None and item['quantity'] > stock_count:
+                        stock_errors.append(
+                            f"Only {stock_count} unit(s) of '{item['name']}' are available."
+                        )
+        except Exception:
+            pass # Ignore API timeout/errors for stock check to prevent blocking checkout
 
     # Pre-fill user data & default address
     default_address = request.user.addresses.filter(is_default=True).first() or request.user.addresses.first()
@@ -389,6 +506,7 @@ def checkout_view(request):
             final_notes = f"{pm_detail}\n{user_notes}".strip() if pm_detail else user_notes
 
             initial_payment_status = 'pending' if pm in ('card', 'fatoorah', 'qr', 'qpay') else 'cod'
+            initial_order_status = 'pending' if pm in ('card', 'fatoorah', 'qr', 'qpay') else 'placed'
 
             # Create the Order — works for both guests and members
             order = Order.objects.create(
@@ -403,17 +521,40 @@ def checkout_view(request):
                 address=addr,
                 payment_method=cd['payment_method'],
                 payment_status=initial_payment_status,
+                status=initial_order_status,
                 notes=final_notes,
                 **delivery_data,
             )
 
+            # Sync to Firestore via NestJS API
+            try:
+                firestore_order = {
+                    'id': order.pk,
+                    'customer_name': order.customer_name,
+                    'customer_email': order.customer_email,
+                    'customer_phone': order.customer_phone,
+                    'subtotal': float(order.subtotal),
+                    'shipping': float(order.shipping),
+                    'total': float(order.total),
+                    'payment_method': order.payment_method,
+                    'payment_status': order.payment_status,
+                    'status': order.status,
+                    'notes': order.notes,
+                    'items': items,
+                    'delivery_address': order.delivery_address_display
+                }
+                user_param = f"?userId={request.user.pk}" if request.user.is_authenticated else ""
+                requests.post(f"http://localhost:3001/api/orders{user_param}", json=firestore_order, timeout=5)
+            except Exception as e:
+                logger.error(f"Failed to sync order {order.pk} to Firestore: {e}")
+
+
             # Create relational OrderItem records
             for item in items:
                 try:
-                    product = Product.objects.get(slug=item['slug'])
                     OrderItem.objects.create(
                         order=order,
-                        product=product,
+                        product=None, # Firestore products aren't stored in local SQLite db
                         product_slug=item['slug'],
                         product_name=item['name'],
                         product_name_ar=item.get('name_ar', ''),
@@ -673,11 +814,22 @@ def fatoorah_callback_view(request):
         # Idempotency check: process order confirmation only once
         if order.payment_status != 'paid':
             order.payment_status = 'paid'
-            order.status = 'confirmed'
+            order.status = 'placed'
             order.fatoorah_payment_id = str(payment_id)
             order.fatoorah_transaction_id = str(tx_id)
             order.payment_response_json = json.dumps(raw_data)
             order.save()
+
+            # Sync payment success to Firestore
+            try:
+                requests.post(f"http://localhost:3001/api/orders/{order.pk}", json={
+                    'payment_status': 'paid',
+                    'status': 'placed',
+                    'fatoorah_payment_id': order.fatoorah_payment_id
+                }, timeout=5)
+            except Exception as e:
+                logger.error(f"Failed to update Firestore order {order.pk}: {e}")
+
 
             # Deduct stock for the confirmed order
             for item in order.order_items.all():
@@ -784,11 +936,21 @@ def fatoorah_webhook_view(request):
 
             if order and order.payment_status != 'paid':
                 order.payment_status = 'paid'
-                order.status = 'confirmed'
+                order.status = 'placed'
                 order.fatoorah_payment_id = str(payment_id)
                 order.fatoorah_transaction_id = str(status_res.get('transaction_id', ''))
                 order.payment_response_json = json.dumps(status_res.get('raw', {}))
                 order.save()
+
+                # Sync webhook payment success to Firestore
+                try:
+                    requests.post(f"http://localhost:3001/api/orders/{order.pk}", json={
+                        'payment_status': 'paid',
+                        'status': 'placed',
+                        'fatoorah_payment_id': order.fatoorah_payment_id
+                    }, timeout=5)
+                except Exception as e:
+                    logger.error(f"Failed to update Firestore order {order.pk} via webhook: {e}")
 
                 for item in order.order_items.all():
                     if item.product and item.product.stock_count is not None:
@@ -814,15 +976,30 @@ def login_view(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             try:
-                user_obj = User.objects.get(email__iexact=email)
-                user = authenticate(request, username=user_obj.username, password=password)
-                if user:
-                    login(request, user)
-                    return redirect(next_url)
+                api_res = requests.post('http://localhost:3001/api/users/login', json={'email': email, 'password': password})
+                if api_res.status_code in [200, 201]:
+                    data = api_res.json()
+                    if data.get('success'):
+                        fb_user = data.get('user', {})
+                        # Create or get shadow user
+                        user, created = User.objects.get_or_create(username=email)
+                        if created:
+                            user.email = email
+                            user.set_unusable_password()
+                        if fb_user.get('name'):
+                            user.first_name = fb_user.get('name')
+                        user.save()
+                        user.backend = 'django.contrib.auth.backends.ModelBackend'
+                        login(request, user)
+                        request.session['firebase_id'] = fb_user.get('id')
+                        return redirect(next_url)
+                    else:
+                        error = 'Invalid credentials.' if locale != 'ar' else 'بيانات الاعتماد غير صحيحة.'
                 else:
-                    error = 'Invalid password.' if locale != 'ar' else 'كلمة المرور غير صحيحة.'
-            except User.DoesNotExist:
-                error = 'No account found with that email.' if locale != 'ar' else 'لم يتم العثور على حساب بهذا البريد الإلكتروني.'
+                    error = 'Server error during login.'
+            except Exception as e:
+                logger.error(f"Error authenticating with NestJS: {e}")
+                error = 'Server error during login.'
     return render(request, 'auth/login.html', {'form': form, 'error': error, 'locale': locale, 'next': next_url})
 
 
@@ -842,12 +1019,27 @@ def register_view(request):
                 error = 'An account with this email already exists.' if locale != 'ar' else 'يوجد حساب مسجل بهذا البريد الإلكتروني بالفعل.'
             else:
                 names = cd['full_name'].strip().split(' ', 1)
+                first_name = names[0]
+                last_name = names[1] if len(names) > 1 else ''
+                
+                # Register in Firebase via NestJS
+                import uuid
+                new_id = str(uuid.uuid4())
+                try:
+                    reg_res = requests.post(f'http://localhost:3001/api/users/{new_id}', json={
+                        'email': email,
+                        'password': cd['password'],
+                        'name': cd['full_name']
+                    })
+                except Exception as e:
+                    logger.error(f"Error registering with NestJS: {e}")
+                    
                 user = User.objects.create_user(
                     username=email,
                     email=email,
                     password=cd['password'],
-                    first_name=names[0],
-                    last_name=names[1] if len(names) > 1 else '',
+                    first_name=first_name,
+                    last_name=last_name,
                     phone=cd.get('phone', ''),
                 )
                 login(request, user)

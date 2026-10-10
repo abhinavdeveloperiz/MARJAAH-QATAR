@@ -37,8 +37,8 @@
           <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--text-tertiary)">
             {% if is_rtl %}حالة الطلب{% else %}Status{% endif %}
           </p>
-          <span class="px-3 py-1 rounded-full text-xs font-bold" style="background:#F59E0B22;color:#F59E0B">
-            {% if is_rtl %}قيد المعالجة{% else %}Processing{% endif %}
+          <span class="px-3 py-1 rounded-full text-xs font-bold" style="background:#10B98122;color:#10B981">
+            {{ order.get_status_display }}
           </span>
         </div>
       </div>
@@ -53,7 +53,7 @@
           <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
             <img src="{{ item.image }}" alt="{% if is_rtl and item.name_ar %}{{ item.name_ar }}{% else %}{{ item.name }}{% endif %}"
                  class="w-full h-full object-cover" loading="lazy"
-                 onerror="this.src='{% static 'images/placeholder.svg' %}'" />
+                 onerror="this.src='/static/images/placeholder.svg'" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-sm font-medium truncate" style="color:var(--text-primary)">

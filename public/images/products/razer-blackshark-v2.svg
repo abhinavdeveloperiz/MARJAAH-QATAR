@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0F1F17" />
+      <stop offset="100%" stop-color="#030A06" />
+    </radialGradient>
+    <linearGradient id="razerGreen" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00FF66" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="600" fill="url(#bg)" rx="24" />
+  <circle cx="400" cy="300" r="180" fill="#00FF66" opacity="0.1" />
+
+  <!-- Headset Shadow -->
+  <ellipse cx="400" cy="480" rx="200" ry="24" fill="#000000" opacity="0.6" />
+
+  <!-- Padded Headband Arch -->
+  <path d="M 270 320 C 270 140, 530 140, 530 320" stroke="#18181B" stroke-width="36" fill="none" stroke-linecap="round" />
+  <!-- Headband Stitching Accent -->
+  <path d="M 290 300 C 290 160, 510 160, 510 300" stroke="#00FF66" stroke-width="2" fill="none" opacity="0.7" stroke-dasharray="6,4" />
+
+  <!-- Metal Adjustment Sliders -->
+  <line x1="260" y1="280" x2="260" y2="350" stroke="#71717A" stroke-width="6" stroke-linecap="round" />
+  <line x1="540" y1="280" x2="540" y2="350" stroke="#71717A" stroke-width="6" stroke-linecap="round" />
+  <!-- Neon green wire loop -->
+  <path d="M260 270 C 240 300, 240 340, 255 370" stroke="#00FF66" stroke-width="3" fill="none" />
+  <path d="M540 270 C 560 300, 560 340, 545 370" stroke="#00FF66" stroke-width="3" fill="none" />
+
+  <!-- Left Earcup (Oval with Plush Cushion) -->
+  <ellipse cx="260" cy="370" rx="48" ry="68" fill="#18181B" stroke="#27272A" stroke-width="3" />
+  <ellipse cx="260" cy="370" rx="34" ry="52" fill="#09090B" stroke="#00FF66" stroke-width="1.5" />
+  <!-- Razer TriForce Icon -->
+  <circle cx="260" cy="370" r="14" fill="#00FF66" opacity="0.8" />
+
+  <!-- Right Earcup -->
+  <ellipse cx="540" cy="370" rx="48" ry="68" fill="#18181B" stroke="#27272A" stroke-width="3" />
+  <ellipse cx="540" cy="370" rx="34" ry="52" fill="#09090B" stroke="#00FF66" stroke-width="1.5" />
+  <circle cx="540" cy="370" r="14" fill="#00FF66" opacity="0.8" />
+
+  <!-- HyperClear Detachable Boom Mic (Left Earcup) -->
+  <path d="M230 400 Q 200 460 280 480 Q 340 480 370 460" stroke="#3F3F46" stroke-width="6" fill="none" stroke-linecap="round" />
+  <!-- Foam Mic Pop Filter -->
+  <ellipse cx="380" cy="455" rx="14" ry="10" fill="#18181B" stroke="#00FF66" stroke-width="1.5" />
+
+  <!-- Volume Dial on Left Cup -->
+  <rect x="210" y="340" width="8" height="24" rx="2" fill="#00FF66" />
+
+  <!-- Spec Badge -->
+  <rect x="630" y="40" width="130" height="28" rx="14" fill="#064E3B" stroke="#00FF66" stroke-width="1" />
+  <text x="695" y="58" fill="#00FF66" font-size="11" font-family="sans-serif" font-weight="bold" text-anchor="middle" letter-spacing="1">THX SPATIAL</text>
+</svg>

@@ -95,11 +95,16 @@
   function refreshCartDrawer() {
     const drawerContent = document.getElementById('cart-drawer-content');
     if (!drawerContent) return;
-    fetch(`/${LOCALE}/cart/?partial=1`).then(r => r.text()).then(html => {
+    const timestamp = new Date().getTime();
+    fetch(`/${LOCALE}/cart/?partial=1&_t=${timestamp}`, { cache: 'no-store' }).then(r => r.text()).then(html => {
       const parser = new DOMParser();
       const doc = parser.parseFromString(html, 'text/html');
       const newContent = doc.getElementById('cart-drawer-content');
-      if (newContent) drawerContent.innerHTML = newContent.innerHTML;
+      if (newContent) {
+          drawerContent.innerHTML = newContent.innerHTML;
+      } else {
+          drawerContent.innerHTML = doc.body.innerHTML;
+      }
     }).catch(() => {
       // Silently fail — page reload will sync
     });

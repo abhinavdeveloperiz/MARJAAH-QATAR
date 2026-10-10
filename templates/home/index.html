@@ -349,10 +349,8 @@
       </a>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-      {% for product in featured %}
-      {% include 'partials/product_card.html' %}
-      {% endfor %}
+    <div id="featured-products-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      <!-- Products will be injected here by NestJS API via JavaScript -->
     </div>
   </div>
 </section>
@@ -374,10 +372,8 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-      {% for product in new_arrivals %}
-      {% include 'partials/product_card.html' %}
-      {% endfor %}
+    <div id="new-arrivals-container" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+      <!-- Products will be injected here by NestJS API via JavaScript -->
     </div>
   </div>
 </section>
