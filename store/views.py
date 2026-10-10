@@ -131,7 +131,7 @@ def shop(request, category_slug=None):
             pass
 
     try:
-        res = requests.get('http://localhost:3001/api/products', params=params, timeout=5)
+        res = requests.get(f'{settings.NESTJS_API_URL}/api/products', params=params, timeout=5)
         data = res.json()
         items = [_enrich_product(p) for p in data.get('items', [])]
         total_count = data.get('total_count', 0)
@@ -183,7 +183,7 @@ def product_detail(request, slug):
     
     # Fetch from NestJS Firebase API
     try:
-        api_res = requests.get(f'http://localhost:3001/api/products/{slug}')
+        api_res = requests.get(f'{settings.NESTJS_API_URL}/api/products/{slug}')
         if api_res.status_code == 200:
             product_data = api_res.json()
         else:
@@ -230,7 +230,7 @@ def product_detail(request, slug):
     # Try fetching related products from API
     related = []
     try:
-        rel_res = requests.get(f'http://localhost:3001/api/products?limit=4&category={product_data.get("category","")}')
+        rel_res = requests.get(f'{settings.NESTJS_API_URL}/api/products?limit=4&category={product_data.get("category","")}')
         if rel_res.status_code == 200:
             rel_data = rel_res.json()
             items = rel_data if isinstance(rel_data, list) else rel_data.get('items', [])
@@ -290,7 +290,7 @@ def cart_add(request):
     
     # Fetch product from NestJS API instead of SQLite
     try:
-        res = requests.get(f'http://localhost:3001/api/products/{product_slug}', timeout=5)
+        res = requests.get(f'{settings.NESTJS_API_URL}/api/products/{product_slug}', timeout=5)
         if res.status_code == 404:
             return JsonResponse({'success': False, 'error': 'Product not found.'}, status=404)
         product_data = _enrich_product(res.json())
@@ -424,7 +424,7 @@ def checkout_view(request):
     stock_errors = []
     for item in items:
         try:
-            res = requests.get(f"http://localhost:3001/api/products/{item['slug']}", timeout=5)
+            res = requests.get(f"{settings.NESTJS_API_URL}/api/products/{item['slug']}", timeout=5)
             if res.status_code == 404:
                 stock_errors.append(f"'{item['name']}' is no longer available.")
             else:
@@ -528,8 +528,17 @@ def checkout_view(request):
 
             # Sync to Firestore via NestJS API
             try:
+                firestore_user_id = ""
+                if request.user.is_authenticated:
+                    # Look up correct Firestore User ID by email
+                    login_res = requests.post(f"{settings.NESTJS_API_URL}/api/users/login", json={'email': request.user.email}, timeout=3)
+                    if login_res.status_code == 200:
+                        login_data = login_res.json()
+                        if login_data.get('success'):
+                            firestore_user_id = login_data['user'].get('id', '')
+
                 firestore_order = {
-                    'id': order.pk,
+                    'id': order.order_number,
                     'customer_name': order.customer_name,
                     'customer_email': order.customer_email,
                     'customer_phone': order.customer_phone,
@@ -543,10 +552,10 @@ def checkout_view(request):
                     'items': items,
                     'delivery_address': order.delivery_address_display
                 }
-                user_param = f"?userId={request.user.pk}" if request.user.is_authenticated else ""
-                requests.post(f"http://localhost:3001/api/orders{user_param}", json=firestore_order, timeout=5)
+                user_param = f"?userId={firestore_user_id}" if firestore_user_id else ""
+                requests.post(f"{settings.NESTJS_API_URL}/api/orders{user_param}", json=firestore_order, timeout=5)
             except Exception as e:
-                logger.error(f"Failed to sync order {order.pk} to Firestore: {e}")
+                logger.error(f"Failed to sync order {order.order_number} to Firestore: {e}")
 
 
             # Create relational OrderItem records
@@ -822,13 +831,13 @@ def fatoorah_callback_view(request):
 
             # Sync payment success to Firestore
             try:
-                requests.post(f"http://localhost:3001/api/orders/{order.pk}", json={
+                requests.post(f"{settings.NESTJS_API_URL}/api/orders/{order.order_number}", json={
                     'payment_status': 'paid',
                     'status': 'placed',
                     'fatoorah_payment_id': order.fatoorah_payment_id
                 }, timeout=5)
             except Exception as e:
-                logger.error(f"Failed to update Firestore order {order.pk}: {e}")
+                logger.error(f"Failed to update Firestore order {order.order_number}: {e}")
 
 
             # Deduct stock for the confirmed order
@@ -944,13 +953,13 @@ def fatoorah_webhook_view(request):
 
                 # Sync webhook payment success to Firestore
                 try:
-                    requests.post(f"http://localhost:3001/api/orders/{order.pk}", json={
+                    requests.post(f"{settings.NESTJS_API_URL}/api/orders/{order.order_number}", json={
                         'payment_status': 'paid',
                         'status': 'placed',
                         'fatoorah_payment_id': order.fatoorah_payment_id
                     }, timeout=5)
                 except Exception as e:
-                    logger.error(f"Failed to update Firestore order {order.pk} via webhook: {e}")
+                    logger.error(f"Failed to update Firestore order {order.order_number} via webhook: {e}")
 
                 for item in order.order_items.all():
                     if item.product and item.product.stock_count is not None:
@@ -976,7 +985,7 @@ def login_view(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             try:
-                api_res = requests.post('http://localhost:3001/api/users/login', json={'email': email, 'password': password})
+                api_res = requests.post(f'{settings.NESTJS_API_URL}/api/users/login', json={'email': email, 'password': password})
                 if api_res.status_code in [200, 201]:
                     data = api_res.json()
                     if data.get('success'):
@@ -1026,7 +1035,7 @@ def register_view(request):
                 import uuid
                 new_id = str(uuid.uuid4())
                 try:
-                    reg_res = requests.post(f'http://localhost:3001/api/users/{new_id}', json={
+                    reg_res = requests.post(f'{settings.NESTJS_API_URL}/api/users/{new_id}', json={
                         'email': email,
                         'password': cd['password'],
                         'name': cd['full_name']

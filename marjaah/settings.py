@@ -331,3 +331,6 @@ _default_api_url = 'https://apitest.myfatoorah.com' if MYFATOORAH_IS_SANDBOX els
 MYFATOORAH_API_URL = os.environ.get('MYFATOORAH_API_URL', _default_api_url).rstrip('/')
 MYFATOORAH_WEBHOOK_SECRET = os.environ.get('MYFATOORAH_WEBHOOK_SECRET', '')
 MYFATOORAH_CURRENCY = os.environ.get('MYFATOORAH_CURRENCY', 'QAR')
+
+# NestJS API
+NESTJS_API_URL = os.environ.get('NESTJS_API_URL', 'http://localhost:3001')
