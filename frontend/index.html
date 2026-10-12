@@ -278,7 +278,7 @@
   <div id="main-navbar" class="transition-all duration-300 navbar-transparent">
     <div class="container-custom h-[64px] sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">
       <!-- Logo -->
-      <a href="/index.html" aria-label="M.SHOP Home" class="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0">
+      <a href="/" aria-label="M.SHOP Home" class="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0">
         <img src="/static/logo-light.png" alt="M.SHOP" class="h-8 dark:hidden" />
         <img src="/static/logo-dark.png" alt="M.SHOP" class="h-8 hidden dark:block" />
       </a>
@@ -286,15 +286,15 @@
       <!-- Desktop Nav -->
       <nav class="hidden lg:flex items-center gap-8">
         
-        <a href="/index.html" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 nav-link-active font-black">Home</a>
+        <a href="/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 nav-link-active font-black">Home</a>
         
-        <a href="/shop.html" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Shop</a>
+        <a href="/shop/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Shop</a>
         
-        <a href="/offers.html" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Offers</a>
+        <a href="/offers/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Offers</a>
         
-        <a href="/about.html" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">About</a>
+        <a href="/about/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">About</a>
         
-        <a href="/contact.html" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Contact</a>
+        <a href="/contact/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Contact</a>
         
       </nav>
 
@@ -342,7 +342,7 @@
         </button>
 
         <!-- Wishlist -->
-        <a href="/wishlist.html" aria-label="Wishlist" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 hover:text-rose-400">
+        <a href="/wishlist/" aria-label="Wishlist" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 hover:text-rose-400">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-400"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           <span data-wishlist-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:none">0</span>
         </a>
@@ -368,8 +368,8 @@
                 <p class="text-xs font-bold truncate" style="color:var(--text-primary)"></p>
                 <p class="text-[11px] truncate mt-0.5" style="color:var(--text-tertiary)">admin@marjaah.qa</p>
               </div>
-              <a href="/account.html" class="flex items-center gap-3 px-4 py-3 text-xs font-sans transition-all" style="color:var(--text-secondary);border-bottom:1px solid var(--border-color)" onmouseover="this.style.background='var(--bg-surface-2)'" onmouseout="this.style.background='transparent'">My Account</a>
-              <a href="javascript:void(0)" onclick="if(window.api){window.api.clearAuth();}window.location.href='/login.html';" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-all font-sans">Sign Out</a>
+              <a href="/account/" class="flex items-center gap-3 px-4 py-3 text-xs font-sans transition-all" style="color:var(--text-secondary);border-bottom:1px solid var(--border-color)" onmouseover="this.style.background='var(--bg-surface-2)'" onmouseout="this.style.background='transparent'">My Account</a>
+              <a href="javascript:void(0)" onclick="if(window.api){window.api.clearAuth();}window.location.href='/login/';" class="w-full flex items-center gap-3 px-4 py-3 text-xs text-red-400/70 hover:text-red-400 hover:bg-red-500/5 transition-all font-sans">Sign Out</a>
             </div>
           </div>
           
@@ -406,32 +406,32 @@
     <div class="mt-5 flex flex-wrap items-center gap-2">
       <span class="text-xs font-sans" style="color:var(--text-tertiary)">Trending:</span>
       
-      <a href="/shop.html?search=RTX 4090" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
+      <a href="/shop/?search=RTX 4090" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
         style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-secondary);"
         onmouseover="this.style.color='var(--color-accent)';this.style.borderColor='var(--color-accent)'"
         onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">RTX 4090</a>
       
-      <a href="/shop.html?search=ROG Strix" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
+      <a href="/shop/?search=ROG Strix" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
         style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-secondary);"
         onmouseover="this.style.color='var(--color-accent)';this.style.borderColor='var(--color-accent)'"
         onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">ROG Strix</a>
       
-      <a href="/shop.html?search=MacBook Pro M3" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
+      <a href="/shop/?search=MacBook Pro M3" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
         style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-secondary);"
         onmouseover="this.style.color='var(--color-accent)';this.style.borderColor='var(--color-accent)'"
         onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">MacBook Pro M3</a>
       
-      <a href="/shop.html?search=Alienware" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
+      <a href="/shop/?search=Alienware" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
         style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-secondary);"
         onmouseover="this.style.color='var(--color-accent)';this.style.borderColor='var(--color-accent)'"
         onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">Alienware</a>
       
-      <a href="/shop.html?search=DDR5 RAM" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
+      <a href="/shop/?search=DDR5 RAM" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
         style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-secondary);"
         onmouseover="this.style.color='var(--color-accent)';this.style.borderColor='var(--color-accent)'"
         onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">DDR5 RAM</a>
       
-      <a href="/shop.html?search=Samsung Odyssey" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
+      <a href="/shop/?search=Samsung Odyssey" class="text-xs px-2.5 py-1 rounded-lg border transition-colors"
         style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-secondary);"
         onmouseover="this.style.color='var(--color-accent)';this.style.borderColor='var(--color-accent)'"
         onmouseout="this.style.color='var(--text-secondary)';this.style.borderColor='var(--border-color)'">Samsung Odyssey</a>
@@ -489,7 +489,7 @@
       </div>
     </div>
     
-    <a href="/index.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
+    <a href="/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
        style="border-bottom:1px solid var(--border-color);color:var(--color-accent)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
@@ -503,7 +503,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1"><path d="m9 18 6-6-6-6"/></svg>
     </a>
     
-    <a href="/shop.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
+    <a href="/shop/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
        style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
@@ -517,7 +517,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1"><path d="m9 18 6-6-6-6"/></svg>
     </a>
     
-    <a href="/offers.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
+    <a href="/offers/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
        style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
@@ -531,7 +531,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1"><path d="m9 18 6-6-6-6"/></svg>
     </a>
     
-    <a href="/about.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
+    <a href="/about/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
        style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
@@ -545,7 +545,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1"><path d="m9 18 6-6-6-6"/></svg>
     </a>
     
-    <a href="/contact.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
+    <a href="/contact/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors"
        style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all"
@@ -559,7 +559,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1"><path d="m9 18 6-6-6-6"/></svg>
     </a>
     
-    <a href="/wishlist.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors" style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
+    <a href="/wishlist/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors" style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all bg-rose-500/10 text-rose-500 border border-rose-500/20">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
@@ -572,7 +572,7 @@
       </div>
     </a>
     
-    <a href="/account.html" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors" style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
+    <a href="/account/" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 transition-colors" style="border-bottom:1px solid var(--border-color);color:var(--text-secondary)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all bg-primary-500/10 text-primary-400 border border-primary-500/20">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -581,7 +581,7 @@
       </div>
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40 group-hover:opacity-100 transition-all group-hover:translate-x-1"><path d="m9 18 6-6-6-6"/></svg>
     </a>
-    <a href="javascript:void(0)" onclick="if(window.api){window.api.clearAuth();}window.location.href='/login.html';" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 text-red-400/80 hover:text-red-400 transition-colors" style="border-bottom:1px solid var(--border-color)">
+    <a href="javascript:void(0)" onclick="if(window.api){window.api.clearAuth();}window.location.href='/login/';" class="group flex items-center justify-between text-sm sm:text-base font-sans font-bold tracking-wider uppercase py-3 text-red-400/80 hover:text-red-400 transition-colors" style="border-bottom:1px solid var(--border-color)">
       <div class="flex items-center gap-3.5">
         <span class="w-8 h-8 rounded-xl flex items-center justify-center transition-all bg-red-500/10 text-red-400 border border-red-500/20">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
@@ -593,7 +593,7 @@
     
   </div>
   <div class="pt-6" style="border-top:1px solid var(--border-color)">
-    <a href="/contact.html" class="w-full py-3.5 btn-primary text-xs font-sans font-bold tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 shadow-lg">GET IN TOUCH
+    <a href="/contact/" class="w-full py-3.5 btn-primary text-xs font-sans font-bold tracking-widest uppercase rounded-xl flex items-center justify-center gap-2 shadow-lg">GET IN TOUCH
       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg>
     </a>
   </div>
@@ -708,7 +708,7 @@
           </p>
         </div>
         <div>
-          <a class="inline-flex items-center gap-3 text-xs font-sans font-bold tracking-widest uppercase px-6 py-3.5 rounded-xl bg-[#4063B2] text-white hover:bg-[#335299] shadow-lg shadow-[#4063B2]/20 hover:shadow-[#4063B2]/40 transition-all duration-300" href="/shop.html">
+          <a class="inline-flex items-center gap-3 text-xs font-sans font-bold tracking-widest uppercase px-6 py-3.5 rounded-xl bg-[#4063B2] text-white hover:bg-[#335299] shadow-lg shadow-[#4063B2]/20 hover:shadow-[#4063B2]/40 transition-all duration-300" href="/shop/">
             <span>EXPLORE ALL BRANDS</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </a>
@@ -726,7 +726,7 @@
             <div class="vertical-marquee-up flex flex-col gap-3 group-hover:[animation-play-state:paused]">
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Dell">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Dell">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#007DB8">Dell</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -736,7 +736,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=HP">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=HP">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#0096D6">HP</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -746,7 +746,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Lenovo">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Lenovo">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#E2231A">Lenovo</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -756,7 +756,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=ASUS">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=ASUS">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#00539B">ASUS</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -766,7 +766,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Apple">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Apple">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#A2AAAD">Apple</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -776,7 +776,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Dell">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Dell">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#007DB8">Dell</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -786,7 +786,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=HP">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=HP">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#0096D6">HP</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -796,7 +796,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Lenovo">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Lenovo">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#E2231A">Lenovo</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -806,7 +806,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=ASUS">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=ASUS">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#00539B">ASUS</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -816,7 +816,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Apple">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Apple">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#A2AAAD">Apple</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -833,7 +833,7 @@
             <div class="vertical-marquee-down flex flex-col gap-3 group-hover:[animation-play-state:paused]">
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=MSI">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=MSI">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FF0000">MSI</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -843,7 +843,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Logitech">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Logitech">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#00B8FC">Logitech</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -853,7 +853,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Razer">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Razer">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#00FF00">Razer</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -863,7 +863,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Samsung">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Samsung">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#1428A0">Samsung</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -873,7 +873,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Corsair">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Corsair">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FFF000">Corsair</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -883,7 +883,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=MSI">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=MSI">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FF0000">MSI</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -893,7 +893,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Logitech">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Logitech">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#00B8FC">Logitech</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -903,7 +903,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Razer">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Razer">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#00FF00">Razer</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -913,7 +913,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Samsung">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Samsung">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#1428A0">Samsung</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -923,7 +923,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Corsair">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Corsair">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FFF000">Corsair</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -940,7 +940,7 @@
             <div class="vertical-marquee-up flex flex-col gap-3 group-hover:[animation-play-state:paused]">
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Intel">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Intel">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#0071C5">Intel</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -950,7 +950,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=NVIDIA">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=NVIDIA">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#76B900">NVIDIA</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -960,7 +960,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=AMD">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=AMD">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#ED1C24">AMD</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -970,7 +970,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Kingston">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Kingston">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#D12420">Kingston</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -980,7 +980,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=SteelSeries">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=SteelSeries">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FF5200">SteelSeries</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -990,7 +990,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Intel">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Intel">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#0071C5">Intel</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1000,7 +1000,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=NVIDIA">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=NVIDIA">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#76B900">NVIDIA</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1010,7 +1010,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=AMD">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=AMD">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#ED1C24">AMD</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1020,7 +1020,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Kingston">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Kingston">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#D12420">Kingston</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1030,7 +1030,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=SteelSeries">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=SteelSeries">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FF5200">SteelSeries</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1047,7 +1047,7 @@
             <div class="vertical-marquee-down flex flex-col gap-3 group-hover:[animation-play-state:paused]">
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=ASUS ROG">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=ASUS ROG">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FF0000">ASUS ROG</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1057,7 +1057,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=BenQ ZOWIE">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=BenQ ZOWIE">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#DF1F26">BenQ ZOWIE</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1067,7 +1067,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=NZXT">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=NZXT">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#7D55C7">NZXT</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1077,7 +1077,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Western Digital">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Western Digital">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#005596">Western Digital</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1087,7 +1087,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Gigabyte AORUS">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Gigabyte AORUS">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FA4616">Gigabyte AORUS</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1097,7 +1097,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=ASUS ROG">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=ASUS ROG">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FF0000">ASUS ROG</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1107,7 +1107,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=BenQ ZOWIE">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=BenQ ZOWIE">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#DF1F26">BenQ ZOWIE</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1117,7 +1117,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=NZXT">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=NZXT">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#7D55C7">NZXT</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1127,7 +1127,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Western Digital">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Western Digital">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#005596">Western Digital</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1137,7 +1137,7 @@
               
               
               
-              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop.html?brand=Gigabyte AORUS">
+              <a class="flex flex-col justify-center p-3.5 sm:p-4 rounded-2xl border transition-all duration-300 shadow-sm group cursor-pointer" style="background-color:var(--bg-surface-2);border-color:var(--border-color)" href="/shop/?brand=Gigabyte AORUS">
                 <div class="flex items-center justify-between mb-1">
                   <span class="text-sm sm:text-base font-black font-display tracking-tight transition-transform duration-300 group-hover:scale-105" style="color:#FA4616">Gigabyte AORUS</span>
                   <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
@@ -1167,7 +1167,7 @@
         <h2 class="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight" style="color:var(--text-primary)">Browse by Category</h2>
         <p class="text-base sm:text-lg mt-2 font-medium" style="color:var(--text-secondary)">Everything you need for your digital setup</p>
       </div>
-      <a class="text-xs font-sans font-bold tracking-widest uppercase flex items-center gap-2 flex-shrink-0 transition-colors" style="color:var(--color-accent)" href="/shop.html">
+      <a class="text-xs font-sans font-bold tracking-widest uppercase flex items-center gap-2 flex-shrink-0 transition-colors" style="color:var(--color-accent)" href="/shop/">
         View All Categories
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
@@ -1177,7 +1177,7 @@
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
       <!-- Big Card: Laptops -->
       <div class="col-span-2 md:col-span-1 lg:col-span-2 row-span-2">
-        <a href="/shop.html?category=laptops">
+        <a href="/shop/?category=laptops">
           <div class="h-[400px] group relative rounded-3xl overflow-hidden border border-[#4063B2]/30 hover:border-[#8D9CF5] hover:shadow-[0_0_30px_rgba(141,156,245,0.3)] transition-all duration-500">
             <img src="/images/categories/cat-laptops.jpg" alt="Laptops" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/40 to-transparent"></div>
@@ -1195,7 +1195,7 @@
 
       <!-- Desktops -->
       <div>
-        <a href="/shop.html?category=desktops">
+        <a href="/shop/?category=desktops">
           <div class="h-[190px] group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#8D9CF5]/70 hover:shadow-[0_0_20px_rgba(141,156,245,0.25)] transition-all duration-300">
             <img src="/images/categories/cat-desktops.jpg" alt="Desktops" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#070B14]/90 via-[#070B14]/30 to-transparent"></div>
@@ -1209,7 +1209,7 @@
 
       <!-- Monitors -->
       <div>
-        <a href="/shop.html?category=monitors">
+        <a href="/shop/?category=monitors">
           <div class="h-[190px] group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#8D9CF5]/70 hover:shadow-[0_0_20px_rgba(141,156,245,0.25)] transition-all duration-300">
             <img src="/images/products/samsung-odyssey-g5.jpg" alt="Monitors" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#070B14]/90 via-[#070B14]/30 to-transparent"></div>
@@ -1223,7 +1223,7 @@
 
       <!-- Keyboards & Mice -->
       <div>
-        <a href="/shop.html?category=peripherals">
+        <a href="/shop/?category=peripherals">
           <div class="h-[190px] group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#8D9CF5]/70 hover:shadow-[0_0_20px_rgba(141,156,245,0.25)] transition-all duration-300">
             <img src="/images/products/corsair-k70-pro.jpg" alt="Keyboards & Mice" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#070B14]/90 via-[#070B14]/30 to-transparent"></div>
@@ -1237,7 +1237,7 @@
 
       <!-- Gaming Gear -->
       <div>
-        <a href="/shop.html?category=gaming">
+        <a href="/shop/?category=gaming">
           <div class="h-[190px] group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#8D9CF5]/70 hover:shadow-[0_0_20px_rgba(141,156,245,0.25)] transition-all duration-300">
             <img src="/images/products/razer-blackshark-v2.jpg" alt="Gaming Gear" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
             <div class="absolute inset-0 bg-gradient-to-t from-[#070B14]/90 via-[#070B14]/30 to-transparent"></div>
@@ -1282,7 +1282,7 @@
       </p>
       
       <div class="pt-4 flex flex-wrap items-center gap-6">
-        <a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300" style="color:var(--text-primary)" href="/shop.html">
+        <a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300" style="color:var(--text-primary)" href="/shop/">
           <span>DISCOVER ALL PRODUCTS</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
         </a>
@@ -1305,7 +1305,7 @@
         <h2 class="font-display text-4xl sm:text-5xl md:text-6xl uppercase tracking-tight" style="color:var(--text-primary)">Featured Products</h2>
         <p class="text-base sm:text-lg mt-2 font-medium" style="color:var(--text-secondary)">Hand-picked tech from the world&#x27;s best brands</p>
       </div>
-      <a class="text-xs font-sans font-bold tracking-widest uppercase flex items-center gap-2 font-display text-sm flex-shrink-0 transition-colors" style="color:var(--color-accent)" href="/shop.html">
+      <a class="text-xs font-sans font-bold tracking-widest uppercase flex items-center gap-2 font-display text-sm flex-shrink-0 transition-colors" style="color:var(--color-accent)" href="/shop/">
         View All Products
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
       </a>
@@ -1398,7 +1398,7 @@
       Discover high-performance hardware and gaming rigs to get started.
     </p>
   </div>
-  <a href="/shop.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
+  <a href="/shop/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
     <span>Explore Shop</span>
     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
   </a>
@@ -1515,7 +1515,7 @@
     <!-- Top section: Logo + tagline + newsletter -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pb-12" style="border-bottom:1px solid var(--border-color)">
       <div>
-        <a href="/index.html">
+        <a href="/">
           <img src="/static/logo-light.png" alt="M.SHOP" class="h-9 mb-5 dark:hidden" />
           <img src="/static/logo-dark.png" alt="M.SHOP" class="h-9 mb-5 hidden dark:block" />
         </a>
@@ -1547,15 +1547,15 @@
         <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
         <ul class="space-y-2.5">
           
-          <li><a href="/index.html" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Home</a></li>
+          <li><a href="/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Home</a></li>
           
-          <li><a href="/shop.html" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Shop</a></li>
+          <li><a href="/shop/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Shop</a></li>
           
-          <li><a href="/offers.html" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Offers</a></li>
+          <li><a href="/offers/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Offers</a></li>
           
-          <li><a href="/about.html" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">About</a></li>
+          <li><a href="/about/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">About</a></li>
           
-          <li><a href="/contact.html" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Contact</a></li>
+          <li><a href="/contact/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Contact</a></li>
           
         </ul>
       </div>
@@ -1572,7 +1572,7 @@
           <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Returns Policy</a></li>
           <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Privacy Policy</a></li>
           <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
-          <li><a href="/contact.html" class="text-xs" style="color:var(--text-secondary)">Contact</a></li>
+          <li><a href="/contact/" class="text-xs" style="color:var(--text-secondary)">Contact</a></li>
         </ul>
       </div>
       <div>

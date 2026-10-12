@@ -69,7 +69,6 @@
         });
 
         if (response.status === 401) {
-          // Token expired or invalid
           if (token) {
             console.warn('Session expired. Clearing credentials.');
             this.clearAuth();

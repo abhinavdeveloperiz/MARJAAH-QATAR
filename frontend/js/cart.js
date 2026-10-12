@@ -206,7 +206,7 @@
                 ${isAr ? 'اكتشف العتاد عالي الأداء وأجهزة الألعاب للبدء.' : 'Discover high-performance hardware and gaming rigs to get started.'}
               </p>
             </div>
-            <a href="/shop.html" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
+            <a href="/shop/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
               <span>${isAr ? 'تصفح المتجر' : 'Explore Shop'}</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
@@ -260,10 +260,10 @@
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <a href="/cart.html" class="py-2.5 rounded-xl text-center text-xs font-bold border transition hover:bg-white/5" style="border-color:var(--border-color);color:var(--text-primary)">
+            <a href="/cart/" class="py-2.5 rounded-xl text-center text-xs font-bold border transition hover:bg-white/5" style="border-color:var(--border-color);color:var(--text-primary)">
               ${isAr ? 'عرض السلة' : 'View Cart'}
             </a>
-            <a href="/checkout.html" class="btn-primary py-2.5 text-center text-xs font-bold justify-center">
+            <a href="/checkout/" class="btn-primary py-2.5 text-center text-xs font-bold justify-center">
               ${isAr ? 'إتمام الطلب' : 'Checkout'}
             </a>
           </div>
@@ -288,7 +288,7 @@
               <h3 class="font-display font-bold text-2xl mb-2" style="color:var(--text-primary)">${isAr ? 'سلة التسوق فارغة' : 'Your cart is empty'}</h3>
               <p class="text-sm" style="color:var(--text-secondary)">${isAr ? 'أضف بعض المنتجات للبدء' : 'Add some products to get started'}</p>
             </div>
-            <a href="/shop.html" class="btn-primary">${isAr ? 'تصفح المتجر' : 'Shop Now'}</a>
+            <a href="/shop/" class="btn-primary">${isAr ? 'تصفح المتجر' : 'Shop Now'}</a>
           </div>
         `;
         return;
@@ -302,7 +302,7 @@
             </div>
             <div>
               <h3 class="font-bold text-sm sm:text-base leading-tight mb-1" style="color:var(--text-primary)">
-                <a href="/product.html?slug=${item.slug}" class="hover:text-primary-400 transition">${isAr && item.name_ar ? item.name_ar : item.name}</a>
+                <a href="/product/?slug=${item.slug}" class="hover:text-primary-400 transition">${isAr && item.name_ar ? item.name_ar : item.name}</a>
               </h3>
               <p class="text-xs font-semibold" style="color:var(--color-accent)">${item.price} QAR</p>
             </div>
@@ -346,10 +346,10 @@
                 <span class="text-xl" style="color:var(--color-accent)">${summary.total.toFixed(0)} QAR</span>
               </div>
             </div>
-            <a href="/checkout.html" class="btn-primary w-full py-3.5 justify-center font-bold text-sm shadow-lg">
+            <a href="/checkout/" class="btn-primary w-full py-3.5 justify-center font-bold text-sm shadow-lg">
               ${isAr ? 'متابعة الدفع' : 'Proceed to Checkout'}
             </a>
-            <a href="/shop.html" class="block text-center text-xs font-semibold py-2 transition" style="color:var(--text-secondary)">
+            <a href="/shop/" class="block text-center text-xs font-semibold py-2 transition" style="color:var(--text-secondary)">
               ${isAr ? 'الاستمرار في التسوق' : 'Continue Shopping'}
             </a>
           </div>

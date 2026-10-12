@@ -174,7 +174,7 @@
             </div>
             <p class="font-semibold text-lg mb-1">${isAr ? 'سلة التسوق فارغة' : 'Your cart is empty'}</p>
             <p class="text-sm text-slate-400 mb-6">${isAr ? 'لم تقم بإضافة أي منتجات بعد' : 'Explore hardware and add your favorite items'}</p>
-            <a href="/shop.html" class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition">
+            <a href="/shop/" class="px-6 py-2.5 rounded-xl text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition">
               ${isAr ? 'تصفح المتجر' : 'Start Shopping'}
             </a>
           </div>
@@ -219,10 +219,10 @@
             <span class="text-indigo-400">${summary.total.toFixed(2)} QAR</span>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <a href="/cart.html" class="py-2.5 rounded-xl text-center text-sm font-semibold border hover:bg-white/5 transition" style="border-color:var(--border-color)">
+            <a href="/cart/" class="py-2.5 rounded-xl text-center text-sm font-semibold border hover:bg-white/5 transition" style="border-color:var(--border-color)">
               ${isAr ? 'عرض السلة' : 'View Cart'}
             </a>
-            <a href="/checkout.html" class="py-2.5 rounded-xl text-center text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition">
+            <a href="/checkout/" class="py-2.5 rounded-xl text-center text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition">
               ${isAr ? 'إتمام الطلب' : 'Checkout'}
             </a>
           </div>

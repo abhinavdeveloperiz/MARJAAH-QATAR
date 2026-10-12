@@ -1,9 +1,12 @@
 {
   "name": "marjaah-qatar",
-  "version": "1.0.0",
-  "description": "M.SHOP Qatar E-Commerce Platform",
+  "version": "2.0.0",
+  "description": "MARJAAH Qatar E-Commerce Platform (NestJS + Firebase Firestore)",
   "scripts": {
-    "build": "./build.sh",
-    "start": "gunicorn marjaah.wsgi:application"
+    "start": "cd backend && node dist/main.js",
+    "dev:backend": "cd backend && npm run start:dev",
+    "build:backend": "cd backend && npm run build",
+    "test:e2e": "cd backend && node test/e2e-verification.js",
+    "deploy:hosting": "firebase deploy --only hosting"
   }
 }
