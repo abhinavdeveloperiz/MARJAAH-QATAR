@@ -18,6 +18,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils import timezone
 from django.template.loader import render_to_string
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.core.cache import cache
 
 from .models import Product, Category, Brand, Address, Order, OrderItem, ContactMessage, User, Banner
 from .forms import (LoginForm, RegisterForm, ForgotPasswordForm, SetNewPasswordForm,
@@ -34,21 +35,29 @@ def _get_locale(request):
 # ─── HOME ───────────────────────────────────────────────────────
 def home(request):
     locale = _get_locale(request)
-    featured = Product.objects.filter(is_featured=True, in_stock=True)[:8]
-    new_arrivals = Product.objects.filter(is_new=True, in_stock=True)[:8]
-    flash_deals = Product.objects.filter(is_on_sale=True, in_stock=True)[:6]
-    categories = Category.objects.filter(is_featured=True).order_by('order')
-    brands = Brand.objects.all()
-    best_sellers = Product.objects.filter(is_best_seller=True, in_stock=True)[:4]
-    hero_banner = Banner.objects.filter(banner_type='hero', is_active=True).first()
+    cache_key = f'home_page_data_{locale}'
+    data = cache.get(cache_key)
+    if not data:
+        featured = list(Product.objects.filter(is_featured=True, in_stock=True).select_related('brand', 'category')[:8])
+        new_arrivals = list(Product.objects.filter(is_new=True, in_stock=True).select_related('brand', 'category')[:8])
+        flash_deals = list(Product.objects.filter(is_on_sale=True, in_stock=True).select_related('brand', 'category')[:6])
+        categories = list(Category.objects.filter(is_featured=True).order_by('order'))
+        brands = list(Brand.objects.all())
+        best_sellers = list(Product.objects.filter(is_best_seller=True, in_stock=True).select_related('brand', 'category')[:4])
+        hero_banner = Banner.objects.filter(banner_type='hero', is_active=True).first()
+        data = {
+            'featured': featured,
+            'new_arrivals': new_arrivals,
+            'flash_deals': flash_deals,
+            'categories': categories,
+            'brands': brands,
+            'best_sellers': best_sellers,
+            'hero_banner': hero_banner,
+        }
+        cache.set(cache_key, data, 300)
+
     return render(request, 'home/index.html', {
-        'featured': featured,
-        'new_arrivals': new_arrivals,
-        'flash_deals': flash_deals,
-        'categories': categories,
-        'brands': brands,
-        'best_sellers': best_sellers,
-        'hero_banner': hero_banner,
+        **data,
         'locale': locale,
     })
 
@@ -96,8 +105,8 @@ def shop(request, category_slug=None):
     }
     qs = qs.order_by(sort_map.get(sort, '-is_featured'))
 
-    all_brands = Brand.objects.all()
-    all_categories = Category.objects.filter(is_featured=True)
+    all_brands = cache.get_or_set('all_brands_list', lambda: list(Brand.objects.all()), 300)
+    all_categories = cache.get_or_set('all_featured_categories_list', lambda: list(Category.objects.filter(is_featured=True)), 300)
 
     # ─── PAGINATION (Default 8 items/page = 2 balanced pages for 13 items) ────
     total_count = qs.count()

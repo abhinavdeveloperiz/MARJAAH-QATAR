@@ -1,4 +1,5 @@
 import json
+from django.core.cache import cache
 from .models import Category, Brand, Banner
 from .translations import get_translations
 
@@ -9,16 +10,22 @@ def site_context(request):
     is_rtl = (locale == 'ar')
     t = get_translations(locale)
 
-    # Active banners
-    try:
-        hero_banner = Banner.objects.filter(banner_type='hero', is_active=True).first()
-    except Exception:
-        hero_banner = None
+    # Active banners (cached for 5 minutes)
+    hero_banner = cache.get('site_hero_banner')
+    if hero_banner is None:
+        try:
+            hero_banner = Banner.objects.filter(banner_type='hero', is_active=True).first()
+            cache.set('site_hero_banner', hero_banner, 300)
+        except Exception:
+            hero_banner = None
 
-    try:
-        admin_banner = Banner.objects.filter(banner_type='admin', is_active=True).first()
-    except Exception:
-        admin_banner = None
+    admin_banner = cache.get('site_admin_banner')
+    if admin_banner is None:
+        try:
+            admin_banner = Banner.objects.filter(banner_type='admin', is_active=True).first()
+            cache.set('site_admin_banner', admin_banner, 300)
+        except Exception:
+            admin_banner = None
 
     # Cart & Wishlist from session safely
     session = getattr(request, 'session', {})
@@ -29,8 +36,14 @@ def site_context(request):
     wishlist = session.get('wishlist', []) if hasattr(session, 'get') else []
     wishlist_count = len(wishlist)
 
-    # Featured categories for nav
-    featured_categories = Category.objects.filter(is_featured=True).order_by('order')[:6]
+    # Featured categories for nav (cached for 5 minutes)
+    featured_categories = cache.get('site_featured_cats')
+    if featured_categories is None:
+        try:
+            featured_categories = list(Category.objects.filter(is_featured=True).order_by('order')[:6])
+            cache.set('site_featured_cats', featured_categories, 300)
+        except Exception:
+            featured_categories = []
 
     # Nav links localized
     nav_links = [

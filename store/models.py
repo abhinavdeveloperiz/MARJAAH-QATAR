@@ -139,8 +139,32 @@ class Product(models.Model):
 
     @property
     def first_image(self):
-        imgs = self.images
-        return imgs[0] if (imgs and imgs[0]) else '/static/images/placeholder.svg'
+        if self.primary_image:
+            try:
+                return self.primary_image.url
+            except Exception:
+                pass
+        if self.images_json and self.images_json.strip() and self.images_json != '[]':
+            try:
+                raw = json.loads(self.images_json)
+                if raw and isinstance(raw, list) and raw[0]:
+                    img = raw[0]
+                    return f"{img}?v=2" if ('?' not in img) else img
+            except Exception:
+                pass
+        try:
+            # Check if gallery_images is prefetched to avoid extra query
+            if hasattr(self, '_prefetched_objects_cache') and 'gallery_images' in self._prefetched_objects_cache:
+                for gi in self.gallery_images.all():
+                    if gi.image:
+                        return gi.image.url
+            else:
+                gi = self.gallery_images.first()
+                if gi and gi.image:
+                    return gi.image.url
+        except Exception:
+            pass
+        return '/static/images/placeholder.svg'
 
     @property
     def specifications(self):
@@ -452,3 +476,19 @@ class LoginOTP(models.Model):
     @property
     def is_valid(self):
         return not self.is_used and not self.is_expired and self.attempts < 5
+
+
+# ─── CACHE INVALIDATION SIGNALS ───────────────────────────────────────────────
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.core.cache import cache
+
+@receiver([post_save, post_delete], sender=Product)
+@receiver([post_save, post_delete], sender=Category)
+@receiver([post_save, post_delete], sender=Brand)
+@receiver([post_save, post_delete], sender=Banner)
+def invalidate_store_cache(sender, **kwargs):
+    try:
+        cache.clear()
+    except Exception:
+        pass

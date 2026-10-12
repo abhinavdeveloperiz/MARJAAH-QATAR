@@ -31,3 +31,9 @@ Thumbs.db
 
 # SQLite database (committed for initial data, but not journal)
 db.sqlite3-journal
+
+# Readme and documentation
+[Rr][Ee][Aa][Dd][Mm][Ee]*
+README.md
+readme.md
+

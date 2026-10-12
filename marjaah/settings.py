@@ -87,6 +87,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.middleware.gzip.GZipMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
@@ -140,6 +141,15 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+
+# ─── CACHE ────────────────────────────────────────────────────────────────────
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'marjaah-cache',
+        'TIMEOUT': 300,  # 5 minutes
+    }
+}
 
 # ─── PASSWORD VALIDATION ──────────────────────────────────────────────────────
 AUTH_PASSWORD_VALIDATORS = [
