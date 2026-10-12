@@ -38,30 +38,60 @@ if not SECRET_KEY:
 
 # Dynamic ALLOWED_HOSTS — automatically supports Render and custom domains
 _ALLOWED_HOST = os.environ.get('ALLOWED_HOST', '')
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', '.onrender.com', '.web.app', '.firebaseapp.com', '.run.app']
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0',
+    '.onrender.com',
+    '.web.app',
+    '.firebaseapp.com',
+    '.run.app',
+    '.marjaah.shop',
+    'marjaah.shop',
+    'www.marjaah.shop',
+    '.marjaah.qa',
+    'marjaah.qa',
+    'www.marjaah.qa',
+]
 if _ALLOWED_HOST:
     for host in _ALLOWED_HOST.split(','):
-        if host.strip():
-            ALLOWED_HOSTS.append(host.strip())
+        h = host.strip()
+        if h and h not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(h)
 if DEBUG:
     ALLOWED_HOSTS.append('*')
 
-# CSRF trusted origins for HTTPS deployments (Render, cPanel)
+# CSRF trusted origins for HTTPS deployments (Render, cPanel, Firebase Hosting, Cloud Run, Custom Domains)
 CSRF_TRUSTED_ORIGINS = [
     'https://*.onrender.com',
     'https://marjaah-qatar.onrender.com',
     'https://*.web.app',
     'https://*.firebaseapp.com',
     'https://*.run.app',
+    'https://*.marjaah.shop',
+    'https://marjaah.shop',
+    'https://www.marjaah.shop',
+    'https://*.marjaah.qa',
+    'https://marjaah.qa',
+    'https://www.marjaah.qa',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
     'http://localhost:8001',
     'http://127.0.0.1:8001',
     'http://localhost:8080',
     'http://127.0.0.1:8080',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
+_CSRF_ORIGINS_ENV = os.environ.get('CSRF_TRUSTED_ORIGINS', '')
+if _CSRF_ORIGINS_ENV:
+    for origin in _CSRF_ORIGINS_ENV.split(','):
+        o = origin.strip()
+        if o and o not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(o)
+
 _SITE_URL = os.environ.get('SITE_URL', '')
-if _SITE_URL:
+if _SITE_URL and _SITE_URL not in CSRF_TRUSTED_ORIGINS:
     CSRF_TRUSTED_ORIGINS.append(_SITE_URL)
 
 CSRF_COOKIE_HTTPONLY = False
@@ -71,6 +101,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_NAME = '__session'
 CSRF_USE_SESSIONS = True
+USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # ─── APPLICATIONS ─────────────────────────────────────────────────────────────

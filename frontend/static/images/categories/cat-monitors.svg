@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#141E33" />
+      <stop offset="100%" stop-color="#070B14" />
+    </radialGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#bg)" rx="20" />
+  <circle cx="300" cy="200" r="140" fill="#00F0FF" opacity="0.12" />
+  <!-- Monitor Art -->
+  <path d="M 140 100 Q 300 115 460 100 L 460 250 Q 300 265 140 250 Z" fill="#0F172A" stroke="#00F0FF" stroke-width="2.5" />
+  <path d="M 148 108 Q 300 121 452 108 L 452 242 Q 300 255 148 242 Z" fill="#1E293B" />
+  <circle cx="300" cy="180" r="30" fill="none" stroke="#00F0FF" stroke-width="2" />
+  <polygon points="290,255 310,255 305,295 295,295" fill="#1E293B" stroke="#475569" stroke-width="1.5" />
+  <polygon points="250,305 350,305 300,295" fill="#334155" />
+  <text x="300" y="360" fill="#FFFFFF" font-size="20" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="2">MONITORS</text>
+</svg>

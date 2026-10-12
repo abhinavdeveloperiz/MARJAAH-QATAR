@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#0F2438" />
+      <stop offset="100%" stop-color="#040D17" />
+    </radialGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#bg)" rx="20" />
+  <circle cx="300" cy="210" r="140" fill="#38BDF8" opacity="0.12" />
+  <!-- Router Art with Antennas & Signal -->
+  <line x1="220" y1="90" x2="220" y2="180" stroke="#38BDF8" stroke-width="4" stroke-linecap="round" />
+  <line x1="300" y1="70" x2="300" y2="180" stroke="#38BDF8" stroke-width="4" stroke-linecap="round" />
+  <line x1="380" y1="90" x2="380" y2="180" stroke="#38BDF8" stroke-width="4" stroke-linecap="round" />
+  <rect x="180" y="180" width="240" height="60" rx="10" fill="#0F172A" stroke="#38BDF8" stroke-width="2" />
+  <circle cx="230" cy="210" r="4" fill="#00F0FF" />
+  <circle cx="260" cy="210" r="4" fill="#00F0FF" />
+  <circle cx="290" cy="210" r="4" fill="#00F0FF" />
+  <circle cx="320" cy="210" r="4" fill="#00F0FF" />
+  <text x="300" y="360" fill="#FFFFFF" font-size="20" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="2">NETWORKING</text>
+</svg>

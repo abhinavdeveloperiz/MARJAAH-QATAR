@@ -8,5 +8,9 @@ env/
 venv/
 # .env
 # db.sqlite3
+serviceAccountKey.json
+firebase-credentials.json
+*credentials*.json
+*service_account*.json
 .git/
 .gitignore

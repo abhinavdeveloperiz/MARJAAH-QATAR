@@ -12,39 +12,49 @@ def export_static_site():
     client = Client()
     
     # Create public directory
-    public_dir = os.path.join(os.path.dirname(__file__), 'public')
-    if not os.path.exists(public_dir):
-        os.makedirs(public_dir)
+    frontend_dir = os.path.join(os.path.dirname(__file__), 'frontend')
+    if not os.path.exists(frontend_dir):
+        os.makedirs(frontend_dir)
 
-    # Copy all static assets to public/static
-    static_src = os.path.join(os.path.dirname(__file__), 'static')
-    static_dest = os.path.join(public_dir, 'static')
-    if os.path.exists(static_src):
-        if os.path.exists(static_dest):
-            shutil.rmtree(static_dest)
-        shutil.copytree(static_src, static_dest)
-        print("Copied static assets.")
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    admin_user = User.objects.filter(is_superuser=True).first()
+    if admin_user:
+        client.force_login(admin_user)
+        print(f"Logged in as admin: {admin_user.username}")
 
-    # List of routes to export
+    # Set cart in session
+    session = client.session
+    session['cart'] = {
+        'asus': {
+            'slug': 'asus-rog-strix-g16-gaming-laptop',
+            'name': 'ASUS ROG Strix G16',
+            'price': 6499.0,
+            'quantity': 1,
+            'image': '/static/images/products/asus-rog-g16.png'
+        }
+    }
+    session.save()
+
+    from store.models import Order
+    order = Order.objects.first()
+    if order:
+        order.user = admin_user
+        order.save()
+        order_id = order.pk
+    else:
+        order_id = 1
+
     routes = {
-        '/': 'index.html',
-        '/shop/': 'shop.html',
-        '/cart/': 'cart.html',
-        '/checkout/': 'checkout.html',
-        '/login/': 'login.html',
-        '/register/': 'register.html',
-        '/account/': 'account.html',
-        '/wishlist/': 'wishlist.html',
-        '/about/': 'about.html',
-        '/contact/': 'contact.html',
-        '/offers/': 'offers.html',
+        '/en/checkout/': 'checkout.html',
+        f'/en/checkout/success/{order_id}/': 'checkout-success.html',
     }
 
     for route, filename in routes.items():
         try:
             response = client.get(route)
             if response.status_code == 200:
-                filepath = os.path.join(public_dir, filename)
+                filepath = os.path.join(frontend_dir, filename)
                 with open(filepath, 'w', encoding='utf-8') as f:
                     f.write(response.content.decode('utf-8'))
                 print(f"Exported {route} -> {filename}")
