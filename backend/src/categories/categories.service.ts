@@ -60,8 +60,16 @@ export class CategoriesService {
       throw new BadRequestException('Name and slug are required');
     }
     const now = new Date().toISOString();
+
+    let image = data.image;
+    if (image && typeof image === 'string' && image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(image, `cat_${data.slug}.jpg`, 'categories');
+      image = uploadRes.url;
+    }
+
     const category = {
       ...data,
+      image: image || null,
       is_featured: Boolean(data.is_featured),
       order: Number(data.order) || 0,
       product_count: Number(data.product_count) || 0,
@@ -79,10 +87,17 @@ export class CategoriesService {
     if (!doc.exists) {
       throw new NotFoundException(`Category ${id} not found`);
     }
-    const updateData = {
+
+    const updateData: any = {
       ...data,
       updated_at: new Date().toISOString(),
     };
+
+    if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(data.image, `cat_${id}.jpg`, 'categories');
+      updateData.image = uploadRes.url;
+    }
+
     await docRef.update(updateData);
     return { id, ...doc.data(), ...updateData };
   }

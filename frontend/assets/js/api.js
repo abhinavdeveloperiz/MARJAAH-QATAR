@@ -156,6 +156,20 @@
     firebaseLogin(idToken) { return this.post('/api/auth/firebase-login', { idToken }); }
     submitContact(message) { return this.post('/api/contact', message); }
     getDashboard() { return this.get('/api/admin/dashboard'); }
+
+    // ── Admin & Storage upload methods ──────────────────
+    async uploadImage(file, folder = 'products') {
+      const formData = new FormData();
+      formData.append('image', file);
+      formData.append('folder', folder);
+      return this.post(`/api/upload/image?folder=${encodeURIComponent(folder)}`, formData);
+    }
+    createProduct(data) { return this.post('/api/products', data); }
+    updateProduct(id, data) { return this.put(`/api/products/${id}`, data); }
+    deleteProduct(id) { return this.delete(`/api/products/${id}`); }
+    createCategory(data) { return this.post('/api/categories', data); }
+    updateCategory(id, data) { return this.put(`/api/categories/${id}`, data); }
+    createSubcategory(data) { return this.post('/api/subcategories', data); }
   }
 
   global.api = new ApiClient(API_CONFIG);

@@ -23,15 +23,31 @@ export class UsersService {
     return { id: doc.id, ...safeData };
   }
 
-  async update(id: string, data: any) {
+  async update(id: string, data: any, requestingUser?: any) {
     const docRef = this.firestore.doc('users', id);
     const doc = await docRef.get();
     if (!doc.exists) {
       throw new NotFoundException(`User ${id} not found`);
     }
 
-    const { password, id: omittedId, ...updateData } = data;
-    updateData.updated_at = new Date().toISOString();
+    const isAdmin = requestingUser?.is_staff || requestingUser?.role === 'admin';
+    const updateData: any = {
+      updated_at: new Date().toISOString(),
+    };
+
+    const safeFields = ['first_name', 'last_name', 'phone', 'avatar', 'address'];
+    for (const field of safeFields) {
+      if (data[field] !== undefined) {
+        updateData[field] = data[field];
+      }
+    }
+
+    // Only administrators can change roles, permissions or staff status
+    if (isAdmin) {
+      if (data.role !== undefined) updateData.role = data.role;
+      if (data.is_staff !== undefined) updateData.is_staff = Boolean(data.is_staff);
+      if (data.is_superuser !== undefined) updateData.is_superuser = Boolean(data.is_superuser);
+    }
 
     await docRef.update(updateData);
     const updatedDoc = await docRef.get();

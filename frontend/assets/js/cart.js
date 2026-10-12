@@ -74,7 +74,7 @@
       } else {
         const firstImg = Array.isArray(product.images) && product.images.length > 0
           ? product.images[0]
-          : (product.primary_image || product.image || '/assets/images/products/placeholder.svg');
+          : (product.primary_image || product.image || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg');
 
         this.items.push({
           id: product.id || '',
@@ -218,7 +218,7 @@
       const itemsHtml = this.items.map(item => `
         <div class="flex items-center gap-3 p-3 rounded-2xl border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
           <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface)">
-            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='/assets/images/products/placeholder.svg'" />
+            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
           </div>
           <div class="flex-1 min-w-0">
             <h4 class="text-xs sm:text-sm font-semibold truncate leading-tight mb-1" style="color:var(--text-primary)">${isAr && item.name_ar ? item.name_ar : item.name}</h4>
@@ -298,7 +298,7 @@
         <div class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 rounded-3xl border gap-4" style="background:var(--bg-surface);border-color:var(--border-color)">
           <div class="flex items-center gap-4 w-full sm:w-auto">
             <div class="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
-              <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='/assets/images/products/placeholder.svg'" />
+              <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
             </div>
             <div>
               <h3 class="font-bold text-sm sm:text-base leading-tight mb-1" style="color:var(--text-primary)">

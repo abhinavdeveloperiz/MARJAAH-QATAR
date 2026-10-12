@@ -4,7 +4,9 @@
   "description": "MARJAAH Qatar E-Commerce Platform (NestJS + Firebase Firestore)",
   "scripts": {
     "start": "cd backend && node dist/main.js",
+    "start:backend": "cd backend && npm run start:prod",
     "dev:backend": "cd backend && npm run start:dev",
+    "start:frontend": "node backend/scripts/serve-frontend.js",
     "build:backend": "cd backend && npm run build",
     "test:e2e": "cd backend && node test/e2e-verification.js",
     "deploy:hosting": "firebase deploy --only hosting"

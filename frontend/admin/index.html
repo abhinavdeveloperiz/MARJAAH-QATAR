@@ -700,8 +700,25 @@
 
     <!-- Product Catalogue Preview -->
     <div class="mt-8 rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
-      <div class="px-6 py-4 flex items-center justify-between border-b" style="border-color:var(--border-color)">
-        <h2 class="font-bold text-base" style="color:var(--text-primary)">Catalogue Preview (Top 20)</h2>
+      <div class="px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b" style="border-color:var(--border-color)">
+        <div>
+          <h2 class="font-bold text-base" style="color:var(--text-primary)">Catalogue Preview (Top 20)</h2>
+          <p class="text-xs" style="color:var(--text-tertiary)">Images stored directly in Firebase Storage</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="openAdminModal('modal-add-category')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition hover:bg-white/5 cursor-pointer" style="border-color:var(--border-color);color:var(--text-primary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+            + Category
+          </button>
+          <button onclick="openAdminModal('modal-add-subcategory')" class="px-3 py-1.5 rounded-xl text-xs font-semibold border flex items-center gap-1.5 transition hover:bg-white/5 cursor-pointer" style="border-color:var(--border-color);color:var(--text-primary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+            + Subcategory
+          </button>
+          <button onclick="openAdminModal('modal-add-product')" class="btn-primary px-3.5 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-sm cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5v14"/></svg>
+            + Add Product
+          </button>
+        </div>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
@@ -831,7 +848,7 @@ async function loadAdminDashboard() {
         <tr class="hover:bg-white/5 transition">
           <td class="px-6 py-3 font-medium" style="color:var(--text-primary)">
             <a href="/product/?slug=${p.slug}" class="hover:underline flex items-center gap-2">
-              <img src="${(p.images && p.images[0]) || p.image || '/assets/images/products/placeholder.svg'}" class="w-8 h-8 rounded-lg object-cover" />
+              <img src="${(p.images && p.images[0]) || p.image || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'}" class="w-8 h-8 rounded-lg object-cover" />
               <span>${p.name}</span>
             </a>
           </td>
@@ -854,7 +871,271 @@ async function loadAdminDashboard() {
 }
 
 document.addEventListener('DOMContentLoaded', loadAdminDashboard);
+
+function openAdminModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.remove('hidden');
+}
+
+function closeAdminModal(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('hidden');
+}
+
+async function handleAdminCreateProduct(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit-product');
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Saving to Firebase Storage...';
+
+  try {
+    const name = document.getElementById('prod-name').value.trim();
+    const name_ar = document.getElementById('prod-name-ar').value.trim();
+    const category = document.getElementById('prod-category').value.trim();
+    const brand = document.getElementById('prod-brand').value.trim();
+    const price = parseFloat(document.getElementById('prod-price').value);
+    const origPrice = parseFloat(document.getElementById('prod-orig-price').value) || null;
+    const stock = parseInt(document.getElementById('prod-stock').value, 10) || 10;
+    const fileInput = document.getElementById('prod-image-file');
+
+    let imageUrl = 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
+
+    if (fileInput.files && fileInput.files.length > 0) {
+      const uploadRes = await window.api.uploadImage(fileInput.files[0], 'products');
+      if (uploadRes && uploadRes.url) {
+        imageUrl = uploadRes.url;
+      }
+    }
+
+    btn.textContent = 'Writing to Firestore...';
+    await window.api.createProduct({
+      name,
+      name_ar,
+      category,
+      brand,
+      price,
+      original_price: origPrice,
+      stock_count: stock,
+      in_stock: stock > 0,
+      image: imageUrl,
+      images: [imageUrl]
+    });
+
+    closeAdminModal('modal-add-product');
+    document.getElementById('form-add-product').reset();
+    if (window.Toast) window.Toast.success('Product saved with Firebase Storage image!');
+    await loadAdminDashboard();
+  } catch (err) {
+    console.error('Failed to create product:', err);
+    if (window.Toast) window.Toast.error(err.message || 'Failed to create product');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+}
+
+async function handleAdminCreateCategory(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit-category');
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Uploading to Storage...';
+
+  try {
+    const name = document.getElementById('cat-name').value.trim();
+    const name_ar = document.getElementById('cat-name-ar').value.trim();
+    const slug = document.getElementById('cat-slug').value.trim();
+    const fileInput = document.getElementById('cat-image-file');
+
+    let imageUrl = null;
+    if (fileInput.files && fileInput.files.length > 0) {
+      const uploadRes = await window.api.uploadImage(fileInput.files[0], 'categories');
+      if (uploadRes && uploadRes.url) {
+        imageUrl = uploadRes.url;
+      }
+    }
+
+    btn.textContent = 'Saving to Firestore...';
+    await window.api.createCategory({
+      name,
+      name_ar,
+      slug,
+      image: imageUrl
+    });
+
+    closeAdminModal('modal-add-category');
+    document.getElementById('form-add-category').reset();
+    if (window.Toast) window.Toast.success('Category created with Firebase Storage image!');
+    await loadAdminDashboard();
+  } catch (err) {
+    console.error('Failed to create category:', err);
+    if (window.Toast) window.Toast.error(err.message || 'Failed to create category');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+}
+
+async function handleAdminCreateSubcategory(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btn-submit-subcategory');
+  const origText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Uploading to Storage...';
+
+  try {
+    const category_name = document.getElementById('subcat-parent').value.trim();
+    const name = document.getElementById('subcat-name').value.trim();
+    const slug = document.getElementById('subcat-slug').value.trim();
+    const fileInput = document.getElementById('subcat-image-file');
+
+    let imageUrl = null;
+    if (fileInput.files && fileInput.files.length > 0) {
+      const uploadRes = await window.api.uploadImage(fileInput.files[0], 'categories');
+      if (uploadRes && uploadRes.url) {
+        imageUrl = uploadRes.url;
+      }
+    }
+
+    btn.textContent = 'Saving to Firestore...';
+    await window.api.createSubcategory({
+      name,
+      slug,
+      category_name,
+      image: imageUrl
+    });
+
+    closeAdminModal('modal-add-subcategory');
+    document.getElementById('form-add-subcategory').reset();
+    if (window.Toast) window.Toast.success('Subcategory created with Firebase Storage image!');
+    await loadAdminDashboard();
+  } catch (err) {
+    console.error('Failed to create subcategory:', err);
+    if (window.Toast) window.Toast.error(err.message || 'Failed to create subcategory');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = origText;
+  }
+}
 </script>
+
+  <!-- MODAL: ADD PRODUCT -->
+  <div id="modal-add-product" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-lg rounded-2xl border p-6 max-h-[90vh] overflow-y-auto" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="flex items-center justify-between pb-3 border-b mb-4" style="border-color:var(--border-color)">
+        <h3 class="font-bold text-base" style="color:var(--text-primary)">Add New Product</h3>
+        <button onclick="closeAdminModal('modal-add-product')" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10" style="color:var(--text-tertiary)">✕</button>
+      </div>
+      <form id="form-add-product" onsubmit="handleAdminCreateProduct(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Product Name (English) *</label>
+          <input type="text" id="prod-name" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. Alienware m18 R2 Gaming Laptop" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Product Name (Arabic)</label>
+          <input type="text" id="prod-name-ar" class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="اسم المنتج بالعربية" dir="rtl" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Category *</label>
+            <input type="text" id="prod-category" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. Laptops" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Brand *</label>
+            <input type="text" id="prod-brand" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. Dell" />
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Price (QAR) *</label>
+            <input type="number" id="prod-price" step="0.01" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="999" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Original Price</label>
+            <input type="number" id="prod-orig-price" step="0.01" class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="1199" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Stock Quantity *</label>
+            <input type="number" id="prod-stock" required value="10" class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Product Image (Uploads to Firebase Storage) *</label>
+          <input type="file" id="prod-image-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700 cursor-pointer" />
+          <p class="text-[11px] mt-1 text-slate-400">File will be uploaded directly to Firebase Storage bucket and linked to Firestore.</p>
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t" style="border-color:var(--border-color)">
+          <button type="button" onclick="closeAdminModal('modal-add-product')" class="px-4 py-2 rounded-xl text-xs font-semibold border hover:bg-white/5 cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)">Cancel</button>
+          <button type="submit" id="btn-submit-product" class="btn-primary px-5 py-2 rounded-xl text-xs font-bold shadow-sm cursor-pointer">Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD CATEGORY -->
+  <div id="modal-add-category" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md rounded-2xl border p-6" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="flex items-center justify-between pb-3 border-b mb-4" style="border-color:var(--border-color)">
+        <h3 class="font-bold text-base" style="color:var(--text-primary)">Add Category</h3>
+        <button onclick="closeAdminModal('modal-add-category')" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10" style="color:var(--text-tertiary)">✕</button>
+      </div>
+      <form id="form-add-category" onsubmit="handleAdminCreateCategory(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Category Name (English) *</label>
+          <input type="text" id="cat-name" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. Gaming Laptops" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Category Name (Arabic)</label>
+          <input type="text" id="cat-name-ar" class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="اسم الفئة بالعربية" dir="rtl" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Slug *</label>
+          <input type="text" id="cat-slug" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. gaming-laptops" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Category Image (Firebase Storage)</label>
+          <input type="file" id="cat-image-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary-600 file:text-white cursor-pointer" />
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t" style="border-color:var(--border-color)">
+          <button type="button" onclick="closeAdminModal('modal-add-category')" class="px-4 py-2 rounded-xl text-xs font-semibold border hover:bg-white/5 cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)">Cancel</button>
+          <button type="submit" id="btn-submit-category" class="btn-primary px-5 py-2 rounded-xl text-xs font-bold shadow-sm cursor-pointer">Save Category</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD SUBCATEGORY -->
+  <div id="modal-add-subcategory" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-md rounded-2xl border p-6" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="flex items-center justify-between pb-3 border-b mb-4" style="border-color:var(--border-color)">
+        <h3 class="font-bold text-base" style="color:var(--text-primary)">Add Subcategory</h3>
+        <button onclick="closeAdminModal('modal-add-subcategory')" class="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-white/10" style="color:var(--text-tertiary)">✕</button>
+      </div>
+      <form id="form-add-subcategory" onsubmit="handleAdminCreateSubcategory(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Parent Category *</label>
+          <input type="text" id="subcat-parent" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. Laptops" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Subcategory Name (English) *</label>
+          <input type="text" id="subcat-name" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. Ultraportables" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Slug *</label>
+          <input type="text" id="subcat-slug" required class="w-full px-3 py-2 rounded-xl text-xs border" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" placeholder="e.g. ultraportables" />
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">Subcategory Image (Firebase Storage)</label>
+          <input type="file" id="subcat-image-file" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-primary-600 file:text-white cursor-pointer" />
+        </div>
+        <div class="pt-3 flex justify-end gap-2 border-t" style="border-color:var(--border-color)">
+          <button type="button" onclick="closeAdminModal('modal-add-subcategory')" class="px-4 py-2 rounded-xl text-xs font-semibold border hover:bg-white/5 cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)">Cancel</button>
+          <button type="submit" id="btn-submit-subcategory" class="btn-primary px-5 py-2 rounded-xl text-xs font-bold shadow-sm cursor-pointer">Save Subcategory</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   </main>
 

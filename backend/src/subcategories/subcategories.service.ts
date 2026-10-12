@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { FirestoreService } from '../firebase/firestore.service';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class SubcategoriesService {
-  constructor(private readonly firestore: FirestoreService) {}
+  constructor(
+    private readonly firestore: FirestoreService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   async findAll(categoryId?: string, categorySlug?: string) {
     let query: any = this.firestore.collection('subcategories');
@@ -42,8 +46,16 @@ export class SubcategoriesService {
       throw new BadRequestException('Name and slug are required');
     }
     const now = new Date().toISOString();
+
+    let image = data.image;
+    if (image && typeof image === 'string' && image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(image, `subcat_${data.slug}.jpg`, 'categories');
+      image = uploadRes.url;
+    }
+
     const subcategory = {
       ...data,
+      image: image || null,
       created_at: now,
       updated_at: now,
     };
@@ -57,10 +69,17 @@ export class SubcategoriesService {
     if (!doc.exists) {
       throw new NotFoundException(`Subcategory ${id} not found`);
     }
-    const updateData = {
+
+    const updateData: any = {
       ...data,
       updated_at: new Date().toISOString(),
     };
+
+    if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(data.image, `subcat_${id}.jpg`, 'categories');
+      updateData.image = uploadRes.url;
+    }
+
     await docRef.update(updateData);
     return { id, ...doc.data(), ...updateData };
   }
@@ -72,6 +91,6 @@ export class SubcategoriesService {
       throw new NotFoundException(`Subcategory ${id} not found`);
     }
     await docRef.delete();
-    return { success: true, message: `Subcategory ${id} deleted` };
+    return { id, message: `Subcategory ${id} deleted successfully` };
   }
 }

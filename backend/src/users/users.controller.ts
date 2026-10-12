@@ -31,7 +31,7 @@ export class UsersController {
     if (!isOwner && !isAdmin) {
       throw new ForbiddenException('Access denied');
     }
-    return this.usersService.update(id, body);
+    return this.usersService.update(id, body, req.user);
   }
 
   @Get(':id/addresses')

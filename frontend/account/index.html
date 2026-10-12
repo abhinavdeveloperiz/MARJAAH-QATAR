@@ -1129,25 +1129,9 @@ function cancelOrder(orderId) {
     btn.innerText = isAr ? 'جاري الإلغاء…' : 'Cancelling…';
   }
 
-  function getCsrf() {
-    if (window.CSRF_TOKEN && window.CSRF_TOKEN !== 'NOTPROVIDED') return window.CSRF_TOKEN;
-    const meta = document.querySelector('meta[name="csrf-token"]');
-    if (meta && meta.content) return meta.content;
-    return document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1] || '';
-  }
-
-  const locale = document.documentElement.lang || 'en';
-  fetch('/' + locale + '/api/order/cancel/', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': getCsrf(),
-    },
-    body: JSON.stringify({ order_id: orderId }),
-  })
-  .then(r => r.json())
+  window.ApiClient.cancelOrder(orderId)
   .then(res => {
-    if (res.success) {
+    if (res && res.success) {
       if (typeof Toast !== 'undefined') {
         Toast.success(res.message || (isAr ? 'تم إلغاء الطلب بنجاح' : 'Order cancelled successfully!'));
       }
@@ -1165,10 +1149,11 @@ function cancelOrder(orderId) {
         btn.style.opacity = '1';
         btn.innerText = isAr ? 'إلغاء الطلب' : 'Cancel Order';
       }
+      const err = (res && res.message) || (isAr ? 'تعذر إلغاء الطلب' : 'Could not cancel order.');
       if (typeof Toast !== 'undefined') {
-        Toast.error(res.error || (isAr ? 'تعذر إلغاء الطلب' : 'Could not cancel order.'));
+        Toast.error(err);
       } else {
-        alert(res.error || 'Could not cancel order.');
+        alert(err);
       }
     }
   })

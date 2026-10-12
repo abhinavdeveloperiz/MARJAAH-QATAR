@@ -17,7 +17,7 @@
     const name = (isRtl && product.name_ar) ? product.name_ar : (product.name || 'Product');
     const price = product.price;
     const originalPrice = product.original_price;
-    const image = product.image || (Array.isArray(product.images) && product.images[0]) || '/assets/images/products/placeholder.svg';
+    const image = product.image || (Array.isArray(product.images) && product.images[0]) || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
     const inStock = product.in_stock !== false && (product.stock_count === undefined || product.stock_count > 0);
     const brandName = product.brand || '';
     const delay = (index % 8) * 50;
@@ -49,7 +49,7 @@
             style="background:rgba(255,255,255,0.9);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
-          <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108" loading="lazy" onerror="this.src='/assets/images/products/placeholder.svg'" />
+          <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108" loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
         </a>
         <div class="p-4 flex flex-col flex-1">
           <div class="mb-1.5">
@@ -359,7 +359,7 @@
       const pOrigPrice = product.original_price;
       const pStock = product.stock_count !== undefined ? product.stock_count : (product.in_stock ? 10 : 0);
       const inStock = product.in_stock !== false && pStock > 0;
-      const primaryImage = product.image || (Array.isArray(product.images) && product.images[0]) || '/assets/images/products/placeholder.svg';
+      const primaryImage = product.image || (Array.isArray(product.images) && product.images[0]) || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
 
       // Document title
       document.title = `${pName} — M.SHOP Qatar`;

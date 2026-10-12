@@ -63,6 +63,16 @@
   if (searchOverlay) searchOverlay.addEventListener('click', function(e) {
     if (e.target === searchOverlay) searchOverlay.classList.add('hidden');
   });
+  if (searchInput) {
+    searchInput.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const q = searchInput.value.trim();
+        if (q) {
+          window.location.href = `/shop/?search=${encodeURIComponent(q)}`;
+        }
+      }
+    });
+  }
 
   // User dropdown
   const userBtn = document.getElementById('user-menu-btn');

@@ -7,21 +7,48 @@ export interface UploadResult {
   path: string;
 }
 
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
+
+const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+
 @Injectable()
 export class UploadService {
   private readonly logger = new Logger(UploadService.name);
 
   constructor(private readonly firestoreService: FirestoreService) {}
 
-  async uploadFile(file: any, folder = 'products'): Promise<UploadResult> {
+  private sanitizeFolder(folder: string): string {
+    const clean = (folder || 'products').replace(/[^a-zA-Z0-9_-]/g, '');
+    return clean || 'products';
+  }
+
+  async uploadFile(file: any, rawFolder = 'products'): Promise<UploadResult> {
     if (!file || !file.buffer) {
       throw new BadRequestException('No file buffer provided for upload');
     }
 
+    if (file.buffer.length > MAX_FILE_SIZE_BYTES) {
+      throw new BadRequestException('File exceeds 5MB maximum allowed size');
+    }
+
+    const mime = (file.mimetype || 'image/jpeg').toLowerCase();
+    if (!ALLOWED_MIME_TYPES.has(mime)) {
+      throw new BadRequestException(`Unsupported file type: ${mime}. Only JPEG, PNG, WEBP, GIF, and SVG are permitted.`);
+    }
+
+    const folder = this.sanitizeFolder(rawFolder);
     const bucket = this.firestoreService.getBucket();
     const cleanOriginalName = (file.originalname || 'image.jpg')
       .toLowerCase()
-      .replace(/[^a-z0-9._-]/g, '_');
+      .replace(/[^a-z0-9._-]/g, '_')
+      .replace(/\.+/g, '.');
     const timestamp = Date.now();
     const destinationPath = `${folder}/${timestamp}_${cleanOriginalName}`;
     const fileRef = bucket.file(destinationPath);
@@ -49,7 +76,7 @@ export class UploadService {
     };
   }
 
-  async uploadBase64(base64Data: string, originalName: string, folder = 'products'): Promise<UploadResult> {
+  async uploadBase64(base64Data: string, originalName: string, rawFolder = 'products'): Promise<UploadResult> {
     if (!base64Data) {
       throw new BadRequestException('No base64 data provided');
     }
@@ -59,15 +86,25 @@ export class UploadService {
 
     if (base64Data.includes(';base64,')) {
       const parts = base64Data.split(';base64,');
-      mimeType = parts[0].replace('data:', '');
+      mimeType = (parts[0].replace('data:', '') || 'image/jpeg').toLowerCase();
       cleanBase64 = parts[1];
     }
 
+    if (!ALLOWED_MIME_TYPES.has(mimeType)) {
+      throw new BadRequestException(`Unsupported file type: ${mimeType}. Only JPEG, PNG, WEBP, GIF, and SVG are permitted.`);
+    }
+
     const buffer = Buffer.from(cleanBase64, 'base64');
+    if (buffer.length > MAX_FILE_SIZE_BYTES) {
+      throw new BadRequestException('File exceeds 5MB maximum allowed size');
+    }
+
+    const folder = this.sanitizeFolder(rawFolder);
     const bucket = this.firestoreService.getBucket();
     const cleanOriginalName = (originalName || 'uploaded.jpg')
       .toLowerCase()
-      .replace(/[^a-z0-9._-]/g, '_');
+      .replace(/[^a-z0-9._-]/g, '_')
+      .replace(/\.+/g, '.');
     const timestamp = Date.now();
     const destinationPath = `${folder}/${timestamp}_${cleanOriginalName}`;
     const fileRef = bucket.file(destinationPath);
