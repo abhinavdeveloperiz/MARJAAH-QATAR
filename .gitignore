@@ -31,7 +31,9 @@ Thumbs.db
 
 # Environment & Secrets — keep .env.example but never commit real credentials
 .env
+backend/.env
 .env.local
+backend/.env.local
 .env.*.local
 !.env.example
 serviceAccountKey.json

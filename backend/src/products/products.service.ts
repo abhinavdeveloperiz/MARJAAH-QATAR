@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { FirestoreService } from '../firebase/firestore.service';
+import { UploadService } from '../upload/upload.service';
 
 export interface ProductFilterQuery {
   page?: number;
@@ -21,7 +22,10 @@ export interface ProductFilterQuery {
 
 @Injectable()
 export class ProductsService {
-  constructor(private readonly firestore: FirestoreService) {}
+  constructor(
+    private readonly firestore: FirestoreService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   async findAll(query: ProductFilterQuery) {
     const page = Math.max(1, Number(query.page) || 1);
@@ -199,9 +203,37 @@ export class ProductsService {
     const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const now = new Date().toISOString();
 
+    // If an image is base64, automatically upload to Firebase Storage
+    let primaryImage = data.image || data.primary_image;
+    if (primaryImage && typeof primaryImage === 'string' && primaryImage.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(primaryImage, `${slug}.jpg`, 'products');
+      primaryImage = uploadRes.url;
+    }
+
+    let images = Array.isArray(data.images) ? data.images : (primaryImage ? [primaryImage] : []);
+    if (images.length > 0) {
+      images = await Promise.all(
+        images.map(async (img: any, idx: number) => {
+          if (typeof img === 'string' && img.startsWith('data:')) {
+            const res = await this.uploadService.uploadBase64(img, `${slug}_${idx}.jpg`, 'products');
+            return res.url;
+          }
+          return img;
+        })
+      );
+    } else {
+      images = ['https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'];
+    }
+
+    if (!primaryImage && images.length > 0) {
+      primaryImage = images[0];
+    }
+
     const product = {
       ...data,
       slug,
+      image: primaryImage,
+      images,
       price: Number(data.price),
       original_price: data.original_price ? Number(data.original_price) : null,
       stock_count: data.stock_count !== undefined ? Number(data.stock_count) : 10,
@@ -212,7 +244,6 @@ export class ProductsService {
       is_best_seller: Boolean(data.is_best_seller),
       rating: Number(data.rating) || 5.0,
       review_count: Number(data.review_count) || 0,
-      images: Array.isArray(data.images) ? data.images : (data.primary_image ? [data.primary_image] : ['/static/images/placeholder.svg']),
       specifications: Array.isArray(data.specifications) ? data.specifications : [],
       tags: Array.isArray(data.tags) ? data.tags : [],
       created_at: now,
@@ -234,6 +265,24 @@ export class ProductsService {
       ...data,
       updated_at: new Date().toISOString(),
     };
+
+    if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(data.image, `prod_${id}.jpg`, 'products');
+      updateData.image = uploadRes.url;
+    }
+
+    if (data.images && Array.isArray(data.images)) {
+      updateData.images = await Promise.all(
+        data.images.map(async (img: any, idx: number) => {
+          if (typeof img === 'string' && img.startsWith('data:')) {
+            const res = await this.uploadService.uploadBase64(img, `prod_${id}_${idx}.jpg`, 'products');
+            return res.url;
+          }
+          return img;
+        })
+      );
+    }
+
     if (data.price !== undefined) updateData.price = Number(data.price);
     if (data.original_price !== undefined) updateData.original_price = data.original_price ? Number(data.original_price) : null;
     if (data.stock_count !== undefined) updateData.stock_count = Number(data.stock_count);

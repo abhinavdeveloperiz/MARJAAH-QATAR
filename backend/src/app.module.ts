@@ -12,10 +12,14 @@ import { CartModule } from './cart/cart.module';
 import { OrdersModule } from './orders/orders.module';
 import { ContactModule } from './contact/contact.module';
 import { AdminModule } from './admin/admin.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', 'backend/.env', '../.env'],
+    }),
     FirebaseModule,
     AuthModule,
     UsersModule,
@@ -28,6 +32,7 @@ import { AdminModule } from './admin/admin.module';
     OrdersModule,
     ContactModule,
     AdminModule,
+    UploadModule,
   ],
 })
 export class AppModule {}

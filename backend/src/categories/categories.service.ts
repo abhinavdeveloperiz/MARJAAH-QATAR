@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { FirestoreService } from '../firebase/firestore.service';
+import { UploadService } from '../upload/upload.service';
 
 @Injectable()
 export class CategoriesService {
-  constructor(private readonly firestore: FirestoreService) {}
+  constructor(
+    private readonly firestore: FirestoreService,
+    private readonly uploadService: UploadService,
+  ) {}
 
   async findAll() {
     const snap = await this.firestore.collection('categories').get();

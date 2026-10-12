@@ -57,7 +57,7 @@ export class CartService {
 
         const firstImage = product.image || (Array.isArray(product.images) && product.images.length > 0
           ? product.images[0]
-          : (product.first_image || product.primary_image || '/static/images/placeholder.svg'));
+          : (product.first_image || product.primary_image || '/assets/images/products/placeholder.svg'));
 
         validatedItems.push({
           id: product.id,

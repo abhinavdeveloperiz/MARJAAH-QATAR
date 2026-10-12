@@ -6,23 +6,30 @@ import * as bcrypt from 'bcryptjs';
 async function runSeed() {
   console.log('--- Starting Firestore Migration / Seeding ---');
 
-  const credPath = path.resolve(__dirname, '../firebase-credentials.json');
-  if (!fs.existsSync(credPath)) {
-    console.error('Credentials file not found at:', credPath);
-    process.exit(1);
+  // 1. Credentials from .env or file
+  let credentialOption: admin.credential.Credential | null = null;
+  if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+    try {
+      credentialOption = admin.credential.cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY));
+    } catch {}
+  }
+  if (!credentialOption && fs.existsSync(path.resolve(__dirname, '../firebase-credentials.json'))) {
+    credentialOption = admin.credential.cert(JSON.parse(fs.readFileSync(path.resolve(__dirname, '../firebase-credentials.json'), 'utf8')));
+  }
+  if (!credentialOption) {
+    credentialOption = admin.credential.applicationDefault();
   }
 
-  const serviceAccount = JSON.parse(fs.readFileSync(credPath, 'utf8'));
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    projectId: serviceAccount.project_id,
+    credential: credentialOption,
+    projectId: process.env.FIREBASE_PROJECT_ID || 'marjaah-ab2a6',
   });
 
   const db = admin.firestore();
   const seedPath = path.resolve(__dirname, '../seed-data.json');
   if (!fs.existsSync(seedPath)) {
-    console.error('Seed data file not found at:', seedPath);
-    process.exit(1);
+    console.log('Seed data already processed and deleted. Skipping seed operation.');
+    return;
   }
 
   const seedData = JSON.parse(fs.readFileSync(seedPath, 'utf8'));
@@ -129,7 +136,7 @@ async function runSeed() {
       price: Number(oi.unit_price),
       quantity: Number(oi.quantity),
       line_total: Number(oi.unit_price) * Number(oi.quantity),
-      image: oi.product_image || '/static/images/placeholder.svg',
+      image: oi.product_image || '/assets/images/products/placeholder.svg',
     }));
 
     await oRef.set({
