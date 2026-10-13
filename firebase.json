@@ -5,6 +5,22 @@
   "storage": {
     "rules": "storage.rules"
   },
+  "functions": [
+    {
+      "source": "backend",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ],
+      "predeploy": [
+        "npm --prefix \"$RESOURCE_DIR\" run build"
+      ]
+    }
+  ],
   "hosting": {
     "public": "frontend",
     "cleanUrls": true,
@@ -24,6 +40,10 @@
       { "source": "/contact.html", "destination": "/contact/", "type": 301 },
       { "source": "/account.html", "destination": "/account/", "type": 301 },
       { "source": "/admin-dashboard.html", "destination": "/admin/", "type": 301 },
+      { "source": "/admin-login", "destination": "/admin/", "type": 301 },
+      { "source": "/admin-login.html", "destination": "/admin/", "type": 301 },
+      { "source": "/admin/login", "destination": "/admin/", "type": 301 },
+      { "source": "/admin/login/**", "destination": "/admin/", "type": 301 },
       { "source": "/login.html", "destination": "/login/", "type": 301 },
       { "source": "/register.html", "destination": "/register/", "type": 301 },
       { "source": "/forgot-password.html", "destination": "/forgot-password/", "type": 301 },
@@ -40,16 +60,51 @@
       { "source": "/images/products/:file*", "destination": "/assets/images/products/:file*", "type": 301 },
       { "source": "/images/banners/:file*", "destination": "/assets/images/banners/:file*", "type": 301 },
       { "source": "/css/:file*", "destination": "/assets/css/:file*", "type": 301 },
-      { "source": "/js/:file*", "destination": "/assets/js/:file*", "type": 301 }
+      { "source": "/js/:file*", "destination": "/assets/js/:file*", "type": 301 },
+      { "source": "/en", "destination": "/", "type": 301 },
+      { "source": "/en/", "destination": "/", "type": 301 },
+      { "source": "/en/:path*", "destination": "/:path*", "type": 301 }
     ],
     "rewrites": [
       {
         "source": "/api/**",
-        "run": {
-          "serviceId": "marjaah-backend",
+        "function": {
+          "functionId": "api",
           "region": "us-central1"
         }
-      }
+      },
+      { "source": "/ar", "destination": "/index.html" },
+      { "source": "/ar/", "destination": "/index.html" },
+      { "source": "/ar/shop", "destination": "/shop/index.html" },
+      { "source": "/ar/shop/**", "destination": "/shop/index.html" },
+      { "source": "/ar/cart", "destination": "/cart/index.html" },
+      { "source": "/ar/cart/**", "destination": "/cart/index.html" },
+      { "source": "/ar/checkout", "destination": "/checkout/index.html" },
+      { "source": "/ar/checkout/**", "destination": "/checkout/index.html" },
+      { "source": "/ar/checkout-success", "destination": "/checkout-success/index.html" },
+      { "source": "/ar/checkout-success/**", "destination": "/checkout-success/index.html" },
+      { "source": "/ar/checkout/success", "destination": "/checkout-success/index.html" },
+      { "source": "/ar/checkout/success/**", "destination": "/checkout-success/index.html" },
+      { "source": "/ar/about", "destination": "/about/index.html" },
+      { "source": "/ar/about/**", "destination": "/about/index.html" },
+      { "source": "/ar/contact", "destination": "/contact/index.html" },
+      { "source": "/ar/contact/**", "destination": "/contact/index.html" },
+      { "source": "/ar/login", "destination": "/login/index.html" },
+      { "source": "/ar/login/**", "destination": "/login/index.html" },
+      { "source": "/ar/register", "destination": "/register/index.html" },
+      { "source": "/ar/register/**", "destination": "/register/index.html" },
+      { "source": "/ar/forgot-password", "destination": "/forgot-password/index.html" },
+      { "source": "/ar/forgot-password/**", "destination": "/forgot-password/index.html" },
+      { "source": "/ar/account", "destination": "/account/index.html" },
+      { "source": "/ar/account/**", "destination": "/account/index.html" },
+      { "source": "/ar/wishlist", "destination": "/wishlist/index.html" },
+      { "source": "/ar/wishlist/**", "destination": "/wishlist/index.html" },
+      { "source": "/ar/offers", "destination": "/offers/index.html" },
+      { "source": "/ar/offers/**", "destination": "/offers/index.html" },
+      { "source": "/ar/product", "destination": "/product/index.html" },
+      { "source": "/ar/product/**", "destination": "/product/index.html" },
+      { "source": "/ar/admin", "destination": "/admin/index.html" },
+      { "source": "/ar/admin/**", "destination": "/admin/index.html" }
     ]
   }
 }

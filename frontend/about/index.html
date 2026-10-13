@@ -393,7 +393,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
     </div>
-    <form method="get" action="/en/shop/" class="mt-4">
+    <form method="get" action="/shop/" class="mt-4">
       <div class="relative">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--color-accent)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="search-input" name="search" type="text" placeholder="Search M.SHOP Catalog..."
@@ -605,45 +605,360 @@
     
     
 <div class="pt-[72px] min-h-screen">
-  <div class="py-20 text-center relative overflow-hidden" style="background:var(--bg-surface)">
-    <div class="absolute inset-0 pointer-events-none"><div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] rounded-full opacity-10" style="background:radial-gradient(circle,#4063B2,transparent 70%)"></div></div>
-    <div class="relative container-custom max-w-3xl">
-      <div class="section-eyebrow">Our Story</div>
-      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-display font-black mb-6" style="color:var(--text-primary)">
-        
-        Qatar's Hardware<br/><span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Authority.</span>
-        
+  <!-- HERO SECTION -->
+  <div class="py-20 text-center relative overflow-hidden border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
+    <div class="absolute inset-0 pointer-events-none">
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] rounded-full opacity-10" style="background:radial-gradient(circle,#4063B2,transparent 70%)"></div>
+      <div class="absolute -top-24 -left-24 w-80 h-80 rounded-full bg-indigo-500/10 blur-3xl"></div>
+      <div class="absolute -bottom-24 -right-24 w-80 h-80 rounded-full bg-rose-500/10 blur-3xl"></div>
+    </div>
+    <div class="relative container-custom max-w-4xl">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-4 border bg-indigo-500/10 text-indigo-400 border-indigo-500/20">
+        <span class="w-2 h-2 rounded-full bg-indigo-400"></span>
+        Established in Doha &bull; State of Qatar
+      </div>
+      <h1 class="text-3xl sm:text-5xl lg:text-6xl font-display font-black mb-6 tracking-tight" style="color:var(--text-primary)">
+        Qatar's Hardware<br/>
+        <span style="background:linear-gradient(135deg,#4063B2,#8D9CF5,#BB9AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Authority &amp; Tech Hub.</span>
       </h1>
-      <p class="text-base leading-relaxed max-w-2xl mx-auto" style="color:var(--text-secondary)">
-        
-        M.SHOP is Qatar's premier destination for high-performance computing hardware. We curate the world's best tech products — from flagship laptops and RTX workstations to OLED monitors and gaming peripherals — backed by official GCC warranties and expert support.
-        
+      <p class="text-base sm:text-lg leading-relaxed max-w-2xl mx-auto" style="color:var(--text-secondary)">
+        M.SHOP is Qatar's premier destination for high-performance computing hardware. We curate the world's finest gaming laptops, RTX workstations, high-refresh OLED monitors, and custom PC components — backed by official GCC warranties and an in-house assembly lab in Doha.
       </p>
+      <div class="flex flex-wrap items-center justify-center gap-4 mt-8">
+        <a href="/shop/" class="btn-primary px-6 py-3 rounded-xl text-xs font-bold shadow-lg">Browse Catalogue</a>
+        <a href="/offers/" class="px-6 py-3 rounded-xl text-xs font-bold border transition hover:bg-white/5" style="border-color:var(--border-color);color:var(--text-primary)">Explore Deals &amp; Offers</a>
+      </div>
     </div>
   </div>
-  <div class="container-custom py-16">
-    <div class="grid sm:grid-cols-3 gap-8 mb-16">
-      <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-        <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">500+</div>
-        <p class="text-sm font-bold" style="color:var(--text-primary)">Products Stocked</p>
-        <p class="text-xs mt-1" style="color:var(--text-secondary)">Latest hardware from top brands</p>
+
+  <!-- KEY METRICS GRID -->
+  <div class="container-custom py-12">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="p-6 rounded-3xl text-center border backdrop-blur-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="text-3xl sm:text-4xl font-display font-black mb-1" style="color:var(--color-accent)">500+</div>
+        <p class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">Products Stocked</p>
+        <p class="text-[11px] mt-1" style="color:var(--text-secondary)">Latest RTX 40/50 &amp; Intel/AMD chips</p>
       </div>
-      <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-        <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">50+</div>
-        <p class="text-sm font-bold" style="color:var(--text-primary)">Global Brands</p>
-        <p class="text-xs mt-1" style="color:var(--text-secondary)">Official authorized reseller</p>
+      <div class="p-6 rounded-3xl text-center border backdrop-blur-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="text-3xl sm:text-4xl font-display font-black mb-1" style="color:var(--color-accent)">50+</div>
+        <p class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">Global Brands</p>
+        <p class="text-[11px] mt-1" style="color:var(--text-secondary)">Official authorized Middle East reseller</p>
       </div>
-      <div class="text-center p-8 rounded-3xl" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-        <div class="text-4xl font-display font-black mb-2" style="color:var(--color-accent)">100%</div>
-        <p class="text-sm font-bold" style="color:var(--text-primary)">Genuine Products</p>
-        <p class="text-xs mt-1" style="color:var(--text-secondary)">Authentic with official warranty</p>
+      <div class="p-6 rounded-3xl text-center border backdrop-blur-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="text-3xl sm:text-4xl font-display font-black mb-1 text-emerald-400">100%</div>
+        <p class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">Genuine GCC Warranty</p>
+        <p class="text-[11px] mt-1" style="color:var(--text-secondary)">Direct Doha RMA &amp; local testing</p>
+      </div>
+      <div class="p-6 rounded-3xl text-center border backdrop-blur-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="text-3xl sm:text-4xl font-display font-black mb-1 text-rose-400">2-4 Hrs</div>
+        <p class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">Express Doha Delivery</p>
+        <p class="text-[11px] mt-1" style="color:var(--text-secondary)">Climate-safe door-to-door courier</p>
       </div>
     </div>
-    <div class="text-center">
-      <a href="/contact/" class="btn-primary">Get In Touch</a>
+  </div>
+
+  <!-- 4 PILLARS OF EXCELLENCE -->
+  <div class="py-16 border-y" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+    <div class="container-custom">
+      <div class="text-center max-w-2xl mx-auto mb-14">
+        <div class="section-eyebrow">The M.SHOP Difference</div>
+        <h2 class="text-2xl sm:text-4xl font-display font-black" style="color:var(--text-primary)">Built for Qatar's Most Demanding Tech Enthusiasts</h2>
+        <p class="text-xs sm:text-sm mt-3 leading-relaxed" style="color:var(--text-secondary)">
+          From competitive esports gamers to 3D rendering studios, here is why Qatar trusts M.SHOP for authentic computing hardware.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Pillar 1 -->
+        <div class="p-6 rounded-2xl border space-y-3 transition duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h3 class="font-bold text-sm sm:text-base" style="color:var(--text-primary)">100% Brand Authorized</h3>
+          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">
+            Zero grey market imports or refurbished components. Every item comes sealed in manufacturer retail packaging with legitimate Middle East distributor serial numbers.
+          </p>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="p-6 rounded-2xl border space-y-3 transition duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-pink-500/10 text-pink-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h3 class="font-bold text-sm sm:text-base" style="color:var(--text-primary)">PC Assembly &amp; Stress Lab</h3>
+          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">
+            Every custom gaming and workstation PC is crafted with surgical cable management, premium Thermal Grizzly paste, and 48 hours of FurMark &amp; Cinebench thermal burn-in.
+          </p>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="p-6 rounded-2xl border space-y-3 transition duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          </div>
+          <h3 class="font-bold text-sm sm:text-base" style="color:var(--text-primary)">Local Doha RMA Support</h3>
+          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">
+            No international shipping fees or months of waiting. If a component ever develops a fault, our Doha in-house technical lab facilitates instant testing and regional warranty swaps.
+          </p>
+        </div>
+
+        <!-- Pillar 4 -->
+        <div class="p-6 rounded-2xl border space-y-3 transition duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-amber-500/10 text-amber-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </div>
+          <h3 class="font-bold text-sm sm:text-base" style="color:var(--text-primary)">Climate-Safe Doha Delivery</h3>
+          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">
+            Hardware components must never sit in sweltering delivery vans. Our express dispatch team delivers across Doha, Lusail, The Pearl, and Al Wakrah in temperature-managed comfort.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRAND PARTNERS SHOWCASE -->
+  <div class="container-custom py-16">
+    <div class="text-center max-w-xl mx-auto mb-10">
+      <div class="section-eyebrow">Direct Global Brands</div>
+      <h2 class="text-2xl sm:text-3xl font-display font-black" style="color:var(--text-primary)">Partnered with Industry Titans</h2>
+      <p class="text-xs sm:text-sm mt-2" style="color:var(--text-secondary)">Supplying genuine hardware with manufacturer guarantees across Qatar.</p>
+    </div>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">ASUS ROG</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Laptops &amp; Motherboards</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">MSI</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Gaming GPUs &amp; Monitors</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">NVIDIA</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">GeForce RTX Series</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">Corsair</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Cooling, PSUs &amp; RAM</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">Razer</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Chroma Peripherals</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">Kingston Fury</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">NVMe SSDs &amp; DDR5</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">AMD Ryzen</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Processors &amp; Radeon</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">Intel Core</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Ultra Desktop &amp; Mobile</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">Lian Li</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">O11 Dynamic Cases &amp; Fans</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">DeepCool</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">AIO Liquid Coolers</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">NZXT</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">Kraken &amp; H-Series</span>
+      </div>
+      <div class="p-4 rounded-2xl border text-center flex flex-col items-center justify-center hover:border-indigo-500/50 transition cursor-default" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <span class="font-bold text-sm" style="color:var(--text-primary)">Apple</span>
+        <span class="text-[10px] mt-1" style="color:var(--text-secondary)">MacBook Pro &amp; Studio</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPARISON TABLE: M.SHOP VS GREY MARKET -->
+  <div class="py-16 border-t" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+    <div class="container-custom max-w-4xl">
+      <div class="text-center mb-10">
+        <div class="section-eyebrow">Peace of Mind</div>
+        <h2 class="text-2xl sm:text-3xl font-display font-black" style="color:var(--text-primary)">M.SHOP Qatar vs. Grey Market Importers</h2>
+        <p class="text-xs sm:text-sm mt-2" style="color:var(--text-secondary)">Why genuine local hardware saves you time, money, and frustration.</p>
+      </div>
+
+      <div class="rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead>
+              <tr class="border-b font-bold uppercase tracking-wider" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+                <th class="p-4">Feature / Service</th>
+                <th class="p-4 text-emerald-500 font-black">M.SHOP Qatar</th>
+                <th class="p-4" style="color:var(--text-tertiary)">Typical Grey Market Importer</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y" style="border-color:var(--border-color)">
+              <tr>
+                <td class="p-4 font-semibold" style="color:var(--text-primary)">Warranty Coverage</td>
+                <td class="p-4 text-emerald-500 font-bold">2 to 3 Years Official GCC Warranty</td>
+                <td class="p-4" style="color:var(--text-secondary)">14-Day or non-existent in GCC</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-semibold" style="color:var(--text-primary)">Local Doha RMA &amp; Testing</td>
+                <td class="p-4 text-emerald-500 font-bold">Yes, in-house technical team in Doha</td>
+                <td class="p-4" style="color:var(--text-secondary)">Must ship internationally at buyer expense</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-semibold" style="color:var(--text-primary)">Delivery Speed</td>
+                <td class="p-4 text-emerald-500 font-bold">Express Same-Day (2-4 Hours in Doha)</td>
+                <td class="p-4" style="color:var(--text-secondary)">10 – 25 Business Days shipping</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-semibold" style="color:var(--text-primary)">Condition &amp; Packaging</td>
+                <td class="p-4 text-emerald-500 font-bold">Factory-Sealed Official Middle East Spec</td>
+                <td class="p-4" style="color:var(--text-secondary)">Refurbished or unsealed OEM parts</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-semibold" style="color:var(--text-primary)">PC Assembly &amp; Thermal Tuning</td>
+                <td class="p-4 text-emerald-500 font-bold">Certified assembly + 48h FurMark stress test</td>
+                <td class="p-4" style="color:var(--text-secondary)">None / DIY troubleshooting risk</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-semibold" style="color:var(--text-primary)">Local Customer Support</td>
+                <td class="p-4 text-emerald-500 font-bold">Bilingual Arabic &amp; English WhatsApp 7/7</td>
+                <td class="p-4" style="color:var(--text-secondary)">Automated ticketing bot</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOWROOM & LAB DETAILS -->
+  <div class="container-custom py-16">
+    <div class="p-8 sm:p-12 rounded-3xl border relative overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <div>
+          <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-indigo-500/10 text-indigo-500 border border-indigo-500/20">Doha Tech Hub &amp; Showroom</span>
+          <h2 class="text-2xl sm:text-4xl font-display font-black mt-4 mb-3" style="color:var(--text-primary)">Visit Us or Consult an Expert</h2>
+          <p class="text-xs sm:text-sm leading-relaxed mb-6" style="color:var(--text-secondary)">
+            Looking to test a mechanical keyboard switch, inspect a high-refresh OLED gaming monitor in person, or review custom liquid-cooling loop options? Our Doha showroom is open 7 days a week.
+          </p>
+
+          <div class="space-y-3 text-xs" style="color:var(--text-secondary)">
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-indigo-500 flex-shrink-0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span><strong>Showroom Hours:</strong> Sat – Thu: 9:00 AM – 10:00 PM &bull; Fri: 4:00 PM – 10:00 PM</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-500 flex-shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <span><strong>Phone &amp; WhatsApp:</strong> <a href="tel:+97477991013" class="hover:underline font-bold" style="color:var(--text-primary)">+974 7799 1013</a></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-rose-500 flex-shrink-0"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span><strong>Showroom Location:</strong> Doha, State of Qatar</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col sm:flex-row lg:flex-col gap-4">
+          <a href="https://wa.me/97477991013" target="_blank" class="p-5 rounded-2xl border flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-[#25D366] text-white flex items-center justify-center font-bold">WA</div>
+              <div>
+                <div class="text-xs font-bold" style="color:var(--text-primary)">Chat Directly with Hardware Techs</div>
+                <div class="text-[11px]" style="color:var(--text-secondary)">Instant answers, custom PC advice, stock check</div>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+
+          <a href="/contact/" class="p-5 rounded-2xl border flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 transition" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/20 text-indigo-500 flex items-center justify-center font-bold">HQ</div>
+              <div>
+                <div class="text-xs font-bold" style="color:var(--text-primary)">Corporate &amp; Enterprise Procurement</div>
+                <div class="text-[11px]" style="color:var(--text-secondary)">Bulk ordering, tax invoices, institutional tenders</div>
+              </div>
+            </div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ ACCORDION -->
+  <div class="py-16 border-t" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+    <div class="container-custom max-w-3xl">
+      <div class="text-center mb-10">
+        <div class="section-eyebrow">Got Questions?</div>
+        <h2 class="text-2xl sm:text-3xl font-display font-black" style="color:var(--text-primary)">Frequently Asked Questions</h2>
+        <p class="text-xs sm:text-sm mt-2" style="color:var(--text-secondary)">Everything you need to know about our products and warranty in Qatar.</p>
+      </div>
+
+      <div class="space-y-3">
+        <!-- FAQ 1 -->
+        <div class="rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <button onclick="toggleAboutFaq(this)" class="w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition" style="color:var(--text-primary)">
+            <span>Are all products original, brand new, and sealed?</span>
+            <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-300 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="about-faq-content hidden p-4 pt-0 text-xs leading-relaxed border-t" style="border-color:var(--border-color);color:var(--text-secondary)">
+            Yes, 100%. M.SHOP only sells brand new, factory-sealed hardware sourced through official GCC distributors. We never sell opened box, refurbished, or grey-market units without explicit authorization and notice.
+          </div>
+        </div>
+
+        <!-- FAQ 2 -->
+        <div class="rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <button onclick="toggleAboutFaq(this)" class="w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition" style="color:var(--text-primary)">
+            <span>How does the manufacturer warranty work in Qatar?</span>
+            <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-300 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="about-faq-content hidden p-4 pt-0 text-xs leading-relaxed border-t" style="border-color:var(--border-color);color:var(--text-secondary)">
+            All laptops and PC components are backed by 1 to 3 years official manufacturer warranty. In case of any hardware malfunction, you simply drop the item at our Doha showroom or coordinate with our team on WhatsApp. We diagnose and service it directly through authorized regional service centers.
+          </div>
+        </div>
+
+        <!-- FAQ 3 -->
+        <div class="rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <button onclick="toggleAboutFaq(this)" class="w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition" style="color:var(--text-primary)">
+            <span>How quickly can I get my order delivered in Qatar?</span>
+            <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-300 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="about-faq-content hidden p-4 pt-0 text-xs leading-relaxed border-t" style="border-color:var(--border-color);color:var(--text-secondary)">
+            In-stock items are delivered same-day (typically within 2 to 4 hours) across Doha, Lusail, The Pearl, and Al Rayyan. Orders placed after 9:00 PM are delivered the following morning.
+          </div>
+        </div>
+
+        <!-- FAQ 4 -->
+        <div class="rounded-2xl border overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <button onclick="toggleAboutFaq(this)" class="w-full p-4 text-left flex items-center justify-between gap-4 font-bold text-xs sm:text-sm cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition" style="color:var(--text-primary)">
+            <span>Can I customize a PC configuration or request special hardware?</span>
+            <svg class="faq-icon w-4 h-4 text-slate-400 transition-transform duration-300 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div class="about-faq-content hidden p-4 pt-0 text-xs leading-relaxed border-t" style="border-color:var(--border-color);color:var(--text-secondary)">
+            Absolutely! Our in-house hardware technicians build bespoke gaming rigs, workstation setups, and servers. Send us your budget and target workload on WhatsApp, and we will formulate an optimized build plan with thermal stress testing included.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+
+<script>
+  function toggleAboutFaq(btn) {
+    const content = btn.nextElementSibling;
+    const icon = btn.querySelector('.faq-icon');
+    const isCurrentlyHidden = content.classList.contains('hidden');
+
+    document.querySelectorAll('.about-faq-content').forEach(c => c.classList.add('hidden'));
+    document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('rotate-180'));
+
+    if (isCurrentlyHidden) {
+      content.classList.remove('hidden');
+      if (icon) icon.classList.add('rotate-180');
+    }
+  }
+</script>
 
   </main>
 

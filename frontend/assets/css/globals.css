@@ -1047,3 +1047,17 @@ html:not(.dark) #main-navbar .lang-switcher-wrap button:not([style*="background:
     gap: 1.5rem !important;
   }
 }
+
+/* ─── Wishlist / Liked Active Heart & Glow ────────────────────────────────── */
+.wishlist-active {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.45) !important;
+  box-shadow: 0 0 12px rgba(239, 68, 68, 0.25) !important;
+}
+.wishlist-active svg {
+  fill: #ef4444 !important;
+  stroke: #ef4444 !important;
+  transform: scale(1.12);
+  transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+

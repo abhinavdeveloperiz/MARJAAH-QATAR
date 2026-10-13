@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <script>window.location.replace('/admin/' + (window.location.search || ''));</script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Portal Sign In — Marjaah Qatar</title>
+  <meta name="description" content="Secure administrative gateway for Marjaah Trading Qatar management and store controls." />
+  
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/branding/favicon.png?v=4" />
+  <link rel="icon" type="image/svg+xml" href="/assets/images/branding/favicon.svg?v=4" />
+  <link rel="shortcut icon" href="/assets/images/branding/favicon.ico?v=4" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/branding/apple-touch-icon.png?v=4" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            base: 'var(--bg-base)',
+            surface: { DEFAULT: 'var(--bg-surface)', 2: 'var(--bg-surface-2)', 3: 'var(--bg-surface-3)' },
+            navy: { DEFAULT: '#070B14', 900: '#070B14', 800: '#0D1326', 700: '#141E38' },
+            primary: { DEFAULT: '#4063B2', 400: '#8D9CF5', 500: '#4063B2', 600: '#36529A' },
+            accent: { DEFAULT: '#8D9CF5', light: '#A8B4F8', dark: '#6F80EB' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ["'Space Grotesk'", 'sans-serif'],
+            cairo: ["'Cairo'", 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Global Design System Tokens -->
+  <link rel="stylesheet" href="/assets/css/globals.css" />
+
+  <style>
+    body {
+      background-color: #070B14;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(64, 99, 178, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(141, 156, 245, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 0% 100%, rgba(187, 154, 237, 0.08) 0%, transparent 40%);
+      min-height: 100vh;
+    }
+    .glow-card {
+      background: rgba(13, 19, 38, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(141, 156, 245, 0.2);
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 30px -5px rgba(64, 99, 178, 0.3);
+    }
+  </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between min-h-screen selection:bg-indigo-500 selection:text-white">
+
+  <!-- Header minimal branding -->
+  <header class="py-6 px-6 sm:px-12 flex items-center justify-between">
+    <a href="/" class="flex items-center gap-3 group">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#4063B2] to-[#8D9CF5] flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-105 transition-transform">
+        <span class="font-display font-black text-xl text-white">M</span>
+      </div>
+      <div>
+        <span class="font-display font-black tracking-wider text-lg text-white block leading-tight">MARJAAH</span>
+        <span class="text-[10px] tracking-widest uppercase text-indigo-300 font-semibold">Qatar Management</span>
+      </div>
+    </a>
+
+    <a href="/" class="inline-flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors py-2 px-3.5 rounded-xl border border-slate-800 hover:border-slate-700 bg-slate-900/60">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      <span>Back to Store</span>
+    </a>
+  </header>
+
+  <!-- Main Sign In Container -->
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-6 my-auto">
+    <div class="w-full max-w-md glow-card rounded-3xl p-8 sm:p-10 relative overflow-hidden">
+      <!-- Top Decorative Accent -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#8D9CF5] to-transparent"></div>
+
+      <!-- Security Badge -->
+      <div class="flex items-center justify-center mb-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Admin Security Access</span>
+        </div>
+      </div>
+
+      <div class="text-center mb-8">
+        <h1 class="text-2xl sm:text-3xl font-display font-extrabold text-white tracking-tight">Admin Sign In</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-2">Enter administrative credentials saved in Database to manage orders, catalog & inventory.</p>
+      </div>
+
+      <!-- Feedback Banner -->
+      <div id="login-error-box" class="hidden mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-xs flex items-start gap-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        <span id="login-error-text">Invalid admin credentials. Please verify username and password.</span>
+      </div>
+
+      <!-- Form -->
+      <form id="admin-login-form" class="space-y-5" autocomplete="off">
+        <div>
+          <label for="admin_username" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Admin Username</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></svg>
+            </span>
+            <input 
+              type="text" 
+              id="admin_username" 
+              name="username" 
+              required 
+              placeholder="e.g. admin" 
+              value="admin"
+              class="w-full pl-11 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="admin_password" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">Admin Password</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </span>
+            <input 
+              type="password" 
+              id="admin_password" 
+              name="password" 
+              required 
+              placeholder="••••••••" 
+              class="w-full pl-11 pr-12 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all"
+            />
+            <button 
+              type="button" 
+              id="toggle-password-btn" 
+              class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors"
+              aria-label="Toggle password visibility"
+            >
+              <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2">
+          <button 
+            type="submit" 
+            id="submit-btn" 
+            class="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-[#4063B2] via-[#5B7BE8] to-[#8D9CF5] hover:from-[#36529A] hover:to-[#7B8BE5] text-white font-display font-bold text-sm tracking-wide shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <span id="btn-text">Authenticate & Sign In</span>
+            <svg id="btn-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </form>
+
+      <!-- Security Notice -->
+      <div class="mt-8 pt-6 border-t border-slate-800/80 text-center">
+        <p class="text-[11px] text-slate-500 leading-relaxed">
+          Authorized personnel only. All access attempts are authenticated against the secure Firestore <code class="text-indigo-300 font-mono">admin_credentials</code> collection.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-6 text-center text-xs text-slate-600">
+    &copy; 2026 Marjaah Trading W.L.L. Doha, Qatar. All Rights Reserved.
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/toast.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('admin-login-form');
+      const usernameInput = document.getElementById('admin_username');
+      const passwordInput = document.getElementById('admin_password');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = document.getElementById('btn-text');
+      const btnIcon = document.getElementById('btn-icon');
+      const errorBox = document.getElementById('login-error-box');
+      const errorText = document.getElementById('login-error-text');
+      const togglePasswordBtn = document.getElementById('toggle-password-btn');
+
+      // Password visibility toggle
+      togglePasswordBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePasswordBtn.innerHTML = isPassword
+          ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>'
+          : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+      });
+
+      // Form submission
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        errorBox.classList.add('hidden');
+
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+
+        if (!username || !password) {
+          errorText.textContent = 'Please enter both admin username and password.';
+          errorBox.classList.remove('hidden');
+          return;
+        }
+
+        // Set Loading State
+        submitBtn.disabled = true;
+        btnText.textContent = 'Authenticating...';
+        btnIcon.classList.add('animate-spin');
+
+        try {
+          const res = await window.api.adminLogin({ username, password });
+          if (res && res.token) {
+            window.api.setToken(res.token);
+            window.api.setUser(res.user);
+            if (window.Toast) {
+              window.Toast.success('Admin authorization verified! Redirecting to dashboard...');
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const nextUrl = urlParams.get('next') || '/admin/';
+            setTimeout(() => {
+              window.location.href = nextUrl;
+            }, 500);
+          } else {
+            throw new Error(res.message || 'Authorization failed. Please check credentials.');
+          }
+        } catch (err) {
+          console.error('Admin login failed:', err);
+          errorText.textContent = err.message || 'Invalid admin username or password. Please verify your Firestore credentials.';
+          errorBox.classList.remove('hidden');
+          submitBtn.disabled = false;
+          btnText.textContent = 'Authenticate & Sign In';
+          btnIcon.classList.remove('animate-spin');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

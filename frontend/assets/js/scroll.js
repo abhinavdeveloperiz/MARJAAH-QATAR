@@ -27,11 +27,16 @@
         observer.unobserve(entry.target);
       }
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  }, { threshold: 0.05, rootMargin: '0px 0px 50px 0px' });
 
-  document.querySelectorAll('[data-animate]').forEach(function(el) {
-    observer.observe(el);
-  });
+  function observeAnimations() {
+    document.querySelectorAll('[data-animate]:not(.anim-visible)').forEach(function(el) {
+      observer.observe(el);
+    });
+  }
+
+  window.observeAnimations = observeAnimations;
+  observeAnimations();
 
   // Hero parallax on scroll
   const heroImg = document.getElementById('hero-parallax');

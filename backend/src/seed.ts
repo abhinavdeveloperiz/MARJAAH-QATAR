@@ -97,22 +97,27 @@ async function runSeed() {
     }, { merge: true });
   }
 
-  // 6. Seed Users & Default Admin
-  console.log(`Seeding users and ensuring admin exists...`);
+  // 6. Seed Users & Default Admin (including admin_credentials collection)
+  console.log(`Seeding users and ensuring admin exists in users and admin_credentials...`);
   const adminHashed = await bcrypt.hash('admin', 10);
-  await db.collection('users').doc('admin').set({
+  const adminPayload = {
     username: 'admin',
     email: 'admin@marjaah.qa',
     first_name: 'Admin',
     last_name: 'Marjaah',
     phone: '+974 7799 1013',
     password: adminHashed,
+    raw_password: 'admin',
     is_staff: true,
     is_superuser: true,
     role: 'admin',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
-  }, { merge: true });
+  };
+
+  await db.collection('users').doc('admin').set(adminPayload, { merge: true });
+  await db.collection('admin_credentials').doc('admin').set(adminPayload, { merge: true });
+  await db.collection('admins').doc('admin').set(adminPayload, { merge: true });
 
   for (const u of seedData.users) {
     if (u.username !== 'admin') {

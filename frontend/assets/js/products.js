@@ -1,8 +1,3 @@
-/**
- * MARJAAH Qatar - Dynamic Products, Catalog & Details Engine
- * Connects Frontend seamlessly with NestJS + Firebase Firestore APIs.
- */
-
 (function (global) {
   const isRtl = document.documentElement.getAttribute('dir') === 'rtl' || window.location.pathname.startsWith('/ar');
   const locale = isRtl ? 'ar' : 'en';
@@ -22,9 +17,23 @@
     const brandName = product.brand || '';
     const delay = (index % 8) * 50;
 
-    const badgeHtml = inStock
-      ? `<span class="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">${isRtl ? 'متوفر' : 'In Stock'}</span>`
-      : `<span class="text-[10px] uppercase font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">${isRtl ? 'غير متوفر' : 'Out of Stock'}</span>`;
+    const isSaved = (typeof window.Wishlist !== 'undefined' && typeof window.Wishlist.has === 'function')
+      ? window.Wishlist.has(slug)
+      : false;
+
+    let badges = [];
+    if (product.is_featured) {
+      badges.push(`<span class="text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">★ ${isRtl ? 'مميز' : 'Featured'}</span>`);
+    }
+    if (product.is_favorite || product.is_liked) {
+      badges.push(`<span class="text-[10px] font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">♥ ${isRtl ? 'مفضل' : 'Favorite'}</span>`);
+    }
+    if (inStock) {
+      badges.push(`<span class="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">${isRtl ? 'متوفر' : 'In Stock'}</span>`);
+    } else {
+      badges.push(`<span class="text-[10px] uppercase font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">${isRtl ? 'غير متوفر' : 'Out of Stock'}</span>`);
+    }
+    const badgeHtml = badges.join('');
 
     let priceHtml = `<span class="font-display font-black text-lg sm:text-xl" style="color:var(--text-primary)">${formatPrice(price)}</span>`;
     if (originalPrice && originalPrice > price) {
@@ -41,13 +50,13 @@
          </div>`;
 
     return `
-      <div data-animate class="card group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
+      <div data-animate class="card anim-visible group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
            style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:${delay}ms">
         <a href="/product/?slug=${encodeURIComponent(slug)}" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
-          <button data-wishlist-toggle="${slug}" aria-label="Toggle wishlist"
-            class="absolute top-3 right-3 z-10 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
+          <button data-wishlist-toggle="${slug}" aria-label="Toggle liked product" aria-pressed="${isSaved ? 'true' : 'false'}"
+            class="${isSaved ? 'wishlist-active ' : ''}absolute top-3 right-3 z-10 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
             style="background:rgba(255,255,255,0.9);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="${isSaved ? '#ef4444' : 'none'}" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
           <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108" loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
         </a>
@@ -81,8 +90,9 @@
         data = await global.api.getProducts(queryParams);
       } else {
         const queryStr = typeof queryParams === 'string' ? queryParams : '?' + new URLSearchParams(queryParams).toString();
-        const base = global.API_BASE_URL || 'http://localhost:3001';
-        const res = await fetch(`${base}/api/products${queryStr}`);
+        const base = global.API_BASE_URL || (global.api && global.api.config && global.api.config.baseUrl) || '';
+        const endpoint = base.endsWith('/api') ? `${base}/products${queryStr}` : `${base}/api/products${queryStr}`;
+        const res = await fetch(endpoint);
         data = await res.json();
       }
 
@@ -101,6 +111,9 @@
       }
 
       container.innerHTML = items.map((p, idx) => renderProductCard(p, idx)).join('');
+      if (window.Wishlist && typeof window.Wishlist.sync === 'function') window.Wishlist.sync();
+      if (window.observeAnimations) window.observeAnimations();
+      container.querySelectorAll('.card, [data-animate]').forEach(card => card.classList.add('anim-visible'));
     } catch (err) {
       console.error('Error loading products for #' + containerId, err);
       container.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 font-medium">${isRtl ? 'فشل تحميل المنتجات.' : 'Failed to load products.'}</div>`;
@@ -118,15 +131,43 @@
     totalPages: 1
   };
 
+  function syncShopUrlParams() {
+    try {
+      const url = new URL(window.location.href);
+      if (shopState.category) url.searchParams.set('category', shopState.category);
+      else url.searchParams.delete('category');
+
+      if (shopState.search) url.searchParams.set('search', shopState.search);
+      else url.searchParams.delete('search');
+
+      if (shopState.sort && shopState.sort !== 'featured') url.searchParams.set('sort', shopState.sort);
+      else url.searchParams.delete('sort');
+
+      if (shopState.page > 1) url.searchParams.set('page', shopState.page);
+      else url.searchParams.delete('page');
+
+      if (shopState.limit && shopState.limit !== 8) url.searchParams.set('per_page', shopState.limit);
+      else url.searchParams.delete('per_page');
+
+      window.history.pushState({}, '', url);
+    } catch (e) { }
+  }
+
   async function loadShopCategories() {
     const pillsContainer = document.getElementById('shop-category-pills');
-    if (!pillsContainer || !global.api) return;
+    if (!pillsContainer) return;
 
     try {
-      const categories = await global.api.getCategories();
+      let categories;
+      if (global.api && typeof global.api.getCategories === 'function') {
+        categories = await global.api.getCategories();
+      } else {
+        const res = await fetch('/api/categories');
+        categories = await res.json();
+      }
       if (!Array.isArray(categories)) return;
 
-      const activeCat = shopState.category;
+      const activeCat = (shopState.category || '').toLowerCase();
       let html = `
         <a href="javascript:void(0)" data-category-slug=""
            class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer ${!activeCat ? 'bg-[#4063B2] text-white shadow-[0_4px_12px_rgba(64,99,178,0.25)]' : 'border border-slate-700/30 text-slate-400 hover:text-white'}">
@@ -137,7 +178,7 @@
       categories.forEach(cat => {
         const slug = cat.slug || cat.id;
         const name = (isRtl && cat.name_ar) ? cat.name_ar : (cat.name || slug);
-        const isActive = activeCat === slug;
+        const isActive = Boolean(activeCat && activeCat === (slug || '').toLowerCase());
         html += `
           <a href="javascript:void(0)" data-category-slug="${slug}"
              class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs cursor-pointer ${isActive ? 'bg-[#4063B2] text-white shadow-[0_4px_12px_rgba(64,99,178,0.25)]' : 'border border-slate-700/30 text-slate-400 hover:text-white'}">
@@ -151,8 +192,10 @@
       pillsContainer.querySelectorAll('[data-category-slug]').forEach(btn => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
-          shopState.category = btn.getAttribute('data-category-slug');
+          const targetSlug = btn.getAttribute('data-category-slug') || '';
+          shopState.category = targetSlug.toLowerCase();
           shopState.page = 1;
+          syncShopUrlParams();
           renderShop();
           loadShopCategories();
         });
@@ -211,6 +254,7 @@
         const p = parseInt(b.getAttribute('data-page'), 10);
         if (p >= 1 && p <= shopState.totalPages && p !== shopState.page) {
           shopState.page = p;
+          syncShopUrlParams();
           renderShop();
           const target = document.getElementById('shop-products-container');
           if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -239,9 +283,24 @@
     if (shopState.search) params.search = shopState.search;
 
     try {
-      const data = await global.api.getProducts(params);
+      let data;
+      try {
+        if (global.api && typeof global.api.getProducts === 'function') {
+          data = await global.api.getProducts(params);
+        } else {
+          const queryStr = '?' + new URLSearchParams(params).toString();
+          const res = await fetch(`/api/products${queryStr}`);
+          data = await res.json();
+        }
+      } catch (primaryErr) {
+        console.warn('Primary products fetch failed, attempting cloud functions direct fallback...', primaryErr);
+        const queryStr = '?' + new URLSearchParams(params).toString();
+        const res = await fetch(`https://us-central1-marjaah-ab2a6.cloudfunctions.net/api/products${queryStr}`);
+        data = await res.json();
+      }
+
       const items = data.items || data.data || (Array.isArray(data) ? data : []);
-      shopState.total = data.total || items.length;
+      shopState.total = data.total !== undefined ? data.total : items.length;
       shopState.totalPages = data.totalPages || 1;
 
       // Update counters
@@ -259,7 +318,10 @@
       }
 
       container.innerHTML = items.map((p, idx) => renderProductCard(p, idx)).join('');
+      if (window.Wishlist && typeof window.Wishlist.sync === 'function') window.Wishlist.sync();
       renderPagination();
+      if (window.observeAnimations) window.observeAnimations();
+      container.querySelectorAll('.card, [data-animate]').forEach(card => card.classList.add('anim-visible'));
     } catch (err) {
       console.error('Failed to load shop catalog:', err);
       container.innerHTML = `<div class="col-span-full py-16 text-center text-rose-500 font-medium">${isRtl ? 'تعذر تحميل المنتجات.' : 'Unable to load products from server.'}</div>`;
@@ -272,7 +334,7 @@
 
     // Read initial URL params
     const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.has('category')) shopState.category = searchParams.get('category');
+    if (searchParams.has('category')) shopState.category = searchParams.get('category').trim().toLowerCase();
     if (searchParams.has('search')) shopState.search = searchParams.get('search');
     if (searchParams.has('sort')) shopState.sort = searchParams.get('sort');
     if (searchParams.has('page')) shopState.page = parseInt(searchParams.get('page'), 10) || 1;
@@ -289,6 +351,7 @@
         debounceTimer = setTimeout(() => {
           shopState.search = e.target.value.trim();
           shopState.page = 1;
+          syncShopUrlParams();
           renderShop();
         }, 350);
       });
@@ -298,6 +361,7 @@
         e.preventDefault();
         if (searchInput) shopState.search = searchInput.value.trim();
         shopState.page = 1;
+        syncShopUrlParams();
         renderShop();
       });
     }
@@ -309,6 +373,7 @@
       sortSelect.addEventListener('change', (e) => {
         shopState.sort = e.target.value;
         shopState.page = 1;
+        syncShopUrlParams();
         renderShop();
       });
     }
@@ -330,10 +395,24 @@
             b.className = 'px-2.5 py-1 rounded-lg transition-all text-slate-500 hover:text-slate-800 dark:text-slate-400 cursor-pointer';
           });
           btn.className = 'px-2.5 py-1 rounded-lg transition-all bg-white dark:bg-slate-700 shadow-xs font-bold text-slate-900 dark:text-white cursor-pointer';
+          syncShopUrlParams();
           renderShop();
         });
       });
     }
+
+    window.addEventListener('popstate', () => {
+      const p = new URLSearchParams(window.location.search);
+      shopState.category = p.get('category')?.trim().toLowerCase() || '';
+      shopState.search = p.get('search')?.trim() || '';
+      shopState.sort = p.get('sort')?.trim() || 'featured';
+      shopState.page = parseInt(p.get('page'), 10) || 1;
+      shopState.limit = parseInt(p.get('per_page'), 10) || 8;
+      if (searchInput) searchInput.value = shopState.search;
+      if (sortSelect) sortSelect.value = shopState.sort;
+      loadShopCategories();
+      renderShop();
+    });
 
     loadShopCategories();
     renderShop();
@@ -431,9 +510,14 @@
         }
       }
 
-      // Wishlist Button
+      // Wishlist / Liked Button
       const wishBtn = document.getElementById('product-wishlist-btn');
-      if (wishBtn) wishBtn.setAttribute('data-wishlist-toggle', product.slug || product.id);
+      if (wishBtn) {
+        wishBtn.setAttribute('data-wishlist-toggle', product.slug || product.id);
+        if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
+          window.Wishlist.sync();
+        }
+      }
 
       // Delivery & Warranty
       const delEl = document.getElementById('product-delivery-text');
@@ -471,17 +555,19 @@
       const relContainer = document.getElementById('product-related-container');
       if (relContainer && Array.isArray(product.related) && product.related.length > 0) {
         relContainer.innerHTML = product.related.map((rp, i) => renderProductCard(rp, i)).join('');
+        if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
+          window.Wishlist.sync();
+        }
       }
     } catch (err) {
       console.error('Failed to hydrate product detail:', err);
     }
   }
 
-  // ─── INITIALIZATION ON DOM READY ─────────────────────────────────────────
-  document.addEventListener('DOMContentLoaded', () => {
+  function initAll() {
     // 1. Featured products on home page
     if (document.getElementById('featured-products-container')) {
-      loadProducts('featured-products-container', { limit: 8 });
+      loadProducts('featured-products-container', { isFeatured: true, limit: 8 });
     }
 
     // 2. New arrivals if container exists
@@ -498,7 +584,13 @@
     if (document.getElementById('product-title') && document.getElementById('product-price-container')) {
       hydrateProductDetail();
     }
-  });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAll);
+  } else {
+    initAll();
+  }
 
   global.loadProducts = loadProducts;
   global.renderProductCard = renderProductCard;

@@ -13,34 +13,37 @@ export class FirestoreService implements OnModuleInit {
     if (admin.apps.length === 0) {
       let credentialOption: admin.credential.Credential | null = null;
 
-      // 1. Check for complete JSON in FIREBASE_SERVICE_ACCOUNT_KEY environment variable
-      if (process.env.FIREBASE_SERVICE_ACCOUNT_KEY) {
+      // 1. Check for complete JSON in APP_SERVICE_ACCOUNT_KEY or FIREBASE_SERVICE_ACCOUNT_KEY
+      const saKey = process.env.APP_SERVICE_ACCOUNT_KEY || process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
+      if (saKey) {
         try {
-          const sa = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
+          const sa = JSON.parse(saKey);
           if (sa.private_key) {
             sa.private_key = sa.private_key.replace(/\\n/g, '\n');
           }
           credentialOption = admin.credential.cert(sa);
-          this.logger.log('Using credentials from FIREBASE_SERVICE_ACCOUNT_KEY environment variable');
+          this.logger.log('Using credentials from service account key environment variable');
         } catch (e: any) {
-          this.logger.warn(`Failed to parse FIREBASE_SERVICE_ACCOUNT_KEY env var: ${e.message}`);
+          this.logger.warn(`Failed to parse service account key env var: ${e.message}`);
         }
       }
 
       // 2. Check for individual environment variables
-      if (!credentialOption && process.env.FIREBASE_CLIENT_EMAIL && process.env.FIREBASE_PRIVATE_KEY) {
-        const privateKey = process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n');
+      const clientEmail = process.env.APP_CLIENT_EMAIL || process.env.FIREBASE_CLIENT_EMAIL;
+      const privateKeyRaw = process.env.APP_PRIVATE_KEY || process.env.FIREBASE_PRIVATE_KEY;
+      if (!credentialOption && clientEmail && privateKeyRaw) {
+        const privateKey = privateKeyRaw.replace(/\\n/g, '\n');
         credentialOption = admin.credential.cert({
-          projectId: process.env.FIREBASE_PROJECT_ID || 'marjaah-ab2a6',
-          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          projectId: process.env.APP_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || 'marjaah-ab2a6',
+          clientEmail: clientEmail,
           privateKey: privateKey,
         });
-        this.logger.log('Using credentials from FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY environment variables');
+        this.logger.log('Using credentials from client email / private key environment variables');
       }
 
-      // 3. Fallback to file path if specified in FIREBASE_CREDENTIALS_PATH or default files
+      // 3. Fallback to file path if specified in credentials path or default files
       if (!credentialOption) {
-        const credPath = process.env.FIREBASE_CREDENTIALS_PATH || path.resolve(process.cwd(), 'firebase-credentials.json');
+        const credPath = process.env.APP_CREDENTIALS_PATH || process.env.FIREBASE_CREDENTIALS_PATH || path.resolve(process.cwd(), 'firebase-credentials.json');
         const rootCredPath = path.resolve(process.cwd(), '../firebase-credentials.json');
 
         if (fs.existsSync(credPath)) {
@@ -57,14 +60,15 @@ export class FirestoreService implements OnModuleInit {
         }
       }
 
-      const storageBucket = process.env.FIREBASE_STORAGE_BUCKET || 'marjaah-ab2a6.firebasestorage.app';
+      const storageBucket = process.env.APP_STORAGE_BUCKET || process.env.FIREBASE_STORAGE_BUCKET || 'marjaah-ab2a6.firebasestorage.app';
+      const projectId = process.env.APP_PROJECT_ID || process.env.FIREBASE_PROJECT_ID || process.env.GCLOUD_PROJECT || 'marjaah-ab2a6';
 
       admin.initializeApp({
         credential: credentialOption,
-        projectId: process.env.FIREBASE_PROJECT_ID || 'marjaah-ab2a6',
+        projectId: projectId,
         storageBucket: storageBucket,
       });
-      this.logger.log(`Firebase initialized with storage bucket: ${storageBucket}`);
+      this.logger.log(`Firebase initialized for project: ${projectId}, storage bucket: ${storageBucket}`);
     }
 
     this.db = admin.firestore();

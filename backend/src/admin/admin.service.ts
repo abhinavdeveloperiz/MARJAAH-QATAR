@@ -18,7 +18,7 @@ export class AdminService {
     const allOrders = ordersSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
     allOrders.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
 
-    const recentOrders = allOrders.slice(0, 10);
+    const recentOrders = allOrders.slice(0, 30);
     const revenueTotal = allOrders
       .filter(o => ['placed', 'processing', 'shipped', 'delivered'].includes(o.status))
       .reduce((sum, o) => sum + (Number(o.total) || 0), 0);
@@ -32,10 +32,11 @@ export class AdminService {
     const brandsSnap = await this.firestore.collection('brands').get();
 
     // 5. Contact messages
-    const messagesSnap = await this.firestore.collection('contact_messages')
-      .where('status', '==', 'new')
-      .get();
-    const newMessages = messagesSnap.size;
+    const allMessagesSnap = await this.firestore.collection('contact_messages').get();
+    const totalMessages = allMessagesSnap.size;
+    const allMessages = allMessagesSnap.docs.map(d => ({ id: d.id, ...d.data() } as any));
+    allMessages.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+    const newMessages = allMessages.filter(m => m.status === 'new').length;
 
     return {
       productsCount: totalProducts,
@@ -51,17 +52,22 @@ export class AdminService {
         low_stock: lowStock.length,
         categories: categoriesSnap.size,
         brands: brandsSnap.size,
+        messages: totalMessages,
+        new_messages: newMessages,
       },
       total_products: totalProducts,
       total_orders: totalOrders,
       total_users: totalUsers,
       total_categories: categoriesSnap.size,
       total_brands: brandsSnap.size,
+      total_messages: totalMessages,
       revenue_total: Math.round(revenueTotal * 100) / 100,
       new_messages: newMessages,
       low_stock: lowStock,
       recent_orders: recentOrders,
-      all_products: allProducts.slice(0, 20),
+      recent_messages: allMessages.slice(0, 5),
+      allProducts: allProducts,
+      all_products: allProducts,
     };
   }
 }

@@ -63,9 +63,20 @@
   if (searchOverlay) searchOverlay.addEventListener('click', function(e) {
     if (e.target === searchOverlay) searchOverlay.classList.add('hidden');
   });
+  const searchForm = searchOverlay ? searchOverlay.querySelector('form') : null;
+  if (searchForm) {
+    searchForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const q = searchInput ? searchInput.value.trim() : '';
+      if (q) {
+        window.location.href = `/shop/?search=${encodeURIComponent(q)}`;
+      }
+    });
+  }
   if (searchInput) {
     searchInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
+        e.preventDefault();
         const q = searchInput.value.trim();
         if (q) {
           window.location.href = `/shop/?search=${encodeURIComponent(q)}`;
@@ -74,32 +85,73 @@
     });
   }
 
-  // User dropdown
+  // User dropdown & dynamic auth state
   const userBtn = document.getElementById('user-menu-btn');
   const userDropdown = document.getElementById('user-dropdown');
+  const user = window.api ? window.api.getUser() : null;
+  const token = window.api ? window.api.getToken() : null;
+
   if (userBtn) {
+    if (user && token && user.role !== 'admin' && user.username !== 'admin') {
+      const nameEl = userBtn.querySelector('.user-name');
+      if (nameEl) nameEl.textContent = user.first_name || user.username || 'Account';
+
+      const avatarEl = userBtn.querySelector('div');
+      if (avatarEl) {
+        const initial = (user.first_name || user.username || 'U').charAt(0).toUpperCase();
+        avatarEl.textContent = initial;
+      }
+
+      if (userDropdown) {
+        const emailP = userDropdown.querySelector('p.text-\\[11px\\]');
+        if (emailP) emailP.textContent = user.email || '';
+        const nameP = userDropdown.querySelector('p.text-xs.font-bold');
+        if (nameP) nameP.textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username;
+      }
+    } else {
+      const nameEl = userBtn.querySelector('.user-name');
+      if (nameEl) nameEl.textContent = 'Sign In';
+      if (userDropdown) {
+        userDropdown.innerHTML = `
+          <div class="p-3 space-y-2">
+            <a href="/login/" class="btn-primary w-full text-center text-xs py-2 block">Sign In</a>
+            <a href="/register/" class="btn-ghost w-full text-center text-xs py-2 block" style="border:1px solid var(--border-color);color:var(--text-secondary)">Register</a>
+          </div>
+        `;
+      }
+    }
+
     userBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      userDropdown.classList.toggle('hidden');
+      userDropdown?.classList.toggle('hidden');
     });
     document.addEventListener('click', function() { userDropdown?.classList.add('hidden'); });
   }
 
   // Language switcher
+  const isArPage = window.location.pathname.startsWith('/ar/') || window.location.pathname === '/ar';
   document.querySelectorAll('[data-locale-switch]').forEach(btn => {
+    const isThisActive = btn.dataset.localeSwitch === (isArPage ? 'ar' : 'en');
+    btn.style.background = isThisActive ? '#4063B2' : 'transparent';
+    btn.style.color = isThisActive ? '#fff' : 'rgba(255,255,255,0.75)';
+
     btn.addEventListener('click', function(e) {
       e.preventDefault();
       const targetLocale = btn.dataset.localeSwitch;
       const pathname = window.location.pathname;
       let newPath;
-      if (pathname.startsWith('/en/') || pathname.startsWith('/ar/')) {
-        newPath = pathname.replace(/^\/(en|ar)\//, '/' + targetLocale + '/');
-      } else if (pathname === '/en' || pathname === '/ar') {
-        newPath = '/' + targetLocale + '/';
-      } else if (pathname === '/' || !pathname) {
-        newPath = '/' + targetLocale + '/';
+      if (targetLocale === 'ar') {
+        if (pathname.startsWith('/ar/')) {
+          newPath = pathname;
+        } else if (pathname === '/ar') {
+          newPath = '/ar/';
+        } else {
+          newPath = '/ar' + (pathname.startsWith('/') ? pathname : '/' + pathname);
+        }
       } else {
-        newPath = '/' + targetLocale + (pathname.startsWith('/') ? pathname : '/' + pathname);
+        // 'en' (default clean URLs without prefix)
+        newPath = pathname.replace(/^\/(en|ar)(\/|$)/, '/');
+        if (!newPath.startsWith('/')) newPath = '/' + newPath;
       }
       window.location.href = newPath + window.location.search + window.location.hash;
     });

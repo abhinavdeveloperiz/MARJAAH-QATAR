@@ -211,9 +211,8 @@ async function runTests() {
       message: 'Migration verification test message'
     }
   });
-  assert(contactRes.ok && contactRes.data?.success, 'POST /api/contact saves contact message to Firestore');
+  assert(contactRes.ok && contactRes.data?.success, 'POST /api/contact saves contact message');
 
-  // Summary
   console.log('\n═══════════════════════════════════════════════════════');
   console.log(`🎉 TEST SUMMARY: ${passedTests} PASSED, ${failedTests} FAILED`);
   console.log('═══════════════════════════════════════════════════════\n');

@@ -45,4 +45,59 @@ export class ContactService {
     });
     return { success: true, id, status };
   }
+
+  async findOne(id: string) {
+    const docRef = this.firestore.doc('contact_messages', id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      throw new NotFoundException(`Message ${id} not found`);
+    }
+    return { id: doc.id, ...doc.data() };
+  }
+
+  async replyMessage(id: string, reply: string) {
+    if (!reply || !reply.trim()) {
+      throw new BadRequestException('Reply text is required');
+    }
+    const docRef = this.firestore.doc('contact_messages', id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      throw new NotFoundException(`Message ${id} not found`);
+    }
+    await docRef.update({
+      reply: reply.trim(),
+      replied_at: new Date().toISOString(),
+      status: 'replied',
+      updated_at: new Date().toISOString(),
+    });
+    return { success: true, id, reply: reply.trim(), status: 'replied' };
+  }
+
+  async deleteMessage(id: string) {
+    const docRef = this.firestore.doc('contact_messages', id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      throw new NotFoundException(`Message ${id} not found`);
+    }
+    await docRef.delete();
+    return { success: true, message: `Message ${id} deleted successfully` };
+  }
+
+  async getStats() {
+    const snap = await this.firestore.collection('contact_messages').get();
+    const list = snap.docs.map(doc => doc.data() as any);
+    const total = list.length;
+    const newCount = list.filter(m => m.status === 'new').length;
+    const readCount = list.filter(m => m.status === 'read').length;
+    const repliedCount = list.filter(m => m.status === 'replied').length;
+    const archivedCount = list.filter(m => m.status === 'archived').length;
+
+    return {
+      total,
+      new: newCount,
+      read: readCount,
+      replied: repliedCount,
+      archived: archivedCount,
+    };
+  }
 }

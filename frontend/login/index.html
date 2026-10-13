@@ -382,7 +382,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
     </div>
-    <form method="get" action="/en/shop/" class="mt-4">
+    <form method="get" action="/shop/" class="mt-4">
       <div class="relative">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-4 top-1/2 -translate-y-1/2" style="color:var(--color-accent)"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         <input id="search-input" name="search" type="text" placeholder="Search M.SHOP Catalog..."
@@ -608,7 +608,7 @@
       
       <form id="loginForm" method="POST" class="space-y-4">
         
-        <input type="hidden" name="next" value="/en/" />
+        <input type="hidden" name="next" value="/" />
         <div>
           <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Email Address</label>
           <input type="email" name="email" class="input" placeholder="you@example.com" id="id_email" maxlength="320" required>
@@ -633,6 +633,12 @@
       <div class="text-center mt-4">
         <a href="/" class="text-xs transition-colors hover:underline" style="color:var(--text-tertiary)">
           ← Back to Store
+        </a>
+      </div>
+      <div class="mt-5 pt-4 border-t border-slate-700/30 text-center">
+        <a href="/admin/login/" class="inline-flex items-center gap-2 text-xs font-semibold py-2 px-4 rounded-xl border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 hover:text-white hover:bg-indigo-500/20 hover:border-indigo-400/50 transition-all">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <span>Administrator Access Portal →</span>
         </a>
       </div>
     </div>

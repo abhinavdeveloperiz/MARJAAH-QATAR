@@ -13,8 +13,15 @@ export interface ProductFilterQuery {
   maxPrice?: number;
   inStock?: boolean | string;
   isFeatured?: boolean | string;
+  is_featured?: boolean | string;
+  featured?: boolean | string;
+  isFavorite?: boolean | string;
+  is_favorite?: boolean | string;
+  isLiked?: boolean | string;
+  is_liked?: boolean | string;
   isNew?: boolean | string;
   isOnSale?: boolean | string;
+  isOffer?: boolean | string;
   isBestSeller?: boolean | string;
   sortBy?: string; // 'price-asc' | 'price-desc' | 'newest' | 'rating' | 'popular' | 'name'
   sort?: string;
@@ -29,7 +36,7 @@ export class ProductsService {
 
   async findAll(query: ProductFilterQuery) {
     const page = Math.max(1, Number(query.page) || 1);
-    const limit = Math.max(1, Math.min(100, Number(query.limit) || 12));
+    const limit = Math.max(1, Math.min(500, Number(query.limit) || 12));
 
     // Fetch all products snapshot to enable multi-field filtering and full-text search
     const snap = await this.firestore.collection('products').get();
@@ -70,15 +77,26 @@ export class ProductsService {
       products = products.filter(p => Boolean(p.in_stock) === inStockBool);
     }
 
-    // 5. Featured / New / On Sale / Best Seller flags
-    if (query.isFeatured !== undefined && String(query.isFeatured).toLowerCase() === 'true') {
-      products = products.filter(p => Boolean(p.is_featured));
+    // 5. Featured / Favorite / New / On Sale / Offer / Best Seller flags
+    const isFeaturedFlag = query.isFeatured ?? query.is_featured ?? query.featured;
+    if (isFeaturedFlag !== undefined && String(isFeaturedFlag).toLowerCase() === 'true') {
+      const featList = products.filter(p => Boolean(p.is_featured));
+      if (featList.length > 0) {
+        products = featList;
+      }
+    }
+    const isFavoriteFlag = query.isFavorite ?? query.is_favorite ?? query.isLiked ?? query.is_liked;
+    if (isFavoriteFlag !== undefined && String(isFavoriteFlag).toLowerCase() === 'true') {
+      products = products.filter(p => Boolean(p.is_favorite || p.is_liked));
     }
     if (query.isNew !== undefined && String(query.isNew).toLowerCase() === 'true') {
       products = products.filter(p => Boolean(p.is_new));
     }
     if (query.isOnSale !== undefined && String(query.isOnSale).toLowerCase() === 'true') {
-      products = products.filter(p => Boolean(p.is_on_sale));
+      products = products.filter(p => Boolean(p.is_on_sale) || Boolean(p.is_offer) || (p.original_price && Number(p.original_price) > Number(p.price)));
+    }
+    if (query.isOffer !== undefined && String(query.isOffer).toLowerCase() === 'true') {
+      products = products.filter(p => Boolean(p.is_offer) || Boolean(p.is_on_sale) || (p.original_price && Number(p.original_price) > Number(p.price)));
     }
     if (query.isBestSeller !== undefined && String(query.isBestSeller).toLowerCase() === 'true') {
       products = products.filter(p => Boolean(p.is_best_seller));
@@ -238,7 +256,9 @@ export class ProductsService {
       original_price: data.original_price ? Number(data.original_price) : null,
       stock_count: data.stock_count !== undefined ? Number(data.stock_count) : 10,
       in_stock: data.in_stock !== undefined ? Boolean(data.in_stock) : true,
-      is_featured: Boolean(data.is_featured),
+      is_featured: Boolean(data.is_featured || data.isFeatured),
+      is_favorite: Boolean(data.is_favorite || data.isFavorite || data.is_liked || data.isLiked),
+      is_liked: Boolean(data.is_liked || data.isLiked || data.is_favorite || data.isFavorite),
       is_new: Boolean(data.is_new),
       is_on_sale: Boolean(data.is_on_sale),
       is_best_seller: Boolean(data.is_best_seller),
@@ -286,6 +306,14 @@ export class ProductsService {
     if (data.price !== undefined) updateData.price = Number(data.price);
     if (data.original_price !== undefined) updateData.original_price = data.original_price ? Number(data.original_price) : null;
     if (data.stock_count !== undefined) updateData.stock_count = Number(data.stock_count);
+    if (data.is_featured !== undefined || data.isFeatured !== undefined) {
+      updateData.is_featured = Boolean(data.is_featured ?? data.isFeatured);
+    }
+    if (data.is_favorite !== undefined || data.isFavorite !== undefined || data.is_liked !== undefined || data.isLiked !== undefined) {
+      const favVal = Boolean(data.is_favorite ?? data.isFavorite ?? data.is_liked ?? data.isLiked);
+      updateData.is_favorite = favVal;
+      updateData.is_liked = favVal;
+    }
 
     await docRef.update(updateData);
     return { id, ...doc.data(), ...updateData };
