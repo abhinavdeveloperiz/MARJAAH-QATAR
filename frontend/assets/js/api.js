@@ -1,6 +1,8 @@
 // ─── MARJAAH Qatar Centralized API Client ─────────────────────────────────
 (function (global) {
-  const CLOUD_FUNCTIONS_API_URL = 'https://us-central1-marjaah-ab2a6.cloudfunctions.net/api';
+  // Live Cloud Run 2nd Gen API URL deployed on Google Cloud
+  const CLOUD_RUN_API_URL = 'https://api-44oukcn4rq-uc.a.run.app';
+  const CLOUD_FUNCTIONS_API_URL = CLOUD_RUN_API_URL;
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
   // If on production, clear any stale localhost or invalid URL accidentally stored in localStorage
@@ -20,7 +22,8 @@
     baseUrl: window.API_BASE_URL || localStorage.getItem('marjaah_api_url') || defaultBaseUrl,
     tokenKey: 'marjaah_auth_token',
     userKey: 'marjaah_auth_user',
-    cloudFunctionsUrl: CLOUD_FUNCTIONS_API_URL,
+    cloudFunctionsUrl: CLOUD_RUN_API_URL,
+    cloudRunUrl: CLOUD_RUN_API_URL,
   };
 
   class ApiClient {
@@ -145,10 +148,10 @@
       } catch (error) {
         if (!options._isRetry) {
           // If calling via one method fails (e.g. cross-origin/CORS or relative rewrite), retry with alternate
-          const isCfUrl = url.includes('cloudfunctions.net');
-          const altUrl = isCfUrl
+          const isDirectUrl = url.includes('run.app') || url.includes('cloudfunctions.net');
+          const altUrl = isDirectUrl
             ? cleanEndpoint
-            : `${CLOUD_FUNCTIONS_API_URL}${cleanEndpoint.replace(/^\/api/, '')}`;
+            : `${CLOUD_RUN_API_URL}${cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`}`;
           console.warn(`API Request failed on [${url}], automatically retrying with fallback [${altUrl}]...`);
           try {
             return await this.request(altUrl, { ...options, _isRetry: true });

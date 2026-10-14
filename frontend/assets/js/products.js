@@ -293,9 +293,9 @@
           data = await res.json();
         }
       } catch (primaryErr) {
-        console.warn('Primary products fetch failed, attempting cloud functions direct fallback...', primaryErr);
+        console.warn('Primary products fetch failed, attempting cloud backend direct fallback...', primaryErr);
         const queryStr = '?' + new URLSearchParams(params).toString();
-        const res = await fetch(`https://us-central1-marjaah-ab2a6.cloudfunctions.net/api/products${queryStr}`);
+        const res = await fetch(`https://api-44oukcn4rq-uc.a.run.app/api/products${queryStr}`);
         data = await res.json();
       }
 

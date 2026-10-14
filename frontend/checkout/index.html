@@ -653,45 +653,33 @@
             <h2 class="font-bold text-base sm:text-lg" style="color:var(--text-primary)">Payment Method</h2>
           </div>
 
-          <!-- Payment Options Tabs -->
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6" id="payment-method-selector">
-            <!-- 1. Cash on Delivery -->
-            <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option" data-method="cash" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-              <div class="flex items-center justify-between mb-2">
-                <input type="radio" name="payment_method" value="cash" checked class="accent-primary-500 w-4 h-4 cursor-pointer" />
-                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Doorstep</span>
+          <!-- Payment Options: Only Cash on Delivery active for now; online card & QR temporarily hidden -->
+          <div class="grid grid-cols-1 gap-3 mb-6" id="payment-method-selector">
+            <!-- 1. Cash on Delivery (Active Sole Payment Method) -->
+            <label class="relative flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option shadow-sm" data-method="cash" style="background:var(--bg-surface-2);border-color:var(--color-accent, #6366f1)">
+              <div class="flex items-center gap-3">
+                <input type="radio" name="payment_method" value="cash" checked class="accent-primary-500 w-5 h-5 cursor-pointer" />
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm sm:text-base font-bold" style="color:var(--text-primary)">Cash on Delivery (COD)</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Doorstep</span>
+                  </div>
+                  <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Pay with cash or card to courier upon receiving your order at your address across Qatar</p>
+                </div>
               </div>
-              <div class="flex items-center gap-2 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400 flex-shrink-0"><rect width="20" height="12" x="2" y="6" rx="2"/><circle cx="12" cy="12" r="2"/><path d="M6 12h.01M18 12h.01"/></svg>
-                <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">Cash on Delivery</span>
-              </div>
-              <p class="text-[11px] mt-1.5" style="color:var(--text-secondary)">Pay cash or card to courier on delivery</p>
             </label>
 
-            <!-- 2. Credit / Debit Card -->
-            <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option" data-method="card" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-              <div class="flex items-center justify-between mb-2">
-                <input type="radio" name="payment_method" value="card"  class="accent-primary-500 w-4 h-4 cursor-pointer" />
-                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-primary-500/10 text-primary-400 border border-primary-500/20">Visa / MC</span>
-              </div>
-              <div class="flex items-center gap-2 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400 flex-shrink-0"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-                <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">Credit / Debit Card</span>
-              </div>
-              <p class="text-[11px] mt-1.5" style="color:var(--text-secondary)">Instant & secure card checkout</p>
+            <!-- 2. Credit / Debit Card (Temporarily Disabled & Hidden) -->
+            <label class="hidden payment-card-option" data-method="card" style="display:none !important">
+              <input type="radio" name="payment_method" value="card" disabled />
             </label>
 
-            <!-- 3. Qatar QR / QPay / Fawran -->
-            <label class="relative flex flex-col p-4 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option" data-method="qr" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-              <div class="flex items-center justify-between mb-2">
-                <input type="radio" name="payment_method" value="qr"  class="accent-primary-500 w-4 h-4 cursor-pointer" />
-                <span class="text-xs px-2 py-0.5 rounded-full font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Fawran / QR</span>
-              </div>
-              <div class="flex items-center gap-2 mt-1">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400 flex-shrink-0"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
-                <span class="text-xs sm:text-sm font-bold" style="color:var(--text-primary)">QR / QPay / Fawran</span>
-              </div>
-              <p class="text-[11px] mt-1.5" style="color:var(--text-secondary)">Instant scan via any Qatar Bank App</p>
+            <!-- 3. Qatar QR / QPay / Fawran (Temporarily Disabled & Hidden) -->
+            <label class="hidden payment-card-option" data-method="qr" style="display:none !important">
+              <input type="radio" name="payment_method" value="qr" disabled />
             </label>
           </div>
 
@@ -703,12 +691,10 @@
               </div>
               <div>
                 <h4 class="font-bold text-sm" style="color:var(--text-primary)">
-                  Cash or Card on Delivery across Qatar
+                  Doorstep Delivery & Payment
                 </h4>
                 <p class="text-xs mt-1 leading-relaxed" style="color:var(--text-secondary)">
-                  
-                  Our delivery courier will bring your order along with a portable POS card machine. You can pay with cash, Apple Pay, or credit/debit card upon arrival.
-                  
+                  Our courier will bring your order to your door. You can pay conveniently with cash or card machine upon delivery anywhere in Qatar.
                 </p>
               </div>
             </div>
@@ -721,91 +707,9 @@
             </div>
           </div>
 
-          <!-- Channel 2: Credit / Debit Card Sub-Panel (MyFatoorah Gateway) -->
-          <div id="channel-panel-card" class="payment-channel-pane hidden p-5 rounded-2xl border space-y-5" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <!-- MyFatoorah Official Partner Info Box -->
-            <div class="p-5 rounded-2xl border text-center space-y-4 shadow-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-primary-500/10 text-primary-400 border border-primary-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <span>MyFatoorah Gateway — QCB Licensed</span>
-              </div>
-
-              <h3 class="text-base sm:text-lg font-bold" style="color:var(--text-primary)">
-                Fast & 100% Secure Online Payment
-              </h3>
-
-              <!-- Payment Method Badges -->
-              <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-black tracking-wider shadow-sm flex items-center gap-1.5" style="background:var(--bg-surface-2);border-color:var(--border-color);color:#60A5FA">
-                  VISA
-                </span>
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-black tracking-wider shadow-sm flex items-center gap-1.5" style="background:var(--bg-surface-2);border-color:var(--border-color);color:#F59E0B">
-                  MASTERCARD
-                </span>
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-black tracking-wider shadow-sm flex items-center gap-1.5" style="background:var(--bg-surface-2);border-color:var(--border-color);color:#10B981">
-                  NAPS (بطاقة الخصم المباشر)
-                </span>
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-bold tracking-wider shadow-sm flex items-center gap-1.5" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 170 170" fill="currentColor"><path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.69-7.77-11.96-14.2-6.52-9.9-11.75-21.46-15.69-34.69-3.94-13.23-5.91-25.75-5.91-37.56 0-14.4 3.42-26.68 10.26-36.85 6.84-10.16 15.82-15.34 26.94-15.54 4.58 0 9.8 1.16 15.66 3.48 5.86 2.33 9.69 3.53 11.49 3.6 2.45-.27 6.42-1.54 11.91-3.82 5.49-2.28 10.36-3.32 14.6-3.13 10.57.54 19.34 4.54 26.31 12 7.02 7.51 11.2 16.74 12.55 27.69-9.58 5.76-14.28 13.91-14.1 24.45.18 8.8 3.54 16.27 10.08 22.41 6.54 6.14 14.2 9.77 22.98 10.89-1.96 5.87-4.13 11.53-6.51 16.98zM119.22 33.15c0-6.73 2.38-13.21 7.14-19.45 4.76-6.24 10.81-10.81 18.15-13.7-1.09 6.84-3.59 13.21-7.5 19.11-4.7 6.94-10.96 11.63-17.79 14.04z"/></svg>
-                  Apple Pay
-                </span>
-              </div>
-
-              <p class="text-xs leading-relaxed max-w-lg mx-auto" style="color:var(--text-secondary)">
-                
-                  Upon clicking the payment button, you will be redirected to the secure MyFatoorah gateway to complete your transaction via Debit Card (NAPS), Credit Card, or Apple Pay with full 3D-Secure bank OTP authentication.
-                
-              </p>
-            </div>
-
-            <!-- Security Assurance Badge -->
-            <div class="flex items-center justify-center gap-2 text-[11px] pt-1" style="color:var(--text-tertiary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400 flex-shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>256-Bit SSL Encrypted — Raw card data is never stored on our servers, adhering to global PCI-DSS standards.</span>
-            </div>
-          </div>
-
-          <!-- Channel 3: Qatar Instant QR / Fawran Sub-Panel (MyFatoorah Gateway) -->
-          <div id="channel-panel-qr" class="payment-channel-pane hidden p-5 rounded-2xl border space-y-5" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <div class="p-5 rounded-2xl border text-center space-y-4 shadow-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
-              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/></svg>
-                <span>MyFatoorah Dynamic QR Gateway — QCB Licensed</span>
-              </div>
-
-              <h3 class="text-base sm:text-lg font-bold" style="color:var(--text-primary)">
-                Scan Dynamic QR to Pay via Qatar Mobile Banking & Wallets
-              </h3>
-
-              <!-- Features / Supported Qatar Banks & Apps -->
-              <div class="flex flex-wrap items-center justify-center gap-2 pt-1">
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm flex items-center gap-1.5 text-indigo-400" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-                  Fawran Instant
-                </span>
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm flex items-center gap-1.5 text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-                  QPay / NAPS
-                </span>
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm flex items-center gap-1.5 text-emerald-400" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-                  QNB • CBQ • Dukhan
-                </span>
-                <span class="px-3 py-1.5 rounded-xl border text-xs font-bold shadow-sm flex items-center gap-1.5 text-amber-400" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-                  Apple Pay
-                </span>
-              </div>
-
-              <p class="text-xs leading-relaxed max-w-lg mx-auto" style="color:var(--text-secondary)">
-                
-                  Upon clicking "Proceed to QR Payment", a dynamic MyFatoorah payment session will be created for your exact order amount (<strong class="text-primary-400">QAR 6499</strong>). Scan the QR code directly with your phone camera or Qatar banking app to pay securely, and your order will be confirmed immediately.
-                
-              </p>
-            </div>
-
-            <!-- Security Assurance Badge -->
-            <div class="flex items-center justify-center gap-2 text-[11px] pt-1" style="color:var(--text-tertiary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400 flex-shrink-0"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-              <span>100% Encrypted & QCB Licensed — Real-time transaction validation & instant order confirmation.</span>
-            </div>
-          </div>
+          <!-- Channel 2 & 3: Temporarily Hidden -->
+          <div id="channel-panel-card" class="payment-channel-pane hidden" style="display:none !important"></div>
+          <div id="channel-panel-qr" class="payment-channel-pane hidden" style="display:none !important"></div>
 
           <!-- General Delivery Notes -->
           <div class="mt-5">
@@ -849,7 +753,7 @@
           <!-- Submit Button -->
           <button type="submit" id="btn-submit-order" class="btn-primary w-full py-3.5 rounded-xl justify-center mt-6 flex items-center gap-2 font-bold text-sm shadow-lg shadow-primary-500/25 hover:shadow-primary-500/40 transition-all cursor-pointer">
             <span id="submit-btn-text">
-              Place Order Now
+              Place Order (Cash on Delivery)
             </span>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class=""><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </button>
@@ -879,13 +783,16 @@ document.addEventListener('DOMContentLoaded', function () {
   const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
 
   function updatePaymentChannel(selectedVal) {
+    // Only cash is active for now
+    selectedVal = 'cash';
+
     // Hide all channel panels
     Object.values(cardPanels).forEach(panel => {
       if (panel) panel.classList.add('hidden');
     });
 
-    // Show active panel
-    const activePanel = cardPanels[selectedVal] || cardPanels['cash'];
+    // Show active panel (Cash on Delivery)
+    const activePanel = cardPanels['cash'];
     if (activePanel) {
       activePanel.classList.remove('hidden');
     }
@@ -893,7 +800,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Highlight selected card container
     cardOptionLabels.forEach(label => {
       const radio = label.querySelector('input');
-      if (radio && (radio.value === selectedVal || (selectedVal === 'qpay' && radio.value === 'qr'))) {
+      if (radio && radio.value === 'cash') {
         label.style.borderColor = 'var(--color-accent, #6366f1)';
         label.style.background = 'var(--bg-surface-3, rgba(99,102,241,0.06))';
       } else {
@@ -904,13 +811,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update CTA button label context
     if (submitBtnText) {
-      if (selectedVal === 'card' || selectedVal === 'fatoorah') {
-        submitBtnText.textContent = isRtl ? 'الانتقال للدفع الآمن بالبطاقة (ماي فاتورة) 🔒' : 'Proceed to Card Payment (MyFatoorah) 🔒';
-      } else if (selectedVal === 'qr' || selectedVal === 'qpay') {
-        submitBtnText.textContent = isRtl ? 'الانتقال للدفع عبر رمز QR (ماي فاتورة) 🔒' : 'Proceed to QR Payment (MyFatoorah) 🔒';
-      } else {
-        submitBtnText.textContent = isRtl ? 'تأكيد وإتمام الطلب (عند الاستلام)' : 'Place Order (Cash on Delivery)';
-      }
+      submitBtnText.textContent = isRtl ? 'تأكيد وإتمام الطلب (الدفع عند الاستلام)' : 'Place Order (Cash on Delivery)';
     }
   }
 
@@ -1074,9 +975,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
       const submitBtn = document.getElementById('btn-submit-order');
       const submitText = document.getElementById('submit-btn-text');
-      const originalText = submitText ? submitText.textContent : 'Place Order';
+      const originalText = submitText ? submitText.textContent : (isRtl ? 'تأكيد وإتمام الطلب (الدفع عند الاستلام)' : 'Place Order (Cash on Delivery)');
       if (submitBtn) submitBtn.disabled = true;
-      if (submitText) submitText.textContent = isRtl ? 'جاري تأكيد الطلب...' : 'Processing Order...';
+      if (submitText) submitText.textContent = isRtl ? 'جاري تأكيد الطلب...' : 'Placing Order...';
 
       try {
         const orderData = {
@@ -1087,7 +988,7 @@ document.addEventListener('DOMContentLoaded', function () {
           street: document.getElementById('id_street')?.value?.trim() || '',
           zone: document.getElementById('id_zone').value.trim(),
           city: document.getElementById('id_city')?.value?.trim() || 'Doha',
-          payment_method: document.querySelector('input[name="payment_method"]:checked')?.value || 'cash',
+          payment_method: 'cash',
           notes: document.getElementById('id_notes')?.value?.trim() || '',
           items: items.map(i => ({
             product_id: i.id || i.slug,

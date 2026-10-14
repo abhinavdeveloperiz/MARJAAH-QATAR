@@ -680,6 +680,22 @@
         <p id="success-address" class="text-sm" style="color:var(--text-secondary)">West Bay, Doha, Qatar</p>
         <p id="success-notes" class="text-xs mt-2 italic" style="color:var(--text-tertiary)">Deliver after 5 PM</p>
       </div>
+
+      <!-- Payment Method snapshot -->
+      <div class="p-6 border-t flex items-center justify-between" style="border-color:var(--border-color)">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--text-tertiary)">
+            Payment Method
+          </p>
+          <p id="success-payment-method" class="text-sm font-bold flex items-center gap-1.5" style="color:var(--text-primary)">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+            Cash on Delivery (COD)
+          </p>
+        </div>
+        <span class="text-xs px-2.5 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+          Pay on Delivery
+        </span>
+      </div>
     </div>
 
 <script>
@@ -707,6 +723,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
     if (document.getElementById('success-status')) {
       document.getElementById('success-status').textContent = (order.status || 'processing').toUpperCase();
+    }
+    if (document.getElementById('success-payment-method')) {
+      const pm = order.payment_method;
+      document.getElementById('success-payment-method').innerHTML = `
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+        ${pm === 'cash' || !pm ? 'Cash on Delivery (COD)' : (pm === 'card' ? 'Credit/Debit Card' : pm.toUpperCase())}
+      `;
     }
     if (document.getElementById('success-subtotal')) {
       document.getElementById('success-subtotal').textContent = 'QAR ' + (order.subtotal || order.total || 0);
