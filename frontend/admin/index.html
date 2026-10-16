@@ -2455,7 +2455,7 @@
                    onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
                    class="w-14 h-14 rounded-xl object-contain bg-white/5 border border-white/10 p-1 flex-shrink-0" alt="${item.name || 'Item'}" />
               <div>
-                <a href="/product/?slug=${item.slug || ''}" target="_blank" class="font-bold text-xs hover:underline text-white block">
+                <a href="/product/${item.slug || ''}/" target="_blank" class="font-bold text-xs hover:underline text-white block">
                   ${item.name || item.title || 'Product Item'}
                 </a>
                 <span class="text-[10px] text-slate-400">ID: ${item.id || item.product_id || '—'}</span>
@@ -2757,7 +2757,7 @@
         tbody.innerHTML = pagedProducts.map(p => `
     <tr class="hover:bg-black/5 dark:hover:bg-white/5 transition" style="border-bottom:1px solid var(--border-color)">
       <td class="px-6 py-3 font-medium" style="color:var(--text-primary)">
-        <a href="/product/?slug=${p.slug || ''}" target="_blank" class="hover:underline flex items-center gap-3">
+        <a href="/product/${p.slug || ''}/" target="_blank" class="hover:underline flex items-center gap-3">
           <img src="${(p.images && p.images[0]) || p.image || '/assets/images/products/placeholder.svg'}"
                onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
                class="w-12 h-12 rounded-xl object-contain p-1 border flex-shrink-0"
@@ -3915,7 +3915,7 @@
           return `
       <tr class="hover:bg-white/5 transition">
         <td class="px-6 py-3 font-medium" style="color:var(--text-primary)">
-          <a href="/product/?slug=${p.slug || ''}" target="_blank" class="hover:underline flex items-center gap-3">
+          <a href="/product/${p.slug || ''}/" target="_blank" class="hover:underline flex items-center gap-3">
             <img src="${(p.images && p.images[0]) || p.image || '/assets/images/products/placeholder.svg'}"
                  onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
                  class="w-12 h-12 rounded-xl object-contain bg-white/5 p-1 border border-white/10 flex-shrink-0" />
@@ -6144,162 +6144,139 @@
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
         <div
           class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
           <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span
-            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free
-            Delivery 500+</span><span class="opacity-50">·</span>
+            class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
         </div>
 
       </div>
@@ -6359,7 +6336,7 @@
       </div>
 
       <!-- Links grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
         <div>
           <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links
           </h4>
@@ -6383,44 +6360,35 @@
           </ul>
         </div>
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Categories</h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
           <ul class="space-y-2.5">
-
+            <li><a href="/terms/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
+            <li><a href="/returns/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Refund &amp; Exchange Policy</a></li>
+            <li><a href="/privacy/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Privacy Policy</a></li>
+            <li><a href="/track-order/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Track Order</a></li>
           </ul>
         </div>
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Support</h4>
-          <ul class="space-y-2.5">
-            <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Track Order</a></li>
-            <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Returns Policy</a></li>
-            <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Privacy Policy</a></li>
-            <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
-            <li><a href="/contact/" class="text-xs" style="color:var(--text-secondary)">Contact</a></li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info
-          </h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
           <ul class="space-y-3">
-            <li class="flex items-start gap-2 text-xs" style="color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)">
-                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-              Doha Showroom
+            <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>
+                Marjaah Trading WLL (CR: 228717)<br/>
+                Doha, State of Qatar
+              </span>
             </li>
-            <li><a href="tel:+97477991013"
-                class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  style="color:var(--color-accent)">
-                  <path
-                    d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
-                </svg>
-                +974 7799 1013</a>
+            <li><a href="tel:+97477991013" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              +974 7799 1013</a>
+            </li>
+            <li><a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              +974 7799 1016</a>
+            </li>
+            <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              info@marjaah.com</a>
             </li>
           </ul>
         </div>
@@ -6428,8 +6396,8 @@
 
       <!-- Bottom bar -->
       <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
-        <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP Qatar. All rights reserved.</p>
-        <p class="text-xs" style="color:var(--text-tertiary)">Developed by InspireZest Technologies Pvt Ltd</p>
+        <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
+        <p class="text-xs" style="color:var(--text-tertiary)">Doha, State of Qatar</p>
       </div>
     </div>
   </footer>

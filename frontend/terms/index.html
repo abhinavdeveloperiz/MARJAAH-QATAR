@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms &amp; Conditions — M.SHOP Qatar</title>
+  <meta name="description" content="Official Terms &amp; Conditions for M.SHOP Qatar, operated by Marjaah Trading WLL (CR No. 228717). Free delivery across Qatar, MyFatoorah secure payments, and consumer rights." />
+  <link rel="canonical" href="https://www.marjaah.shop/terms/" />
+  
+  <meta name="csrf-token" content="E4UwUg8sVIwN0C82upIB6tDbNfqae3YZJdWrTxFWufLUTe3MFJxzVCoMt7UPZqlk" />
+  <script>window.CSRF_TOKEN = "E4UwUg8sVIwN0C82upIB6tDbNfqae3YZJdWrTxFWufLUTe3MFJxzVCoMt7UPZqlk";</script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/branding/favicon.png?v=4" />
+  <link rel="icon" type="image/svg+xml" href="/assets/images/branding/favicon.svg?v=4" />
+  <link rel="shortcut icon" href="/assets/images/branding/favicon.ico?v=4" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/branding/apple-touch-icon.png?v=4" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN with custom config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            base: 'var(--bg-base)',
+            surface: { DEFAULT: 'var(--bg-surface)', 2: 'var(--bg-surface-2)', 3: 'var(--bg-surface-3)' },
+            'text-primary': 'var(--text-primary)',
+            'text-secondary': 'var(--text-secondary)',
+            'text-tertiary': 'var(--text-tertiary)',
+            'border-default': 'var(--border-color)',
+            primary: { DEFAULT: '#4063B2', 50: '#EEF2FF', 100: '#E0E7FF', 200: '#C7D2FE', 300: '#A5B4FC', 400: '#8D9CF5', 500: '#4063B2', 600: '#36529A', 700: '#2C427F', 800: '#223363', 900: '#182447' },
+            accent: { DEFAULT: '#8D9CF5', light: '#A8B4F8', dark: '#6F80EB', 500: '#8D9CF5', 400: '#A8B4F8' },
+          },
+          fontFamily: {
+            cairo: ["'Cairo'", 'sans-serif'],
+            display: ["'Space Grotesk'", 'Outfit', 'sans-serif'],
+            sans: ['Inter', 'Outfit', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/globals.css" />
+
+  <style>
+    .navbar-scrolled { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(13,19,38,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important; }
+    .dark .navbar-scrolled { background: rgba(7,11,20,0.95) !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+    .policy-card { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    [dir="rtl"] { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
+  </style>
+
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('marjaah-theme') || localStorage.getItem('theme');
+        if (t === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+          return;
+        }
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        if (!t) {
+          localStorage.setItem('marjaah-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      } catch(e) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  
+  <script src="/assets/js/api.js"></script>
+</head>
+<body style="background-color:var(--bg-base);color:var(--text-primary);margin:0;padding:0;" class="font-sans antialiased m-0 p-0">
+
+  <!-- Main Navbar -->
+  <header class="fixed top-0 left-0 right-0 z-50 select-none">
+    <div id="main-navbar" class="transition-all duration-300 navbar-scrolled">
+      <div class="container-custom h-[64px] sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">
+        <!-- Logo -->
+        <a href="/" aria-label="M.SHOP Home" class="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0">
+          <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-8 dark:hidden" />
+          <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-8 hidden dark:block" />
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden lg:flex items-center gap-8">
+          <a href="/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Home</a>
+          <a href="/shop/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Shop</a>
+          <a href="/offers/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Offers</a>
+          <a href="/about/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">About</a>
+          <a href="/contact/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Contact</a>
+        </nav>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-1.5 sm:gap-3 md:gap-5 flex-shrink-0">
+          <!-- Language Switcher in Nav -->
+          <div class="lang-switcher-wrap hidden md:flex items-center gap-0.5 rounded-xl px-1 py-1 border transition-all border-white/30 bg-white/10 backdrop-blur-sm">
+            <button onclick="switchPolicyLang('en')" id="nav-btn-en" class="px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold uppercase tracking-widest transition-all cursor-pointer bg-primary-500 text-white">EN</button>
+            <button onclick="switchPolicyLang('ar')" id="nav-btn-ar" class="px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold uppercase tracking-widest transition-all cursor-pointer bg-transparent text-white/75">AR</button>
+          </div>
+
+          <!-- Search -->
+          <button id="search-btn" aria-label="Search" class="nav-btn w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+
+          <!-- Wishlist -->
+          <a href="/wishlist/" aria-label="Wishlist" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 hover:text-rose-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-400"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <span data-wishlist-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:none">0</span>
+          </a>
+
+          <!-- Cart -->
+          <button data-open-cart onclick="if(window.openCart)window.openCart();" aria-label="Open cart" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span data-cart-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:none">0</span>
+          </button>
+
+          <!-- Account -->
+          <a href="/account/" aria-label="Account" class="nav-btn w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </a>
+
+          <!-- Mobile menu toggle -->
+          <button id="mobile-menu-btn" aria-label="Open menu" class="nav-btn lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div id="mobile-drawer" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
+       style="background:var(--bg-surface);border-color:var(--border-color);">
+    <div>
+      <div class="flex items-center justify-between pb-6" style="border-bottom:1px solid var(--border-color)">
+        <span class="font-display font-black text-lg tracking-wider" style="color:var(--text-primary)">MENU</span>
+        <button id="mobile-drawer-close" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="py-6 space-y-2">
+        <a href="/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-primary)">Home</a>
+        <a href="/shop/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Shop</a>
+        <a href="/offers/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Offers</a>
+        <a href="/about/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">About</a>
+        <a href="/contact/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Contact</a>
+        <a href="/account/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">My Account</a>
+      </div>
+    </div>
+    <div class="pt-6 border-t" style="border-color:var(--border-color)">
+      <a href="https://wa.me/97477991013" target="_blank" class="w-full py-3 btn-primary text-xs font-bold uppercase rounded-xl flex items-center justify-center gap-2">
+        WhatsApp Support
+      </a>
+    </div>
+  </div>
+  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-[105] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 min-h-screen pt-[72px]">
+    
+    <!-- HEADER HERO -->
+    <div class="py-12 sm:py-16 border-b relative overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="container-custom max-w-4xl relative z-10">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-xs mb-4" style="color:var(--text-tertiary)">
+          <a href="/" class="hover:text-primary-400 transition">Home</a>
+          <span>/</span>
+          <span>Legal &amp; Support</span>
+          <span>/</span>
+          <span style="color:var(--color-accent)">Terms &amp; Conditions</span>
+        </nav>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h1 class="text-3xl sm:text-4xl font-display font-black tracking-tight" style="color:var(--text-primary)">
+              Terms &amp; Conditions
+            </h1>
+            <p class="text-xs sm:text-sm mt-1" style="color:var(--text-secondary)">
+              m.shop – Terms &amp; Conditions &bull; Part 1
+            </p>
+          </div>
+
+          <!-- Bilingual Toggle Pill -->
+          <div class="flex items-center gap-1.5 p-1 rounded-2xl border self-start md:self-auto" style="background:var(--bg-surface-2);border-color:var(--border-color);">
+            <button id="toggle-en-btn" onclick="switchPolicyLang('en')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md">
+              English
+            </button>
+            <button id="toggle-ar-btn" onclick="switchPolicyLang('ar')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white">
+              العربية (Arabic)
+            </button>
+          </div>
+        </div>
+
+        <!-- Meta Summary Badge Bar -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs pt-2" style="color:var(--text-secondary)">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            🏢 <strong>Operator:</strong> Marjaah Trading WLL (CR: 228717)
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            🌐 <strong>Website:</strong> www.marjaah.shop
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            📅 <strong>Last Updated:</strong> 23 September 2026
+          </span>
+        </div>
+
+        <!-- Navigation Tabs for Policy Pages -->
+        <div class="flex flex-wrap items-center gap-2 mt-8 pt-6 border-t" style="border-color:var(--border-color)">
+          <a href="/terms/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md">
+            📋 Terms &amp; Conditions
+          </a>
+          <a href="/returns/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border hover:border-primary-400 hover:text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+            🔄 Refund &amp; Exchange Policy
+          </a>
+          <a href="/privacy/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border hover:border-primary-400 hover:text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+            🔒 Privacy Policy
+          </a>
+          <a href="/track-order/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border hover:border-primary-400 hover:text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+            📦 Track Order
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLICY CONTENT (ENGLISH) -->
+    <div id="content-en" class="container-custom max-w-4xl py-12">
+      <div class="space-y-6 text-sm leading-relaxed" style="color:var(--text-secondary)">
+
+        <!-- 1. About us -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">1</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">About us</h2>
+          </div>
+          <p>
+            m.shop is the online store of Marjaah Trading WLL, a company registered in the State of Qatar.
+          </p>
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
+            <li><strong>Company name:</strong> Marjaah Trading WLL</li>
+            <li><strong>Commercial Registration No.:</strong> 228717</li>
+            <li><strong>Address:</strong> Doha, Qatar</li>
+            <li><strong>Phone / WhatsApp:</strong> +974 7799 1013 (also +974 7799 1016)</li>
+            <li><strong>Email:</strong> info@marjaah.com</li>
+            <li><strong>Website:</strong> www.marjaah.shop</li>
+          </ul>
+        </section>
+
+        <!-- 2. Acceptance of these terms -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">2</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Acceptance of these terms</h2>
+          </div>
+          <p>
+            By browsing this website or placing an order, you confirm that you have read and agree to these Terms &amp; Conditions, our <a href="/returns/" class="text-primary-400 font-bold hover:underline">Refund &amp; Exchange Policy</a> and our <a href="/privacy/" class="text-primary-400 font-bold hover:underline">Privacy Policy</a>. If you do not agree, please do not use the website. Nothing in these terms limits your rights under <strong>Qatar Consumer Protection Law No. 8 of 2008</strong> or any other law that cannot be waived.
+          </p>
+        </section>
+
+        <!-- 3. Who can order -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">3</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Who can order</h2>
+          </div>
+          <p>
+            You must be at least 18 years old and able to enter into a binding contract to place an order. Orders can be delivered to addresses inside Qatar.
+          </p>
+        </section>
+
+        <!-- 4. Products and information -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">4</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Products and information</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
+            <li>We sell IT products and mobile accessories. We aim to sell genuine products only.</li>
+            <li>We try to make product names, descriptions, specifications and images accurate. Images are for illustration; colours may differ slightly depending on your screen.</li>
+            <li>Products are subject to availability. If an item you ordered is out of stock, we will contact you and offer a replacement, a wait, or a full refund.</li>
+          </ul>
+        </section>
+
+        <!-- 5. Prices -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">5</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Prices</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm">
+            <li>All prices are in Qatari Riyals (QAR). The price shown is the final price; no sales tax or VAT is added. If any tax is introduced in Qatar in future, prices will be updated and any tax will be shown clearly before you pay.</li>
+            <li><strong>Delivery is free across Qatar on every order, with no minimum order value.</strong> The price shown at checkout is the total price you pay.</li>
+            <li>We may change prices and run offers or promotions at any time. The price that applies is the price shown when you place your order.</li>
+            <li>If a price is clearly wrong because of a technical or typing error, we may cancel the order and refund you in full, or ask whether you would like to buy at the correct price.</li>
+          </ul>
+        </section>
+
+        <!-- 6. Placing an order -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">6</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Placing an order</h2>
+          </div>
+          <ol class="list-decimal list-inside space-y-2 pl-2 text-xs sm:text-sm">
+            <li>You add products to your cart and complete the checkout form with accurate details.</li>
+            <li>Your order is an offer to buy. The contract is formed when we confirm your order by <strong>WhatsApp and email</strong>, using the mobile number and email address you gave at checkout. Please make sure both are correct and that the number can receive WhatsApp messages.</li>
+            <li>We may decline or cancel an order (for example for stock problems, pricing errors, incorrect details, or suspected fraud). If you have already paid, we will refund you in full.</li>
+            <li>You are responsible for entering a correct name, phone number and delivery address.</li>
+          </ol>
+        </section>
+
+        <!-- 7. Payment -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">7</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Payment</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm">
+            <li>Accepted payment methods: <strong>cash on delivery</strong>, and <strong>online payment</strong> by credit or debit card, <strong>Apple Pay</strong> and <strong>Google Pay</strong>, all processed through <strong>MyFatoorah</strong>.</li>
+            <li><strong>No payment fees.</strong> We do not charge any extra fee for cash on delivery or for paying online. The price you see is the price you pay.</li>
+            <li>Online payments are processed securely by MyFatoorah, our payment gateway. m.shop does not see or store your full card details.</li>
+            <li>Cash on delivery: please have the exact amount ready where possible.</li>
+          </ul>
+        </section>
+
+        <!-- 8. Delivery -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">8</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Delivery</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm">
+            <li><strong>Delivery area:</strong> all of Qatar.</li>
+            <li><strong>Delivery time:</strong> within 1–3 days from order confirmation. The estimated time is shown at checkout, and the exact time is confirmed after you place your order.</li>
+            <li><strong>Delivery fee: free.</strong> We deliver free of charge anywhere in Qatar, on every order, with no minimum order value.</li>
+            <li>Someone must be available to receive the order at the address and phone number provided. If we cannot reach you after 2 attempts, we may cancel or re-schedule the order. Re-delivery is also free.</li>
+            <li>Please check the parcel on delivery. If it is visibly damaged or something is missing, tell the delivery person and contact us the same day.</li>
+            <li>Risk of loss or damage passes to you once the order is delivered to you.</li>
+          </ul>
+        </section>
+
+        <!-- 9. Returns, exchanges and refunds -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">9</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Returns, exchanges and refunds</h2>
+          </div>
+          <p>
+            Your right to return or exchange products and get refunds is set out in our <a href="/returns/" class="text-primary-400 font-bold hover:underline">Refund &amp; Exchange Policy</a> (Part 2), which forms an integral part of these terms.
+          </p>
+        </section>
+
+        <!-- 10. Warranty and after-sales service -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">10</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Warranty and after-sales service</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm">
+            <li>Products come with the manufacturer, agent or supplier warranty where one applies. The warranty period and terms for each product are shown in the product details on its product page. Where no warranty is mentioned, the product is sold without a manufacturer warranty, and your rights under Qatar Consumer Protection Law still apply.</li>
+            <li>Warranty does not cover damage from misuse, liquids, drops, unauthorised repair, or normal wear (for example worn cables or cases).</li>
+            <li>To claim warranty, contact us with your order number and a description or photo of the problem. We will repair, replace or refund the product as required by law and the warranty terms.</li>
+          </ul>
+        </section>
+
+        <!-- 11. Promotions and offers -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">11</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Promotions and offers</h2>
+          </div>
+          <p>
+            Offers and discount codes are valid for the period stated, are limited to the stated products or conditions, and cannot be combined unless stated. We may end an offer earlier if the promoted stock runs out. Where you return a product bought with a free gift, the gift must be returned with it.
+          </p>
+        </section>
+
+        <!-- 12. Orders through other platforms -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">12</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Orders through other platforms</h2>
+          </div>
+          <p>
+            We also sell through third-party delivery platforms (such as Snoonu, Talabat and Rafeeq). Orders placed there are also subject to the terms and return process of that platform. The rest of this policy applies to orders placed directly on <strong>www.marjaah.shop</strong>.
+          </p>
+        </section>
+
+        <!-- 13. Your account -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">13</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Your account (if you create one)</h2>
+          </div>
+          <p>
+            You are responsible for keeping your login details confidential and for all activity under your account. Tell us immediately if you think someone else is using it. We may suspend an account that is used in a fraudulent or abusive way.
+          </p>
+        </section>
+
+        <!-- 14. Acceptable use -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">14</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Acceptable use</h2>
+          </div>
+          <p>
+            You agree not to: misuse the website; attempt to hack, disrupt or copy it; place false or fraudulent orders; or use it for anything illegal.
+          </p>
+        </section>
+
+        <!-- 15. Intellectual property -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">15</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Intellectual property</h2>
+          </div>
+          <p>
+            All content on this website (logo, text, images, design, code) belongs to <strong>Marjaah Trading WLL</strong> or its licensors and may not be copied or reused without our written permission. Brand names and product images belong to their respective owners.
+          </p>
+        </section>
+
+        <!-- 16. Privacy -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">16</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Privacy</h2>
+          </div>
+          <p>
+            We collect and use your personal data as described in our <a href="/privacy/" class="text-primary-400 font-bold hover:underline">Privacy Policy</a>, in line with Qatar's data protection law. We use your details only to process your order, provide support, and (where you agree) send you offers. We do not sell your personal data.
+          </p>
+        </section>
+
+        <!-- 17. Our liability -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">17</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Our liability</h2>
+          </div>
+          <p>
+            We are responsible for the products we sell as required by Qatar law. We are not liable for indirect or consequential loss, or for delays or failures caused by events outside our reasonable control (for example severe weather, network or carrier disruption). Nothing in these terms excludes liability that cannot lawfully be excluded, including liability for defective products under the Consumer Protection Law.
+          </p>
+        </section>
+
+        <!-- 18. Complaints -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">18</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Complaints</h2>
+          </div>
+          <p>
+            Contact us first at <a href="mailto:info@marjaah.com" class="text-primary-400 font-bold hover:underline">info@marjaah.com</a> or WhatsApp <a href="https://wa.me/97477991013" class="text-primary-400 font-bold hover:underline">+974 7799 1013</a> with your order number. We aim to reply within 2 working days and resolve the issue as soon as possible. If it cannot be resolved, you may contact the Consumer Protection Department at the Ministry of Commerce and Industry (MOCI) in Qatar.
+          </p>
+        </section>
+
+        <!-- 19. Changes to these terms -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">19</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Changes to these terms</h2>
+          </div>
+          <p>
+            We may update these terms from time to time. The version published on the website when you place your order applies to that order.
+          </p>
+        </section>
+
+        <!-- 20. Governing law -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">20</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Governing law</h2>
+          </div>
+          <p>
+            These terms are governed by the laws of the State of Qatar, and the competent courts of Qatar have jurisdiction over any dispute, without affecting your rights as a consumer.
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- POLICY CONTENT (ARABIC) -->
+    <div id="content-ar" class="hidden container-custom max-w-4xl py-12" dir="rtl">
+      <div class="space-y-6 text-sm leading-relaxed text-right font-cairo" style="color:var(--text-secondary)">
+
+        <div class="p-6 rounded-3xl border bg-primary-500/10 border-primary-500/20 text-primary-300 mb-6">
+          <h2 class="font-bold text-base mb-1 text-white">الجزء الأول – الشروط والأحكام</h2>
+          <p class="text-xs">الموقع الإلكتروني: www.marjaah.shop &bull; يُدار بواسطة: مرجاح للتجارة ذ.م.م ("m.shop"، "نحن"، "لنا") &bull; آخر تحديث: ٢٣ سبتمبر ٢٠٢٦</p>
+        </div>
+
+        <!-- ١. من نحن -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١. من نحن</h2>
+          </div>
+          <p>m.shop هو المتجر الإلكتروني لشركة مرجاح للتجارة ذ.م.م، وهي شركة مسجلة في دولة قطر.</p>
+          <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
+            <li><strong>اسم الشركة:</strong> مرجاح للتجارة ذ.م.م</li>
+            <li><strong>رقم السجل التجاري:</strong> 228717</li>
+            <li><strong>العنوان:</strong> الدوحة، قطر</li>
+            <li><strong>الهاتف / واتساب:</strong> +974 7799 1013 (وأيضاً +974 7799 1016)</li>
+            <li><strong>البريد الإلكتروني:</strong> info@marjaah.com</li>
+            <li><strong>الموقع الإلكتروني:</strong> www.marjaah.shop</li>
+          </ul>
+        </section>
+
+        <!-- ٢. قبول هذه الشروط -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٢</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٢. قبول هذه الشروط</h2>
+          </div>
+          <p>
+            بتصفحك هذا الموقع أو بتقديمك طلب شراء، فإنك تؤكد أنك قرأت ووافقت على هذه الشروط والأحكام وعلى <a href="/returns/" class="text-primary-400 font-bold hover:underline">سياسة الاسترجاع والاستبدال</a> و<a href="/privacy/" class="text-primary-400 font-bold hover:underline">سياسة الخصوصية</a> الخاصة بنا. إذا كنت لا توافق عليها، نرجو عدم استخدام الموقع. ولا تحدّ هذه الشروط بأي حال من حقوقك المقررة بموجب <strong>قانون حماية المستهلك القطري رقم (٨) لسنة ٢٠٠٨</strong> أو أي قانون آخر لا يجوز التنازل عنه.
+          </p>
+        </section>
+
+        <!-- ٣. من يحق له الشراء -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٣</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٣. من يحق له الشراء</h2>
+          </div>
+          <p>
+            يجب ألا يقل عمرك عن ١٨ عاماً وأن تكون أهلاً لإبرام عقد ملزم لتقديم الطلب. ويتم التوصيل إلى العناوين داخل دولة قطر.
+          </p>
+        </section>
+
+        <!-- ٤. المنتجات والمعلومات -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٤</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٤. المنتجات والمعلومات</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
+            <li>نبيع منتجات تقنية المعلومات وإكسسوارات الهواتف المحمولة، ونحرص على بيع المنتجات الأصلية فقط.</li>
+            <li>نبذل جهدنا لضمان دقة أسماء المنتجات وأوصافها ومواصفاتها وصورها. والصور لغرض التوضيح، وقد تختلف الألوان قليلاً حسب شاشة العرض.</li>
+            <li>تخضع المنتجات للتوفر. وإذا نفد المنتج الذي طلبته، سنتواصل معك لعرض بديل أو الانتظار أو استرداد كامل المبلغ.</li>
+          </ul>
+        </section>
+
+        <!-- ٥. الأسعار -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٥</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٥. الأسعار</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pr-2 text-xs sm:text-sm">
+            <li>جميع الأسعار بالريال القطري (ر.ق). السعر المعروض هو السعر النهائي، ولا تُضاف عليه أي ضريبة مبيعات أو ضريبة قيمة مضافة. وفي حال فرض أي ضريبة في قطر مستقبلاً، سيتم تحديث الأسعار وإظهار الضريبة بوضوح قبل الدفع.</li>
+            <li><strong>التوصيل مجاني في جميع أنحاء قطر على كل الطلبات، دون حد أدنى لقيمة الطلب.</strong> والسعر الظاهر عند إتمام الطلب هو إجمالي ما تدفعه.</li>
+            <li>يحق لنا تغيير الأسعار وطرح العروض والتخفيضات في أي وقت. والسعر المعتمد هو السعر المعروض وقت تقديم طلبك.</li>
+            <li>إذا كان السعر خاطئاً بشكل واضح نتيجة خطأ فني أو خطأ في الكتابة، يجوز لنا إلغاء الطلب مع رد كامل المبلغ، أو سؤالك عمّا إذا كنت ترغب في الشراء بالسعر الصحيح.</li>
+          </ul>
+        </section>
+
+        <!-- ٦. تقديم الطلب -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٦</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٦. تقديم الطلب</h2>
+          </div>
+          <ol class="list-decimal list-inside space-y-2 pr-2 text-xs sm:text-sm">
+            <li>تضيف المنتجات إلى سلة الشراء وتُكمل بيانات الطلب بدقة.</li>
+            <li>يُعدّ طلبك عرضاً للشراء، وينعقد العقد عند تأكيدنا للطلب عبر <strong>واتساب والبريد الإلكتروني</strong>، باستخدام رقم الهاتف والبريد الإلكتروني اللذين أدخلتهما عند الطلب. يُرجى التأكد من صحتهما ومن أن الرقم يستقبل رسائل واتساب.</li>
+            <li>يجوز لنا رفض الطلب أو إلغاؤه (مثلاً بسبب نفاد المخزون أو خطأ في السعر أو بيانات غير صحيحة أو الاشتباه في الاحتيال). وإذا كنت قد دفعت، نرد لك كامل المبلغ.</li>
+            <li>أنت مسؤول عن إدخال الاسم ورقم الهاتف وعنوان التوصيل بشكل صحيح.</li>
+          </ol>
+        </section>
+
+        <!-- ٧. الدفع -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٧</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٧. الدفع</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pr-2 text-xs sm:text-sm">
+            <li><strong>وسائل الدفع المقبولة:</strong> <strong>الدفع عند الاستلام</strong>، و<strong>الدفع الإلكتروني</strong> ببطاقات الائتمان والخصم و<strong>Apple Pay</strong> و<strong>Google Pay</strong>، وجميعها تتم عبر بوابة <strong>MyFatoorah</strong>.</li>
+            <li><strong>لا توجد رسوم دفع.</strong> لا نفرض أي رسوم إضافية على الدفع عند الاستلام أو على الدفع الإلكتروني. السعر الذي تراه هو السعر الذي تدفعه.</li>
+            <li>تتم معالجة المدفوعات الإلكترونية بشكل آمن عبر بوابة الدفع MyFatoorah، ولا يطّلع m.shop على بيانات بطاقتك الكاملة ولا يحتفظ بها.</li>
+            <li>الدفع عند الاستلام: يُرجى تجهيز المبلغ بالتمام قدر الإمكان.</li>
+          </ul>
+        </section>
+
+        <!-- ٨. التوصيل -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٨</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٨. التوصيل</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pr-2 text-xs sm:text-sm">
+            <li><strong>نطاق التوصيل:</strong> جميع أنحاء قطر.</li>
+            <li><strong>مدة التوصيل:</strong> خلال ١ إلى ٣ أيام من تأكيد الطلب. وتظهر المدة التقديرية عند إتمام الطلب، ويتم تأكيد الموعد الدقيق بعد تقديم الطلب.</li>
+            <li><strong>رسوم التوصيل: مجاناً.</strong> نوصل مجاناً إلى أي مكان في قطر، على كل الطلبات، دون حد أدنى لقيمة الطلب.</li>
+            <li>يجب توفّر شخص لاستلام الطلب على العنوان ورقم الهاتف المذكورين. وإذا تعذّر الوصول إليك بعد محاولتين، يجوز لنا إلغاء الطلب أو إعادة جدولته. وإعادة التوصيل مجانية أيضاً.</li>
+            <li>يُرجى فحص الطرد عند الاستلام. وإذا كان به تلف ظاهر أو نقص، أبلغ مندوب التوصيل وتواصل معنا في اليوم نفسه.</li>
+            <li>تنتقل إليك مسؤولية الفقد أو التلف بمجرد تسليم الطلب إليك.</li>
+          </ul>
+        </section>
+
+        <!-- ٩. الاسترجاع والاستبدال واسترداد المبالغ -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٩</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٩. الاسترجاع والاستبدال واسترداد المبالغ</h2>
+          </div>
+          <p>
+            حقك في استرجاع المنتجات أو استبدالها واسترداد المبالغ موضّح في <a href="/returns/" class="text-primary-400 font-bold hover:underline">سياسة الاسترجاع والاستبدال</a> (الجزء الثاني)، وهي جزء لا يتجزأ من هذه الشروط.
+          </p>
+        </section>
+
+        <!-- ١٠. الضمان وخدمة ما بعد البيع -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٠</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٠. الضمان وخدمة ما بعد البيع</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-2 pr-2 text-xs sm:text-sm">
+            <li>تأتي المنتجات بضمان الشركة المصنّعة أو الوكيل أو المورّد، حيثما ينطبق ذلك. وتُذكر مدة الضمان وشروطه لكل منتج ضمن تفاصيل المنتج في صفحته. وإذا لم يُذكر ضمان، فإن المنتج يُباع دون ضمان من المصنّع، مع بقاء حقوقك بموجب قانون حماية المستهلك القطري قائمة.</li>
+            <li>لا يشمل الضمان التلف الناتج عن سوء الاستخدام أو السوائل أو السقوط أو الإصلاح غير المعتمد أو الاستهلاك الطبيعي (مثل تآكل الكابلات أو الأغطية).</li>
+            <li>للمطالبة بالضمان، تواصل معنا مع ذكر رقم الطلب ووصف المشكلة أو صورة لها. وسنقوم بإصلاح المنتج أو استبداله أو رد قيمته وفقاً للقانون وشروط الضمان.</li>
+          </ul>
+        </section>
+
+        <!-- ١١. العروض والتخفيضات -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١١</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١١. العروض والتخفيضات</h2>
+          </div>
+          <p>
+            تسري العروض وأكواد الخصم خلال المدة المحددة، وتقتصر على المنتجات أو الشروط المذكورة، ولا يجوز الجمع بينها ما لم يُنص على ذلك. ويجوز لنا إنهاء العرض مبكراً عند نفاد الكمية المخصصة له. وعند إرجاع منتج اشتُري مع هدية مجانية، يجب إرجاع الهدية معه.
+          </p>
+        </section>
+
+        <!-- ١٢. الطلبات عبر المنصات الأخرى -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٢</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٢. الطلبات عبر المنصات الأخرى</h2>
+          </div>
+          <p>
+            نبيع أيضاً عبر منصات توصيل تابعة لجهات خارجية (مثل سنونو وطلبات ورفيق). وتخضع الطلبات المقدَّمة عبرها أيضاً لشروط تلك المنصة وإجراءات الإرجاع لديها. وتنطبق هذه السياسة على الطلبات المقدَّمة مباشرة عبر <strong>www.marjaah.shop</strong>.
+          </p>
+        </section>
+
+        <!-- ١٣. حسابك -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٣</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٣. حسابك (إن أنشأت حساباً)</h2>
+          </div>
+          <p>
+            أنت مسؤول عن الحفاظ على سرية بيانات الدخول وعن جميع الأنشطة التي تتم من خلال حسابك. وأبلغنا فوراً إذا اشتبهت في استخدام شخص آخر له. ويجوز لنا تعليق أي حساب يُستخدم بطريقة احتيالية أو مسيئة.
+          </p>
+        </section>
+
+        <!-- ١٤. الاستخدام المقبول -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٤</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٤. الاستخدام المقبول</h2>
+          </div>
+          <p>
+            تتعهد بعدم إساءة استخدام الموقع، أو محاولة اختراقه أو تعطيله أو نسخه، أو تقديم طلبات وهمية أو احتيالية، أو استخدامه في أي غرض غير قانوني.
+          </p>
+        </section>
+
+        <!-- ١٥. الملكية الفكرية -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٥</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٥. الملكية الفكرية</h2>
+          </div>
+          <p>
+            جميع محتويات هذا الموقع (الشعار والنصوص والصور والتصميم والبرمجة) مملوكة لشركة <strong>مرجاح للتجارة ذ.م.م</strong> أو للمرخِّصين لها، ولا يجوز نسخها أو إعادة استخدامها دون إذن كتابي منا. وتعود الأسماء التجارية وصور المنتجات إلى أصحابها.
+          </p>
+        </section>
+
+        <!-- ١٦. الخصوصية -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٦</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٦. الخصوصية</h2>
+          </div>
+          <p>
+            نجمع بياناتك الشخصية ونستخدمها وفقاً لما هو موضّح في <a href="/privacy/" class="text-primary-400 font-bold hover:underline">سياسة الخصوصية</a> لدينا، وبما يتوافق مع قانون حماية البيانات في قطر. ونستخدم بياناتك فقط لتنفيذ طلبك وتقديم الدعم، وإرسال العروض إليك إذا وافقت على ذلك. ولا نبيع بياناتك الشخصية.
+          </p>
+        </section>
+
+        <!-- ١٧. حدود المسؤولية -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٧</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٧. حدود المسؤولية</h2>
+          </div>
+          <p>
+            نتحمل المسؤولية عن المنتجات التي نبيعها وفقاً للقانون القطري. ولا نتحمل المسؤولية عن الأضرار غير المباشرة أو التبعية، ولا عن التأخير أو الإخفاق الناتج عن ظروف خارجة عن إرادتنا المعقولة (مثل الأحوال الجوية الشديدة أو أعطال الشبكات أو شركات التوصيل). ولا يستثني أي بند في هذه الشروط المسؤولية التي لا يجوز استثناؤها قانوناً، بما في ذلك المسؤولية عن المنتجات المعيبة بموجب قانون حماية المستهلك.
+          </p>
+        </section>
+
+        <!-- ١٨. الشكاوى -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٨</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٨. الشكاوى</h2>
+          </div>
+          <p>
+            تواصل معنا أولاً على <a href="mailto:info@marjaah.com" class="text-primary-400 font-bold hover:underline">info@marjaah.com</a> أو عبر واتساب <a href="https://wa.me/97477991013" class="text-primary-400 font-bold hover:underline">+974 7799 1013</a> مع ذكر رقم الطلب. ونسعى للرد خلال يومي عمل ومعالجة المشكلة في أسرع وقت. وإذا تعذّر حلها، يمكنك التواصل مع إدارة حماية المستهلك بوزارة التجارة والصناعة (MOCI) في دولة قطر.
+          </p>
+        </section>
+
+        <!-- ١٩. التعديلات على هذه الشروط -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١٩</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١٩. التعديلات على هذه الشروط</h2>
+          </div>
+          <p>
+            قد نُحدّث هذه الشروط من حين لآخر. والنسخة المنشورة على الموقع وقت تقديم طلبك هي النسخة السارية على ذلك الطلب.
+          </p>
+        </section>
+
+        <!-- ٢٠. القانون الواجب التطبيق -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٢٠</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٢٠. القانون الواجب التطبيق</h2>
+          </div>
+          <p>
+            تخضع هذه الشروط لقوانين دولة قطر، وتختص المحاكم القطرية بالنظر في أي نزاع، دون الإخلال بحقوقك كمستهلك.
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- SUPPORT CONTACT BANNER -->
+    <div class="container-custom max-w-4xl pb-16">
+      <section class="p-6 sm:p-8 rounded-3xl border text-center space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+        <h3 class="text-base sm:text-lg font-display font-bold" style="color:var(--text-primary)">
+          Questions or Assistance? / لديك استفسار؟
+        </h3>
+        <p class="text-xs sm:text-sm max-w-xl mx-auto" style="color:var(--text-secondary)">
+          Our team in Doha, Qatar is ready to assist you regarding any aspect of our terms or your orders:
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs font-semibold pt-2">
+          <a href="mailto:info@marjaah.com" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border hover:border-primary-400 transition" style="border-color:var(--border-color);color:var(--text-primary)">
+            ✉️ info@marjaah.com
+          </a>
+          <a href="tel:+97477991013" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border hover:border-primary-400 transition" style="border-color:var(--border-color);color:var(--text-primary)">
+            📞 +974 7799 1013
+          </a>
+          <a href="tel:+97477991016" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border hover:border-primary-400 transition" style="border-color:var(--border-color);color:var(--text-primary)">
+            📞 +974 7799 1016
+          </a>
+          <a href="https://wa.me/97477991013" target="_blank" class="btn-primary inline-flex items-center gap-2 px-4 py-2.5 rounded-xl shadow-md">
+            💬 WhatsApp Support
+          </a>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t pt-16 pb-8 transition-colors select-none" style="border-color:var(--border-color);background:var(--bg-surface)">
+    <div class="container-custom">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 pb-12" style="border-bottom:1px solid var(--border-color)">
+        <div class="col-span-2">
+          <a href="/" class="flex items-center gap-2 mb-4">
+            <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-8 dark:hidden" />
+            <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-8 hidden dark:block" />
+          </a>
+          <p class="text-xs leading-relaxed max-w-sm mb-4" style="color:var(--text-secondary)">
+            Qatar's premier destination for high-performance laptops, custom PC builds, GPUs, and genuine tech accessories with official brand warranties.
+          </p>
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Free Delivery Across Qatar (No Minimum Order)
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
+          <ul class="space-y-2.5">
+            <li><a href="/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Home</a></li>
+            <li><a href="/shop/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Shop</a></li>
+            <li><a href="/offers/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Offers</a></li>
+            <li><a href="/about/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">About</a></li>
+            <li><a href="/contact/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
+          <ul class="space-y-2.5">
+            <li><a href="/terms/" class="text-xs transition-colors font-bold text-primary-400">Terms &amp; Conditions</a></li>
+            <li><a href="/returns/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Refund &amp; Exchange Policy</a></li>
+            <li><a href="/privacy/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Privacy Policy</a></li>
+            <li><a href="/track-order/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Track Order</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>
+                Marjaah Trading WLL (CR: 228717)<br/>
+                Doha, State of Qatar
+              </span>
+            </li>
+            <li><a href="tel:+97477991013" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              +974 7799 1013</a>
+            </li>
+            <li><a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              +974 7799 1016</a>
+            </li>
+            <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              info@marjaah.com</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
+        <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
+        <p class="text-xs" style="color:var(--text-tertiary)">Doha, State of Qatar</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WHATSAPP WIDGET -->
+  <a href="https://wa.me/97477991013" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"
+    class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] flex items-center justify-center shadow-lg hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 group"
+    style="box-shadow:0 6px 24px rgba(37,211,102,0.45)">
+    <svg viewBox="0 0 24 24" width="30" height="30" class="w-7 h-7 text-white fill-white" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+  </a>
+
+  <!-- Toast container -->
+  <div id="toast-container" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;"></div>
+
+  <!-- JS -->
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/toast.js"></script>
+  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/wishlist.js"></script>
+  <script src="/assets/js/mobile-menu.js"></script>
+
+  <!-- Bilingual Switching Script -->
+  <script>
+    function switchPolicyLang(lang) {
+      const enSection = document.getElementById('content-en');
+      const arSection = document.getElementById('content-ar');
+      const btnEn = document.getElementById('toggle-en-btn');
+      const btnAr = document.getElementById('toggle-ar-btn');
+      const navBtnEn = document.getElementById('nav-btn-en');
+      const navBtnAr = document.getElementById('nav-btn-ar');
+
+      if (lang === 'ar') {
+        enSection.classList.add('hidden');
+        arSection.classList.remove('hidden');
+
+        btnAr.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md font-cairo';
+        btnEn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white';
+
+        if (navBtnAr) { navBtnAr.style.background = '#4063B2'; navBtnAr.style.color = '#fff'; }
+        if (navBtnEn) { navBtnEn.style.background = 'transparent'; navBtnEn.style.color = 'rgba(255,255,255,0.75)'; }
+      } else {
+        arSection.classList.add('hidden');
+        enSection.classList.remove('hidden');
+
+        btnEn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md';
+        btnAr.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white font-cairo';
+
+        if (navBtnEn) { navBtnEn.style.background = '#4063B2'; navBtnEn.style.color = '#fff'; }
+        if (navBtnAr) { navBtnAr.style.background = 'transparent'; navBtnAr.style.color = 'rgba(255,255,255,0.75)'; }
+      }
+    }
+
+    // Auto-detect if user navigated with #ar or from an Arabic context
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.location.hash === '#ar' || window.location.search.includes('lang=ar')) {
+        switchPolicyLang('ar');
+      }
+    });
+  </script>
+
+</body>
+</html>

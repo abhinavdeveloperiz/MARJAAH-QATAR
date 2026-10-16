@@ -41,8 +41,8 @@ export class OrdersController {
   }
 
   @Get(':idOrNumber')
-  async findOne(@Param('idOrNumber') idOrNumber: string, @Request() req: any) {
-    return this.ordersService.findOne(idOrNumber, req.user);
+  async findOne(@Param('idOrNumber') idOrNumber: string, @Query('phone') phone: string, @Request() req: any) {
+    return this.ordersService.findOne(idOrNumber, req.user, phone);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)

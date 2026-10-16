@@ -31,6 +31,7 @@
       "**/node_modules/**"
     ],
     "redirects": [
+      { "source": "/robot.txt", "destination": "/robots.txt", "type": 301 },
       { "source": "/shop.html", "destination": "/shop/", "type": 301 },
       { "source": "/cart.html", "destination": "/cart/", "type": 301 },
       { "source": "/checkout.html", "destination": "/checkout/", "type": 301 },
@@ -50,6 +51,19 @@
       { "source": "/offers.html", "destination": "/offers/", "type": 301 },
       { "source": "/wishlist.html", "destination": "/wishlist/", "type": 301 },
       { "source": "/product.html", "destination": "/product/", "type": 301 },
+      { "source": "/privacy.html", "destination": "/privacy/", "type": 301 },
+      { "source": "/privacy-policy", "destination": "/privacy/", "type": 301 },
+      { "source": "/privacy-policy.html", "destination": "/privacy/", "type": 301 },
+      { "source": "/returns.html", "destination": "/returns/", "type": 301 },
+      { "source": "/returns-policy", "destination": "/returns/", "type": 301 },
+      { "source": "/returns-policy.html", "destination": "/returns/", "type": 301 },
+      { "source": "/refund-policy", "destination": "/returns/", "type": 301 },
+      { "source": "/refund-policy.html", "destination": "/returns/", "type": 301 },
+      { "source": "/terms.html", "destination": "/terms/", "type": 301 },
+      { "source": "/terms-and-conditions", "destination": "/terms/", "type": 301 },
+      { "source": "/terms-and-conditions.html", "destination": "/terms/", "type": 301 },
+      { "source": "/track-order.html", "destination": "/track-order/", "type": 301 },
+      { "source": "/order-tracking", "destination": "/track-order/", "type": 301 },
       { "source": "/static/images/categories/:file*", "destination": "/assets/images/categories/:file*", "type": 301 },
       { "source": "/static/images/products/:file*", "destination": "/assets/images/products/:file*", "type": 301 },
       { "source": "/static/images/banners/:file*", "destination": "/assets/images/banners/:file*", "type": 301 },
@@ -101,10 +115,20 @@
       { "source": "/ar/wishlist/**", "destination": "/wishlist/index.html" },
       { "source": "/ar/offers", "destination": "/offers/index.html" },
       { "source": "/ar/offers/**", "destination": "/offers/index.html" },
+      { "source": "/product", "destination": "/product/index.html" },
+      { "source": "/product/**", "destination": "/product/index.html" },
       { "source": "/ar/product", "destination": "/product/index.html" },
       { "source": "/ar/product/**", "destination": "/product/index.html" },
       { "source": "/ar/admin", "destination": "/admin/index.html" },
-      { "source": "/ar/admin/**", "destination": "/admin/index.html" }
+      { "source": "/ar/admin/**", "destination": "/admin/index.html" },
+      { "source": "/ar/privacy", "destination": "/privacy/index.html" },
+      { "source": "/ar/privacy/**", "destination": "/privacy/index.html" },
+      { "source": "/ar/returns", "destination": "/returns/index.html" },
+      { "source": "/ar/returns/**", "destination": "/returns/index.html" },
+      { "source": "/ar/terms", "destination": "/terms/index.html" },
+      { "source": "/ar/terms/**", "destination": "/terms/index.html" },
+      { "source": "/ar/track-order", "destination": "/track-order/index.html" },
+      { "source": "/ar/track-order/**", "destination": "/track-order/index.html" }
     ]
   }
 }

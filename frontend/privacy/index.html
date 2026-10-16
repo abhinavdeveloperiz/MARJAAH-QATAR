@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — M.SHOP Qatar</title>
+  <meta name="description" content="Official Privacy Policy of M.SHOP Qatar, operated by Marjaah Trading WLL (CR No. 228717). We protect your personal data in compliance with Qatar Data Protection Law." />
+  <link rel="canonical" href="https://www.marjaah.shop/privacy/" />
+  
+  <meta name="csrf-token" content="E4UwUg8sVIwN0C82upIB6tDbNfqae3YZJdWrTxFWufLUTe3MFJxzVCoMt7UPZqlk" />
+  <script>window.CSRF_TOKEN = "E4UwUg8sVIwN0C82upIB6tDbNfqae3YZJdWrTxFWufLUTe3MFJxzVCoMt7UPZqlk";</script>
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/branding/favicon.png?v=4" />
+  <link rel="icon" type="image/svg+xml" href="/assets/images/branding/favicon.svg?v=4" />
+  <link rel="shortcut icon" href="/assets/images/branding/favicon.ico?v=4" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/branding/apple-touch-icon.png?v=4" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CDN with custom config -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            base: 'var(--bg-base)',
+            surface: { DEFAULT: 'var(--bg-surface)', 2: 'var(--bg-surface-2)', 3: 'var(--bg-surface-3)' },
+            'text-primary': 'var(--text-primary)',
+            'text-secondary': 'var(--text-secondary)',
+            'text-tertiary': 'var(--text-tertiary)',
+            'border-default': 'var(--border-color)',
+            primary: { DEFAULT: '#4063B2', 50: '#EEF2FF', 100: '#E0E7FF', 200: '#C7D2FE', 300: '#A5B4FC', 400: '#8D9CF5', 500: '#4063B2', 600: '#36529A', 700: '#2C427F', 800: '#223363', 900: '#182447' },
+            accent: { DEFAULT: '#8D9CF5', light: '#A8B4F8', dark: '#6F80EB', 500: '#8D9CF5', 400: '#A8B4F8' },
+          },
+          fontFamily: {
+            cairo: ["'Cairo'", 'sans-serif'],
+            display: ["'Space Grotesk'", 'Outfit', 'sans-serif'],
+            sans: ['Inter', 'Outfit', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <link rel="stylesheet" href="/assets/css/globals.css" />
+
+  <style>
+    .navbar-scrolled { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(13,19,38,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important; }
+    .dark .navbar-scrolled { background: rgba(7,11,20,0.95) !important; border-bottom: 1px solid rgba(255,255,255,0.08) !important; }
+    .policy-card { background: var(--bg-surface); border: 1px solid var(--border-color); }
+    [dir="rtl"] { font-family: 'Cairo', system-ui, -apple-system, sans-serif !important; }
+  </style>
+
+  <script>
+    (function(){
+      try {
+        var t = localStorage.getItem('marjaah-theme') || localStorage.getItem('theme');
+        if (t === 'light') {
+          document.documentElement.classList.remove('dark');
+          document.documentElement.classList.add('light');
+          return;
+        }
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        if (!t) {
+          localStorage.setItem('marjaah-theme', 'dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      } catch(e) {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  
+  <script src="/assets/js/api.js"></script>
+</head>
+<body style="background-color:var(--bg-base);color:var(--text-primary);margin:0;padding:0;" class="font-sans antialiased m-0 p-0">
+
+  <!-- Main Navbar -->
+  <header class="fixed top-0 left-0 right-0 z-50 select-none">
+    <div id="main-navbar" class="transition-all duration-300 navbar-scrolled">
+      <div class="container-custom h-[64px] sm:h-[72px] flex items-center justify-between gap-2 sm:gap-4">
+        <!-- Logo -->
+        <a href="/" aria-label="M.SHOP Home" class="flex items-center group transition-transform duration-300 hover:scale-105 flex-shrink-0">
+          <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-8 dark:hidden" />
+          <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-8 hidden dark:block" />
+        </a>
+
+        <!-- Desktop Nav -->
+        <nav class="hidden lg:flex items-center gap-8">
+          <a href="/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Home</a>
+          <a href="/shop/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Shop</a>
+          <a href="/offers/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Offers</a>
+          <a href="/about/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">About</a>
+          <a href="/contact/" class="nav-link text-xs font-sans tracking-widest uppercase transition-all duration-300 hover:tracking-[0.2em] font-bold">Contact</a>
+        </nav>
+
+        <!-- Right Actions -->
+        <div class="flex items-center gap-1.5 sm:gap-3 md:gap-5 flex-shrink-0">
+          <!-- Language Switcher in Nav -->
+          <div class="lang-switcher-wrap hidden md:flex items-center gap-0.5 rounded-xl px-1 py-1 border transition-all border-white/30 bg-white/10 backdrop-blur-sm">
+            <button onclick="switchPolicyLang('en')" id="nav-btn-en" class="px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold uppercase tracking-widest transition-all cursor-pointer bg-primary-500 text-white">EN</button>
+            <button onclick="switchPolicyLang('ar')" id="nav-btn-ar" class="px-2.5 py-1 rounded-lg text-[10px] font-sans font-bold uppercase tracking-widest transition-all cursor-pointer bg-transparent text-white/75">AR</button>
+          </div>
+
+          <!-- Search -->
+          <button id="search-btn" aria-label="Search" class="nav-btn w-8 h-8 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </button>
+
+          <!-- Wishlist -->
+          <a href="/wishlist/" aria-label="Wishlist" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0 hover:text-rose-400">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-rose-400"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <span data-wishlist-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:none">0</span>
+          </a>
+
+          <!-- Cart -->
+          <button data-open-cart onclick="if(window.openCart)window.openCart();" aria-label="Open cart" class="nav-btn relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            <span data-cart-count class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary-500 text-white text-[9px] flex items-center justify-center font-bold shadow-md" style="display:none">0</span>
+          </button>
+
+          <!-- Account -->
+          <a href="/account/" aria-label="Account" class="nav-btn w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </a>
+
+          <!-- Mobile menu toggle -->
+          <button id="mobile-menu-btn" aria-label="Open menu" class="nav-btn lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center transition-all cursor-pointer flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Drawer Menu -->
+  <div id="mobile-drawer" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
+       style="background:var(--bg-surface);border-color:var(--border-color);">
+    <div>
+      <div class="flex items-center justify-between pb-6" style="border-bottom:1px solid var(--border-color)">
+        <span class="font-display font-black text-lg tracking-wider" style="color:var(--text-primary)">MENU</span>
+        <button id="mobile-drawer-close" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+      </div>
+      <div class="py-6 space-y-2">
+        <a href="/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-primary)">Home</a>
+        <a href="/shop/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Shop</a>
+        <a href="/offers/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Offers</a>
+        <a href="/about/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">About</a>
+        <a href="/contact/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">Contact</a>
+        <a href="/account/" class="block py-2.5 text-sm font-bold uppercase tracking-wider" style="color:var(--text-secondary)">My Account</a>
+      </div>
+    </div>
+    <div class="pt-6 border-t" style="border-color:var(--border-color)">
+      <a href="https://wa.me/97477991013" target="_blank" class="w-full py-3 btn-primary text-xs font-bold uppercase rounded-xl flex items-center justify-center gap-2">
+        WhatsApp Support
+      </a>
+    </div>
+  </div>
+  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-[105] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 min-h-screen pt-[72px]">
+    
+    <!-- HEADER HERO -->
+    <div class="py-12 sm:py-16 border-b relative overflow-hidden" style="background:var(--bg-surface);border-color:var(--border-color)">
+      <div class="container-custom max-w-4xl relative z-10">
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-xs mb-4" style="color:var(--text-tertiary)">
+          <a href="/" class="hover:text-primary-400 transition">Home</a>
+          <span>/</span>
+          <span>Legal &amp; Support</span>
+          <span>/</span>
+          <span style="color:var(--color-accent)">Privacy Policy</span>
+        </nav>
+
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+          <div>
+            <h1 class="text-3xl sm:text-4xl font-display font-black tracking-tight" style="color:var(--text-primary)">
+              Privacy Policy
+            </h1>
+            <p class="text-xs sm:text-sm mt-1" style="color:var(--text-secondary)">
+              m.shop – Privacy &amp; Data Protection Policy
+            </p>
+          </div>
+
+          <!-- Bilingual Toggle Pill -->
+          <div class="flex items-center gap-1.5 p-1 rounded-2xl border self-start md:self-auto" style="background:var(--bg-surface-2);border-color:var(--border-color);">
+            <button id="toggle-en-btn" onclick="switchPolicyLang('en')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md">
+              English
+            </button>
+            <button id="toggle-ar-btn" onclick="switchPolicyLang('ar')" class="px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white">
+              العربية (Arabic)
+            </button>
+          </div>
+        </div>
+
+        <!-- Meta Summary Badge Bar -->
+        <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs pt-2" style="color:var(--text-secondary)">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            🏢 <strong>Operator:</strong> Marjaah Trading WLL (CR: 228717)
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            🔒 <strong>Protection:</strong> Qatar Law No. (13) of 2016
+          </span>
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            📅 <strong>Last Updated:</strong> 23 September 2026
+          </span>
+        </div>
+
+        <!-- Navigation Tabs for Policy Pages -->
+        <div class="flex flex-wrap items-center gap-2 mt-8 pt-6 border-t" style="border-color:var(--border-color)">
+          <a href="/terms/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border hover:border-primary-400 hover:text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+            📋 Terms &amp; Conditions
+          </a>
+          <a href="/returns/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border hover:border-primary-400 hover:text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+            🔄 Refund &amp; Exchange Policy
+          </a>
+          <a href="/privacy/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md">
+            🔒 Privacy Policy
+          </a>
+          <a href="/track-order/" class="px-4 py-2 rounded-xl text-xs font-bold transition-all border hover:border-primary-400 hover:text-primary-400" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-secondary)">
+            📦 Track Order
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLICY CONTENT (ENGLISH) -->
+    <div id="content-en" class="container-custom max-w-4xl py-12">
+      <div class="space-y-6 text-sm leading-relaxed" style="color:var(--text-secondary)">
+
+        <div class="p-5 sm:p-6 rounded-3xl border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+          <p class="font-medium text-xs sm:text-sm" style="color:var(--text-primary)">
+            We collect and use your personal data as described in this Privacy Policy, in line with Qatar's data protection law. We use your details only to process your order, provide support, and (where you agree) send you offers. We do not sell your personal data.
+          </p>
+        </div>
+
+        <!-- 1. Who We Are -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">1</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Who We Are</h2>
+          </div>
+          <p>
+            <strong>m.shop</strong> is operated by <strong>Marjaah Trading WLL</strong>, a company duly registered in the State of Qatar under Commercial Registration No. <strong>228717</strong>.
+          </p>
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
+            <li><strong>Official Address:</strong> Doha, Qatar</li>
+            <li><strong>Phone / WhatsApp:</strong> +974 7799 1013 (also +974 7799 1016)</li>
+            <li><strong>Email:</strong> info@marjaah.com</li>
+            <li><strong>Website:</strong> www.marjaah.shop</li>
+          </ul>
+        </section>
+
+        <!-- 2. What Information We Collect -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">2</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">What Information We Collect</h2>
+          </div>
+          <p>To fulfill your orders and deliver exceptional customer care, we collect:</p>
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
+            <li><strong>Contact details:</strong> Name, phone / mobile number, and email address.</li>
+            <li><strong>Delivery address:</strong> Zone, street, building, and location details anywhere in Qatar.</li>
+            <li><strong>Order details:</strong> Products ordered, order value in QAR, and delivery confirmation history.</li>
+            <li><strong>Payment information:</strong> Payment method selected (Cash on Delivery or Online Card / Apple Pay / Google Pay via MyFatoorah). <em>We never store or see your full credit or debit card numbers; all transactions are processed securely by MyFatoorah.</em></li>
+          </ul>
+        </section>
+
+        <!-- 3. How We Use Your Information -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">3</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">How We Use Your Information</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
+            <li>To process, confirm, and deliver your orders anywhere in Qatar free of charge.</li>
+            <li>To communicate with you via WhatsApp, telephone, or email about your order status, delivery coordination, or returns.</li>
+            <li>To provide after-sales support and assist with manufacturer warranty claims.</li>
+            <li>To send you promotions, offers, or discounts only if you have consented to receive them.</li>
+            <li>To prevent fraud, secure our website, and comply with applicable Qatar legal obligations.</li>
+          </ul>
+        </section>
+
+        <!-- 4. Data Sharing & Security -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">4</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Data Sharing &amp; Security</h2>
+          </div>
+          <p>
+            We take your privacy seriously. <strong>We do not sell, rent, or trade your personal data.</strong>
+          </p>
+          <p>
+            Your information is shared only with trusted service partners strictly necessary to complete your order:
+          </p>
+          <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
+            <li><strong>Payment Gateway (MyFatoorah):</strong> Encrypted card processing for online payments, Apple Pay, and Google Pay.</li>
+            <li><strong>Delivery Couriers:</strong> Delivery name, address, and mobile number to deliver your parcel safely.</li>
+          </ul>
+        </section>
+
+        <!-- 5. Your Rights Under Qatar Law -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm">5</span>
+            <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Your Rights</h2>
+          </div>
+          <p>
+            Under Qatar's personal data privacy regulations, you have the right to request access to the personal data we hold about you, request corrections to inaccurate data, or request that your account and personal details be removed.
+          </p>
+          <p>
+            To exercise any of these rights, simply email us at <a href="mailto:info@marjaah.com" class="text-primary-400 font-bold hover:underline">info@marjaah.com</a> or WhatsApp us at <a href="https://wa.me/97477991013" class="text-primary-400 font-bold hover:underline">+974 7799 1013</a>.
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- POLICY CONTENT (ARABIC) -->
+    <div id="content-ar" class="hidden container-custom max-w-4xl py-12" dir="rtl">
+      <div class="space-y-6 text-sm leading-relaxed text-right font-cairo" style="color:var(--text-secondary)">
+
+        <div class="p-6 rounded-3xl border bg-primary-500/10 border-primary-500/20 text-primary-300 mb-6">
+          <h2 class="font-bold text-base mb-1 text-white">سياسة الخصوصية وحماية البيانات</h2>
+          <p class="text-xs">الموقع الإلكتروني: www.marjaah.shop &bull; يُدار بواسطة: مرجاح للتجارة ذ.م.م ("m.shop"، "نحن"، "لنا") &bull; آخر تحديث: ٢٣ سبتمبر ٢٠٢٦</p>
+          <p class="text-xs mt-2 text-slate-300">نجمع بياناتك الشخصية ونستخدمها وفقاً لما هو موضّح في هذه السياسة، وبما يتوافق مع قانون حماية البيانات في دولة قطر. ونستخدم بياناتك فقط لتنفيذ طلبك وتقديم الدعم، وإرسال العروض إليك إذا وافقت على ذلك. ولا نبيع بياناتك الشخصية.</p>
+        </div>
+
+        <!-- ١. من نحن -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">١</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">١. من نحن</h2>
+          </div>
+          <p>يُدار متجر m.shop بواسطة شركة مرجاح للتجارة ذ.م.م، وهي شركة مسجلة في دولة قطر بالسجل التجاري رقم <strong>228717</strong>.</p>
+          <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
+            <li><strong>العنوان:</strong> الدوحة، دولة قطر</li>
+            <li><strong>الهاتف / واتساب:</strong> +974 7799 1013 (وأيضاً +974 7799 1016)</li>
+            <li><strong>البريد الإلكتروني:</strong> info@marjaah.com</li>
+            <li><strong>الموقع الإلكتروني:</strong> www.marjaah.shop</li>
+          </ul>
+        </section>
+
+        <!-- ٢. البيانات التي نجمعها -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٢</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٢. البيانات التي نجمعها</h2>
+          </div>
+          <p>لتنفيذ طلباتك وتقديم أفضل خدمة، نجمع المعلومات التالية:</p>
+          <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
+            <li><strong>بيانات التواصل:</strong> الاسم، ورقم الهاتف المحمول، والبريد الإلكتروني.</li>
+            <li><strong>عنوان التوصيل:</strong> المنطقة، والشارع، والمبنى، وبيانات الموقع في أي مكان داخل قطر.</li>
+            <li><strong>تفاصيل الطلب:</strong> المنتجات المطلوبة، وقيمة الطلب بالريال القطري، وتاريخ التسليم.</li>
+            <li><strong>بيانات الدفع:</strong> طريقة الدفع المختارة (الدفع عند الاستلام أو الدفع الإلكتروني عبر بطاقات الائتمان، أو Apple Pay، أو Google Pay بواسطة MyFatoorah). <em>نحن لا نطلع على أرقام بطاقتك الكاملة ولا نحتفظ بها؛ وتتم جميع المعاملات عبر بوابة الدفع الآمنة MyFatoorah.</em></li>
+          </ul>
+        </section>
+
+        <!-- ٣. كيفية استخدامنا لبياناتك -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٣</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٣. كيفية استخدامنا لبياناتك</h2>
+          </div>
+          <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
+            <li>لتنفيذ وتأكيد وتوصيل طلباتك إلى أي مكان داخل دولة قطر مجاناً.</li>
+            <li>للتواصل معك عبر واتساب أو الهاتف أو البريد الإلكتروني بشأن حالة الطلب أو التوصيل أو الإرجاع.</li>
+            <li>لتقديم خدمات ما بعد البيع ودعم مطالبات الضمان لدى الوكلاء المعتمدين.</li>
+            <li>لإرسال العروض والتخفيضات إذا وافقت صراحة على ذلك.</li>
+            <li>لمنع الاحتيال وحماية أمان الموقع والامتثال للقوانين والأنظمة المعمول بها في دولة قطر.</li>
+          </ul>
+        </section>
+
+        <!-- ٤. مشاركة البيانات والأمان -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٤</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٤. مشاركة البيانات والأمان</h2>
+          </div>
+          <p>
+            نحن نولي خصوصيتك أقصى درجات العناية. <strong>نحن لا نبيع بياناتك الشخصية ولا نؤجرها لأي جهة ثالثة.</strong>
+          </p>
+          <p>
+            تتم مشاركة البيانات الضرورية فقط مع الشركاء المعتمدين لتنفيذ طلبك:
+          </p>
+          <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
+            <li><strong>بوابة الدفع (MyFatoorah):</strong> لمعالجة الدفع الإلكتروني المشفر ببطاقات الائتمان وApple Pay وGoogle Pay بأمان.</li>
+            <li><strong>مندوبي التوصيل:</strong> الاسم ورقم الهاتف والعنوان لتسليم الطلب إليك بدقة وسرعة.</li>
+          </ul>
+        </section>
+
+        <!-- ٥. حقوقك بموجب القانون القطري -->
+        <section class="policy-card p-6 sm:p-8 rounded-3xl space-y-3">
+          <div class="flex items-center gap-3">
+            <span class="w-8 h-8 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center font-bold text-sm font-cairo">٥</span>
+            <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٥. حقوقك القانونية</h2>
+          </div>
+          <p>
+            بموجب قانون حماية خصوصية البيانات الشخصية في قطر، يحق لك طلب الاطلاع على بياناتك المحفوظة لدينا، أو طلب تصحيح أي بيانات غير دقيقة، أو طلب حذف حسابك وبياناتك.
+          </p>
+          <p>
+            لممارسة أي من هذه الحقوق، يُرجى مراسلتنا على <a href="mailto:info@marjaah.com" class="text-primary-400 font-bold hover:underline">info@marjaah.com</a> أو عبر واتساب <a href="https://wa.me/97477991013" class="text-primary-400 font-bold hover:underline">+974 7799 1013</a>.
+          </p>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- SUPPORT CONTACT BANNER -->
+    <div class="container-custom max-w-4xl pb-16">
+      <section class="p-6 sm:p-8 rounded-3xl border text-center space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+        <h3 class="text-base sm:text-lg font-display font-bold" style="color:var(--text-primary)">
+          Questions or Assistance? / لديك استفسار؟
+        </h3>
+        <p class="text-xs sm:text-sm max-w-xl mx-auto" style="color:var(--text-secondary)">
+          Our customer service team in Doha is ready to answer any questions about our privacy policies or your orders:
+        </p>
+        <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-xs font-semibold pt-2">
+          <a href="mailto:info@marjaah.com" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border hover:border-primary-400 transition" style="border-color:var(--border-color);color:var(--text-primary)">
+            ✉️ info@marjaah.com
+          </a>
+          <a href="tel:+97477991013" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border hover:border-primary-400 transition" style="border-color:var(--border-color);color:var(--text-primary)">
+            📞 +974 7799 1013
+          </a>
+          <a href="tel:+97477991016" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border hover:border-primary-400 transition" style="border-color:var(--border-color);color:var(--text-primary)">
+            📞 +974 7799 1016
+          </a>
+          <a href="https://wa.me/97477991013" target="_blank" class="btn-primary inline-flex items-center gap-2 px-4 py-2.5 rounded-xl shadow-md">
+            💬 WhatsApp Support
+          </a>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t pt-16 pb-8 transition-colors select-none" style="border-color:var(--border-color);background:var(--bg-surface)">
+    <div class="container-custom">
+      <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 sm:gap-10 pb-12" style="border-bottom:1px solid var(--border-color)">
+        <div class="col-span-2">
+          <a href="/" class="flex items-center gap-2 mb-4">
+            <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-8 dark:hidden" />
+            <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-8 hidden dark:block" />
+          </a>
+          <p class="text-xs leading-relaxed max-w-sm mb-4" style="color:var(--text-secondary)">
+            Qatar's premier destination for high-performance laptops, custom PC builds, GPUs, and genuine tech accessories with official brand warranties.
+          </p>
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Free Delivery Across Qatar (No Minimum Order)
+            </span>
+          </div>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
+          <ul class="space-y-2.5">
+            <li><a href="/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Home</a></li>
+            <li><a href="/shop/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Shop</a></li>
+            <li><a href="/offers/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Offers</a></li>
+            <li><a href="/about/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">About</a></li>
+            <li><a href="/contact/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Contact</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
+          <ul class="space-y-2.5">
+            <li><a href="/terms/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
+            <li><a href="/returns/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Refund &amp; Exchange Policy</a></li>
+            <li><a href="/privacy/" class="text-xs transition-colors font-bold text-primary-400">Privacy Policy</a></li>
+            <li><a href="/track-order/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Track Order</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
+          <ul class="space-y-3">
+            <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span>
+                Marjaah Trading WLL (CR: 228717)<br/>
+                Doha, State of Qatar
+              </span>
+            </li>
+            <li><a href="tel:+97477991013" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              +974 7799 1013</a>
+            </li>
+            <li><a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              +974 7799 1016</a>
+            </li>
+            <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              info@marjaah.com</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
+        <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
+        <p class="text-xs" style="color:var(--text-tertiary)">Doha, State of Qatar</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- WHATSAPP WIDGET -->
+  <a href="https://wa.me/97477991013" target="_blank" rel="noopener noreferrer" aria-label="Chat on WhatsApp"
+    class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#20bd5a] flex items-center justify-center shadow-lg hover:shadow-green-500/50 transition-all duration-300 hover:scale-110 group"
+    style="box-shadow:0 6px 24px rgba(37,211,102,0.45)">
+    <svg viewBox="0 0 24 24" width="30" height="30" class="w-7 h-7 text-white fill-white" aria-hidden="true"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+  </a>
+
+  <!-- Toast container -->
+  <div id="toast-container" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;"></div>
+
+  <!-- JS -->
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/toast.js"></script>
+  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/wishlist.js"></script>
+  <script src="/assets/js/mobile-menu.js"></script>
+
+  <!-- Bilingual Switching Script -->
+  <script>
+    function switchPolicyLang(lang) {
+      const enSection = document.getElementById('content-en');
+      const arSection = document.getElementById('content-ar');
+      const btnEn = document.getElementById('toggle-en-btn');
+      const btnAr = document.getElementById('toggle-ar-btn');
+      const navBtnEn = document.getElementById('nav-btn-en');
+      const navBtnAr = document.getElementById('nav-btn-ar');
+
+      if (lang === 'ar') {
+        enSection.classList.add('hidden');
+        arSection.classList.remove('hidden');
+
+        btnAr.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md font-cairo';
+        btnEn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white';
+
+        if (navBtnAr) { navBtnAr.style.background = '#4063B2'; navBtnAr.style.color = '#fff'; }
+        if (navBtnEn) { navBtnEn.style.background = 'transparent'; navBtnEn.style.color = 'rgba(255,255,255,0.75)'; }
+      } else {
+        arSection.classList.add('hidden');
+        enSection.classList.remove('hidden');
+
+        btnEn.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all bg-primary-500 text-white shadow-md';
+        btnAr.className = 'px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-white font-cairo';
+
+        if (navBtnEn) { navBtnEn.style.background = '#4063B2'; navBtnEn.style.color = '#fff'; }
+        if (navBtnAr) { navBtnAr.style.background = 'transparent'; navBtnAr.style.color = 'rgba(255,255,255,0.75)'; }
+      }
+    }
+
+    // Auto-detect if user navigated with #ar or from an Arabic context
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.location.hash === '#ar' || window.location.search.includes('lang=ar')) {
+        switchPolicyLang('ar');
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -18,6 +18,8 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon',
   '.webp': 'image/webp',
   '.woff2': 'font/woff2',
+  '.txt': 'text/plain; charset=UTF-8',
+  '.xml': 'application/xml; charset=UTF-8',
 };
 
 const server = http.createServer((req, res) => {
@@ -47,10 +49,20 @@ const server = http.createServer((req, res) => {
   let parsedUrl = new URL(req.url, `http://localhost:${PORT}`);
   let pathname = decodeURIComponent(parsedUrl.pathname);
 
-  // Clean URLs & directory resolution
-  let filePath = path.join(FRONTEND_DIR, pathname);
+  let cleanPath = pathname.replace(/^\/ar\//, '/').replace(/^\/ar$/, '/');
+  if (cleanPath === '/privacy-policy' || cleanPath === '/privacy-policy/') cleanPath = '/privacy/';
+  if (cleanPath === '/returns-policy' || cleanPath === '/returns-policy/' || cleanPath === '/refund-policy') cleanPath = '/returns/';
+  if (cleanPath === '/terms-and-conditions' || cleanPath === '/terms-and-conditions/') cleanPath = '/terms/';
+  if (cleanPath === '/order-tracking') cleanPath = '/track-order/';
 
-  if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
+  let filePath = path.join(FRONTEND_DIR, cleanPath);
+
+  // Route clean product URLs: /product/:slug, /ar/product/:slug
+  if (pathname.match(/^\/(?:ar\/)?product(?:\/.*)?$/)) {
+    filePath = path.join(FRONTEND_DIR, 'product', 'index.html');
+  } else if (pathname === '/robot.txt') {
+    filePath = path.join(FRONTEND_DIR, 'robots.txt');
+  } else if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {
     filePath = path.join(filePath, 'index.html');
   } else if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
     filePath = filePath + '.html';

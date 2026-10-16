@@ -34,9 +34,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
     const data = userDoc.data();
     return {
-      id: userDoc.id,
       ...data,
-      is_staff: data?.is_staff || data?.role === 'admin' || false,
+      id: String(userDoc.id),
+      sub: String(userDoc.id),
+      is_staff: Boolean(data?.is_staff || data?.role === 'admin' || false),
     };
   }
 }

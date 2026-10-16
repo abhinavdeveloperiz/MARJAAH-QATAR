@@ -2,7 +2,9 @@ import { Injectable, UnauthorizedException, BadRequestException, ConflictExcepti
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import * as admin from 'firebase-admin';
+import * as crypto from 'crypto';
 import { FirestoreService } from '../firebase/firestore.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService implements OnModuleInit {
@@ -11,6 +13,7 @@ export class AuthService implements OnModuleInit {
   constructor(
     private readonly firestore: FirestoreService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   async onModuleInit() {
@@ -360,28 +363,251 @@ export class AuthService implements OnModuleInit {
   }
 
   async getProfile(userId: string) {
-    const doc = await this.firestore.doc('users', userId).get();
-    if (!doc.exists) {
+    const cleanId = String(userId || '').trim();
+    if (!cleanId) {
       throw new UnauthorizedException('User not found');
     }
-    const data = doc.data();
-    const { password, ...safeUser } = data;
+    let doc = await this.firestore.doc('users', cleanId).get();
+    if (!doc.exists) {
+      const q = await this.firestore.collection('users')
+        .where('email', '==', cleanId.toLowerCase())
+        .limit(1)
+        .get();
+      if (!q.empty) {
+        doc = q.docs[0];
+      }
+    }
+    if (!doc.exists) {
+      const adminDoc = await this.firestore.collection('admin_credentials').doc(cleanId).get();
+      if (adminDoc.exists) {
+        const { password, raw_password, ...safeAdmin } = adminDoc.data();
+        return {
+          id: adminDoc.id,
+          ...safeAdmin,
+          role: 'admin',
+          is_staff: true,
+        };
+      }
+    }
+    if (!doc.exists) {
+      return {
+        id: cleanId,
+        role: 'customer',
+      };
+    }
+    const data = doc.data() || {};
+    const { password, raw_password, ...safeUser } = data;
     return {
-      id: doc.id,
       ...safeUser,
+      id: String(doc.id),
+      full_name: safeUser.full_name || [safeUser.first_name, safeUser.last_name].filter(Boolean).join(' ') || safeUser.username || '',
     };
   }
 
+  async updateProfile(userId: string, dto: { full_name?: string; phone?: string; first_name?: string; last_name?: string; building?: string; street?: string; zone?: string; city?: string }) {
+    const cleanId = String(userId || '').trim();
+    if (!cleanId) throw new BadRequestException('User ID required');
+    let docRef = this.firestore.doc('users', cleanId);
+    let doc = await docRef.get();
+    if (!doc.exists) {
+      const q = await this.firestore.collection('users').where('email', '==', cleanId.toLowerCase()).limit(1).get();
+      if (!q.empty) {
+        docRef = q.docs[0].ref as any;
+        doc = q.docs[0];
+      }
+    }
+    const updateData: any = { updated_at: new Date().toISOString() };
+    if (dto.full_name !== undefined) {
+      updateData.full_name = dto.full_name.trim();
+      const parts = updateData.full_name.split(' ');
+      updateData.first_name = parts[0] || '';
+      updateData.last_name = parts.slice(1).join(' ') || '';
+    }
+    if (dto.phone !== undefined) {
+      updateData.phone = dto.phone.trim();
+    }
+    if (dto.building !== undefined || dto.street !== undefined || dto.zone !== undefined || dto.city !== undefined) {
+      updateData.delivery_address = {
+        building: (dto.building || '').trim(),
+        street: (dto.street || '').trim(),
+        zone: (dto.zone || '').trim(),
+        city: (dto.city || 'Doha').trim(),
+        country: 'Qatar',
+      };
+    }
+    if (doc.exists) {
+      await docRef.update(updateData);
+    }
+    return { success: true, message: 'Profile updated successfully', ...updateData };
+  }
+
   async forgotPassword(email: string) {
+    if (!email) {
+      throw new BadRequestException('Email address is required');
+    }
     const emailNorm = email.toLowerCase().trim();
+
+    // Check if user exists in 'users' or 'admin_credentials'
+    let userDoc: any = null;
+    const userSnap = await this.firestore.collection('users')
+      .where('email', '==', emailNorm)
+      .limit(1)
+      .get();
+
+    if (!userSnap.empty) {
+      userDoc = userSnap.docs[0];
+    } else {
+      const adminSnap = await this.firestore.collection('admin_credentials')
+        .where('email', '==', emailNorm)
+        .limit(1)
+        .get();
+      if (!adminSnap.empty) {
+        userDoc = adminSnap.docs[0];
+      }
+    }
+
+    // Invalidate any previous unused reset requests for this email
+    try {
+      const prevSnap = await this.firestore.collection('password_resets')
+        .where('email', '==', emailNorm)
+        .where('used', '==', false)
+        .get();
+      for (const p of prevSnap.docs) {
+        await p.ref.update({ used: true, superseded: true });
+      }
+    } catch (e) {}
+
+    // Generate secure 6-digit verification code and URL token
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const token = crypto.randomBytes(24).toString('hex');
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + 15 * 60 * 1000).toISOString(); // 15 minutes expiration
+
     await this.firestore.collection('password_resets').add({
       email: emailNorm,
-      requested_at: new Date().toISOString(),
-      status: 'pending',
+      code,
+      token,
+      requested_at: now.toISOString(),
+      expires_at: expiresAt,
+      used: false,
+      user_id: userDoc ? userDoc.id : null,
     });
+
+    this.logger.log(`[PASSWORD RESET OTP] Generated for ${emailNorm}: ${code}`);
+
+    // Send email using MailService
+    const mailResult = await this.mailService.sendPasswordResetOtp(emailNorm, code);
+
     return {
       success: true,
-      message: 'If the email is registered, password reset instructions have been sent.',
+      message: mailResult.sent
+        ? 'A 6-digit verification code has been sent to your email address. Please check your inbox and enter the code.'
+        : 'A 6-digit verification code has been generated. Please check your email or enter the code below.',
+      email: emailNorm,
+      code: !mailResult.sent ? code : undefined,
+    };
+  }
+
+  async verifyResetToken(email: string, token: string) {
+    if (!email || !token) {
+      return { valid: false, message: 'Missing email or reset token/code' };
+    }
+    const emailNorm = email.toLowerCase().trim();
+    const tokenInput = token.trim();
+
+    const snap = await this.firestore.collection('password_resets')
+      .where('email', '==', emailNorm)
+      .where('used', '==', false)
+      .limit(10)
+      .get();
+
+    const validDoc = snap.docs.find(doc => {
+      const data = doc.data();
+      const matchToken = data.token === tokenInput || data.code === tokenInput;
+      const notExpired = !data.expires_at || new Date(data.expires_at).getTime() > Date.now();
+      return matchToken && notExpired;
+    });
+
+    return {
+      valid: !!validDoc,
+    };
+  }
+
+  async resetPassword(dto: { email: string; token: string; new_password: string }) {
+    if (!dto.email || !dto.token || !dto.new_password) {
+      throw new BadRequestException('Email, reset token/code, and new password are required');
+    }
+
+    if (dto.new_password.length < 6) {
+      throw new BadRequestException('Password must be at least 6 characters long');
+    }
+
+    const emailNorm = dto.email.toLowerCase().trim();
+    const tokenInput = dto.token.trim();
+
+    const snap = await this.firestore.collection('password_resets')
+      .where('email', '==', emailNorm)
+      .where('used', '==', false)
+      .limit(10)
+      .get();
+
+    if (snap.empty) {
+      throw new BadRequestException('No pending password reset request found for this email');
+    }
+
+    const validDoc = snap.docs.find(doc => {
+      const data = doc.data();
+      const matchToken = data.token === tokenInput || data.code === tokenInput;
+      const notExpired = !data.expires_at || new Date(data.expires_at).getTime() > Date.now();
+      return matchToken && notExpired;
+    });
+
+    if (!validDoc) {
+      throw new BadRequestException('Invalid or expired reset code. Please request a new link.');
+    }
+
+    const hashedPassword = await bcrypt.hash(dto.new_password, 10);
+    const now = new Date().toISOString();
+
+    // 1. Update in 'users' collection
+    let updated = false;
+    const userSnap = await this.firestore.collection('users')
+      .where('email', '==', emailNorm)
+      .limit(1)
+      .get();
+
+    if (!userSnap.empty) {
+      await userSnap.docs[0].ref.update({
+        password: hashedPassword,
+        updated_at: now,
+      });
+      updated = true;
+    }
+
+    // 2. Also update in 'admin_credentials' if email matches
+    const adminSnap = await this.firestore.collection('admin_credentials')
+      .where('email', '==', emailNorm)
+      .limit(1)
+      .get();
+
+    if (!adminSnap.empty) {
+      await adminSnap.docs[0].ref.update({
+        password: hashedPassword,
+        raw_password: dto.new_password,
+        updated_at: now,
+      });
+      updated = true;
+    }
+
+    // Mark reset record as used
+    await validDoc.ref.update({
+      used: true,
+      used_at: now,
+    });
+
+    return {
+      success: true,
+      message: 'Your password has been updated successfully. You can now sign in with your new password.',
     };
   }
 

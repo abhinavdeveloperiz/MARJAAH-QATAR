@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Disallow private user and administrative areas
+Disallow: /admin/
+Disallow: /admin-login/
+Disallow: /account/
+Disallow: /checkout/
+Disallow: /checkout-success/
+Disallow: /api/
+Disallow: /ar/admin/
+Disallow: /ar/account/
+Disallow: /ar/checkout/
+Disallow: /ar/checkout-success/
+
+# Sitemaps
+Sitemap: https://www.marjaah.shop/sitemap.xml

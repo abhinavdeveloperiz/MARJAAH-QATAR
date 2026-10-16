@@ -15,6 +15,7 @@ import { OrdersModule } from './orders/orders.module';
 import { ContactModule } from './contact/contact.module';
 import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UploadModule } from './upload/upload.module';
       },
     ]),
     FirebaseModule,
+    MailModule,
     AuthModule,
     UsersModule,
     CategoriesModule,

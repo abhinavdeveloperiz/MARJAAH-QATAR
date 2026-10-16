@@ -134,8 +134,8 @@
         subtotal += (item.price * item.quantity);
         count += item.quantity;
       });
-      // Free delivery over 500 QAR in Qatar
-      const shipping = subtotal >= 500 || subtotal === 0 ? 0 : 20;
+      // Free delivery across Qatar
+      const shipping = 0;
       const total = subtotal + shipping;
       return { subtotal, shipping, total, count };
     }
@@ -302,7 +302,7 @@
             </div>
             <div>
               <h3 class="font-bold text-sm sm:text-base leading-tight mb-1" style="color:var(--text-primary)">
-                <a href="/product/?slug=${item.slug}" class="hover:text-primary-400 transition">${isAr && item.name_ar ? item.name_ar : item.name}</a>
+                <a href="/product/${encodeURIComponent(item.slug)}/" class="hover:text-primary-400 transition">${isAr && item.name_ar ? item.name_ar : item.name}</a>
               </h3>
               <p class="text-xs font-semibold" style="color:var(--color-accent)">${item.price} QAR</p>
             </div>

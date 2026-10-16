@@ -98,7 +98,7 @@ export class FirestoreService implements OnModuleInit {
     return this.getFirestore().collection(collectionName);
   }
 
-  doc(collectionName: string, id: string): admin.firestore.DocumentReference {
-    return this.getFirestore().collection(collectionName).doc(id);
+  doc(collectionName: string, id: any): admin.firestore.DocumentReference {
+    return this.getFirestore().collection(collectionName).doc(String(id !== undefined && id !== null ? id : ''));
   }
 }

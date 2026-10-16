@@ -219,10 +219,14 @@
     updateOrderStatus(id, status) { return this.patch(`/api/orders/${id}/status`, { status }); }
     cancelOrder(id) { return this.post(`/api/orders/${id}/cancel`, {}); }
     getProfile() { return this.get('/api/auth/me'); }
+    updateProfile(data) { return this.patch('/api/auth/me', data); }
     login(credentials) { return this.post('/api/auth/login', credentials); }
     adminLogin(credentials) { return this.post('/api/auth/admin-login', credentials); }
     register(userData) { return this.post('/api/auth/register', userData); }
     firebaseLogin(idToken) { return this.post('/api/auth/firebase-login', { idToken }); }
+    forgotPassword(email) { return this.post('/api/auth/forgot-password', { email }); }
+    verifyResetToken(email, token) { return this.get('/api/auth/verify-reset-token', { email, token }); }
+    resetPassword(data) { return this.post('/api/auth/reset-password', data); }
     submitContact(message) { return this.post('/api/contact', message); }
     getContactMessages(params) { return this.get('/api/contact', params); }
     getContactMessage(id) { return this.get(`/api/contact/${id}`); }

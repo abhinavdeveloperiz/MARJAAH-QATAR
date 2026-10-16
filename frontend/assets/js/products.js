@@ -49,10 +49,12 @@
           ${isRtl ? 'نفذت الكمية' : 'Out of Stock'}
          </div>`;
 
+    const productHref = `/product/${encodeURIComponent(slug)}/`;
+
     return `
       <div data-animate class="card anim-visible group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
            style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:${delay}ms">
-        <a href="/product/?slug=${encodeURIComponent(slug)}" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
+        <a href="${productHref}" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
           <button data-wishlist-toggle="${slug}" aria-label="Toggle liked product" aria-pressed="${isSaved ? 'true' : 'false'}"
             class="${isSaved ? 'wishlist-active ' : ''}absolute top-3 right-3 z-10 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
             style="background:rgba(255,255,255,0.9);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
@@ -63,7 +65,7 @@
         <div class="p-4 flex flex-col flex-1">
           <div class="mb-1.5">
             ${brandName ? `<span class="text-[10px] font-extrabold uppercase tracking-widest" style="color:var(--color-accent)">${brandName}</span>` : ''}
-            <a href="/product/?slug=${encodeURIComponent(slug)}" class="block text-sm font-semibold leading-snug mt-1 line-clamp-2 transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
+            <a href="${productHref}" class="block text-sm font-semibold leading-snug mt-1 line-clamp-2 transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
               ${name}
             </a>
           </div>
@@ -423,9 +425,25 @@
     const titleEl = document.getElementById('product-title');
     if (!titleEl || !global.api) return;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug') || urlParams.get('id');
+    // Extract slug from standard clean path /product/:slug/ or /ar/product/:slug/, with query fallback
+    let slug = '';
+    const pathname = window.location.pathname;
+    const match = pathname.match(/(?:\/ar)?\/product\/([^/?#]+)/i);
+    if (match && match[1] && match[1] !== 'index.html') {
+      slug = decodeURIComponent(match[1]);
+    } else {
+      const urlParams = new URLSearchParams(window.location.search);
+      slug = urlParams.get('slug') || urlParams.get('id') || '';
+    }
+
     if (!slug) return; // Keep fallback if no slug specified
+
+    // If loaded via legacy ?slug= query param, update URL to clean standard path
+    if (window.history && window.history.replaceState && window.location.search.includes('slug=')) {
+      const isArabic = pathname.startsWith('/ar');
+      const cleanPath = `${isArabic ? '/ar' : ''}/product/${encodeURIComponent(slug)}/`;
+      window.history.replaceState(null, '', cleanPath);
+    }
 
     try {
       const product = await global.api.getProduct(slug);

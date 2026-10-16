@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, Query, Headers, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, Query, Headers, UseGuards, Request } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -76,12 +76,47 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('me')
   async getMe(@Request() req: any) {
-    return this.authService.getProfile(req.user.id || req.user.sub);
+    try {
+      const targetId = String(req.user?.id || req.user?.sub || '').trim();
+      const profile = await this.authService.getProfile(targetId);
+      return {
+        ...req.user,
+        ...profile,
+        id: String(req.user?.id || profile?.id || targetId),
+      };
+    } catch (e) {
+      return req.user;
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('me')
+  async updateMe(@Request() req: any, @Body() body: any) {
+    const userId = String(req.user?.id || req.user?.sub || '').trim();
+    return this.authService.updateProfile(userId, body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile')
+  async updateProfilePost(@Request() req: any, @Body() body: any) {
+    const userId = String(req.user?.id || req.user?.sub || '').trim();
+    return this.authService.updateProfile(userId, body);
   }
 
   @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('forgot-password')
   async forgotPassword(@Body('email') email: string) {
     return this.authService.forgotPassword(email);
+  }
+
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Post('reset-password')
+  async resetPassword(@Body() body: { email: string; token: string; new_password: string }) {
+    return this.authService.resetPassword(body);
+  }
+
+  @Get('verify-reset-token')
+  async verifyResetToken(@Query('email') email: string, @Query('token') token: string) {
+    return this.authService.verifyResetToken(email, token);
   }
 }

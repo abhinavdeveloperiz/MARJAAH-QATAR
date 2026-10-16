@@ -609,7 +609,7 @@
     <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
       <div>
         <h1 class="text-3xl font-display font-black" style="color:var(--text-primary)">My Account</h1>
-        <p class="text-sm mt-1" style="color:var(--text-secondary)">Welcome back, !</p>
+        <p class="text-sm mt-1" style="color:var(--text-secondary)">Welcome back, <span id="welcome-user-name"></span>!</p>
       </div>
       <a href="javascript:void(0)" onclick="if(window.api){window.api.clearAuth();}window.location.href='/login/';" class="btn-ghost border text-sm text-red-400/80 hover:text-red-400" style="border-color:rgba(239,68,68,0.3)">Sign Out</a>
     </div>
@@ -634,18 +634,95 @@
       <div class="lg:col-span-3">
         <!-- Overview Tab -->
         <div id="tab-overview" class="tab-panel">
-          <div class="grid sm:grid-cols-3 gap-4">
-            <div class="rounded-2xl p-5" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div class="rounded-2xl p-5 cursor-pointer hover:border-primary-500/40 transition group" onclick="showTab('orders')" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-2xl">📦</span>
+                <span class="text-[11px] font-bold text-primary-400 group-hover:translate-x-1 transition-transform">View →</span>
+              </div>
               <p id="user-kpi-orders" class="text-3xl font-display font-black" style="color:var(--text-primary)">0</p>
               <p class="text-xs mt-1 uppercase tracking-widest font-bold" style="color:var(--text-tertiary)">Total Orders</p>
             </div>
-            <div class="rounded-2xl p-5" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-              <p class="text-3xl font-display font-black" style="color:var(--text-primary)">1</p>
-              <p class="text-xs mt-1 uppercase tracking-widest font-bold" style="color:var(--text-tertiary)">Saved Addresses</p>
+
+            <div class="rounded-2xl p-5 cursor-pointer hover:border-primary-500/40 transition group" onclick="showTab('profile')" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-2xl">📍</span>
+                <span class="text-[11px] font-bold text-primary-400 group-hover:translate-x-1 transition-transform">Manage →</span>
+              </div>
+              <p id="user-kpi-addresses" class="text-3xl font-display font-black" style="color:var(--text-primary)">0</p>
+              <p class="text-xs mt-1 uppercase tracking-widest font-bold" style="color:var(--text-tertiary)">Saved Destinations</p>
             </div>
-            <div class="rounded-2xl p-5" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-              <p class="text-3xl font-display font-black" style="color:var(--color-accent)">0</p>
+
+            <div class="rounded-2xl p-5 cursor-pointer hover:border-rose-500/40 transition group" onclick="window.location.href='/wishlist/'" style="background:var(--bg-surface);border:1px solid var(--border-color)">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-2xl">❤️</span>
+                <span class="text-[11px] font-bold text-rose-400 group-hover:translate-x-1 transition-transform">Explore →</span>
+              </div>
+              <p id="user-kpi-wishlist" class="text-3xl font-display font-black text-rose-500">0</p>
               <p class="text-xs mt-1 uppercase tracking-widest font-bold" style="color:var(--text-tertiary)">Wishlist Items</p>
+            </div>
+          </div>
+
+          <!-- Quick Navigation Actions -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <button onclick="showTab('orders')" class="p-3.5 rounded-xl border flex items-center gap-2.5 text-xs font-bold transition hover:bg-primary-500/10 hover:border-primary-500/40" style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary)">
+              <span class="text-base">📦</span> My Orders
+            </button>
+            <button onclick="showTab('profile')" class="p-3.5 rounded-xl border flex items-center gap-2.5 text-xs font-bold transition hover:bg-primary-500/10 hover:border-primary-500/40" style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary)">
+              <span class="text-base">👤</span> Edit Profile
+            </button>
+            <a href="/wishlist/" class="p-3.5 rounded-xl border flex items-center gap-2.5 text-xs font-bold transition hover:bg-rose-500/10 hover:border-rose-500/40" style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary)">
+              <span class="text-base">❤️</span> View Wishlist
+            </a>
+            <a href="/shop/" class="p-3.5 rounded-xl border flex items-center gap-2.5 text-xs font-bold transition hover:bg-primary-500/10 hover:border-primary-500/40" style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary)">
+              <span class="text-base">🛒</span> Shop Hardware
+            </a>
+          </div>
+
+          <!-- Overview Details: Latest Order & Profile Snapshot -->
+          <div class="grid lg:grid-cols-3 gap-6">
+            <!-- Latest Order Card -->
+            <div class="lg:col-span-2 rounded-2xl p-6 border space-y-4" style="background:var(--bg-surface);border-color:var(--border-color)">
+              <div class="flex items-center justify-between pb-3 border-b" style="border-color:var(--border-color)">
+                <h3 class="font-display font-bold text-sm tracking-wide uppercase text-slate-400">Latest Order Snapshot</h3>
+                <button onclick="showTab('orders')" class="text-xs font-bold transition hover:underline" style="color:var(--color-accent)">View All Orders →</button>
+              </div>
+              <div id="overview-latest-order">
+                <p class="text-xs py-4 text-center" style="color:var(--text-tertiary)">Loading latest order...</p>
+              </div>
+            </div>
+
+            <!-- Profile Summary Card -->
+            <div class="rounded-2xl p-6 border space-y-4" style="background:var(--bg-surface);border-color:var(--border-color)">
+              <div class="flex items-center justify-between pb-3 border-b" style="border-color:var(--border-color)">
+                <h3 class="font-display font-bold text-sm tracking-wide uppercase text-slate-400">Account Summary</h3>
+                <button onclick="showTab('profile')" class="text-xs font-bold transition hover:underline" style="color:var(--color-accent)">Edit</button>
+              </div>
+              <div class="space-y-3.5 text-xs">
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Name</p>
+                  <p id="overview-user-name" class="font-bold text-sm mt-0.5" style="color:var(--text-primary)">—</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Email</p>
+                  <p id="overview-user-email" class="font-medium mt-0.5 truncate" style="color:var(--text-secondary)">—</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Phone</p>
+                  <p id="overview-user-phone" class="font-medium mt-0.5" style="color:var(--text-secondary)">—</p>
+                </div>
+                <div>
+                  <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Default Delivery Address</p>
+                  <p id="overview-user-address" class="font-medium mt-0.5 text-slate-300 leading-relaxed">—</p>
+                </div>
+                <div class="pt-3 border-t flex items-center justify-between" style="border-color:var(--border-color)">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Verified Customer
+                  </span>
+                  <a href="/track-order/" class="text-[11px] font-bold text-primary-400 hover:underline">Track Order →</a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -666,16 +743,70 @@
 
         <!-- Profile Tab -->
         <div id="tab-profile" class="tab-panel hidden">
-          <div class="rounded-2xl p-6" style="background:var(--bg-surface);border:1px solid var(--border-color)">
-            <h2 class="font-bold mb-5" style="color:var(--text-primary)">Profile Settings</h2>
-            <form id="profileForm" class="space-y-4">
+          <div class="rounded-2xl p-6 border space-y-6" style="background:var(--bg-surface);border-color:var(--border-color)">
+            <div>
+              <h2 class="font-display font-bold text-lg" style="color:var(--text-primary)">Profile & Address Settings</h2>
+              <p class="text-xs mt-0.5" style="color:var(--text-tertiary)">Update your account contact information and default delivery location across Qatar.</p>
+            </div>
+
+            <form id="profileForm" class="space-y-5">
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Full Name</label><input type="text" name="full_name" class="input" id="id_full_name"></div>
-                <div><label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Phone</label><input type="text" name="phone" class="input" maxlength="30" id="id_phone"></div>
+                <div>
+                  <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Full Name</label>
+                  <input type="text" name="full_name" class="input w-full" id="id_full_name" placeholder="Your Full Name">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Phone Number</label>
+                  <input type="text" name="phone" class="input w-full" maxlength="30" id="id_phone" placeholder="e.g. 77991016">
+                </div>
               </div>
-              <div class="pt-2"><label class="block text-xs mb-2" style="color:var(--text-tertiary)">Email (cannot be changed)</label>
-                <input type="text" id="user-profile-email" value="" disabled class="w-full px-4 py-3 rounded-xl border text-sm" style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-tertiary)" /></div>
-              <button type="submit" class="btn-primary mt-2">Save Changes</button>
+
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-tertiary)">Email Address</label>
+                <input type="text" id="user-profile-email" value="" disabled class="w-full px-4 py-2.5 rounded-xl border text-sm cursor-not-allowed" style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-tertiary)" />
+                <p class="text-[11px] mt-1" style="color:var(--text-tertiary)">Your verified login email for authentication and order invoices.</p>
+              </div>
+
+              <!-- Address Section -->
+              <div class="pt-4 border-t space-y-3.5" style="border-color:var(--border-color)">
+                <div>
+                  <h3 class="font-bold text-xs uppercase tracking-wider" style="color:var(--text-primary)">Default Delivery Destination (Qatar)</h3>
+                  <p class="text-[11px] mt-0.5" style="color:var(--text-tertiary)">This address is prefilled automatically during your one-click checkout.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Zone No.</label>
+                    <input type="text" id="id_zone" class="input w-full text-xs" placeholder="e.g. 91">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Street No. / Name</label>
+                    <input type="text" id="id_street" class="input w-full text-xs" placeholder="e.g. Street 295">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Building / Shop No.</label>
+                    <input type="text" id="id_building" class="input w-full text-xs" placeholder="e.g. Building 12">
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">City</label>
+                    <input type="text" id="id_city" class="input w-full text-xs" value="Doha" placeholder="Doha">
+                  </div>
+                  <div>
+                    <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Country</label>
+                    <input type="text" disabled class="w-full px-3 py-2 rounded-xl border text-xs cursor-not-allowed" style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-tertiary)" value="State of Qatar">
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-t flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border-color)">
+                <button type="submit" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs inline-flex items-center gap-2">
+                  <span>💾</span> Save Changes
+                </button>
+                <a href="/forgot-password/" class="text-xs font-semibold hover:underline" style="color:var(--color-accent)">Reset Password →</a>
+              </div>
             </form>
           </div>
         </div>
@@ -686,113 +817,498 @@
 
 <script>
 window.showTab = function(tabName) {
+  const allowed = ['overview', 'orders', 'profile'];
+  const activeTab = allowed.includes(tabName) ? tabName : 'overview';
+  
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
   document.querySelectorAll('.tab-btn').forEach(b => {
     b.classList.remove('bg-primary-500/10', 'text-primary-400');
+    b.style.background = 'transparent';
     b.style.color = 'var(--text-secondary)';
   });
-  const panel = document.getElementById('tab-' + tabName);
-  const btn = document.getElementById('tab-btn-' + tabName);
+  
+  const panel = document.getElementById('tab-' + activeTab);
+  const btn = document.getElementById('tab-btn-' + activeTab);
   if (panel) panel.classList.remove('hidden');
   if (btn) {
     btn.classList.add('bg-primary-500/10', 'text-primary-400');
+    btn.style.background = 'var(--bg-surface-2)';
     btn.style.color = 'var(--color-accent)';
   }
+
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', activeTab);
+    window.history.replaceState({}, '', url);
+  } catch (e) {}
 };
 
 async function cancelUserOrder(orderId) {
-  if (!confirm('Are you sure you want to cancel this order?')) return;
-  try {
-    await window.api.cancelOrder(orderId);
-    if (window.Toast) window.Toast.success('Order cancelled successfully.');
-    loadAccountData();
-  } catch (e) {
-    if (window.Toast) window.Toast.error(e.message || 'Failed to cancel order.');
+  const confirmMsg = 'Are you sure you want to cancel this order? Any reserved stock will be automatically restocked.';
+  if (!confirm(confirmMsg)) return;
+
+  const btn = document.getElementById('cancel-btn-' + orderId);
+  if (btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    btn.innerText = 'Cancelling…';
   }
+
+  try {
+    const res = await window.api.cancelOrder(orderId);
+    if (window.Toast) {
+      window.Toast.success(res?.message || 'Order cancelled successfully.');
+    } else {
+      alert('Order cancelled successfully.');
+    }
+    await loadAccountData();
+    window.showTab('orders');
+  } catch (e) {
+    if (btn) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.innerText = 'Cancel Order';
+    }
+    const errMsg = e.message || 'Failed to cancel order.';
+    if (window.Toast) {
+      window.Toast.error(errMsg);
+    } else {
+      alert(errMsg);
+    }
+  }
+}
+
+function applyUserData(u) {
+  if (!u) return;
+  const name = u.full_name || `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.name || u.username || (u.email ? u.email.split('@')[0] : 'User');
+  const initial = (name[0] || 'U').toUpperCase();
+  const email = u.email || '';
+  const phone = u.phone || '';
+
+  const welcomeEl = document.getElementById('welcome-user-name');
+  if (welcomeEl) welcomeEl.textContent = name;
+
+  const avatarEl = document.getElementById('user-avatar-initial');
+  if (avatarEl) avatarEl.textContent = initial;
+
+  const displayEl = document.getElementById('user-display-name');
+  if (displayEl) displayEl.textContent = name;
+
+  const emailEl = document.getElementById('user-display-email');
+  if (emailEl) emailEl.textContent = email;
+
+  const profEmail = document.getElementById('user-profile-email');
+  if (profEmail) profEmail.value = email;
+
+  const profName = document.getElementById('id_full_name');
+  if (profName && !profName.value) profName.value = name;
+
+  const profPhone = document.getElementById('id_phone');
+  if (profPhone && !profPhone.value) profPhone.value = phone;
+
+  // Overview quick profile
+  const ovName = document.getElementById('overview-user-name');
+  if (ovName) ovName.textContent = name;
+
+  const ovEmail = document.getElementById('overview-user-email');
+  if (ovEmail) ovEmail.textContent = email || '—';
+
+  const ovPhone = document.getElementById('overview-user-phone');
+  if (ovPhone) ovPhone.textContent = phone || 'Not provided yet';
+
+  // Address fields
+  const addr = u.delivery_address || {};
+  let addrFormatted = '';
+  if (typeof addr === 'string') {
+    addrFormatted = addr;
+  } else if (addr && typeof addr === 'object') {
+    addrFormatted = [addr.building, addr.street, addr.zone ? `Zone ${addr.zone}` : '', addr.city || 'Doha', addr.country || 'Qatar'].filter(Boolean).join(', ');
+    if (document.getElementById('id_building') && !document.getElementById('id_building').value) document.getElementById('id_building').value = addr.building || '';
+    if (document.getElementById('id_street') && !document.getElementById('id_street').value) document.getElementById('id_street').value = addr.street || '';
+    if (document.getElementById('id_zone') && !document.getElementById('id_zone').value) document.getElementById('id_zone').value = addr.zone || '';
+    if (document.getElementById('id_city') && !document.getElementById('id_city').value) document.getElementById('id_city').value = addr.city || 'Doha';
+  }
+
+  const ovAddr = document.getElementById('overview-user-address');
+  if (ovAddr) {
+    ovAddr.textContent = addrFormatted || 'No delivery address saved yet';
+  }
+
+  const kpiAddr = document.getElementById('user-kpi-addresses');
+  if (kpiAddr) {
+    kpiAddr.textContent = addrFormatted ? '1' : '0';
+  }
+
+  // Wishlist count
+  let wishlistCount = 0;
+  try {
+    const wl = JSON.parse(localStorage.getItem('marjaah_wishlist') || '[]');
+    wishlistCount = Array.isArray(wl) ? wl.length : 0;
+  } catch (e) {}
+  const kpiWl = document.getElementById('user-kpi-wishlist');
+  if (kpiWl) {
+    kpiWl.textContent = wishlistCount;
+  }
+}
+
+async function loadOrdersList() {
+  const ordersContainer = document.getElementById('user-orders-container');
+  if (!ordersContainer) return;
+
+  let orders = [];
+  let isError = false;
+
+  try {
+    const ordersRes = await window.api.get('/api/orders/user');
+    orders = Array.isArray(ordersRes) ? ordersRes : (ordersRes.items || ordersRes.data || []);
+  } catch (err1) {
+    console.warn('Orders /api/orders/user error:', err1);
+    try {
+      const fbRes = await window.api.get('/api/orders');
+      orders = Array.isArray(fbRes) ? fbRes : (fbRes.items || fbRes.data || []);
+    } catch (err2) {
+      console.error('Orders fallback fetch error:', err2);
+      isError = true;
+    }
+  }
+
+  // Also check local/session storage for recent orders
+  try {
+    const lastPlaced = localStorage.getItem('last_order_placed') || sessionStorage.getItem('last_order');
+    if (lastPlaced) {
+      const parsed = JSON.parse(lastPlaced);
+      if (parsed && (parsed.id || parsed.order_number)) {
+        const num = parsed.order_number || parsed.id;
+        const exists = orders.some(o => (o.order_number && o.order_number === num) || (o.id && o.id === parsed.id));
+        if (!exists) {
+          orders.unshift(parsed);
+        }
+      }
+    }
+  } catch (e) {}
+
+  if (document.getElementById('user-kpi-orders')) {
+    document.getElementById('user-kpi-orders').textContent = orders.length;
+  }
+
+  // Render Latest Order in Overview snapshot
+  const latestEl = document.getElementById('overview-latest-order');
+  if (latestEl) {
+    if (orders.length > 0) {
+      const latest = orders[0];
+      const latestNum = latest.order_number || (latest.id ? (String(latest.id).startsWith('MTQ-') ? latest.id : `MTQ-${String(latest.id).padStart(5, '0')}`) : 'MTQ-00000');
+      const latestDate = latest.created_at ? new Date(latest.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Recent';
+      const latestItems = Array.isArray(latest.items) ? latest.items : [];
+      const latestStatus = (latest.status || 'placed').toUpperCase();
+
+      // If overview address is still empty, derive from latest order
+      const ovAddr = document.getElementById('overview-user-address');
+      if (ovAddr && (ovAddr.textContent === '—' || ovAddr.textContent.includes('No delivery address'))) {
+        let derivedAddr = '';
+        if (typeof latest.delivery_address === 'string') {
+          derivedAddr = latest.delivery_address;
+        } else if (latest.delivery_address && typeof latest.delivery_address === 'object') {
+          const a = latest.delivery_address;
+          derivedAddr = [a.building, a.street, a.zone ? `Zone ${a.zone}` : '', a.city || 'Doha', 'Qatar'].filter(Boolean).join(', ');
+        }
+        if (derivedAddr) {
+          ovAddr.textContent = derivedAddr;
+          if (document.getElementById('user-kpi-addresses')) {
+            document.getElementById('user-kpi-addresses').textContent = '1';
+          }
+        }
+      }
+
+      // If user phone is empty, derive from latest order
+      const ovPhone = document.getElementById('overview-user-phone');
+      if (ovPhone && (ovPhone.textContent === '—' || ovPhone.textContent.includes('Not provided')) && latest.customer_phone) {
+        ovPhone.textContent = latest.customer_phone;
+        const profPhoneInput = document.getElementById('id_phone');
+        if (profPhoneInput && !profPhoneInput.value) profPhoneInput.value = latest.customer_phone;
+      }
+
+      latestEl.innerHTML = `
+        <div class="p-4 rounded-2xl space-y-3.5" style="background:var(--bg-surface-2)">
+          <div class="flex items-center justify-between pb-2 border-b" style="border-color:var(--border-color)">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Order</span>
+              <span class="font-display font-black text-primary-400 text-base">#${latestNum}</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">${latestStatus}</span>
+          </div>
+
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400">Date: <span class="text-slate-200 font-semibold">${latestDate}</span></span>
+            <span class="font-display font-black text-sm" style="color:var(--text-primary)">${latest.total || 0} <span class="text-xs font-normal text-primary-400 font-sans">QAR</span></span>
+          </div>
+
+          <!-- Items Mini list -->
+          <div class="space-y-1.5 pt-1">
+            ${latestItems.slice(0, 2).map(i => `
+              <div class="flex items-center justify-between text-xs py-1">
+                <span class="truncate max-w-[200px] text-slate-300 font-medium">${i.name}</span>
+                <span class="text-[11px] text-slate-400 flex-shrink-0">Qty: ${i.quantity || 1}</span>
+              </div>
+            `).join('')}
+            ${latestItems.length > 2 ? `<p class="text-[11px] text-primary-400 font-semibold">+${latestItems.length - 2} more item(s)</p>` : ''}
+          </div>
+
+          <div class="flex items-center gap-2 pt-2 border-t" style="border-color:var(--border-color)">
+            <a href="/track-order/?id=${encodeURIComponent(latestNum)}" class="btn-primary text-xs px-3.5 py-1.5 rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm">
+              <span>📦</span> Track Shipment
+            </a>
+            <button onclick="showTab('orders')" class="text-xs px-3.5 py-1.5 rounded-xl border hover:bg-white/5 transition font-semibold" style="border-color:var(--border-color);color:var(--text-secondary)">
+              View Details
+            </button>
+          </div>
+        </div>
+      `;
+    } else {
+      latestEl.innerHTML = `
+        <div class="p-6 rounded-2xl text-center space-y-3 border border-dashed" style="border-color:var(--border-color)">
+          <div class="w-10 h-10 rounded-xl mx-auto flex items-center justify-center bg-primary-500/10 text-primary-400 text-lg">📦</div>
+          <p class="text-xs font-medium" style="color:var(--text-secondary)">No orders placed yet. Start exploring Qatar's best high-performance laptops and PC hardware.</p>
+          <a href="/shop/" class="btn-primary text-xs px-4 py-2 rounded-xl font-bold inline-block">
+            Browse Hardware Store →
+          </a>
+        </div>
+      `;
+    }
+  }
+
+  // Render Orders Tab
+  if (orders.length === 0) {
+    if (isError) {
+      ordersContainer.innerHTML = `
+        <div class="rounded-3xl p-8 text-center border" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-12 h-12 rounded-2xl mx-auto mb-3 flex items-center justify-center bg-amber-500/10 text-amber-400 text-xl font-bold">⚠️</div>
+          <h3 class="font-display font-bold text-base mb-1" style="color:var(--text-primary)">Unable to load orders right now</h3>
+          <p class="text-xs mb-4 max-w-sm mx-auto" style="color:var(--text-secondary)">We couldn't connect to the server to fetch your orders. Please check your connection and retry.</p>
+          <button onclick="loadOrdersList()" class="btn-primary px-5 py-2 rounded-xl font-bold text-xs inline-flex items-center gap-2">
+            🔄 Retry
+          </button>
+        </div>
+      `;
+    } else {
+      ordersContainer.innerHTML = `
+        <div class="rounded-3xl p-12 text-center border" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-14 h-14 rounded-2xl mx-auto mb-3 flex items-center justify-center bg-primary-500/10 text-primary-400 text-2xl font-bold">📦</div>
+          <h3 class="font-display font-bold text-lg mb-1" style="color:var(--text-primary)">No orders placed yet</h3>
+          <p class="text-xs mb-6 max-w-sm mx-auto" style="color:var(--text-secondary)">Explore Qatar's best high-performance laptops, custom PC rigs, GPUs, and genuine peripherals.</p>
+          <a href="/shop/" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs inline-flex items-center gap-2">
+            Browse Hardware Store →
+          </a>
+        </div>
+      `;
+    }
+    return;
+  }
+
+  ordersContainer.innerHTML = orders.map(o => {
+    const orderNum = o.order_number || (o.id ? (String(o.id).startsWith('MTQ-') ? o.id : `MTQ-${String(o.id).padStart(5, '0')}`) : 'MTQ-00000');
+    const status = (o.status || 'placed').toLowerCase();
+    const canCancel = (status === 'placed' || status === 'pending' || status === 'processing');
+    
+    let badgeClass = 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+    let statusText = 'PLACED';
+    if (status === 'processing') {
+      badgeClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+      statusText = 'PROCESSING & QC';
+    } else if (status === 'shipped') {
+      badgeClass = 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
+      statusText = 'OUT FOR DELIVERY';
+    } else if (status === 'delivered') {
+      badgeClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      statusText = 'DELIVERED';
+    } else if (status === 'cancelled') {
+      badgeClass = 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+      statusText = 'CANCELLED';
+    }
+
+    const dateFormatted = o.created_at ? new Date(o.created_at).toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    }) : 'Recent';
+
+    const items = Array.isArray(o.items) ? o.items : [];
+    let addrText = '';
+    if (typeof o.delivery_address === 'string') {
+      addrText = o.delivery_address;
+    } else if (o.delivery_address && typeof o.delivery_address === 'object') {
+      const addr = o.delivery_address;
+      addrText = [addr.building, addr.street, addr.zone ? `Zone ${addr.zone}` : '', addr.city || 'Doha', addr.country || 'Qatar'].filter(Boolean).join(', ');
+    }
+
+    return `
+      <div class="rounded-3xl p-6 border mb-4 space-y-4 shadow-sm" style="background:var(--bg-surface);border-color:var(--border-color)">
+        
+        <!-- Card Top -->
+        <div class="flex flex-wrap items-center justify-between gap-4 pb-4 border-b" style="border-color:var(--border-color)">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] uppercase font-bold tracking-wider text-slate-400">Order</span>
+              <span class="font-display font-black text-lg text-primary-400">#${orderNum}</span>
+            </div>
+            <p class="text-[11px] text-slate-400 mt-0.5">Date: <span class="text-slate-200">${dateFormatted}</span></p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span id="order-status-badge-${o.id}" class="px-3 py-1 rounded-full text-[11px] font-bold ${badgeClass}">
+              ${statusText}
+            </span>
+            <div>
+              <span class="font-display font-black text-base" style="color:var(--text-primary)">${o.total || 0} <span class="text-xs font-normal text-primary-400 font-sans">QAR</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Item List -->
+        <div class="space-y-2.5">
+          ${items.map(i => `
+            <div class="flex items-center gap-3 text-xs p-2.5 rounded-xl" style="background:var(--bg-surface-2)">
+              <img src="${i.image || '/assets/images/placeholder.png'}" alt="${i.name}"
+                class="w-11 h-11 object-contain rounded-lg bg-black/10 p-0.5 flex-shrink-0"
+                onerror="this.src='/assets/images/branding/favicon.png'" />
+              <div class="min-w-0 flex-1">
+                <p class="font-bold truncate" style="color:var(--text-primary)">${i.name}</p>
+                <p class="text-[11px]" style="color:var(--text-tertiary)">Qty: ${i.quantity || 1} × ${i.price || 0} QAR</p>
+              </div>
+              <span class="font-bold text-primary-400 flex-shrink-0">${(i.line_total || ((i.price || 0) * (i.quantity || 1)))} QAR</span>
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Address Snippet -->
+        ${addrText ? `
+          <div class="text-[11px] text-slate-400 flex items-center gap-1.5 pt-1">
+            <span>📍 Destination:</span>
+            <span class="text-slate-300 font-medium truncate">${addrText}</span>
+          </div>
+        ` : ''}
+
+        <!-- Actions -->
+        <div class="pt-3 border-t flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border-color)">
+          <div class="flex flex-wrap items-center gap-2">
+            <a href="/track-order/?id=${encodeURIComponent(orderNum)}"
+              class="btn-primary text-xs px-3.5 py-1.5 rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm">
+              <span>📦</span> Track Shipment
+            </a>
+
+            <a href="https://wa.me/97477991013?text=${encodeURIComponent('Hi M.SHOP Qatar, inquiry regarding Order #' + orderNum)}" target="_blank"
+              class="text-xs px-3 py-1.5 rounded-xl border hover:border-emerald-500/50 hover:bg-emerald-500/10 transition inline-flex items-center gap-1.5 text-slate-300" style="border-color:var(--border-color)">
+              <span class="text-[#25D366]">💬</span> WhatsApp
+            </a>
+          </div>
+
+          ${canCancel ? `
+            <button id="cancel-btn-${o.id}" onclick="cancelUserOrder('${o.id}')"
+              class="text-xs px-3 py-1.5 rounded-xl border text-rose-400 hover:bg-rose-500/10 transition font-bold" style="border-color:rgba(244,63,94,0.3)">
+              Cancel Order
+            </button>
+          ` : ''}
+        </div>
+
+      </div>
+    `;
+  }).join('');
 }
 
 async function loadAccountData() {
   const token = window.api ? window.api.getToken() : null;
   if (!token) {
-    window.location.href = '/login/?next=/account.html';
+    window.location.href = '/login/?next=/account/';
     return;
   }
 
-  showTab('overview');
-
-  try {
-    const user = await window.api.getProfile();
-    if (user) {
-      const name = user.full_name || user.username || user.email.split('@')[0];
-      const initial = (name[0] || 'U').toUpperCase();
-      if (document.getElementById('user-avatar-initial')) document.getElementById('user-avatar-initial').textContent = initial;
-      if (document.getElementById('user-display-name')) document.getElementById('user-display-name').textContent = name;
-      if (document.getElementById('user-display-email')) document.getElementById('user-display-email').textContent = user.email;
-      if (document.getElementById('user-profile-email')) document.getElementById('user-profile-email').value = user.email;
-      if (document.getElementById('id_full_name')) document.getElementById('id_full_name').value = user.full_name || '';
-      if (document.getElementById('id_phone')) document.getElementById('id_phone').value = user.phone || '';
-    }
-
-    // Load user orders
-    const ordersRes = await window.api.get('/api/orders/user');
-    const orders = Array.isArray(ordersRes) ? ordersRes : (ordersRes.data || []);
-    if (document.getElementById('user-kpi-orders')) {
-      document.getElementById('user-kpi-orders').textContent = orders.length;
-    }
-
-    const ordersContainer = document.getElementById('user-orders-container');
-    if (ordersContainer) {
-      if (orders.length === 0) {
-        ordersContainer.innerHTML = `
-          <div class="rounded-3xl p-12 text-center border" style="background:var(--bg-surface);border-color:var(--border-color)">
-            <h3 class="font-display font-bold text-lg mb-1" style="color:var(--text-primary)">No orders found</h3>
-            <p class="text-xs mb-6 max-w-sm mx-auto" style="color:var(--text-secondary)">Browse our catalog of genuine high-performance computer hardware and peripherals.</p>
-            <a href="/shop/" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-xs">Browse Hardware Store</a>
-          </div>
-        `;
-      } else {
-        ordersContainer.innerHTML = orders.map(o => `
-          <div class="rounded-3xl p-6 border mb-4" style="background:var(--bg-surface);border-color:var(--border-color)">
-            <div class="flex flex-wrap items-center justify-between gap-4 mb-4 pb-4 border-b" style="border-color:var(--border-color)">
-              <div>
-                <p class="text-xs uppercase font-bold" style="color:var(--text-tertiary)">Order #</p>
-                <p class="font-display font-black text-lg" style="color:var(--color-accent)">${o.order_number || o.id}</p>
-              </div>
-              <div>
-                <p class="text-xs uppercase font-bold" style="color:var(--text-tertiary)">Total</p>
-                <p class="font-bold text-base" style="color:var(--text-primary)">${o.total || 0} QAR</p>
-              </div>
-              <div>
-                <p class="text-xs uppercase font-bold" style="color:var(--text-tertiary)">Status</p>
-                <span class="px-3 py-1 rounded-full text-xs font-bold ${o.status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-primary-500/20 text-primary-400'}">
-                  ${(o.status || 'processing').toUpperCase()}
-                </span>
-              </div>
-              ${(o.status === 'pending' || o.status === 'processing') ? `
-                <button onclick="cancelUserOrder('${o.id}')" class="text-xs px-3 py-1.5 rounded-xl border text-rose-400 hover:bg-rose-500/10 transition" style="border-color:rgba(244,63,94,0.3)">
-                  Cancel Order
-                </button>
-              ` : ''}
-            </div>
-            <div class="space-y-2">
-              ${(o.items || []).map(i => `
-                <div class="flex items-center gap-3 text-xs">
-                  <span class="font-medium" style="color:var(--text-primary)">${i.name}</span>
-                  <span style="color:var(--text-tertiary)">x${i.quantity}</span>
-                  <span class="ml-auto font-bold" style="color:var(--color-accent)">${i.price * i.quantity} QAR</span>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('');
-      }
-    }
-  } catch (err) {
-    console.error('Account data error:', err);
+  // 1. Immediately render cached user info synchronously
+  const cachedUser = window.api ? window.api.getUser() : null;
+  if (cachedUser) {
+    applyUserData(cachedUser);
   }
+
+  // 2. Select initial tab
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialTab = urlParams.get('tab') || window.location.hash.replace('#', '') || 'overview';
+  window.showTab(initialTab);
+
+  // 3. Asynchronously refresh profile in background
+  (async () => {
+    try {
+      const freshUser = await window.api.getProfile();
+      if (freshUser) {
+        applyUserData(freshUser);
+        if (window.api && window.api.setAuth && token) {
+          window.api.setAuth(token, { ...cachedUser, ...freshUser });
+        }
+      }
+    } catch (err) {
+      console.warn('Profile sync notice:', err);
+    }
+  })();
+
+  // 4. Asynchronously load orders list & overview data
+  await loadOrdersList();
 }
 
-document.addEventListener('DOMContentLoaded', loadAccountData);
+document.addEventListener('DOMContentLoaded', () => {
+  loadAccountData();
+
+  const profileForm = document.getElementById('profileForm');
+  if (profileForm) {
+    profileForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const submitBtn = profileForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.textContent : 'Save Changes';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+      }
+      try {
+        const full_name = (document.getElementById('id_full_name')?.value || '').trim();
+        const phone = (document.getElementById('id_phone')?.value || '').trim();
+        const building = (document.getElementById('id_building')?.value || '').trim();
+        const street = (document.getElementById('id_street')?.value || '').trim();
+        const zone = (document.getElementById('id_zone')?.value || '').trim();
+        const city = (document.getElementById('id_city')?.value || 'Doha').trim();
+
+        const res = await window.api.updateProfile({ full_name, phone, building, street, zone, city });
+        
+        // Update local auth user
+        const cached = (window.api ? window.api.getUser() : null) || {};
+        const updated = {
+          ...cached,
+          full_name,
+          phone,
+          delivery_address: { building, street, zone, city, country: 'Qatar' }
+        };
+        const token = window.api ? window.api.getToken() : null;
+        if (token && window.api && window.api.setAuth) {
+          window.api.setAuth(token, updated);
+        }
+        applyUserData(updated);
+
+        if (window.Toast) {
+          window.Toast.success(res?.message || 'Profile and address updated successfully!');
+        } else {
+          alert('Profile and address updated successfully!');
+        }
+      } catch (err) {
+        const errMsg = err?.message || 'Failed to update profile.';
+        if (window.Toast) {
+          window.Toast.error(errMsg);
+        } else {
+          alert(errMsg);
+        }
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalText;
+        }
+      }
+    });
+  }
+});
 </script>
 
   </main>
@@ -891,95 +1407,95 @@ document.addEventListener('DOMContentLoaded', loadAccountData);
     <div class="marquee-ltr">
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
     </div>
@@ -1016,7 +1532,7 @@ document.addEventListener('DOMContentLoaded', loadAccountData);
     </div>
 
     <!-- Links grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
       <div>
         <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
         <ul class="space-y-2.5">
@@ -1034,31 +1550,35 @@ document.addEventListener('DOMContentLoaded', loadAccountData);
         </ul>
       </div>
       <div>
-        <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Categories</h4>
+        <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
         <ul class="space-y-2.5">
-          
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Support</h4>
-        <ul class="space-y-2.5">
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Track Order</a></li>
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Returns Policy</a></li>
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Privacy Policy</a></li>
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
-          <li><a href="/contact/" class="text-xs" style="color:var(--text-secondary)">Contact</a></li>
+          <li><a href="/terms/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
+          <li><a href="/returns/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Refund &amp; Exchange Policy</a></li>
+          <li><a href="/privacy/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Privacy Policy</a></li>
+          <li><a href="/track-order/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Track Order</a></li>
         </ul>
       </div>
       <div>
         <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
         <ul class="space-y-3">
-          <li class="flex items-start gap-2 text-xs" style="color:var(--text-secondary)">
+          <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            Doha Showroom
+            <span>
+              Marjaah Trading WLL (CR: 228717)<br/>
+              Doha, State of Qatar
+            </span>
           </li>
           <li><a href="tel:+97477991013" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             +974 7799 1013</a>
+          </li>
+          <li><a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            +974 7799 1016</a>
+          </li>
+          <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            info@marjaah.com</a>
           </li>
         </ul>
       </div>
@@ -1066,8 +1586,8 @@ document.addEventListener('DOMContentLoaded', loadAccountData);
 
     <!-- Bottom bar -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
-      <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP Qatar. All rights reserved.</p>
-      <p class="text-xs" style="color:var(--text-tertiary)">Developed by InspireZest Technologies Pvt Ltd</p>
+      <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
+      <p class="text-xs" style="color:var(--text-tertiary)">Doha, State of Qatar</p>
     </div>
   </div>
 </footer>
@@ -1101,76 +1621,6 @@ document.addEventListener('DOMContentLoaded', loadAccountData);
   <script src="/assets/js/scroll.js"></script>
   <script src="/assets/js/carousel.js"></script>
   
-<script>
-function showTab(id) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
-  document.querySelectorAll('.tab-btn').forEach(b => { b.style.background='transparent'; b.style.color='var(--text-secondary)'; });
-  const panel = document.getElementById('tab-' + id);
-  const btn = document.getElementById('tab-btn-' + id);
-  if(panel) panel.classList.remove('hidden');
-  if(btn) { btn.style.background='var(--bg-surface-2)'; btn.style.color='var(--color-accent)'; }
-}
-
-// Check URL params for initial tab
-const urlParams = new URLSearchParams(window.location.search);
-const initialTab = urlParams.get('tab') || 'overview';
-showTab(initialTab);
-
-// Interactive Order Cancellation
-function cancelOrder(orderId) {
-  const isAr = document.documentElement.lang === 'ar' || document.documentElement.dir === 'rtl';
-  const confirmMsg = isAr ? 'هل أنت متأكد من رغبتك في إلغاء هذا الطلب؟' : 'Are you sure you want to cancel this order?';
-  if (!confirm(confirmMsg)) return;
-
-  const btn = document.getElementById('cancel-btn-' + orderId);
-  if (btn) {
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-    btn.innerText = isAr ? 'جاري الإلغاء…' : 'Cancelling…';
-  }
-
-  window.ApiClient.cancelOrder(orderId)
-  .then(res => {
-    if (res && res.success) {
-      if (typeof Toast !== 'undefined') {
-        Toast.success(res.message || (isAr ? 'تم إلغاء الطلب بنجاح' : 'Order cancelled successfully!'));
-      }
-      // Update badge
-      const badge = document.getElementById('order-status-badge-' + orderId);
-      if (badge) {
-        badge.className = 'px-3 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-red-500/10 text-red-400 border border-red-500/20';
-        badge.innerText = isAr ? 'ملغي' : 'Cancelled';
-      }
-      // Remove cancel button
-      if (btn) btn.remove();
-    } else {
-      if (btn) {
-        btn.disabled = false;
-        btn.style.opacity = '1';
-        btn.innerText = isAr ? 'إلغاء الطلب' : 'Cancel Order';
-      }
-      const err = (res && res.message) || (isAr ? 'تعذر إلغاء الطلب' : 'Could not cancel order.');
-      if (typeof Toast !== 'undefined') {
-        Toast.error(err);
-      } else {
-        alert(err);
-      }
-    }
-  })
-  .catch(err => {
-    console.error(err);
-    if (btn) {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.innerText = isAr ? 'إلغاء الطلب' : 'Cancel Order';
-    }
-    if (typeof Toast !== 'undefined') {
-      Toast.error(isAr ? 'حدث خطأ في الاتصال' : 'Network error. Please try again.');
-    }
-  });
-}
-</script>
-
 
 </body>
 </html>

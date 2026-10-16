@@ -606,32 +606,148 @@
     
 <div class="min-h-screen flex items-center justify-center px-4" style="background:var(--bg-base);padding-top:72px;padding-bottom:3rem">
   <div class="relative z-10 w-full max-w-md">
-    <div class="rounded-3xl p-8 shadow-2xl border animate-fade-in-up" style="background:var(--bg-surface);border-color:var(--border-color)">
-      <div class="text-center mb-8">
-        <h1 class="text-2xl font-display font-black mb-1" style="color:var(--text-primary)">
-          Forgot Password
-        </h1>
-        <p class="text-sm" style="color:var(--text-secondary)">
-          Enter your email and we&#x27;ll send you a reset link
-        </p>
-      </div>
+    <div class="rounded-3xl p-7 sm:p-9 shadow-2xl border animate-fade-in-up transition-all duration-300" style="background:var(--bg-surface);border-color:var(--border-color);box-shadow:0 20px 50px rgba(0,0,0,0.35);">
       
-      <form method="post" class="space-y-4">
-        
-        <div>
-          <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Email Address</label>
-          <input type="email" name="email" class="input" placeholder="you@example.com" id="id_email" autofocus maxlength="320" required>
+      <!-- STEP 1: Request Reset Instructions -->
+      <div id="step-request" class="space-y-6">
+        <div class="text-center space-y-2">
+          <div class="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg border border-primary-500/20" style="background:linear-gradient(135deg,rgba(64,99,178,0.2),rgba(141,156,245,0.2))">
+            🔑
+          </div>
+          <h1 class="text-2xl font-display font-black tracking-tight" style="color:var(--text-primary)">
+            Forgot Password?
+          </h1>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color:var(--text-secondary)">
+            Enter your registered email address and we'll generate your secure password reset code and instructions.
+          </p>
         </div>
-        <button type="submit" class="btn-primary w-full justify-center mt-2">
-          Send Reset Link
-        </button>
-      </form>
-      <div class="text-center mt-5">
-        <a href="/login/" class="text-xs hover:underline" style="color:var(--text-tertiary)">
-          ← Back to Login
-        </a>
+
+        <form id="request-form" class="space-y-4" autocomplete="off">
+          <div id="request-alert" class="hidden p-3.5 rounded-xl text-xs border font-medium"></div>
+
+          <div>
+            <label for="req-email" class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-secondary)">
+              Email Address
+            </label>
+            <input id="req-email" type="email" placeholder="you@example.com" required autofocus autocomplete="email"
+              class="w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none transition-colors"
+              style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary);" />
+          </div>
+
+          <button type="submit" id="request-btn"
+            class="btn-primary w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2">
+            Send Reset Instructions
+          </button>
+        </form>
+
+        <div class="pt-4 border-t space-y-3 text-center" style="border-color:var(--border-color)">
+          <a href="/login/" class="text-xs font-bold hover:underline inline-flex items-center gap-1.5" style="color:var(--text-secondary)">
+            <span>←</span> Back to Sign In
+          </a>
+          <p class="text-[11px]" style="color:var(--text-tertiary)">
+            Need help? <a href="https://wa.me/97477991013?text=Hi%20M.SHOP%20Qatar,%20I%20need%20help%20recovering%20my%20account%20password." target="_blank" class="text-primary-400 font-bold hover:underline">Chat with Doha Support on WhatsApp</a>
+          </p>
+        </div>
       </div>
-      
+
+      <!-- STEP 2: Enter Verification Code & Set New Password -->
+      <div id="step-reset" class="hidden space-y-6">
+        <div class="text-center space-y-2">
+          <div class="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-lg border border-purple-500/20" style="background:linear-gradient(135deg,rgba(187,154,237,0.2),rgba(141,156,245,0.2))">
+            🔒
+          </div>
+          <h2 class="text-2xl font-display font-black tracking-tight" style="color:var(--text-primary)">
+            Set New Password
+          </h2>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color:var(--text-secondary)">
+            Verification code sent for <span id="reset-target-email" class="text-primary-400 font-bold font-mono"></span>.
+          </p>
+        </div>
+
+        <form id="reset-form" class="space-y-4" autocomplete="off">
+          <div id="reset-alert" class="hidden p-3.5 rounded-xl text-xs border font-medium"></div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <label for="reset-token-input" class="block text-xs font-bold uppercase tracking-wider" style="color:var(--text-secondary)">
+                Verification Code
+              </label>
+              <span class="text-[11px] text-slate-400 font-mono">Expires in 15 mins</span>
+            </div>
+            <input id="reset-token-input" name="reset_otp_token" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+              placeholder="Enter 6-digit code" autocomplete="one-time-code" required
+              class="w-full px-4 py-3.5 rounded-xl border text-base font-mono tracking-widest text-center focus:outline-none transition-colors"
+              style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary);" />
+            <p class="text-[11px] mt-1.5" style="color:var(--text-tertiary)">Please enter the 6-digit verification code sent to your email.</p>
+          </div>
+
+          <div>
+            <label for="new-password-input" class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-secondary)">
+              New Password
+            </label>
+            <div class="relative">
+              <input id="new-password-input" name="new_user_password" type="password" autocomplete="new-password"
+                placeholder="At least 6 characters" required minlength="6"
+                class="w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none transition-colors pr-12"
+                style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary);" />
+              <button type="button" onclick="togglePasswordVisibility('new-password-input', this)"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label for="confirm-password-input" class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-secondary)">
+              Confirm New Password
+            </label>
+            <div class="relative">
+              <input id="confirm-password-input" name="confirm_user_password" type="password" autocomplete="new-password"
+                placeholder="Re-enter new password" required minlength="6"
+                class="w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none transition-colors pr-12"
+                style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary);" />
+              <button type="button" onclick="togglePasswordVisibility('confirm-password-input', this)"
+                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1">
+                👁️
+              </button>
+            </div>
+            <p id="password-match-hint" class="text-[11px] mt-1.5 hidden"></p>
+          </div>
+
+          <button type="submit" id="reset-btn"
+            class="btn-primary w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2">
+            Save New Password
+          </button>
+        </form>
+
+        <div class="pt-4 border-t text-center" style="border-color:var(--border-color)">
+          <button type="button" onclick="goToStep('step-request')" class="text-xs font-bold text-slate-400 hover:text-white transition">
+            ← Request a different code
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Success Celebration -->
+      <div id="step-success" class="hidden space-y-6 text-center">
+        <div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl shadow-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400">
+          ✓
+        </div>
+        <div class="space-y-2">
+          <h2 class="text-2xl font-display font-black tracking-tight" style="color:var(--text-primary)">
+            Password Updated! 🎉
+          </h2>
+          <p class="text-xs sm:text-sm leading-relaxed" style="color:var(--text-secondary)">
+            Your M.SHOP account password has been successfully reset. You can now log in securely with your new password.
+          </p>
+        </div>
+
+        <div class="pt-4 border-t" style="border-color:var(--border-color)">
+          <a href="/login/" class="btn-primary w-full py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg flex items-center justify-center gap-2">
+            Proceed to Sign In →
+          </a>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -732,95 +848,95 @@
     <div class="marquee-ltr">
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
       <div class="flex items-center gap-4 pr-6 text-white/95 text-xs font-bold tracking-widest uppercase flex-shrink-0">
-        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery 500+</span><span class="opacity-50">·</span>
+        <span>M.SHOP</span><span class="opacity-50">·</span><span>Qatar Hardware</span><span class="opacity-50">·</span><span>Official Warranty</span><span class="opacity-50">·</span><span>Free Delivery Across Qatar</span><span class="opacity-50">·</span>
       </div>
       
     </div>
@@ -857,7 +973,7 @@
     </div>
 
     <!-- Links grid -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
       <div>
         <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
         <ul class="space-y-2.5">
@@ -875,31 +991,35 @@
         </ul>
       </div>
       <div>
-        <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Categories</h4>
+        <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
         <ul class="space-y-2.5">
-          
-        </ul>
-      </div>
-      <div>
-        <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Support</h4>
-        <ul class="space-y-2.5">
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Track Order</a></li>
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Returns Policy</a></li>
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Privacy Policy</a></li>
-          <li><a href="#" class="text-xs" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
-          <li><a href="/contact/" class="text-xs" style="color:var(--text-secondary)">Contact</a></li>
+          <li><a href="/terms/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
+          <li><a href="/returns/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Refund &amp; Exchange Policy</a></li>
+          <li><a href="/privacy/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Privacy Policy</a></li>
+          <li><a href="/track-order/" class="text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">Track Order</a></li>
         </ul>
       </div>
       <div>
         <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
         <ul class="space-y-3">
-          <li class="flex items-start gap-2 text-xs" style="color:var(--text-secondary)">
+          <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-            Doha Showroom
+            <span>
+              Marjaah Trading WLL (CR: 228717)<br/>
+              Doha, State of Qatar
+            </span>
           </li>
           <li><a href="tel:+97477991013" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
             +974 7799 1013</a>
+          </li>
+          <li><a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--color-accent)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            +974 7799 1016</a>
+          </li>
+          <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            info@marjaah.com</a>
           </li>
         </ul>
       </div>
@@ -907,8 +1027,8 @@
 
     <!-- Bottom bar -->
     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
-      <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP Qatar. All rights reserved.</p>
-      <p class="text-xs" style="color:var(--text-tertiary)">Developed by InspireZest Technologies Pvt Ltd</p>
+      <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
+      <p class="text-xs" style="color:var(--text-tertiary)">Doha, State of Qatar</p>
     </div>
   </div>
 </footer>
@@ -941,7 +1061,247 @@
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js"></script>
   <script src="/assets/js/carousel.js"></script>
-  
+
+  <!-- Password Recovery Logic -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      let currentEmail = '';
+
+      window.goToStep = function(stepId) {
+        document.getElementById('step-request').classList.add('hidden');
+        document.getElementById('step-reset').classList.add('hidden');
+        document.getElementById('step-success').classList.add('hidden');
+        const active = document.getElementById(stepId);
+        if (active) active.classList.remove('hidden');
+
+        // Security: clear code & password inputs on view transition to avoid browser autofill
+        if (stepId === 'step-reset') {
+          const tokenInput = document.getElementById('reset-token-input');
+          const newPassInput = document.getElementById('new-password-input');
+          const confirmPassInput = document.getElementById('confirm-password-input');
+          if (tokenInput && !urlToken) tokenInput.value = '';
+          if (newPassInput) newPassInput.value = '';
+          if (confirmPassInput) confirmPassInput.value = '';
+
+          // Delayed wipe to prevent aggressive browser autofill of previous credentials
+          setTimeout(function() {
+            if (tokenInput && !urlToken) tokenInput.value = '';
+            if (newPassInput) newPassInput.value = '';
+            if (confirmPassInput) confirmPassInput.value = '';
+          }, 60);
+        }
+      };
+
+      window.togglePasswordVisibility = function(inputId, btn) {
+        const input = document.getElementById(inputId);
+        if (!input) return;
+        if (input.type === 'password') {
+          input.type = 'text';
+          btn.textContent = '🔒';
+        } else {
+          input.type = 'password';
+          btn.textContent = '👁️';
+        }
+      };
+
+      // Realtime password match validation
+      const newPassInput = document.getElementById('new-password-input');
+      const confirmPassInput = document.getElementById('confirm-password-input');
+      const matchHint = document.getElementById('password-match-hint');
+
+      function checkPasswordMatch() {
+        if (!matchHint || !confirmPassInput) return;
+        if (!confirmPassInput.value) {
+          matchHint.classList.add('hidden');
+          return;
+        }
+        if (newPassInput.value === confirmPassInput.value) {
+          matchHint.className = 'text-[11px] mt-1.5 text-emerald-400 font-medium flex items-center gap-1';
+          matchHint.innerHTML = '<span>✓</span> Passwords match';
+          matchHint.classList.remove('hidden');
+        } else {
+          matchHint.className = 'text-[11px] mt-1.5 text-rose-400 font-medium flex items-center gap-1';
+          matchHint.innerHTML = '<span>✕</span> Passwords do not match';
+          matchHint.classList.remove('hidden');
+        }
+      }
+
+      if (newPassInput) newPassInput.addEventListener('input', checkPasswordMatch);
+      if (confirmPassInput) confirmPassInput.addEventListener('input', checkPasswordMatch);
+
+      // Digits-only filter for 6-digit OTP code input
+      const tokenInput = document.getElementById('reset-token-input');
+      if (tokenInput) {
+        tokenInput.addEventListener('input', function() {
+          this.value = this.value.replace(/\D/g, '').slice(0, 6);
+        });
+      }
+
+      // Check URL parameters for direct reset links (e.g. ?token=...&email=...)
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlToken = urlParams.get('token') || urlParams.get('code');
+      const urlEmail = urlParams.get('email');
+
+      if (urlToken) {
+        document.getElementById('reset-token-input').value = urlToken;
+        if (urlEmail) {
+          currentEmail = urlEmail.toLowerCase().trim();
+          document.getElementById('reset-target-email').textContent = currentEmail;
+        }
+        window.goToStep('step-reset');
+      }
+
+      // Step 1: Request Code
+      const requestForm = document.getElementById('request-form');
+      if (requestForm) {
+        requestForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const emailInput = document.getElementById('req-email').value.trim();
+          if (!emailInput) return;
+
+          const btn = document.getElementById('request-btn');
+          const alertBox = document.getElementById('request-alert');
+          alertBox.classList.add('hidden');
+
+          btn.disabled = true;
+          btn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Sending Verification Code...
+          `;
+
+          try {
+            let res = null;
+            if (window.api && typeof window.api.forgotPassword === 'function') {
+              res = await window.api.forgotPassword(emailInput);
+            } else {
+              const resp = await fetch('/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailInput })
+              });
+              res = await resp.json();
+            }
+
+            currentEmail = emailInput;
+            document.getElementById('reset-target-email').textContent = currentEmail;
+
+            // Security: Reset fields completely - user must enter the OTP code manually
+            document.getElementById('reset-token-input').value = '';
+            document.getElementById('new-password-input').value = '';
+            document.getElementById('confirm-password-input').value = '';
+
+            if (window.Toast) {
+              window.Toast.success(res?.message || 'Verification code sent!');
+            }
+
+            window.goToStep('step-reset');
+
+            const resetAlert = document.getElementById('reset-alert');
+            resetAlert.className = 'p-3.5 rounded-xl text-xs border font-medium bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+            if (res?.code) {
+              resetAlert.innerHTML = `Verification code: <strong class="text-sm font-mono tracking-widest text-emerald-300 ml-1 px-2 py-0.5 rounded bg-emerald-950/60 border border-emerald-500/30">${res.code}</strong><br><span class="text-[11px] opacity-80 mt-1 block">Entered automatically below for testing.</span>`;
+              const codeInput = document.getElementById('reset-token-input');
+              if (codeInput) codeInput.value = res.code;
+            } else {
+              resetAlert.textContent = res?.message || 'A 6-digit verification code has been generated. Please check your email and enter the code below.';
+            }
+            resetAlert.classList.remove('hidden');
+
+          } catch (err) {
+            console.error('Password reset request error:', err);
+            alertBox.className = 'p-3.5 rounded-xl text-xs border font-medium bg-rose-500/10 text-rose-400 border-rose-500/20';
+            alertBox.textContent = err.message || 'Could not process request. Please check your email and try again.';
+            alertBox.classList.remove('hidden');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Send Reset Instructions';
+          }
+        });
+      }
+
+      // Step 2: Set New Password
+      const resetForm = document.getElementById('reset-form');
+      if (resetForm) {
+        resetForm.addEventListener('submit', async function(e) {
+          e.preventDefault();
+          const token = document.getElementById('reset-token-input').value.trim();
+          const newPass = document.getElementById('new-password-input').value;
+          const confirmPass = document.getElementById('confirm-password-input').value;
+          const alertBox = document.getElementById('reset-alert');
+
+          if (!token || token.length < 6) {
+            alertBox.className = 'p-3.5 rounded-xl text-xs border font-medium bg-rose-500/10 text-rose-400 border-rose-500/20';
+            alertBox.textContent = 'Please enter the complete 6-digit verification code.';
+            alertBox.classList.remove('hidden');
+            return;
+          }
+
+          if (newPass.length < 6) {
+            alertBox.className = 'p-3.5 rounded-xl text-xs border font-medium bg-rose-500/10 text-rose-400 border-rose-500/20';
+            alertBox.textContent = 'Password must be at least 6 characters.';
+            alertBox.classList.remove('hidden');
+            return;
+          }
+
+          if (newPass !== confirmPass) {
+            alertBox.className = 'p-3.5 rounded-xl text-xs border font-medium bg-rose-500/10 text-rose-400 border-rose-500/20';
+            alertBox.textContent = 'Passwords do not match. Please re-enter.';
+            alertBox.classList.remove('hidden');
+            return;
+          }
+
+          const btn = document.getElementById('reset-btn');
+          btn.disabled = true;
+          btn.innerHTML = `
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Saving New Password...
+          `;
+
+          try {
+            const payload = {
+              email: currentEmail || (urlEmail || ''),
+              token: token,
+              new_password: newPass
+            };
+
+            let res = null;
+            if (window.api && typeof window.api.resetPassword === 'function') {
+              res = await window.api.resetPassword(payload);
+            } else {
+              const resp = await fetch('/api/auth/reset-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              res = await resp.json();
+              if (!resp.ok) throw new Error(res.message || 'Failed to update password');
+            }
+
+            if (window.Toast) {
+              window.Toast.success(res?.message || 'Password updated successfully!');
+            }
+
+            window.goToStep('step-success');
+
+          } catch (err) {
+            console.error('Password update error:', err);
+            alertBox.className = 'p-3.5 rounded-xl text-xs border font-medium bg-rose-500/10 text-rose-400 border-rose-500/20';
+            alertBox.textContent = err.message || 'Failed to update password. Please check your verification code.';
+            alertBox.classList.remove('hidden');
+          } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Save New Password';
+          }
+        });
+      }
+    });
+  </script>
 
 </body>
 </html>

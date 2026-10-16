@@ -76,8 +76,8 @@ export class CartService {
       }
     }
 
-    // Shipping policy: Free shipping if subtotal >= 200 QAR, otherwise 20 QAR
-    const shipping = subtotal >= 200 || subtotal === 0 ? 0 : 20;
+    // Shipping policy: Free delivery across Qatar
+    const shipping = 0;
     const total = subtotal + shipping;
 
     return {
