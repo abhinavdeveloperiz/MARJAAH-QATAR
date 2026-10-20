@@ -39,5 +39,9 @@ backend/.env.local
 serviceAccountKey.json
 firebase-credentials.json
 *credentials*.json
-*service_account*.json
 backend/firebase-credentials.json
+.products-cache.json
+*.products-cache.json
+.categories-cache.json
+.brands-cache.json
+*.cache.json

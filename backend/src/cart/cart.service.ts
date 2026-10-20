@@ -59,6 +59,14 @@ export class CartService {
           ? product.images[0]
           : (product.first_image || product.primary_image || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'));
 
+        const isItemInStock = Boolean(
+          product.in_stock !== false &&
+          product.in_stock !== 'false' &&
+          product.stock_status !== 'outofstock' &&
+          product.stock_status !== 'OUT_OF_STOCK' &&
+          (product.stock_count === undefined || product.stock_count === null || Number(product.stock_count) > 0)
+        );
+
         validatedItems.push({
           id: product.id,
           slug: product.slug,
@@ -69,7 +77,7 @@ export class CartService {
           price: unitPrice,
           original_price: product.original_price ? Number(product.original_price) : null,
           quantity: qty,
-          in_stock: Boolean(product.in_stock),
+          in_stock: isItemInStock,
           stock_count: product.stock_count,
           line_total: lineTotal,
         });

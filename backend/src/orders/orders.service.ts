@@ -16,10 +16,14 @@ export class OrdersService {
       throw new BadRequestException('Order must contain at least one item');
     }
 
-    // 1. Authoritative cart calculation from backend
     const validatedCart = await this.cartService.validateAndComputeCart(items);
     if (validatedCart.items.length === 0) {
       throw new BadRequestException('None of the items in the cart are valid');
+    }
+
+    const outOfStockItem = validatedCart.items.find(item => item.in_stock === false);
+    if (outOfStockItem) {
+      throw new BadRequestException(`Product "${outOfStockItem.name}" is currently out of stock`);
     }
 
     // 2. Customer info (authenticated or guest)

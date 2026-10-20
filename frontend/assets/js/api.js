@@ -307,6 +307,7 @@
       }
     }
     createProduct(data) { return this.post('/api/products', data); }
+    bulkUpsertProducts(items) { return this.post('/api/products/bulk', items); }
     updateProduct(id, data) { return this.put(`/api/products/${id}`, data); }
     deleteProduct(id) { return this.delete(`/api/products/${id}`); }
     createCategory(data) { return this.post('/api/categories', data); }

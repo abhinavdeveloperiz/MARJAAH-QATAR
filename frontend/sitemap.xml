@@ -4,10 +4,10 @@
 
   <!-- Home Page -->
   <url>
-    <loc>https://www.marjaah.shop/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/" />
+    <loc>https://mshop.qa/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
@@ -15,10 +15,10 @@
 
   <!-- Arabic Home Page -->
   <url>
-    <loc>https://www.marjaah.shop/ar/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/" />
+    <loc>https://mshop.qa/ar/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
@@ -26,20 +26,20 @@
 
   <!-- Shop Catalog -->
   <url>
-    <loc>https://www.marjaah.shop/shop/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/shop/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/shop/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/shop/" />
+    <loc>https://mshop.qa/shop/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/shop/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/shop/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/shop/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/ar/shop/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/shop/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/shop/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/shop/" />
+    <loc>https://mshop.qa/ar/shop/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/shop/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/shop/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/shop/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -47,20 +47,20 @@
 
   <!-- Offers & Deals -->
   <url>
-    <loc>https://www.marjaah.shop/offers/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/offers/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/offers/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/offers/" />
+    <loc>https://mshop.qa/offers/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/offers/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/offers/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/offers/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/ar/offers/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/offers/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/offers/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/offers/" />
+    <loc>https://mshop.qa/ar/offers/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/offers/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/offers/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/offers/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -68,20 +68,20 @@
 
   <!-- Product Details Base -->
   <url>
-    <loc>https://www.marjaah.shop/product/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/product/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/product/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/product/" />
+    <loc>https://mshop.qa/product/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/product/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/product/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/product/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/ar/product/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/product/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/product/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/product/" />
+    <loc>https://mshop.qa/ar/product/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/product/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/product/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/product/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.7</priority>
@@ -89,20 +89,20 @@
 
   <!-- About Us -->
   <url>
-    <loc>https://www.marjaah.shop/about/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/about/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/about/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/about/" />
+    <loc>https://mshop.qa/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/about/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/about/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/about/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/ar/about/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/about/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/about/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/about/" />
+    <loc>https://mshop.qa/ar/about/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/about/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/about/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/about/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -110,20 +110,20 @@
 
   <!-- Contact Us -->
   <url>
-    <loc>https://www.marjaah.shop/contact/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/contact/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/contact/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/contact/" />
+    <loc>https://mshop.qa/contact/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/contact/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/contact/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/contact/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/ar/contact/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/contact/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/contact/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/contact/" />
+    <loc>https://mshop.qa/ar/contact/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/contact/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/contact/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/contact/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
@@ -131,40 +131,40 @@
 
   <!-- Legal & Support Policies -->
   <url>
-    <loc>https://www.marjaah.shop/privacy/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/privacy/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/privacy/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/privacy/" />
+    <loc>https://mshop.qa/privacy/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/privacy/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/privacy/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/privacy/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/returns/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/returns/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/returns/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/returns/" />
+    <loc>https://mshop.qa/returns/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/returns/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/returns/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/returns/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/terms/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/terms/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/terms/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/terms/" />
+    <loc>https://mshop.qa/terms/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/terms/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/terms/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/terms/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <url>
-    <loc>https://www.marjaah.shop/track-order/</loc>
-    <xhtml:link rel="alternate" hreflang="en" href="https://www.marjaah.shop/track-order/" />
-    <xhtml:link rel="alternate" hreflang="ar" href="https://www.marjaah.shop/ar/track-order/" />
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://www.marjaah.shop/track-order/" />
+    <loc>https://mshop.qa/track-order/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://mshop.qa/track-order/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://mshop.qa/ar/track-order/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://mshop.qa/track-order/" />
     <lastmod>2026-10-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>

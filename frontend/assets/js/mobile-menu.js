@@ -1,5 +1,14 @@
 // ─── Mobile Menu ──────────────────────────────────────────────────────────────
 (function () {
+  const isArPage = window.location.pathname.startsWith('/ar/') || window.location.pathname === '/ar';
+  if (isArPage) {
+    document.documentElement.setAttribute('dir', 'rtl');
+    document.documentElement.setAttribute('lang', 'ar');
+  } else {
+    document.documentElement.setAttribute('dir', 'ltr');
+    document.documentElement.setAttribute('lang', 'en');
+  }
+
   const menuBtn = document.getElementById('mobile-menu-btn');
   const closeBtn = document.getElementById('mobile-menu-close');
   const drawer = document.getElementById('mobile-menu');
@@ -69,7 +78,7 @@
       e.preventDefault();
       const q = searchInput ? searchInput.value.trim() : '';
       if (q) {
-        window.location.href = `/shop/?search=${encodeURIComponent(q)}`;
+        window.location.href = `${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}`;
       }
     });
   }
@@ -79,7 +88,7 @@
         e.preventDefault();
         const q = searchInput.value.trim();
         if (q) {
-          window.location.href = `/shop/?search=${encodeURIComponent(q)}`;
+          window.location.href = `${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}`;
         }
       }
     });
@@ -129,7 +138,6 @@
   }
 
   // Language switcher
-  const isArPage = window.location.pathname.startsWith('/ar/') || window.location.pathname === '/ar';
   document.querySelectorAll('[data-locale-switch]').forEach(btn => {
     const isThisActive = btn.dataset.localeSwitch === (isArPage ? 'ar' : 'en');
     btn.style.background = isThisActive ? '#4063B2' : 'transparent';
@@ -156,4 +164,58 @@
       window.location.href = newPath + window.location.search + window.location.hash;
     });
   });
+
+  // Arabic navigation link persistence & label translations
+  if (isArPage) {
+    function applyArabicNav() {
+      const internalPaths = [
+        '/shop/', '/cart/', '/checkout/', '/about/', '/contact/',
+        '/offers/', '/wishlist/', '/account/', '/login/', '/register/',
+        '/privacy/', '/terms/', '/returns/', '/track-order/'
+      ];
+      document.querySelectorAll('a[href]').forEach(a => {
+        const href = a.getAttribute('href');
+        if (!href) return;
+        if (href === '/' || href === '/en' || href === '/en/') {
+          a.setAttribute('href', '/ar/');
+        } else if (href.startsWith('/') && !href.startsWith('/ar/') && !href.startsWith('/assets/') && !href.startsWith('/api/') && !href.startsWith('/static/')) {
+          for (const p of internalPaths) {
+            if (href === p || href.startsWith(p)) {
+              a.setAttribute('href', '/ar' + href);
+              break;
+            }
+          }
+        }
+      });
+
+      const navMap = {
+        'Shop': 'المتجر',
+        'Offers': 'العروض',
+        'About': 'عن المتجر',
+        'Contact': 'اتصل بنا',
+        'Cart': 'السلة',
+        'Sign In': 'تسجيل الدخول',
+        'Register': 'إنشاء حساب',
+        'Account': 'حسابي',
+        'Wishlist': 'المفضلة',
+        'My Account': 'حسابي'
+      };
+      document.querySelectorAll('.nav-link, #mobile-menu a, .user-name').forEach(el => {
+        const text = el.textContent.trim();
+        if (navMap[text]) {
+          el.textContent = navMap[text];
+        }
+      });
+
+      document.querySelectorAll('input[type="search"], #search-input').forEach(inp => {
+        inp.placeholder = 'ابحث عن الملحقات أو الماركات أو الموديل...';
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', applyArabicNav);
+    } else {
+      applyArabicNav();
+    }
+  }
 })();

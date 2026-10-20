@@ -14,4 +14,5 @@ Disallow: /ar/checkout/
 Disallow: /ar/checkout-success/
 
 # Sitemaps
+Sitemap: https://mshop.qa/sitemap.xml
 Sitemap: https://www.marjaah.shop/sitemap.xml

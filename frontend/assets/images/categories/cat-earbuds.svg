@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgAudio" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1E1B4B" />
+      <stop offset="100%" stop-color="#070B14" />
+    </radialGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#bgAudio)" rx="20" />
+  <circle cx="300" cy="200" r="130" fill="#818CF8" opacity="0.12" />
+  <!-- Earbuds Case -->
+  <rect x="220" y="140" width="160" height="110" rx="40" fill="#0F172A" stroke="#818CF8" stroke-width="4" />
+  <line x1="220" y1="180" x2="380" y2="180" stroke="#818CF8" stroke-width="2" opacity="0.6" />
+  <circle cx="300" cy="205" r="4" fill="#38BDF8" />
+  <!-- Earbud Left -->
+  <path d="M 245 110 C 235 90, 265 80, 275 95 C 280 105, 275 115, 260 125 L 255 145" stroke="#A78BFA" stroke-width="4" fill="none" stroke-linecap="round" />
+  <circle cx="258" cy="98" r="14" fill="#1E1B4B" stroke="#A78BFA" stroke-width="3" />
+  <!-- Earbud Right -->
+  <path d="M 355 110 C 365 90, 335 80, 325 95 C 320 105, 325 115, 340 125 L 345 145" stroke="#A78BFA" stroke-width="4" fill="none" stroke-linecap="round" />
+  <circle cx="342" cy="98" r="14" fill="#1E1B4B" stroke="#A78BFA" stroke-width="3" />
+  <text x="300" y="375" fill="#FFFFFF" font-size="20" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="2">EARBUDS &amp; AUDIO</text>
+</svg>

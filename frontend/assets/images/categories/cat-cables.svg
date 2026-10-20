@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 450" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgCables" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1E293B" />
+      <stop offset="100%" stop-color="#070B14" />
+    </radialGradient>
+  </defs>
+  <rect width="600" height="450" fill="url(#bgCables)" rx="20" />
+  <circle cx="300" cy="200" r="130" fill="#34D399" opacity="0.1" />
+  <!-- Braided Cable Coil -->
+  <circle cx="300" cy="190" r="70" fill="none" stroke="#34D399" stroke-width="6" stroke-dasharray="12 4" opacity="0.8" />
+  <circle cx="300" cy="190" r="50" fill="none" stroke="#10B981" stroke-width="6" stroke-dasharray="10 3" opacity="0.6" />
+  <!-- USB C Heads -->
+  <rect x="275" y="90" width="22" height="36" rx="6" fill="#0F172A" stroke="#34D399" stroke-width="3" />
+  <rect x="281" y="80" width="10" height="10" rx="3" fill="#64748B" />
+  <rect x="305" y="250" width="22" height="36" rx="6" fill="#0F172A" stroke="#34D399" stroke-width="3" />
+  <rect x="311" y="286" width="10" height="10" rx="3" fill="#64748B" />
+  <text x="300" y="375" fill="#FFFFFF" font-size="20" font-family="sans-serif" font-weight="900" text-anchor="middle" letter-spacing="2">CABLES &amp; HUBS</text>
+</svg>

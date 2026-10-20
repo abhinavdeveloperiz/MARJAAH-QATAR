@@ -119,11 +119,11 @@
     try {
       let allRes;
       if (window.api && typeof window.api.getProducts === 'function') {
-        allRes = await window.api.getProducts({ limit: 200 });
+        allRes = await window.api.getProducts({ limit: 1000 });
       } else if (window.ApiClient) {
-        allRes = await (new window.ApiClient()).getProducts({ limit: 200 });
+        allRes = await (new window.ApiClient()).getProducts({ limit: 1000 });
       } else {
-        const res = await fetch('/api/products?limit=200');
+        const res = await fetch('/api/products?limit=1000');
         allRes = await res.json();
       }
 

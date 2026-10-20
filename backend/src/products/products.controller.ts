@@ -18,6 +18,13 @@ export class ProductsController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Post('bulk')
+  async bulkUpsert(@Body() body: any) {
+    const items = Array.isArray(body) ? body : (body.products || []);
+    return this.productsService.bulkUpsert(items);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Post()
   async create(@Body() body: any) {
     return this.productsService.create(body);

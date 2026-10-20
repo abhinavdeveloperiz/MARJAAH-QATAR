@@ -48,9 +48,11 @@
 
     async addItem(productOrSlug, quantity = 1) {
       let product = productOrSlug;
+      const slug = typeof productOrSlug === 'string'
+        ? productOrSlug
+        : (productOrSlug && (productOrSlug.slug || productOrSlug.id));
+
       if (typeof productOrSlug === 'string') {
-        const slug = productOrSlug;
-        // Check window.productsMap
         if (global.productsMap && global.productsMap[slug]) {
           product = global.productsMap[slug];
         } else if (global.api) {
@@ -58,14 +60,52 @@
             product = await global.api.getProduct(slug);
           } catch (e) {
             console.error('Failed to fetch product for cart:', e);
-            product = { slug: slug, name: slug, price: 0 };
+            product = { slug: slug, name: slug, price: 0, in_stock: false };
           }
         } else {
-          product = { slug: slug, name: slug, price: 0 };
+          product = { slug: slug, name: slug, price: 0, in_stock: false };
+        }
+      } else if (product && typeof product === 'object') {
+        // If passed as partial object without stock information, look up full product
+        if (product.in_stock === undefined && product.stock_count === undefined && slug) {
+          if (global.productsMap && global.productsMap[slug]) {
+            product = { ...global.productsMap[slug], ...product };
+          } else if (global.api) {
+            try {
+              const fullProd = await global.api.getProduct(slug);
+              if (fullProd) product = { ...fullProd, ...product };
+            } catch (e) {
+              console.error('Failed to verify product stock for cart:', e);
+            }
+          }
         }
       }
 
       if (!product || !product.slug) return;
+
+      // ── Enforce Out-of-Stock Protection ──
+      const isOutOfStock = Boolean(
+        product.in_stock === false ||
+        product.in_stock === 'false' ||
+        product.stock_status === 'outofstock' ||
+        product.stock_status === 'OUT_OF_STOCK' ||
+        (product.stock_count !== undefined && product.stock_count !== null && Number(product.stock_count) <= 0) ||
+        (product.stock !== undefined && product.stock !== null && Number(product.stock) <= 0)
+      );
+
+      if (isOutOfStock) {
+        const isAr = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar' || window.location.pathname.startsWith('/ar');
+        const msg = isAr ? 'عذراً، هذا المنتج غير متوفر حالياً في المخزون' : 'Sorry, this product is currently out of stock';
+        if (global.Toast && typeof global.Toast.error === 'function') {
+          global.Toast.error(msg);
+        } else if (global.Toast && typeof global.Toast.info === 'function') {
+          global.Toast.info(msg);
+        } else {
+          alert(msg);
+        }
+        return;
+      }
+
       const qty = Math.max(1, Number(quantity) || 1);
       const existing = this.items.find(i => i.slug === product.slug);
 
@@ -91,6 +131,21 @@
 
       this.save();
       const isAr = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar' || window.location.pathname.startsWith('/ar');
+
+      // Trigger tracking for GA4, Meta Pixel, Snapchat Pixel
+      if (global.MShopTracker && typeof global.MShopTracker.trackAddToCart === 'function') {
+        try {
+          const itemAdded = this.items.find(i => i.slug === product.slug);
+          global.MShopTracker.trackAddToCart({
+            sku: (itemAdded && itemAdded.sku) || product.sku || product.slug,
+            id: product.id || product.slug,
+            name: product.name,
+            price: product.price,
+            quantity: qty
+          });
+        } catch (e) { }
+      }
+
       if (global.Toast) {
         global.Toast.success(isAr ? 'تمت إضافة المنتج إلى السلة' : 'Added to cart successfully');
       }
@@ -203,10 +258,10 @@
                 ${isAr ? 'سلة التسوق فارغة' : 'Your cart is empty'}
               </h4>
               <p class="text-xs sm:text-sm max-w-[240px] mx-auto leading-relaxed" style="color:var(--text-secondary)">
-                ${isAr ? 'اكتشف العتاد عالي الأداء وأجهزة الألعاب للبدء.' : 'Discover high-performance hardware and gaming rigs to get started.'}
+                ${isAr ? 'اكتشف ملحقات الهواتف ومستلزمات التكنولوجيا للبدء.' : 'Discover mobile accessories and tech essentials.'}
               </p>
             </div>
-            <a href="/shop/" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
+            <a href="${isAr ? '/ar/shop/' : '/shop/'}" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer">
               <span>${isAr ? 'تصفح المتجر' : 'Explore Shop'}</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
@@ -260,10 +315,10 @@
             </div>
           </div>
           <div class="grid grid-cols-2 gap-2">
-            <a href="/cart/" class="py-2.5 rounded-xl text-center text-xs font-bold border transition hover:bg-white/5" style="border-color:var(--border-color);color:var(--text-primary)">
+            <a href="${isAr ? '/ar/cart/' : '/cart/'}" class="py-2.5 rounded-xl text-center text-xs font-bold border transition hover:bg-white/5" style="border-color:var(--border-color);color:var(--text-primary)">
               ${isAr ? 'عرض السلة' : 'View Cart'}
             </a>
-            <a href="/checkout/" class="btn-primary py-2.5 text-center text-xs font-bold justify-center">
+            <a href="${isAr ? '/ar/checkout/' : '/checkout/'}" class="btn-primary py-2.5 text-center text-xs font-bold justify-center">
               ${isAr ? 'إتمام الطلب' : 'Checkout'}
             </a>
           </div>
@@ -368,6 +423,9 @@
         const addBtn = e.target.closest('[data-add-to-cart]');
         if (addBtn) {
           e.preventDefault();
+          if (addBtn.disabled || addBtn.getAttribute('aria-disabled') === 'true' || addBtn.classList.contains('cursor-not-allowed')) {
+            return;
+          }
           const slug = addBtn.dataset.addToCart;
           const name = addBtn.dataset.name;
           const price = addBtn.dataset.price;
