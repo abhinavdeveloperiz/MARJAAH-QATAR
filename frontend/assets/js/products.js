@@ -1044,18 +1044,42 @@
       window.history.replaceState(null, '', cleanPath);
     }
 
+    let product;
     try {
-      const product = await global.api.getProduct(slug);
-      if (!product || !product.name) {
-        showNotFound();
-        return;
-      }
+      product = await global.api.getProduct(slug);
+    } catch (err) {
+      console.error('Failed to fetch product:', err);
+      showNotFound();
+      return;
+    }
 
-      const pName = (isRtl && product.name_ar) ? product.name_ar : (product.name || 'Product');
-      const pDesc = (isRtl && product.description_ar) ? product.description_ar : (product.description || '');
-      const pShortDesc = (isRtl && product.short_description_ar) ? product.short_description_ar : (product.short_description || '');
+    if (!product || !product.name) {
+      showNotFound();
+      return;
+    }
+
+    // Product found successfully: ensure detail view is shown and 404 view is hidden
+    if (detailView) detailView.classList.remove('hidden');
+    if (notFoundView) notFoundView.classList.add('hidden');
+
+    try {
+      const pName = (isRtl && (product.name_ar || product.nameAr)) ? (product.name_ar || product.nameAr) : (product.name || 'Product');
+      const rawDesc = (isRtl && (product.description_ar || product.descriptionAr))
+        ? (product.description_ar || product.descriptionAr)
+        : (product.description || '');
+      const pDesc = typeof rawDesc === 'string'
+        ? rawDesc
+        : (Array.isArray(rawDesc) ? rawDesc.join('\n') : (rawDesc ? String(rawDesc) : ''));
+
+      const rawShortDesc = (isRtl && (product.short_description_ar || product.shortDescriptionAr))
+        ? (product.short_description_ar || product.shortDescriptionAr)
+        : (product.short_description || product.shortDescription || '');
+      const pShortDesc = typeof rawShortDesc === 'string'
+        ? rawShortDesc
+        : (Array.isArray(rawShortDesc) ? rawShortDesc.join('\n') : (rawShortDesc ? String(rawShortDesc) : ''));
+
       const pPrice = product.price;
-      const pOrigPrice = product.original_price;
+      const pOrigPrice = product.original_price || product.originalPrice;
       const pStockCount = product.stock_count !== undefined ? Number(product.stock_count) : (product.stock !== undefined ? Number(product.stock) : null);
       const inStock = Boolean(
         product.in_stock !== false &&
@@ -1157,17 +1181,42 @@
       const crumbNameEl = document.getElementById('product-crumb-name');
       if (crumbNameEl) crumbNameEl.textContent = pName;
       const catLinkEl = document.getElementById('product-category-link');
-      if (catLinkEl && product.category) {
-        catLinkEl.textContent = product.category;
-        catLinkEl.href = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(product.category_slug || product.category)}/`;
+      if (catLinkEl && (product.category || product.category_name)) {
+        const catName = product.category || product.category_name;
+        catLinkEl.textContent = catName;
+        catLinkEl.href = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(product.category_slug || catName)}/`;
       }
 
       // Title & Brand & SKU
       titleEl.textContent = pName;
       const brandEl = document.getElementById('product-brand');
-      if (brandEl) brandEl.textContent = product.brand || 'M.SHOP';
+      if (brandEl) brandEl.textContent = product.brand || product.brand_name || 'M.SHOP';
       const skuEl = document.getElementById('product-sku');
       if (skuEl) skuEl.textContent = `SKU: ${product.sku || product.id || 'N/A'}`;
+
+      // Rating & Reviews Count
+      const ratingContainer = document.getElementById('product-rating-container');
+      if (ratingContainer) {
+        const rating = Number(product.rating || product.ratings || 5.0);
+        const reviewsCount = Number(product.review_count || product.reviews_count || product.reviewsCount || 0);
+        const fullStars = Math.floor(rating);
+        const hasHalf = rating % 1 >= 0.5;
+        let starsHtml = '';
+        for (let i = 0; i < 5; i++) {
+          if (i < fullStars) {
+            starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+          } else if (i === fullStars && hasHalf) {
+            starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" class="text-amber-400"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`;
+          } else {
+            starsHtml += `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-slate-600"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+          }
+        }
+        ratingContainer.innerHTML = `
+          <div class="flex items-center gap-0.5">${starsHtml}</div>
+          <span class="text-sm font-bold" style="color:var(--text-primary)">${rating.toFixed(1)}</span>
+          <span class="text-xs" style="color:var(--text-tertiary)">(${reviewsCount} ${isRtl ? 'تقييم' : (reviewsCount === 1 ? 'review' : 'reviews')})</span>
+        `;
+      }
 
       // ── Normalize Images List (array, JSON string, or comma-separated) ──
       let imagesList = [];
@@ -1309,7 +1358,7 @@
       // Short Description
       const shortDescEl = document.getElementById('product-short-description');
       if (shortDescEl) {
-        if (pShortDesc) {
+        if (pShortDesc && pShortDesc.trim()) {
           if (pShortDesc.includes('\n') || pShortDesc.includes('•') || pShortDesc.includes('-')) {
             const lines = pShortDesc.split('\n').map(l => l.replace(/^[•\-\*]\s*/, '').trim()).filter(Boolean);
             shortDescEl.innerHTML = `<ul class="space-y-1.5 list-disc list-inside text-sm leading-relaxed">${lines.map(l => `<li>${l}</li>`).join('')}</ul>`;
@@ -1322,21 +1371,36 @@
         }
       }
 
-      // Compatibility Badges
+      // Compatibility Badges (handles array, JSON string, or comma-separated string)
       const compBox = document.getElementById('product-compatibility-container');
       const compBadges = document.getElementById('product-compatibility-badges');
-      const compStr = product.compatibility || product.compatibleWith || '';
-      if (compBox && compBadges && compStr) {
-        const items = compStr.split(',').map(s => s.trim()).filter(Boolean);
-        if (items.length > 0) {
-          compBadges.innerHTML = items.map(c => `
-            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#4063B2]/20 text-[#8D9CF5] border border-[#8D9CF5]/30">
-              ${c}
-            </span>
-          `).join('');
-          compBox.classList.remove('hidden');
-          compBox.classList.add('flex');
+      let compItems = [];
+      const rawComp = product.compatibility || product.compatibleWith || product.compatible_with;
+      if (Array.isArray(rawComp)) {
+        compItems = rawComp.map(s => String(s).trim()).filter(Boolean);
+      } else if (typeof rawComp === 'string' && rawComp.trim()) {
+        try {
+          const parsed = JSON.parse(rawComp);
+          if (Array.isArray(parsed)) {
+            compItems = parsed.map(s => String(s).trim()).filter(Boolean);
+          } else {
+            compItems = rawComp.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
+          }
+        } catch (e) {
+          compItems = rawComp.split(/[,;\n]+/).map(s => s.trim()).filter(Boolean);
         }
+      }
+      if (compBox && compBadges && compItems.length > 0) {
+        compBadges.innerHTML = compItems.map(c => `
+          <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#4063B2]/20 text-[#8D9CF5] border border-[#8D9CF5]/30">
+            ${c}
+          </span>
+        `).join('');
+        compBox.classList.remove('hidden');
+        compBox.classList.add('flex');
+      } else if (compBox) {
+        compBox.classList.add('hidden');
+        compBox.classList.remove('flex');
       }
 
       // Stock Container
@@ -1360,7 +1424,7 @@
         const updateSelectedVariant = (idx) => {
           activeVariantIdx = idx;
           const v = variantsList[idx];
-          const vName = (isRtl && v.nameAr) || v.name || v.color || v.size || `Variant ${idx + 1}`;
+          const vName = (isRtl && (v.nameAr || v.name_ar)) || v.name || v.color || v.size || `Variant ${idx + 1}`;
           if (variantLabel) variantLabel.textContent = vName;
           if (v.price && priceContainer) {
             let phtml = `<span class="text-4xl font-display font-black" style="color:var(--text-primary)">${formatPrice(v.price)}</span>`;
@@ -1384,7 +1448,7 @@
         const renderVariantButtons = () => {
           variantsOptions.innerHTML = variantsList.map((v, i) => {
             const isSel = i === activeVariantIdx;
-            const label = (isRtl && v.nameAr) || v.name || v.color || v.size || `Variant ${i + 1}`;
+            const label = (isRtl && (v.nameAr || v.name_ar)) || v.name || v.color || v.size || `Variant ${i + 1}`;
             return `
               <button type="button" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${isSel ? 'bg-[#4063B2] text-white shadow-md' : 'border border-slate-700/30 text-slate-300 hover:text-white'}" onclick="window.__selectVariant(${i})">
                 ${label}
@@ -1439,11 +1503,11 @@
       }
       const warEl = document.getElementById('product-warranty-text');
       if (warEl) {
-        const warVal = (isRtl && product.warrantyAr) || product.warranty || (product.warranty_months ? `${product.warranty_months} Months Warranty` : '1 Year Brand Warranty');
+        const warVal = (isRtl && (product.warrantyAr || product.warranty_ar)) || product.warranty || (product.warranty_months ? `${product.warranty_months} Months Warranty` : '1 Year Brand Warranty');
         warEl.textContent = warVal;
       }
 
-      // Specifications Table (supports array, object, JSON, or pipe/newline text)
+      // Specifications Table (supports array of objects, array of strings, object map, JSON, or pipe/newline text)
       const specsTableTbody = document.getElementById('product-specs-tbody') || document.getElementById('product-specs-table');
       const specsContainer = document.getElementById('product-specs-container') || (specsTableTbody ? specsTableTbody.closest('.rounded-2xl') : null);
       let specs = product.specifications || product.specs;
@@ -1466,8 +1530,22 @@
       }
       if (specsTableTbody && Array.isArray(specs) && specs.length > 0) {
         const rowsHtml = specs.map(s => {
-          const k = (isRtl && (s.keyAr || s.labelAr)) ? (s.keyAr || s.labelAr) : (s.key || s.label || s.name || '');
-          const v = (isRtl && (s.valueAr || s.valAr)) ? (s.valueAr || s.valAr) : (s.value || s.val || '');
+          if (!s) return '';
+          if (typeof s === 'string') {
+            const parts = s.split(/[:=]/);
+            return `
+              <tr style="border-bottom:1px solid var(--border-color)">
+                <td class="px-4 py-3 font-medium w-36 sm:w-44" style="color:var(--text-secondary)">${parts[0]?.trim() || ''}</td>
+                <td class="px-4 py-3 font-bold" style="color:var(--text-primary)">${parts.slice(1).join(':')?.trim() || ''}</td>
+              </tr>
+            `;
+          }
+          const k = (isRtl && (s.keyAr || s.labelAr || s.key_ar || s.label_ar))
+            ? (s.keyAr || s.labelAr || s.key_ar || s.label_ar)
+            : (s.key || s.label || s.name || '');
+          const v = (isRtl && (s.valueAr || s.valAr || s.value_ar || s.val_ar))
+            ? (s.valueAr || s.valAr || s.value_ar || s.val_ar)
+            : (s.value || s.val || '');
           if (!k && !v) return '';
           return `
             <tr style="border-bottom:1px solid var(--border-color)">
@@ -1487,13 +1565,24 @@
         specsContainer.classList.add('hidden');
       }
 
-      // What's in the Box
+      // What's in the Box (handles string, array, or HTML)
       const inBoxBox = document.getElementById('product-in-box-container');
       const inBoxText = document.getElementById('product-in-box-text');
-      const inBoxContent = (isRtl && product.whatsInBoxAr) || product.whatsInBox || product.whats_in_box;
+      const rawInBox = (isRtl && (product.whatsInBoxAr || product.whats_in_box_ar))
+        ? (product.whatsInBoxAr || product.whats_in_box_ar)
+        : (product.whatsInBox || product.whats_in_box);
+      let inBoxContent = '';
+      if (Array.isArray(rawInBox)) {
+        inBoxContent = rawInBox.map(s => String(s).trim()).filter(Boolean).join('<br/>');
+      } else if (typeof rawInBox === 'string' && rawInBox.trim()) {
+        inBoxContent = rawInBox.trim();
+        inBoxContent = inBoxContent.includes('<') ? inBoxContent : inBoxContent.replace(/\n/g, '<br/>');
+      } else if (rawInBox) {
+        inBoxContent = String(rawInBox);
+      }
       if (inBoxBox && inBoxText) {
-        if (inBoxContent && inBoxContent.trim()) {
-          inBoxText.innerHTML = inBoxContent.includes('<') ? inBoxContent : inBoxContent.replace(/\n/g, '<br/>');
+        if (inBoxContent) {
+          inBoxText.innerHTML = inBoxContent;
           inBoxBox.classList.remove('hidden');
         } else {
           inBoxBox.classList.add('hidden');
@@ -1521,8 +1610,7 @@
         }
       }
     } catch (err) {
-      console.error('Failed to hydrate product detail:', err);
-      showNotFound();
+      console.warn('Warning during product hydration:', err);
     }
   }
 
