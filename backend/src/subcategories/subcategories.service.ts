@@ -80,6 +80,12 @@ export class SubcategoriesService {
       updateData.image = uploadRes.url;
     }
 
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+
     await docRef.update(updateData);
     return { id, ...doc.data(), ...updateData };
   }

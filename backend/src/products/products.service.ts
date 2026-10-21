@@ -462,6 +462,12 @@ export class ProductsService implements OnModuleInit {
       updated_at: now,
     };
 
+    Object.keys(product).forEach((key) => {
+      if ((product as any)[key] === undefined) {
+        delete (product as any)[key];
+      }
+    });
+
     const ref = await this.firestore.collection('products').add(product);
     this.invalidateCache();
     return { id: ref.id, ...product };
@@ -514,7 +520,7 @@ export class ProductsService implements OnModuleInit {
     if (data.whats_in_box_ar !== undefined) updateData.whats_in_box_ar = data.whats_in_box_ar;
     if (data.warranty !== undefined) updateData.warranty = data.warranty;
     if (data.compatibility !== undefined) updateData.compatibility = data.compatibility;
-    if (data.colour !== undefined || data.color !== undefined) updateData.colour = data.colour || data.color;
+    if (data.colour !== undefined || data.color !== undefined) updateData.colour = data.colour ?? data.color ?? '';
     if (data.variants !== undefined) updateData.variants = Array.isArray(data.variants) ? data.variants : [];
     if (data.image_alts !== undefined) updateData.image_alts = data.image_alts;
     if (data.seo_title !== undefined) updateData.seo_title = data.seo_title;
@@ -538,6 +544,13 @@ export class ProductsService implements OnModuleInit {
       updateData.is_favorite = favVal;
       updateData.is_liked = favVal;
     }
+
+    // Ensure no undefined properties are passed to Firestore update
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
 
     await docRef.update(updateData);
     this.invalidateCache();

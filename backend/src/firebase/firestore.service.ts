@@ -72,6 +72,11 @@ export class FirestoreService implements OnModuleInit {
     }
 
     this.db = admin.firestore();
+    try {
+      this.db.settings({ ignoreUndefinedProperties: true });
+    } catch (e: any) {
+      this.logger.debug(`Firestore settings note: ${e.message}`);
+    }
     this.storage = admin.storage();
     this.logger.log('Firebase Firestore and Storage initialized successfully');
   }
@@ -79,6 +84,9 @@ export class FirestoreService implements OnModuleInit {
   getFirestore(): admin.firestore.Firestore {
     if (!this.db) {
       this.db = admin.firestore();
+      try {
+        this.db.settings({ ignoreUndefinedProperties: true });
+      } catch (e: any) {}
     }
     return this.db;
   }

@@ -174,6 +174,12 @@ export class CategoriesService implements OnModuleInit {
       updateData.image = uploadRes.url;
     }
 
+    Object.keys(updateData).forEach((key) => {
+      if (updateData[key] === undefined) {
+        delete updateData[key];
+      }
+    });
+
     await docRef.update(updateData);
     this.invalidateCache();
     return { id, ...doc.data(), ...updateData };
