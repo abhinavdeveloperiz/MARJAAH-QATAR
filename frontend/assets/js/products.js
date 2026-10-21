@@ -30,67 +30,56 @@
       ? window.Wishlist.has(slug)
       : false;
 
-    let badges = [];
-    if (product.is_featured) {
-      badges.push(`<span class="text-[10px] font-bold text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">★ ${isRtl ? 'مميز' : 'Featured'}</span>`);
-    }
-    if (product.is_favorite || product.is_liked) {
-      badges.push(`<span class="text-[10px] font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md flex items-center gap-1">♥ ${isRtl ? 'مفضل' : 'Favorite'}</span>`);
-    }
-    if (inStock) {
-      badges.push(`<span class="text-[10px] uppercase font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md">${isRtl ? 'متوفر' : 'In Stock'}</span>`);
-    } else {
-      badges.push(`<span class="text-[10px] uppercase font-bold text-rose-500 bg-rose-500/10 border border-rose-500/20 px-2 py-0.5 rounded-md">${isRtl ? 'غير متوفر' : 'Out of Stock'}</span>`);
-    }
-    const badgeHtml = badges.join('');
+    const isFeatured = Boolean(product.is_featured || product.featured);
 
-    let priceHtml = `<span class="font-display font-black text-lg sm:text-xl" style="color:var(--text-primary)">${formatPrice(price)}</span>`;
+    let priceHtml = `<span class="font-display font-black text-base sm:text-lg md:text-xl" style="color:var(--text-primary)">${formatPrice(price)}</span>`;
     if (originalPrice && originalPrice > price) {
-      priceHtml += `<span class="text-xs line-through" style="color:var(--text-tertiary)">${formatPrice(originalPrice)}</span>`;
+      priceHtml += `<span class="text-[11px] sm:text-xs line-through" style="color:var(--text-tertiary)">${formatPrice(originalPrice)}</span>`;
     }
 
     const actionHtml = inStock
-      ? `<button data-add-to-cart="${slug}" class="btn-primary w-full justify-center text-xs font-bold py-2.5 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-          ${isRtl ? 'أضف إلى السلة' : 'Add to Cart'}
+      ? `<button data-add-to-cart="${slug}" class="btn-primary w-full justify-center text-xs font-bold py-2 sm:py-2.5 px-2 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <span class="truncate">${isRtl ? 'أضف إلى السلة' : 'Add to Cart'}</span>
          </button>`
-      : `<button disabled type="button" aria-disabled="true" class="w-full text-xs text-center py-2.5 rounded-xl font-bold uppercase tracking-wider opacity-60 cursor-not-allowed border border-rose-500/25 text-rose-500 bg-rose-500/10 flex items-center justify-center gap-1.5 select-none" style="pointer-events:none">
-          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>
-          ${isRtl ? 'نفذت الكمية' : 'Out of Stock'}
+      : `<button disabled type="button" aria-disabled="true" class="w-full text-xs text-center py-2 sm:py-2.5 px-2 rounded-xl font-bold uppercase tracking-wider opacity-60 cursor-not-allowed border border-rose-500/25 text-rose-500 bg-rose-500/10 flex items-center justify-center gap-1.5 select-none shrink-0" style="pointer-events:none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="4.93" x2="19.07" y1="4.93" y2="19.07"/></svg>
+          <span class="truncate">${isRtl ? 'نفذت الكمية' : 'Out of Stock'}</span>
          </button>`;
 
     const productHref = `${isRtl ? '/ar' : ''}/product/${encodeURIComponent(slug)}/`;
 
+    const starPos = isRtl ? 'top-2.5 right-2.5 sm:top-3 sm:right-3' : 'top-2.5 left-2.5 sm:top-3 sm:left-3';
+    const heartPos = isRtl ? 'top-2.5 left-2.5 sm:top-3 sm:left-3' : 'top-2.5 right-2.5 sm:top-3 sm:right-3';
+
     return `
-      <div data-animate class="card anim-visible group relative rounded-2xl overflow-hidden flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300 ${!inStock ? 'opacity-90' : ''}"
+      <div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300 ${!inStock ? 'opacity-90' : ''}"
            style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:${delay}ms">
         <a href="${productHref}" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
-          ${!inStock ? `
-            <div class="absolute top-3 left-3 z-10">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-rose-600/90 text-white backdrop-blur-md shadow-md border border-rose-400/30">
-                <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-                ${isRtl ? 'نفذت الكمية' : 'Out of Stock'}
-              </span>
+          ${isFeatured ? `
+            <div class="absolute ${starPos} z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shadow-sm pointer-events-none transition-transform group-hover:scale-105"
+                 style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)"
+                 title="${isRtl ? 'منتج مميز' : 'Featured Product'}" aria-label="${isRtl ? 'منتج مميز' : 'Featured Product'}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+              </svg>
             </div>
           ` : ''}
           <button data-wishlist-toggle="${slug}" aria-label="Toggle liked product" aria-pressed="${isSaved ? 'true' : 'false'}"
-            class="${isSaved ? 'wishlist-active ' : ''}absolute top-3 right-3 z-10 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
-            style="background:rgba(255,255,255,0.9);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
+            class="${isSaved ? 'wishlist-active ' : ''}absolute ${heartPos} z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
+            style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="${isSaved ? '#ef4444' : 'none'}" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
           <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108 ${!inStock ? 'grayscale-[25%]' : ''}" loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
         </a>
-        <div class="p-4 flex flex-col flex-1">
-          <div class="mb-1.5">
-            ${brandName ? `<span class="text-[10px] font-extrabold uppercase tracking-widest" style="color:var(--color-accent)">${brandName}</span>` : ''}
-            <a href="${productHref}" class="block text-sm font-semibold leading-snug mt-1 line-clamp-2 transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
+        <div class="p-3 sm:p-4 flex flex-col flex-1">
+          <div class="mb-2">
+            ${brandName ? `<span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block truncate" style="color:var(--color-accent)">${brandName}</span>` : ''}
+            <a href="${productHref}" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
               ${name}
             </a>
           </div>
-          <div class="flex items-center gap-1.5 mb-3">
-            ${badgeHtml}
-          </div>
-          <div class="flex flex-wrap items-baseline gap-2 mb-4 mt-auto">
+          <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 mt-auto">
             ${priceHtml}
           </div>
           ${actionHtml}
