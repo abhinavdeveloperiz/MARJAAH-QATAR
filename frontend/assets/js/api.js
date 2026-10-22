@@ -233,6 +233,8 @@
     updateContactStatus(id, status) { return this.patch(`/api/contact/${id}/status`, { status }); }
     replyContactMessage(id, reply) { return this.post(`/api/contact/${id}/reply`, { reply }); }
     deleteContactMessage(id) { return this.delete(`/api/contact/${id}`); }
+    getGoogleReviews(params) { return this.get('/api/reviews', params); }
+    refreshGoogleReviews() { return this.post('/api/reviews/refresh', {}); }
     getContactStats() { return this.get('/api/contact/stats'); }
     getDashboard() { return this.get('/api/admin/dashboard'); }
 

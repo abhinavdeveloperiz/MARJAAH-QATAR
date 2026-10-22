@@ -17,6 +17,7 @@ import { AdminModule } from './admin/admin.module';
 import { UploadModule } from './upload/upload.module';
 import { MailModule } from './mail/mail.module';
 import { SeoModule } from './seo/seo.module';
+import { ReviewsModule } from './reviews/reviews.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { SeoModule } from './seo/seo.module';
     AdminModule,
     UploadModule,
     SeoModule,
+    ReviewsModule,
   ],
   providers: [
     {
