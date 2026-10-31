@@ -613,7 +613,7 @@
   <div class="py-8 sm:py-10 border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
     <div class="container-custom">
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-2 text-xs mb-4" style="color:var(--text-tertiary)">
+      <nav id="shop-breadcrumb" class="flex items-center gap-2 text-xs mb-4" style="color:var(--text-tertiary)">
         <a href="/" class="hover:text-primary transition-colors flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -623,26 +623,33 @@
           Home
         </a>
         <span>/</span>
-        <a href="/shop/" class="hover:text-primary transition-colors">
+        <a href="/shop/" id="shop-breadcrumb-root" class="hover:text-primary transition-colors">
           Shop
         </a>
-        
+        <span id="shop-breadcrumb-sep" class="hidden">/</span>
+        <span id="shop-breadcrumb-current" class="hidden font-semibold text-[#8D9CF5]"></span>
       </nav>
 
       <!-- Title & Counters -->
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 id="shop-page-title" class="text-2xl sm:text-3xl lg:text-4xl font-display font-black tracking-tight"
-            style="color:var(--text-primary)">
-            All Products
-          </h1>
+          <div class="flex items-center gap-3">
+            <h1 id="shop-page-title" class="text-2xl sm:text-3xl lg:text-4xl font-display font-black tracking-tight"
+              style="color:var(--text-primary)">
+              Shop by Category
+            </h1>
+            <button id="shop-back-to-categories-btn" type="button" class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10 text-[#8D9CF5] cursor-pointer" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <span id="shop-back-to-categories-text">All Categories</span>
+            </button>
+          </div>
           <p id="shop-items-counter" class="text-sm mt-1.5 flex items-center gap-2 font-medium" style="color:var(--text-secondary)">
-            <span>Explore genuine mobile accessories &amp; fast charging essentials in Qatar</span>
+            <span>Explore categories with 20 items per page</span>
           </p>
         </div>
 
         <!-- Filter Controls: Sort & Items Per Page -->
-        <div class="flex flex-wrap items-center justify-between sm:justify-end gap-2 sm:gap-3 w-full sm:w-auto">
+        <div id="shop-filter-controls-bar" class="hidden flex flex-wrap items-center justify-between sm:justify-end gap-2 sm:gap-3 w-full sm:w-auto">
           <!-- Right-Side Filter Sidebar Trigger Button (Desktop + Tablet + Mobile) -->
           <button id="shop-filter-open-btn" type="button" onclick="if(window.openShopFilterDrawer)window.openShopFilterDrawer()" class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
@@ -692,7 +699,7 @@
               <path d="m21 21-4.3-4.3" />
             </svg>
             <input type="text" id="shop-search-input" name="search" value=""
-              placeholder="Search products, brands..."
+              placeholder="Search categories or products..."
               class="w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none transition-all shadow-xs"
               style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
           </div>
@@ -700,9 +707,9 @@
 
         <!-- Category Pills -->
         <div id="shop-category-pills" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center touch-pan-x">
-          <a href="/shop/"
+          <a href="javascript:void(0)" data-category-slug=""
             class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs bg-[#4063B2] text-white shadow-[0_4px_12px_rgba(64,99,178,0.25)]">
-            All Products
+            All Categories
           </a>
         </div>
       </div>
@@ -718,9 +725,15 @@
       <button id="shop-clear-all-filters" onclick="if(window.clearAllShopFilters)window.clearAllShopFilters()" type="button" class="text-xs font-bold text-rose-500 hover:underline ml-2 cursor-pointer">Clear All</button>
     </div>
 
-    <!-- Full-Width Products Grid Container -->
+    <!-- Full-Width Catalog Grid Container -->
     <div class="w-full flex flex-col">
-      <div id="shop-products-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5 xl:gap-6 w-full min-h-[420px]">
+      <!-- 1. Categories Grid (Shown when browsing categories, 20 per page) -->
+      <div id="shop-categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 w-full min-h-[420px]">
+        <!-- Rendered dynamically by renderShopCategories() with 20 per page limit -->
+      </div>
+
+      <!-- 2. Products Grid (Shown when category is selected or search active) -->
+      <div id="shop-products-container" class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5 xl:gap-6 w-full min-h-[420px]">
         <!-- Centered Modern Loading State -->
         <div class="col-span-full w-full min-h-[420px] flex flex-col items-center justify-center py-24 px-4 text-center">
           <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
@@ -1156,7 +1169,7 @@
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js?v=2.3"></script>
   <script src="/assets/js/carousel.js"></script>
-  <script src="/assets/js/products.js?v=2.5"></script>
+  <script src="/assets/js/products.js?v=2.6"></script>
   
 
 </body>
