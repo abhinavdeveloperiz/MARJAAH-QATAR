@@ -42,21 +42,21 @@ export class ReviewsService {
    */
   async getReviews(forceRefresh: boolean = false): Promise<GoogleReviewsResponse> {
     const apiKey = this.configService.get<string>('GOOGLE_PLACES_API_KEY');
-    const placeId = this.configService.get<string>('GOOGLE_PLACE_ID');
-    const customBusinessUrl = this.configService.get<string>('GOOGLE_BUSINESS_URL');
+    const placeId = this.configService.get<string>('GOOGLE_PLACE_ID') || 'ChIJR51rR8XPRT4RoyIq8yD-X6Q';
+    const customBusinessUrl = this.configService.get<string>('GOOGLE_BUSINESS_URL') || 'https://maps.google.com/?cid=11844464962479727267';
 
     // If API credentials are not yet configured in .env
-    if (!apiKey || !placeId) {
-      this.logger.warn('GOOGLE_PLACES_API_KEY or GOOGLE_PLACE_ID is not configured in .env');
+    if (!apiKey) {
+      this.logger.warn('GOOGLE_PLACES_API_KEY is not configured in .env');
       return {
         configured: false,
-        name: 'MARJAAH Qatar (M.SHOP)',
-        rating: 5.0,
-        userRatingCount: 0,
-        googleMapsUri: customBusinessUrl || 'https://maps.google.com',
-        writeReviewUri: customBusinessUrl ? `${customBusinessUrl}#reviews` : 'https://maps.google.com',
+        name: 'M Shop Qatar',
+        rating: 4.7,
+        userRatingCount: 26,
+        googleMapsUri: customBusinessUrl || 'https://maps.google.com/?cid=11844464962479727267',
+        writeReviewUri: `https://search.google.com/local/writereview?placeid=${placeId}`,
         reviews: [],
-        message: 'Google Place ID or Google Places API Key is missing. Please add GOOGLE_PLACES_API_KEY and GOOGLE_PLACE_ID in backend/.env',
+        message: 'Google Places API Key is missing. Please add GOOGLE_PLACES_API_KEY in backend/.env',
       };
     }
 
@@ -73,7 +73,8 @@ export class ReviewsService {
         const cacheDoc = await this.firestoreService.doc('settings', 'google_reviews').get();
         if (cacheDoc.exists) {
           const data = cacheDoc.data() as any;
-          if (data && data.cachedAt) {
+          // Verify cached data belongs to the correct placeId and is fresh
+          if (data && data.cachedAt && data.placeId === placeId) {
             const cachedTime = new Date(data.cachedAt).getTime();
             if (now - cachedTime < this.CACHE_TTL_MS) {
               this.memoryCache = data;
@@ -95,7 +96,7 @@ export class ReviewsService {
 
       // Save to Firestore so it survives server restarts
       try {
-        await this.firestoreService.doc('settings', 'google_reviews').set(freshData, { merge: true });
+        await this.firestoreService.doc('settings', 'google_reviews').set({ ...freshData, placeId }, { merge: true });
       } catch (err: any) {
         this.logger.warn(`Could not persist reviews into Firestore: ${err.message}`);
       }
@@ -111,11 +112,11 @@ export class ReviewsService {
 
       return {
         configured: true,
-        name: 'MARJAAH Qatar',
-        rating: 5.0,
-        userRatingCount: 0,
-        googleMapsUri: customBusinessUrl || 'https://maps.google.com',
-        writeReviewUri: customBusinessUrl || 'https://maps.google.com',
+        name: 'M Shop Qatar',
+        rating: 4.7,
+        userRatingCount: 26,
+        googleMapsUri: customBusinessUrl || 'https://maps.google.com/?cid=11844464962479727267',
+        writeReviewUri: `https://search.google.com/local/writereview?placeid=${placeId}`,
         reviews: [],
         message: `Failed to fetch from Google Places API: ${err.message}`,
       };
@@ -123,7 +124,7 @@ export class ReviewsService {
   }
 
   /**
-   * Fetch details and reviews using Google Places API (supports both Places API New & Legacy Place Details)
+   * Fetch details and reviews using Google Places API (combines most_relevant & newest for maximum coverage)
    */
   private async fetchFromGooglePlaces(
     apiKey: string,
@@ -132,44 +133,68 @@ export class ReviewsService {
   ): Promise<GoogleReviewsResponse> {
     this.logger.log(`Fetching live Google reviews for placeId: ${placeId}...`);
 
-    // Standard Google Place Details endpoint
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
-      placeId,
-    )}&fields=name,rating,reviews,user_ratings_total,url&key=${encodeURIComponent(apiKey)}`;
+    // Fetch both most_relevant and newest sorting to capture all available reviews from Google Places API
+    const sortModes = ['most_relevant', 'newest'];
+    const fetchPromises = sortModes.map(async (sort) => {
+      const url = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${encodeURIComponent(
+        placeId,
+      )}&fields=name,rating,reviews,user_ratings_total,url&reviews_sort=${sort}&key=${encodeURIComponent(apiKey)}`;
+      const res = await fetch(url);
+      if (!res.ok) return null;
+      return res.json();
+    });
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Google API HTTP ${response.status}: ${response.statusText}`);
+    const responses = await Promise.all(fetchPromises);
+
+    let resultName = 'M Shop Qatar';
+    let resultRating = 4.7;
+    let resultTotalRatings = 26;
+    let mapsUrl = customBusinessUrl || `https://maps.google.com/?cid=11844464962479727267`;
+
+    const reviewMap = new Map<string, GoogleReviewItem>();
+
+    for (const data of responses) {
+      if (!data || data.status !== 'OK' || !data.result) continue;
+      const resObj = data.result;
+
+      if (resObj.name) resultName = resObj.name;
+      if (typeof resObj.rating === 'number') resultRating = resObj.rating;
+      if (typeof resObj.user_ratings_total === 'number') resultTotalRatings = resObj.user_ratings_total;
+      if (resObj.url && !customBusinessUrl) mapsUrl = resObj.url;
+
+      const rawReviews: any[] = resObj.reviews || [];
+      for (const [idx, r] of rawReviews.entries()) {
+        const author = r.author_name || `reviewer-${idx}`;
+        const existing = reviewMap.get(author);
+        if (!existing || (!existing.text && r.text)) {
+          reviewMap.set(author, {
+            id: `${r.time || Date.now()}-${idx}`,
+            authorName: r.author_name || 'Verified Customer',
+            authorPhotoUrl: r.profile_photo_url || '',
+            rating: typeof r.rating === 'number' ? r.rating : 5,
+            text: r.text || '',
+            relativeTimeDescription: r.relative_time_description || '',
+            publishTime: r.time ? new Date(r.time * 1000).toISOString() : new Date().toISOString(),
+            authorUrl: r.author_url || '',
+          });
+        }
+      }
     }
 
-    const data: any = await response.json();
+    // Sort reviews: prioritize non-empty text reviews first
+    const reviews: GoogleReviewItem[] = Array.from(reviewMap.values()).sort((a, b) => {
+      if (a.text && !b.text) return -1;
+      if (!a.text && b.text) return 1;
+      return (b.rating || 0) - (a.rating || 0);
+    });
 
-    if (data.status !== 'OK') {
-      throw new Error(`Google Places API returned status: ${data.status} - ${data.error_message || ''}`);
-    }
-
-    const result = data.result || {};
-    const rawReviews: any[] = result.reviews || [];
-
-    const reviews: GoogleReviewItem[] = rawReviews.map((r: any, idx: number) => ({
-      id: `${r.time || Date.now()}-${idx}`,
-      authorName: r.author_name || 'Verified Customer',
-      authorPhotoUrl: r.profile_photo_url || '',
-      rating: typeof r.rating === 'number' ? r.rating : 5,
-      text: r.text || '',
-      relativeTimeDescription: r.relative_time_description || '',
-      publishTime: r.time ? new Date(r.time * 1000).toISOString() : new Date().toISOString(),
-      authorUrl: r.author_url || '',
-    }));
-
-    const mapsUrl = result.url || customBusinessUrl || `https://www.google.com/maps/search/?api=1&query_place_id=${placeId}`;
     const writeReviewUrl = `https://search.google.com/local/writereview?placeid=${placeId}`;
 
     return {
       configured: true,
-      name: result.name || 'MARJAAH Qatar (M.SHOP)',
-      rating: typeof result.rating === 'number' ? result.rating : 5.0,
-      userRatingCount: typeof result.user_ratings_total === 'number' ? result.user_ratings_total : reviews.length,
+      name: resultName,
+      rating: resultRating,
+      userRatingCount: resultTotalRatings,
       googleMapsUri: mapsUrl,
       writeReviewUri: writeReviewUrl,
       reviews: reviews,

@@ -1061,3 +1061,42 @@ html:not(.dark) #main-navbar .lang-switcher-wrap button:not([style*="background:
   transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* ─── Standardized Footer Typography & Hierarchy ──────────────────────────── */
+footer h4 {
+  font-size: 0.75rem !important; /* 12px */
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  font-weight: 700 !important;
+  color: var(--text-primary) !important;
+}
+
+#footer-categories-list,
+footer ul {
+  margin: 0 !important;
+  padding: 0 !important;
+  list-style: none !important;
+}
+
+#footer-categories-list li a,
+footer ul li a {
+  font-size: 0.75rem !important; /* 12px text-xs standard */
+  line-height: 1.5 !important;
+  font-weight: 400 !important;
+  color: var(--text-secondary) !important;
+  transition: color 0.15s ease !important;
+}
+
+#footer-categories-list li a:hover,
+footer ul li a:hover {
+  color: #8D9CF5 !important;
+}
+
+#footer-categories-list li a.view-all-link {
+  font-weight: 600 !important;
+  color: #8D9CF5 !important;
+  margin-top: 0.25rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+

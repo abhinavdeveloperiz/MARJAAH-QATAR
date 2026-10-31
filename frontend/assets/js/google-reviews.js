@@ -4,46 +4,60 @@
 
   const fallbackReviews = [
     {
-      authorName: 'Ahmad Al-Kuwari',
-      authorPhotoUrl: '',
+      authorName: 'Raneem Issa',
+      authorPhotoUrl: 'https://lh3.googleusercontent.com/a/ACg8ocJYoEc0MMK69ekANwLM_vgdzK8ZdgEr246NlJwBRaYEwDtI6A=s128-c0x00000000-cc-rp-mo',
       rating: 5,
-      relativeTimeDescription: '3 days ago',
-      text: 'Best tech store in Qatar! Ordered an ASUS ROG Strix laptop and got same-day delivery to Lusail. Brand new sealed with official warranty.',
+      relativeTimeDescription: '2 weeks ago',
+      text: 'Awesome price and amazing quality would definitely shop again 💪',
+      authorUrl: 'https://www.google.com/maps/contrib/110254622439949430199/reviews',
     },
     {
-      authorName: 'Mohammed Rashid',
+      authorName: 'Mohomed Rizwan',
       authorPhotoUrl: '',
       rating: 5,
       relativeTimeDescription: '1 week ago',
-      text: '100% genuine gaming peripherals and Corsair hardware. Excellent communication via WhatsApp hardware desk. Highly recommended!',
+      text: 'Excellent value for money. exceptional quality and super fast delivery. Very satisfied with the overall experience!',
+      authorUrl: '',
     },
     {
-      authorName: 'Sarah Henderson',
-      authorPhotoUrl: '',
-      rating: 5,
-      relativeTimeDescription: '2 weeks ago',
-      text: 'Great customer service and fast delivery across Doha. Prices are much better than local malls and the products are strictly genuine.',
-    },
-    {
-      authorName: 'Jassim Al-Sulaiti',
-      authorPhotoUrl: '',
+      authorName: 'Maychel Salaum',
+      authorPhotoUrl: 'https://lh3.googleusercontent.com/a/ACg8ocKVL2rhWSx7zpSVsmFOmH1ygjgzVtr7rKspp2gvpccbv9UOP4g=s128-c0x00000000-cc-rp-mo',
       rating: 5,
       relativeTimeDescription: '3 weeks ago',
-      text: 'Super smooth experience. Bought Samsung Odyssey curved monitor and gaming keyboard. Seamless Cash on Delivery in Doha.',
+      text: 'All of the items I ordered was great same as the picture… And the seller was great too. Thank you M.Shop. I will order again',
+      authorUrl: 'https://www.google.com/maps/contrib/112818143387358483910/reviews',
     },
     {
-      authorName: 'Khalid Al-Thani',
-      authorPhotoUrl: '',
+      authorName: 'Lamar qasim',
+      authorPhotoUrl: 'https://lh3.googleusercontent.com/a/ACg8ocJE95TX7VzD0zoBrQYFQQ0LC4bhAX2gi32vu_Rj4z_s8vzilZw=s128-c0x00000000-cc-rp-mo',
       rating: 5,
-      relativeTimeDescription: '1 month ago',
-      text: 'Top tier hardware distribution in Qatar. Very knowledgeable team at Souq Umm Besher. Will definitely buy my PC parts here again.',
+      relativeTimeDescription: '3 weeks ago',
+      text: 'the services is amazing and they reply quickly. for the quality and the color it’s so worthy the price i would definitely purchase again',
+      authorUrl: 'https://www.google.com/maps/contrib/108187324897150201780/reviews',
     },
     {
-      authorName: 'David Miller',
+      authorName: 'Jerryngl',
       authorPhotoUrl: '',
       rating: 5,
-      relativeTimeDescription: '1 month ago',
-      text: 'Express delivery to The Pearl Qatar in under 3 hours. Packaging was pristine and tech support answered all my compatibility questions.',
+      relativeTimeDescription: '1 week ago',
+      text: 'good shop good product fast delivery and free',
+      authorUrl: '',
+    },
+    {
+      authorName: 'TCL TV Account',
+      authorPhotoUrl: 'https://lh3.googleusercontent.com/a-/ALV-UjWSYlDofJ2sLQHm4wQhKE6G2bBNkCgwzVfV-l6Q4Hs56drBCcw=s128-c0x00000000-cc-rp-mo',
+      rating: 5,
+      relativeTimeDescription: '4 weeks ago',
+      text: 'Great product and worth for money',
+      authorUrl: 'https://www.google.com/maps/contrib/102097212536246660233/reviews',
+    },
+    {
+      authorName: 'EBRAHIM ALBOKARI',
+      authorPhotoUrl: '',
+      rating: 5,
+      relativeTimeDescription: '1 week ago',
+      text: 'Very good and quick',
+      authorUrl: '',
     },
   ];
 
@@ -224,18 +238,18 @@
       const hasLiveReviews = data && data.configured && Array.isArray(data.reviews) && data.reviews.length > 0;
       const reviewsToDisplay = hasLiveReviews ? data.reviews : fallbackReviews;
 
-      if (data && data.rating && ratingEl) {
-        ratingEl.textContent = Number(data.rating).toFixed(1);
+      if (ratingEl) {
+        ratingEl.textContent = (data && data.rating) ? Number(data.rating).toFixed(1) : '4.7';
       }
       if (countEl) {
         if (data && data.userRatingCount > 0) {
           countEl.textContent = `${data.userRatingCount} Reviews`;
         } else {
-          countEl.textContent = '4.9 • Google Rating';
+          countEl.textContent = '26 Reviews';
         }
       }
-      if (writeBtn && data && data.writeReviewUri) {
-        writeBtn.href = data.writeReviewUri;
+      if (writeBtn) {
+        writeBtn.href = (data && data.writeReviewUri) ? data.writeReviewUri : 'https://search.google.com/local/writereview?placeid=ChIJR51rR8XPRT4RoyIq8yD-X6Q';
       }
       if (statusPill) {
         if (hasLiveReviews) {

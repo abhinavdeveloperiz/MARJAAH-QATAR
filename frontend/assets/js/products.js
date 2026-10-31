@@ -2301,15 +2301,15 @@
       const topCats = categories
         .filter(c => c && c.name)
         .sort((a, b) => (b.product_count || 0) - (a.product_count || 0))
-        .slice(0, 6);
+        .slice(0, 5);
 
       let html = topCats.map(c => {
         const slug = c.slug || c.id;
         const name = (isArabic && c.name_ar) ? c.name_ar : c.name;
-        return `<li><a href="${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(slug)}" class="text-xs transition-colors hover:text-[#8D9CF5]" style="color:var(--text-secondary)">${name}</a></li>`;
+        return `<li><a href="${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(slug)}" class="text-xs transition-colors hover:text-[#8D9CF5]" style="color:var(--text-secondary);font-size:12px">${name}</a></li>`;
       }).join('');
 
-      html += `<li><a href="${isArabic ? '/ar' : ''}/categories/" class="text-xs font-semibold tracking-wide text-[#8D9CF5] hover:underline flex items-center gap-1 mt-1.5">${isArabic ? 'جميع الفئات ←' : 'View All Categories →'}</a></li>`;
+      html += `<li><a href="${isArabic ? '/ar' : ''}/categories/" class="view-all-link text-xs font-semibold tracking-wide text-[#8D9CF5] hover:underline flex items-center gap-1 mt-1.5" style="font-size:12px">${isArabic ? 'جميع الفئات ←' : 'View All Categories →'}</a></li>`;
 
       list.innerHTML = html;
     } catch (e) {

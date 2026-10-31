@@ -87,7 +87,7 @@
   </script>
 
   <!-- Global CSS (design tokens + component classes) -->
-  <link rel="stylesheet" href="/assets/css/globals.css" />
+  <link rel="stylesheet" href="/assets/css/globals.css?v=3.0" />
 
   <!-- Inline anim & RTL font helpers -->
   <style>
@@ -3250,7 +3250,7 @@
             <!-- Compact Rating Badge -->
             <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border"
               style="background-color:var(--bg-surface);border-color:var(--border-color)">
-              <span class="text-xl sm:text-2xl font-black font-display text-amber-400 leading-none" id="google-reviews-rating-number">4.9</span>
+              <span class="text-xl sm:text-2xl font-black font-display text-amber-400 leading-none" id="google-reviews-rating-number">4.7</span>
               <div>
                 <div class="flex items-center gap-0.5 text-amber-400">
                   <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
@@ -3260,13 +3260,13 @@
                   <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 </div>
                 <p class="text-[10px] font-medium leading-tight mt-0.5" id="google-reviews-count" style="color:var(--text-secondary)">
-                  Google Rating
+                  26 Reviews • Google Rating
                 </p>
               </div>
             </div>
 
             <!-- Write Review button -->
-            <a id="google-reviews-write-btn" href="https://maps.google.com" target="_blank" rel="noopener noreferrer"
+            <a id="google-reviews-write-btn" href="https://search.google.com/local/writereview?placeid=ChIJR51rR8XPRT4RoyIq8yD-X6Q" target="_blank" rel="noopener noreferrer"
               class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-105 shadow-xs">
               <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
                 <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
@@ -3644,23 +3644,40 @@
       </div>
     </div>
 
-    <div class="container-custom py-14 md:py-20">
-      <!-- Top section: Logo + tagline + newsletter -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pb-12" style="border-bottom:1px solid var(--border-color)">
-        <div>
-          <a href="/">
-            <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-9 mb-5 dark:hidden" />
-            <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-9 mb-5 hidden dark:block" />
+    <div class="container-custom py-12 md:py-16">
+      <!-- 1. TOP NEWSLETTER BANNER (Full-width, balanced) -->
+      <div class="pb-10 mb-12 border-b flex flex-col lg:flex-row lg:items-center justify-between gap-6" style="border-color:var(--border-color)">
+        <div class="max-w-xl">
+          <div class="flex items-center gap-2 mb-1.5">
+            <span class="w-2 h-2 rounded-full bg-[#8D9CF5]"></span>
+            <h3 class="text-xs font-bold tracking-widest uppercase" style="color:var(--text-primary)">Stay in the Loop</h3>
+          </div>
+          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">Subscribe to get exclusive tech deals, new hardware arrivals, and special promotions across Qatar.</p>
+        </div>
+        <form class="flex flex-col sm:flex-row w-full lg:w-auto gap-2.5" onsubmit="event.preventDefault();this.querySelector('button').textContent='Subscribed!';">
+          <input type="email" placeholder="Enter your email address" class="w-full sm:w-80 px-4 py-2.5 rounded-xl border text-xs focus:outline-none transition-all" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
+          <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all shadow-md hover:brightness-110 cursor-pointer" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">Subscribe</button>
+        </form>
+      </div>
+
+      <!-- 2. MAIN 5-COLUMN GRID (Standard E-Commerce Hierarchy) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6 pb-12" style="border-bottom:1px solid var(--border-color)">
+        <!-- COL 1: Brand & Identity -->
+        <div class="sm:col-span-2 lg:col-span-1 lg:pr-2">
+          <a href="/" class="inline-block mb-3.5">
+            <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-8 object-contain dark:hidden" />
+            <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-8 object-contain hidden dark:block" />
           </a>
-          <p class="text-sm leading-relaxed max-w-sm" style="color:var(--text-secondary)">Qatar&#x27;s premier tech
-            store for laptops, gaming gear, monitors, mobile accessories, and premium electronics.</p>
-          <div class="flex items-center gap-3 mt-6">
+          <p class="text-xs leading-relaxed mb-4" style="color:var(--text-secondary)">
+            Qatar&#x27;s premier destination for mobile accessories, gaming gear, laptops, and premium tech essentials.
+          </p>
+          <div class="flex items-center gap-2 mb-4">
             <a href="https://www.instagram.com/mshop.qatar/" target="_blank" rel="noopener noreferrer"
-              aria-label="Instagram" class="w-9 h-9 rounded-xl border flex items-center justify-center transition-all"
+              aria-label="Instagram" class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#E1306C]"
               style="border-color:var(--border-color);color:#E1306C"
               onmouseover="this.style.background='rgba(225,48,108,0.1)'"
               onmouseout="this.style.background='transparent'">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
                 <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
@@ -3668,173 +3685,153 @@
               </svg>
             </a>
             <a href="https://www.facebook.com/p/Mshop-61584136214261/" target="_blank" rel="noopener noreferrer"
-              aria-label="Facebook" class="w-9 h-9 rounded-xl border flex items-center justify-center transition-all"
+              aria-label="Facebook" class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#1877F2]"
               style="border-color:var(--border-color);color:#1877F2"
               onmouseover="this.style.background='rgba(24,119,242,0.1)'"
               onmouseout="this.style.background='transparent'">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
             </a>
             <a href="https://wa.me/97477991013" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"
-              class="w-9 h-9 rounded-xl border flex items-center justify-center transition-all"
+              class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#25D366]"
               style="border-color:var(--border-color);color:#25D366"
               onmouseover="this.style.background='rgba(37,211,102,0.1)'"
               onmouseout="this.style.background='transparent'">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path
                   d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
             </a>
             <a href="tel:+97477991013" aria-label="Phone Hotline"
-              class="w-9 h-9 rounded-xl border flex items-center justify-center transition-all"
+              class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#8D9CF5]"
               style="border-color:var(--border-color);color:var(--text-secondary)"
               onmouseover="this.style.background='var(--bg-surface-2)'"
               onmouseout="this.style.background='transparent'">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path
                   d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
               </svg>
             </a>
           </div>
+          <span class="text-[11px] block" style="color:var(--text-tertiary)">CR No. 228717 • Qatar</span>
         </div>
-        <!-- Newsletter -->
-        <div>
-          <h3 class="text-sm font-bold tracking-widest uppercase mb-2" style="color:var(--text-primary)">Stay in the
-            Loop</h3>
-          <p class="text-xs mb-4" style="color:var(--text-secondary)">Get exclusive deals, new arrivals, and tech news
-            delivered to your inbox.</p>
-          <form class="flex gap-2"
-            onsubmit="this.querySelector('button').textContent='Subscribed!';event.preventDefault()">
-            <input type="email" placeholder="Enter your email address"
-              class="flex-1 px-4 py-2.5 rounded-xl border text-sm focus:outline-none transition-all"
-              style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)"
-              onfocus="this.style.borderColor='var(--color-accent)'"
-              onblur="this.style.borderColor='var(--border-color)'" />
-            <button type="submit" class="btn-primary text-xs whitespace-nowrap">Subscribe</button>
-          </form>
-          <p class="text-[11px] mt-2.5" style="color:var(--text-tertiary)">We respect your privacy. Unsubscribe anytime.
-          </p>
-        </div>
-      </div>
 
-      <!-- Links grid -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 py-12" style="border-bottom:1px solid var(--border-color)">
+        <!-- COL 2: Categories -->
         <div>
           <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Categories</h4>
           <ul id="footer-categories-list" class="space-y-2.5">
-            <li><a href="/shop/?category=laptops-pcs" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Laptops &amp; PCs</a></li>
-            <li><a href="/shop/?category=mobile-accessories" class="text-xs transition-colors hover:text-primary-500"
+            <li><a href="/shop/?category=mobile-accessories" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Mobile Accessories</a></li>
-            <li><a href="/shop/?category=monitors" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Monitors &amp; Displays</a></li>
-            <li><a href="/shop/?category=peripherals" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Keyboards &amp; Mice</a></li>
-            <li><a href="/shop/?category=storage" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Storage &amp; SSDs</a></li>
-            <li><a href="/shop/?category=gaming" class="text-xs transition-colors hover:text-primary-500"
+            <li><a href="/shop/?category=laptops-pcs" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Laptops &amp; PCs</a></li>
+            <li><a href="/shop/?category=gaming" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Gaming Gear</a></li>
-            <li><a href="/shop/?category=networking" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Networking &amp; Wi-Fi</a></li>
-            <li><a href="/categories/"
-                class="text-xs font-bold tracking-wide transition-colors flex items-center gap-1 mt-1 text-[#8D9CF5] hover:underline">View
+            <li><a href="/shop/?category=storage" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Storage &amp; SSDs</a></li>
+            <li><a href="/shop/?category=audio" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Audio &amp; Sound</a></li>
+            <li><a href="/categories/" onclick="if(window.openAllCategoriesModal){window.openAllCategoriesModal(event);}"
+                class="view-all-link text-xs font-semibold tracking-wide text-[#8D9CF5] hover:underline flex items-center gap-1 mt-1.5">View
                 All Categories →</a></li>
           </ul>
         </div>
+
+        <!-- COL 3: Quick Links -->
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links
-          </h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
           <ul class="space-y-2.5">
-            <li><a href="/" class="text-xs transition-colors hover:text-primary-500"
+            <li><a href="/" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Home</a></li>
-            <li><a href="/shop/" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Shop</a></li>
-            <li><a href="/offers/" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Offers</a></li>
-            <li><a href="/about/" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">About</a></li>
-            <li><a href="/contact/" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Contact</a></li>
+            <li><a href="/shop/" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Shop Catalog</a></li>
+            <li><a href="/offers/" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Special Offers</a></li>
+            <li><a href="/about/" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">About M.SHOP</a></li>
+            <li><a href="/contact/" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Contact Us</a></li>
           </ul>
         </div>
+
+        <!-- COL 4: Policies & Legal -->
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp;
-            Legal</h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
           <ul class="space-y-2.5">
-            <li><a href="/terms/" class="text-xs transition-colors hover:text-primary-500"
+            <li><a href="/terms/" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
-            <li><a href="/returns/" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Refund &amp; Exchange Policy</a></li>
-            <li><a href="/privacy/" class="text-xs transition-colors hover:text-primary-500"
+            <li><a href="/returns/" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Refund &amp; Exchange</a></li>
+            <li><a href="/privacy/" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Privacy Policy</a></li>
-            <li><a href="/track-order/" class="text-xs transition-colors hover:text-primary-500"
-                style="color:var(--text-secondary)">Track Order</a></li>
+            <li><a href="/track-order/" class="text-xs transition-colors hover:text-[#8D9CF5]"
+                style="color:var(--text-secondary)">Track Your Order</a></li>
           </ul>
         </div>
+
+        <!-- COL 5: Contact & Showroom -->
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info
-          </h4>
-          <ul class="space-y-3">
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
+          <ul class="space-y-2.5">
             <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="mt-0.5 flex-shrink-0" style="color:var(--color-accent)">
+                class="mt-0.5 flex-shrink-0 text-[#8D9CF5]">
                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                 <circle cx="12" cy="10" r="3" />
               </svg>
-              <span>
-                M.SHOP – by Marjaah Trading WLL<br />
-                Shop No. 8, Building No. 12, Street No. 295, Zone No. 91<br />
-                SOUQ UMM BESHER<br />
-                Doha, State of Qatar<br />
-                CR No. 228717
-              </span>
+              <span>Shop 8, Bldg 12, St 295, Souq Umm Besher, Doha, Qatar</span>
             </li>
-            <li><a href="tel:+97477991013"
-                class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500"
+            <li>
+              <a href="tel:+97477991013" class="flex items-center gap-2 text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  style="color:var(--color-accent)">
+                  class="text-[#8D9CF5]">
                   <path
                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
-                +974 7799 1013</a>
+                +974 7799 1013
+              </a>
             </li>
-            <li><a href="tel:+97477991016"
-                class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500"
+            <li>
+              <a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  style="color:var(--color-accent)">
+                  class="text-[#8D9CF5]">
                   <path
                     d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" />
                 </svg>
-                +974 7799 1016</a>
+                +974 7799 1016
+              </a>
             </li>
-            <li><a href="mailto:info@marjaah.com"
-                class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500"
+            <li>
+              <a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                  class="text-primary-400">
+                  class="text-[#8D9CF5]">
                   <rect width="20" height="16" x="2" y="4" rx="2" />
                   <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
                 </svg>
-                info@marjaah.com</a>
+                info@marjaah.com
+              </a>
             </li>
           </ul>
         </div>
       </div>
 
-      <!-- Bottom bar -->
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6">
-        <p class="text-xs" style="color:var(--text-tertiary)">© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All
-          rights reserved.</p>
-        <p class="text-xs" style="color:var(--text-tertiary)">Doha, State of Qatar</p>
+      <!-- 3. BOTTOM BAR -->
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style="color:var(--text-tertiary)">
+        <p>© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
+        <div class="flex items-center gap-4">
+          <span>Doha, State of Qatar</span>
+          <span>•</span>
+          <span>100% Genuine Products</span>
+        </div>
       </div>
     </div>
   </footer>
@@ -3876,8 +3873,8 @@
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js?v=2.3"></script>
   <script src="/assets/js/carousel.js"></script>
-  <script src="/assets/js/products.js?v=2.5"></script>
-  <script src="/assets/js/google-reviews.js?v=1.0"></script>
+  <script src="/assets/js/products.js?v=3.0"></script>
+  <script src="/assets/js/google-reviews.js?v=2.0"></script>
   <script>
     (function () {
       // Navbar transparent on hero
