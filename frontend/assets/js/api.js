@@ -321,8 +321,38 @@
     createBrand(data) { return this.post('/api/brands', data); }
     updateBrand(id, data) { return this.put(`/api/brands/${id}`, data); }
     deleteBrand(id) { return this.delete(`/api/brands/${id}`); }
+
+    startPresenceTracking() {
+      if (this._presenceStarted) return;
+      this._presenceStarted = true;
+
+      const ping = async () => {
+        const token = this.getToken();
+        if (!token) return;
+        try {
+          await this.post('/api/auth/heartbeat', {});
+        } catch (e) {}
+      };
+
+      setTimeout(ping, 2000);
+
+      setInterval(() => {
+        if (!document.hidden && this.getToken()) {
+          ping();
+        }
+      }, 4 * 60 * 1000);
+
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && this.getToken()) {
+          ping();
+        }
+      });
+    }
   }
 
   global.api = new ApiClient(API_CONFIG);
   global.ApiClient = ApiClient;
+  if (typeof window !== 'undefined') {
+    global.api.startPresenceTracking();
+  }
 })(window);

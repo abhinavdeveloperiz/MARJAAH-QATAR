@@ -37,8 +37,10 @@ const server = http.createServer((req, res) => {
     });
 
     proxyReq.on('error', (err) => {
-      res.writeHead(502, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ error: 'Backend proxy error', details: err.message }));
+      if (!res.headersSent) {
+        res.writeHead(502, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ message: 'Backend service is restarting or warming up. Auto-retrying...', details: err.message }));
+      }
     });
 
     req.pipe(proxyReq);
@@ -60,6 +62,8 @@ const server = http.createServer((req, res) => {
   // Route clean product URLs: /product/:slug, /ar/product/:slug
   if (pathname.match(/^\/(?:ar\/)?product(?:\/.*)?$/)) {
     filePath = path.join(FRONTEND_DIR, 'product', 'index.html');
+  } else if (pathname.match(/^\/(?:ar\/)?category(?:\/.*)?$/)) {
+    filePath = path.join(FRONTEND_DIR, 'shop', 'index.html');
   } else if (pathname === '/robot.txt') {
     filePath = path.join(FRONTEND_DIR, 'robots.txt');
   } else if (fs.existsSync(filePath) && fs.statSync(filePath).isDirectory()) {

@@ -61,9 +61,37 @@ export class CategoriesService implements OnModuleInit {
     }
   }
 
+  private getProductCounts(): Record<string, number> {
+    const counts: Record<string, number> = {};
+    try {
+      const productsCachePath = path.resolve(process.cwd(), '.products-cache.json');
+      if (fs.existsSync(productsCachePath)) {
+        const raw = fs.readFileSync(productsCachePath, 'utf-8');
+        const products = JSON.parse(raw);
+        if (Array.isArray(products)) {
+          for (const p of products) {
+            if (p.status === 'hidden' || p.status === 'pending_approval') continue;
+            const slug = p.category_slug || (p.category ? String(p.category).toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
+            if (slug) {
+              counts[slug] = (counts[slug] || 0) + 1;
+            }
+          }
+        }
+      }
+    } catch (_) {}
+    return counts;
+  }
+
   private async fetchFromFirestore(): Promise<any[]> {
     const snap = await this.firestore.collection('categories').get();
     const categories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+    const counts = this.getProductCounts();
+    for (const cat of categories) {
+      const slug = cat.slug || cat.id;
+      if (counts[slug] !== undefined) {
+        cat.product_count = counts[slug];
+      }
+    }
     categories.sort((a, b) => (a.order || 0) - (b.order || 0));
     this.cachedCategories = categories;
     this.cacheExpiresAt = Date.now() + this.CACHE_TTL_MS;

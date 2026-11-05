@@ -78,15 +78,41 @@ export class AuthController {
   async getMe(@Request() req: any) {
     try {
       const targetId = String(req.user?.id || req.user?.sub || '').trim();
+      if (targetId) {
+        this.authService.updatePresence(targetId).catch(() => {});
+      }
       const profile = await this.authService.getProfile(targetId);
-      return {
+      const combined = {
         ...req.user,
         ...profile,
         id: String(req.user?.id || profile?.id || targetId),
       };
+      const { password, raw_password, ...safe } = combined;
+      return safe;
     } catch (e) {
-      return req.user;
+      const { password, raw_password, ...safe } = req.user || {};
+      return safe;
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('heartbeat')
+  async heartbeat(@Request() req: any) {
+    const userId = String(req.user?.id || req.user?.sub || '').trim();
+    if (userId) {
+      await this.authService.updatePresence(userId);
+    }
+    return { success: true, timestamp: new Date().toISOString() };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('presence')
+  async presence(@Request() req: any) {
+    const userId = String(req.user?.id || req.user?.sub || '').trim();
+    if (userId) {
+      await this.authService.updatePresence(userId);
+    }
+    return { success: true, timestamp: new Date().toISOString() };
   }
 
   @UseGuards(JwtAuthGuard)

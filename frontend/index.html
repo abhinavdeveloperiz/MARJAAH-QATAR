@@ -247,6 +247,7 @@
     .hide-scrollbar::-webkit-scrollbar {
       display: none !important;
     }
+
     .hide-scrollbar {
       -ms-overflow-style: none !important;
       scrollbar-width: none !important;
@@ -926,27 +927,66 @@
           class="flex-1 flex flex-col items-center justify-center text-center max-w-6xl mx-auto w-full py-8 sm:py-12 md:py-16 pt-16 sm:pt-20 transition-transform duration-300 ease-out"
           style="transform:perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(10px)">
           <div class="relative inline-flex items-center justify-center my-auto select-none px-2 sm:px-6 max-w-5xl">
-            <h1
+            <h1 id="hero-headline"
               class="font-guminert text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.15] sm:leading-[1.1] tracking-tight drop-shadow-[0_20px_50px_rgba(0,0,0,0.9)]">
               <span
-                class="bg-gradient-to-b from-white via-[#E0E7FF] to-[#8D9CF5] bg-clip-text text-transparent transition-all duration-300 hover:brightness-125 cursor-default font-extrabold">M.SHOP
-                - TECH STORE<br class="hidden sm:inline" /> IN QATAR</span>
+                class="bg-gradient-to-b from-white via-[#E0E7FF] to-[#8D9CF5] bg-clip-text text-transparent transition-all duration-300 hover:brightness-125 cursor-default font-extrabold">M.SHOP<br class="hidden sm:inline" />Technology, Lifestyle & More – All in One Place</span>
             </h1>
           </div>
-          <p
-            class="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-md sm:max-w-lg md:max-w-xl font-normal leading-relaxed text-center px-3">
-            Qatar's premier destination for genuine mobile accessories, high-speed power banks, fast chargers, premium
-            earbuds, and tech essentials with free delivery across Qatar.
+          <p id="hero-subtitle"
+            class="mt-4 sm:mt-6 text-xs sm:text-sm md:text-base font-sans text-white/80 max-w-md sm:max-w-lg md:max-w-2xl font-normal leading-relaxed text-center px-3">
+            Discover quality electronics, smart technology, and home appliances at great value.
           </p>
+          <div id="hero-actions" class="mt-6 sm:mt-8 flex flex-wrap items-center justify-center gap-3">
+            <a href="/shop/" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#4063B2] to-[#8D9CF5] text-white text-xs font-bold uppercase tracking-wider hover:brightness-110 shadow-lg shadow-[#4063B2]/20 transition-all duration-200">
+              <span>Shop All Collections</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a href="/shop/?category=home-appliances" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/20 backdrop-blur-md transition-all duration-200">
+              <span>Explore Smart Home &amp; Appliances</span>
+            </a>
+          </div>
         </div>
+
+        <!-- 0ms Immediate Synchronous Hero Banner Hydration from Local Storage -->
+        <script>
+          (function() {
+            try {
+              var raw = localStorage.getItem('marjaah_hero_banner_cache');
+              if (!raw) return;
+              var c = JSON.parse(raw);
+              var b = c && (c.banner || (c.allBanners && c.allBanners[0]));
+              if (!b) return;
+              var isRtl = document.documentElement.dir === 'rtl' || window.location.pathname.indexOf('/ar') === 0;
+              var h = isRtl && b.headline_ar ? b.headline_ar : (b.headline || b.title);
+              if (h) {
+                var el = document.getElementById('hero-headline');
+                if (el) {
+                  var sp = el.querySelector('span') || el;
+                  sp.textContent = h;
+                }
+              }
+              var s = isRtl && b.subtitle_ar ? b.subtitle_ar : (b.subtitle || b.description);
+              if (s) {
+                var subEl = document.getElementById('hero-subtitle');
+                if (subEl) subEl.textContent = s;
+              }
+              var bg = b.image_desktop || b.image || b.image_url;
+              if (bg) {
+                var bgEl = document.getElementById('hero-bg-img');
+                if (bgEl) bgEl.style.backgroundImage = "url('" + bg + "')";
+              }
+            } catch(e) {}
+          })();
+        </script>
 
         <div
           class="relative z-20 flex items-center justify-between gap-3 pt-3 sm:pt-4 border-t border-slate-400/20 mt-auto w-full">
           <div class="flex items-center gap-2.5 min-w-0">
             <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#4063B2] flex-shrink-0"></div>
-            <span
-              class="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider text-slate-700 dark:text-white/60 truncate">M.SHOP
-              • TECH STORE IN QATAR</span>
+            <span id="hero-badge"
+              class="text-[10px] sm:text-xs font-sans font-bold uppercase tracking-wider text-slate-700 dark:text-white/70 truncate">MARJAAH
+              • ELECTRONICS &amp; HOME APPLIANCES IN QATAR</span>
           </div>
           <button id="hero-down-btn" aria-label="Scroll down"
             class="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-slate-300/40 bg-white/80 dark:bg-[#0B1120]/60 hover:bg-[#4063B2] hover:border-[#4063B2] text-slate-700 dark:text-slate-300 hover:text-white flex items-center justify-center transition-all duration-300 cursor-pointer group flex-shrink-0 shadow-sm">
@@ -3116,67 +3156,70 @@
       </div>
     </section>
 
-    <!-- ═══ ULTRA RIGS & WORKSTATIONS ═════════════════════════════════════════════ -->
-    <section class="py-24 md:py-36 px-6 sm:px-12 md:px-16 overflow-hidden"
-      style="background-color:var(--bg-surface);border-top:1px solid var(--border-color);color:var(--text-primary)">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center max-w-[1440px] mx-auto">
-        <!-- Image Card -->
-        <div class="lg:col-span-6 relative cursor-pointer group">
-          <div
-            class="absolute w-full h-full bg-gradient-to-br from-[#4063B2]/20 to-[#8D9CF5]/20 rounded-3xl pointer-events-none -top-8 -left-8 md:-top-12 md:-left-12 z-0">
-          </div>
-          <div
-            class="relative z-10 aspect-[4/5] overflow-hidden rounded-2xl bg-surface-2 transition-transform duration-500 ease-out">
-            <img src="/assets/images/products/asus-rog-g16.jpg" alt="ASUS ROG Strix G16 Flagship"
-              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
-            <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
+    <!-- ═══ DYNAMIC PROMOTIONAL SECTIONS CONTAINER (Req 6) ═══════════════════════ -->
+    <div id="dynamic-promotional-sections">
+      <!-- ═══ ULTRA RIGS & WORKSTATIONS (Default / Fallback) ═════════════════════════ -->
+      <section class="py-24 md:py-36 px-6 sm:px-12 md:px-16 overflow-hidden"
+        style="background-color:var(--bg-surface);border-top:1px solid var(--border-color);color:var(--text-primary)">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center max-w-[1440px] mx-auto">
+          <!-- Image Card -->
+          <div class="lg:col-span-6 relative cursor-pointer group">
             <div
-              class="absolute bottom-6 left-6 right-6 p-4 bg-[#070B14]/85 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-between rounded-xl">
-              <div>
-                <p class="text-[10px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">ROG STRIX SCAR 18
-                </p>
-                <p class="font-display text-lg text-white font-bold">QAR 12,499</p>
+              class="absolute w-full h-full bg-gradient-to-br from-[#4063B2]/20 to-[#8D9CF5]/20 rounded-3xl pointer-events-none -top-8 -left-8 md:-top-12 md:-left-12 z-0">
+            </div>
+            <div
+              class="relative z-10 aspect-[4/5] overflow-hidden rounded-2xl bg-surface-2 transition-transform duration-500 ease-out">
+              <img src="/assets/images/products/asus-rog-g16.jpg" alt="ASUS ROG Strix G16 Flagship"
+                class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />
+              <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
+              <div
+                class="absolute bottom-6 left-6 right-6 p-4 bg-[#070B14]/85 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-between rounded-xl">
+                <div>
+                  <p class="text-[10px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">ROG STRIX SCAR 18
+                  </p>
+                  <p class="font-display text-lg text-white font-bold">QAR 12,499</p>
+                </div>
+                <span
+                  class="text-xs font-sans font-bold uppercase tracking-widest text-white underline underline-offset-4">EXPLORE</span>
               </div>
-              <span
-                class="text-xs font-sans font-bold uppercase tracking-widest text-white underline underline-offset-4">EXPLORE</span>
+            </div>
+          </div>
+
+          <!-- Text Side -->
+          <div class="lg:col-span-6 space-y-8">
+            <span
+              class="font-display text-sm md:text-base uppercase tracking-widest text-[#8D9CF5] font-bold block">AUTHORIZED
+              GCC DISTRIBUTION</span>
+            <h2 class="font-display text-5xl sm:text-6xl md:text-7xl leading-tight uppercase tracking-tight font-black"
+              style="color:var(--text-primary)">
+              ULTRA RIGS &amp;<br /><span class="text-outline">WORKSTATIONS</span>
+            </h2>
+            <p class="text-base sm:text-lg font-sans leading-relaxed max-w-xl" style="color:var(--text-secondary)">
+              Bridging the pinnacle of global computing hardware with Qatar&#x27;s visionary tech community. Every
+              workstation, GPU, curved display, and peripheral comes backed with local authorized warranties and express
+              Doha dispatch.
+            </p>
+
+            <div class="pt-4 flex flex-wrap items-center gap-6">
+              <a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300"
+                style="color:var(--text-primary)" href="/shop/">
+                <span>DISCOVER ALL PRODUCTS</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                  class="transition-transform duration-300 group-hover:translate-x-2">
+                  <path d="M5 12h14" />
+                  <path d="m12 5 7 7-7 7" />
+                </svg>
+              </a>
+              <a href="https://wa.me/97477991013" target="_blank" rel="noopener noreferrer"
+                class="text-xs font-sans font-bold tracking-widest uppercase text-slate-400 hover:text-white underline underline-offset-4 transition-colors">
+                WHATSAPP HARDWARE DESK
+              </a>
             </div>
           </div>
         </div>
-
-        <!-- Text Side -->
-        <div class="lg:col-span-6 space-y-8">
-          <span
-            class="font-display text-sm md:text-base uppercase tracking-widest text-[#8D9CF5] font-bold block">AUTHORIZED
-            GCC DISTRIBUTION</span>
-          <h2 class="font-display text-5xl sm:text-6xl md:text-7xl leading-tight uppercase tracking-tight font-black"
-            style="color:var(--text-primary)">
-            ULTRA RIGS &amp;<br /><span class="text-outline">WORKSTATIONS</span>
-          </h2>
-          <p class="text-base sm:text-lg font-sans leading-relaxed max-w-xl" style="color:var(--text-secondary)">
-            Bridging the pinnacle of global computing hardware with Qatar&#x27;s visionary tech community. Every
-            workstation, GPU, curved display, and peripheral comes backed with local authorized warranties and express
-            Doha dispatch.
-          </p>
-
-          <div class="pt-4 flex flex-wrap items-center gap-6">
-            <a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300"
-              style="color:var(--text-primary)" href="/shop/">
-              <span>DISCOVER ALL PRODUCTS</span>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                class="transition-transform duration-300 group-hover:translate-x-2">
-                <path d="M5 12h14" />
-                <path d="m12 5 7 7-7 7" />
-              </svg>
-            </a>
-            <a href="https://wa.me/97477991013" target="_blank" rel="noopener noreferrer"
-              class="text-xs font-sans font-bold tracking-widest uppercase text-slate-400 hover:text-white underline underline-offset-4 transition-colors">
-              WHATSAPP HARDWARE DESK
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+      </section>
+    </div>
 
 
 
@@ -3214,8 +3257,12 @@
     <section id="google-reviews-section" class="py-10 sm:py-14 md:py-16 relative overflow-hidden"
       style="background-color:var(--bg-base);border-top:1px solid var(--border-color)">
       <!-- Subtle glow accents -->
-      <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none"></div>
-      <div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-64 h-64 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none"></div>
+      <div
+        class="absolute top-1/2 left-1/4 -translate-y-1/2 w-72 h-72 bg-blue-500/5 rounded-full blur-[100px] pointer-events-none">
+      </div>
+      <div
+        class="absolute top-1/2 right-1/4 -translate-y-1/2 w-64 h-64 bg-amber-500/5 rounded-full blur-[100px] pointer-events-none">
+      </div>
 
       <div class="container-custom relative z-10">
         <!-- Compact Header Section -->
@@ -3223,18 +3270,24 @@
           <!-- Left: Title & Badge -->
           <div class="space-y-1.5 sm:space-y-2">
             <div class="flex items-center gap-2">
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide border shadow-xs"
+              <span
+                class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide border shadow-xs"
                 style="background-color:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary)">
                 <!-- Google 4-Color Icon -->
                 <svg class="w-3.5 h-3.5 flex-shrink-0" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                  <path fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                  <path fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                  <path fill="#FBBC05"
+                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                  <path fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
                 </svg>
                 <span>GOOGLE REVIEWS</span>
               </span>
-              <span id="google-reviews-status-pill" class="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
+              <span id="google-reviews-status-pill"
+                class="text-[10px] text-emerald-500 font-semibold flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span>Verified</span>
               </span>
@@ -3250,26 +3303,46 @@
             <!-- Compact Rating Badge -->
             <div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl border"
               style="background-color:var(--bg-surface);border-color:var(--border-color)">
-              <span class="text-xl sm:text-2xl font-black font-display text-amber-400 leading-none" id="google-reviews-rating-number">4.7</span>
+              <span class="text-xl sm:text-2xl font-black font-display text-amber-400 leading-none"
+                id="google-reviews-rating-number">4.7</span>
               <div>
                 <div class="flex items-center gap-0.5 text-amber-400">
-                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                  <svg class="w-3 h-3 fill-amber-400" viewBox="0 0 20 20">
+                    <path
+                      d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
                 </div>
-                <p class="text-[10px] font-medium leading-tight mt-0.5" id="google-reviews-count" style="color:var(--text-secondary)">
+                <p class="text-[10px] font-medium leading-tight mt-0.5" id="google-reviews-count"
+                  style="color:var(--text-secondary)">
                   26 Reviews • Google Rating
                 </p>
               </div>
             </div>
 
             <!-- Write Review button -->
-            <a id="google-reviews-write-btn" href="https://search.google.com/local/writereview?placeid=ChIJR51rR8XPRT4RoyIq8yD-X6Q" target="_blank" rel="noopener noreferrer"
+            <a id="google-reviews-write-btn"
+              href="https://search.google.com/local/writereview?placeid=ChIJR51rR8XPRT4RoyIq8yD-X6Q" target="_blank"
+              rel="noopener noreferrer"
               class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider px-3 py-2 rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all hover:scale-105 shadow-xs">
               <svg class="w-3 h-3 fill-current" viewBox="0 0 24 24">
-                <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                <path
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
               </svg>
               <span>Write Review</span>
             </a>
@@ -3279,12 +3352,16 @@
               <button id="google-reviews-prev" type="button" aria-label="Previous review"
                 class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all cursor-pointer opacity-50 hover:opacity-100 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/10"
                 style="border-color:var(--border-color);color:var(--text-primary)">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
               </button>
               <button id="google-reviews-next" type="button" aria-label="Next review"
                 class="w-8 h-8 rounded-xl border flex items-center justify-center transition-all cursor-pointer hover:bg-white/10"
                 style="border-color:var(--border-color);color:var(--text-primary)">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
               </button>
             </div>
           </div>
@@ -3296,7 +3373,8 @@
             class="flex gap-3 sm:gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory py-2 px-1 hide-scrollbar cursor-grab active:cursor-grabbing"
             style="scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;">
             <!-- Skeletons will be replaced dynamically -->
-            <div class="w-[78vw] max-w-[270px] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-start p-4 rounded-xl border animate-pulse space-y-3"
+            <div
+              class="w-[78vw] max-w-[270px] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-start p-4 rounded-xl border animate-pulse space-y-3"
               style="background-color:var(--bg-surface);border-color:var(--border-color)">
               <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-full bg-slate-700/30"></div>
@@ -3311,7 +3389,8 @@
                 <div class="w-4/5 h-2 rounded bg-slate-700/20"></div>
               </div>
             </div>
-            <div class="w-[78vw] max-w-[270px] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-start p-4 rounded-xl border animate-pulse space-y-3"
+            <div
+              class="w-[78vw] max-w-[270px] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-start p-4 rounded-xl border animate-pulse space-y-3"
               style="background-color:var(--bg-surface);border-color:var(--border-color)">
               <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-full bg-slate-700/30"></div>
@@ -3326,7 +3405,8 @@
                 <div class="w-4/5 h-2 rounded bg-slate-700/20"></div>
               </div>
             </div>
-            <div class="w-[78vw] max-w-[270px] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-start p-4 rounded-xl border animate-pulse space-y-3"
+            <div
+              class="w-[78vw] max-w-[270px] sm:w-[280px] md:w-[300px] flex-shrink-0 snap-start p-4 rounded-xl border animate-pulse space-y-3"
               style="background-color:var(--bg-surface);border-color:var(--border-color)">
               <div class="flex items-center gap-2.5">
                 <div class="w-8 h-8 rounded-full bg-slate-700/30"></div>
@@ -3646,34 +3726,45 @@
 
     <div class="container-custom py-12 md:py-16">
       <!-- 1. TOP NEWSLETTER BANNER (Full-width, balanced) -->
-      <div class="pb-10 mb-12 border-b flex flex-col lg:flex-row lg:items-center justify-between gap-6" style="border-color:var(--border-color)">
+      <div class="pb-10 mb-12 border-b flex flex-col lg:flex-row lg:items-center justify-between gap-6"
+        style="border-color:var(--border-color)">
         <div class="max-w-xl">
           <div class="flex items-center gap-2 mb-1.5">
             <span class="w-2 h-2 rounded-full bg-[#8D9CF5]"></span>
-            <h3 class="text-xs font-bold tracking-widest uppercase" style="color:var(--text-primary)">Stay in the Loop</h3>
+            <h3 class="text-xs font-bold tracking-widest uppercase" style="color:var(--text-primary)">Stay in the Loop
+            </h3>
           </div>
-          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">Subscribe to get exclusive tech deals, new hardware arrivals, and special promotions across Qatar.</p>
+          <p class="text-xs leading-relaxed" style="color:var(--text-secondary)">Subscribe to get exclusive tech deals,
+            new hardware arrivals, and special promotions across Qatar.</p>
         </div>
-        <form class="flex flex-col sm:flex-row w-full lg:w-auto gap-2.5" onsubmit="event.preventDefault();this.querySelector('button').textContent='Subscribed!';">
-          <input type="email" placeholder="Enter your email address" class="w-full sm:w-80 px-4 py-2.5 rounded-xl border text-xs focus:outline-none transition-all" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
-          <button type="submit" class="px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all shadow-md hover:brightness-110 cursor-pointer" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">Subscribe</button>
+        <form class="flex flex-col sm:flex-row w-full lg:w-auto gap-2.5"
+          onsubmit="event.preventDefault();this.querySelector('button').textContent='Subscribed!';">
+          <input type="email" placeholder="Enter your email address"
+            class="w-full sm:w-80 px-4 py-2.5 rounded-xl border text-xs focus:outline-none transition-all"
+            style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
+          <button type="submit"
+            class="px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all shadow-md hover:brightness-110 cursor-pointer"
+            style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">Subscribe</button>
         </form>
       </div>
 
       <!-- 2. MAIN 5-COLUMN GRID (Standard E-Commerce Hierarchy) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6 pb-12" style="border-bottom:1px solid var(--border-color)">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-6 pb-12"
+        style="border-bottom:1px solid var(--border-color)">
         <!-- COL 1: Brand & Identity -->
         <div class="sm:col-span-2 lg:col-span-1 lg:pr-2">
           <a href="/" class="inline-block mb-3.5">
             <img src="/assets/images/branding/logo-light.png" alt="M.SHOP" class="h-8 object-contain dark:hidden" />
-            <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP" class="h-8 object-contain hidden dark:block" />
+            <img src="/assets/images/branding/logo-dark.png" alt="M.SHOP"
+              class="h-8 object-contain hidden dark:block" />
           </a>
           <p class="text-xs leading-relaxed mb-4" style="color:var(--text-secondary)">
             Qatar&#x27;s premier destination for mobile accessories, gaming gear, laptops, and premium tech essentials.
           </p>
           <div class="flex items-center gap-2 mb-4">
             <a href="https://www.instagram.com/mshop.qatar/" target="_blank" rel="noopener noreferrer"
-              aria-label="Instagram" class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#E1306C]"
+              aria-label="Instagram"
+              class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#E1306C]"
               style="border-color:var(--border-color);color:#E1306C"
               onmouseover="this.style.background='rgba(225,48,108,0.1)'"
               onmouseout="this.style.background='transparent'">
@@ -3685,7 +3776,8 @@
               </svg>
             </a>
             <a href="https://www.facebook.com/p/Mshop-61584136214261/" target="_blank" rel="noopener noreferrer"
-              aria-label="Facebook" class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#1877F2]"
+              aria-label="Facebook"
+              class="w-8 h-8 rounded-lg border flex items-center justify-center transition-all hover:border-[#1877F2]"
               style="border-color:var(--border-color);color:#1877F2"
               onmouseover="this.style.background='rgba(24,119,242,0.1)'"
               onmouseout="this.style.background='transparent'">
@@ -3733,7 +3825,8 @@
                 style="color:var(--text-secondary)">Storage &amp; SSDs</a></li>
             <li><a href="/shop/?category=audio" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Audio &amp; Sound</a></li>
-            <li><a href="/categories/" onclick="if(window.openAllCategoriesModal){window.openAllCategoriesModal(event);}"
+            <li><a href="/categories/"
+                onclick="if(window.openAllCategoriesModal){window.openAllCategoriesModal(event);}"
                 class="view-all-link text-xs font-semibold tracking-wide text-[#8D9CF5] hover:underline flex items-center gap-1 mt-1.5">View
                 All Categories →</a></li>
           </ul>
@@ -3741,7 +3834,8 @@
 
         <!-- COL 3: Quick Links -->
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links</h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Quick Links
+          </h4>
           <ul class="space-y-2.5">
             <li><a href="/" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Home</a></li>
@@ -3758,7 +3852,8 @@
 
         <!-- COL 4: Policies & Legal -->
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp; Legal</h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Policies &amp;
+            Legal</h4>
           <ul class="space-y-2.5">
             <li><a href="/terms/" class="text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">Terms &amp; Conditions</a></li>
@@ -3773,7 +3868,8 @@
 
         <!-- COL 5: Contact & Showroom -->
         <div>
-          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info</h4>
+          <h4 class="text-xs font-bold tracking-widest uppercase mb-4" style="color:var(--text-primary)">Contact Info
+          </h4>
           <ul class="space-y-2.5">
             <li class="flex items-start gap-2 text-xs leading-relaxed" style="color:var(--text-secondary)">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
@@ -3809,7 +3905,8 @@
               </a>
             </li>
             <li>
-              <a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-[#8D9CF5]"
+              <a href="mailto:info@marjaah.com"
+                class="flex items-center gap-2 text-xs transition-colors hover:text-[#8D9CF5]"
                 style="color:var(--text-secondary)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none"
                   stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -3820,12 +3917,19 @@
                 info@marjaah.com
               </a>
             </li>
+            <li class="pt-2 border-t border-slate-700/40">
+              <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+                CR No. 228717 • Qatar
+              </span>
+            </li>
           </ul>
         </div>
       </div>
 
       <!-- 3. BOTTOM BAR -->
-      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs" style="color:var(--text-tertiary)">
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs"
+        style="color:var(--text-tertiary)">
         <p>© 2026 M.SHOP – Marjaah Trading WLL (CR No. 228717). All rights reserved.</p>
         <div class="flex items-center gap-4">
           <span>Doha, State of Qatar</span>
@@ -4058,7 +4162,7 @@
               <img src="${imgUrl}" alt="${name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" onerror="this.src='${imageFallbacks.default}'" />
             </div>
             <h4 class="text-xs font-bold leading-tight line-clamp-2 group-hover:text-[#8D9CF5] transition-colors mb-1" style="color:var(--text-primary)">${name}</h4>
-            <span class="text-[10px] font-semibold text-slate-400">${pCount > 0 ? pCount + ' items' : 'Explore'}</span>
+            <span class="text-[10px] font-semibold text-slate-400">${isAr ? 'استكشف' : 'Explore'}</span>
           </a>
         `;
         }).join('');
@@ -4110,19 +4214,23 @@
       };
 
       if (searchInput) {
+        var catDebounceTimer;
         searchInput.addEventListener('input', function (e) {
+          clearTimeout(catDebounceTimer);
           var q = e.target.value.toLowerCase().trim();
-          if (!cachedCategories) return;
-          if (!q) {
-            renderModalCategories(cachedCategories);
-            return;
-          }
-          var filtered = cachedCategories.filter(function (c) {
-            return (c.name || '').toLowerCase().includes(q) ||
-              (c.name_ar || '').toLowerCase().includes(q) ||
-              (c.slug || '').toLowerCase().includes(q);
-          });
-          renderModalCategories(filtered);
+          catDebounceTimer = setTimeout(function () {
+            if (!cachedCategories) return;
+            if (!q) {
+              renderModalCategories(cachedCategories);
+              return;
+            }
+            var filtered = cachedCategories.filter(function (c) {
+              return (c.name || '').toLowerCase().includes(q) ||
+                (c.name_ar || '').toLowerCase().includes(q) ||
+                (c.slug || '').toLowerCase().includes(q);
+            });
+            renderModalCategories(filtered);
+          }, 200);
         });
       }
 
@@ -4351,21 +4459,25 @@
       };
 
       if (brandSearchInput) {
+        var brandDebounceTimer;
         brandSearchInput.addEventListener('input', function (e) {
+          clearTimeout(brandDebounceTimer);
           var q = e.target.value.toLowerCase().trim();
-          if (!cachedBrands) return;
-          if (!q) {
-            renderModalBrands(cachedBrands);
-            return;
-          }
-          var filtered = cachedBrands.filter(function (b) {
-            var name = (b.name || '').toLowerCase();
-            var slug = (b.slug || b.id || '').toLowerCase();
-            var meta = brandMeta[name] || {};
-            var series = (meta.series || '').toLowerCase();
-            return name.includes(q) || slug.includes(q) || series.includes(q);
-          });
-          renderModalBrands(filtered);
+          brandDebounceTimer = setTimeout(function () {
+            if (!cachedBrands) return;
+            if (!q) {
+              renderModalBrands(cachedBrands);
+              return;
+            }
+            var filtered = cachedBrands.filter(function (b) {
+              var name = (b.name || '').toLowerCase();
+              var slug = (b.slug || b.id || '').toLowerCase();
+              var meta = brandMeta[name] || {};
+              var series = (meta.series || '').toLowerCase();
+              return name.includes(q) || slug.includes(q) || series.includes(q);
+            });
+            renderModalBrands(filtered);
+          }, 200);
         });
       }
 

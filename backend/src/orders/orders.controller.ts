@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Param, Body, Query, UseGuards, Request, Optional } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Delete, Param, Body, Query, UseGuards, Request, Optional } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -55,5 +55,15 @@ export class OrdersController {
   @Post(':id/cancel')
   async cancel(@Param('id') id: string, @Request() req: any) {
     return this.ordersService.cancelOrder(id, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Delete(':id')
+  async delete(
+    @Param('id') id: string,
+    @Query('restock') restock: string,
+    @Request() req: any,
+  ) {
+    return this.ordersService.deleteOrder(id, req.user, restock !== 'false');
   }
 }

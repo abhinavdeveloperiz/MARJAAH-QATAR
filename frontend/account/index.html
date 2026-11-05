@@ -753,17 +753,17 @@
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Full Name</label>
-                  <input type="text" name="full_name" class="input w-full" id="id_full_name" placeholder="Your Full Name">
+                  <input type="text" name="full_name" class="input w-full px-4 py-3.5 text-sm rounded-xl focus:outline-none transition-all" id="id_full_name" placeholder="Your Full Name">
                 </div>
                 <div>
                   <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Phone Number</label>
-                  <input type="text" name="phone" class="input w-full" maxlength="30" id="id_phone" placeholder="e.g. 77991016">
+                  <input type="text" name="phone" class="input w-full px-4 py-3.5 text-sm rounded-xl focus:outline-none transition-all" maxlength="30" id="id_phone" placeholder="e.g. 77991016">
                 </div>
               </div>
 
               <div>
                 <label class="block text-xs font-bold mb-1.5" style="color:var(--text-tertiary)">Email Address</label>
-                <input type="text" id="user-profile-email" value="" disabled class="w-full px-4 py-2.5 rounded-xl border text-sm cursor-not-allowed" style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-tertiary)" />
+                <input type="text" id="user-profile-email" value="" disabled class="w-full px-4 py-3 rounded-xl border text-sm cursor-not-allowed" style="background:var(--bg-surface-3);border-color:var(--border-color);color:var(--text-tertiary)" />
                 <p class="text-[11px] mt-1" style="color:var(--text-tertiary)">Your verified login email for authentication and order invoices.</p>
               </div>
 
@@ -777,22 +777,22 @@
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div>
                     <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Zone No.</label>
-                    <input type="text" id="id_zone" class="input w-full text-xs" placeholder="e.g. 91">
+                    <input type="text" id="id_zone" class="input w-full px-3.5 py-2.5 text-xs rounded-xl focus:outline-none transition-all" placeholder="e.g. 91">
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Street No. / Name</label>
-                    <input type="text" id="id_street" class="input w-full text-xs" placeholder="e.g. Street 295">
+                    <input type="text" id="id_street" class="input w-full px-3.5 py-2.5 text-xs rounded-xl focus:outline-none transition-all" placeholder="e.g. Street 295">
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Building / Shop No.</label>
-                    <input type="text" id="id_building" class="input w-full text-xs" placeholder="e.g. Building 12">
+                    <input type="text" id="id_building" class="input w-full px-3.5 py-2.5 text-xs rounded-xl focus:outline-none transition-all" placeholder="e.g. Building 12">
                   </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">City</label>
-                    <input type="text" id="id_city" class="input w-full text-xs" value="Doha" placeholder="Doha">
+                    <input type="text" id="id_city" class="input w-full px-3.5 py-2.5 text-xs rounded-xl focus:outline-none transition-all" value="Doha" placeholder="Doha">
                   </div>
                   <div>
                     <label class="block text-[11px] font-bold mb-1" style="color:var(--text-secondary)">Country</label>
@@ -1133,7 +1133,10 @@ async function loadOrdersList() {
 
     const items = Array.isArray(o.items) ? o.items : [];
     let addrText = '';
-    if (typeof o.delivery_address === 'string') {
+    if (o.fulfillment_type === 'store_pickup') {
+      const loc = o.store_pickup_location || {};
+      addrText = `🏪 Store Pickup: ${loc.name || 'Store Hub'} (${loc.address || 'Al Sadd, Doha'})`;
+    } else if (typeof o.delivery_address === 'string') {
       addrText = o.delivery_address;
     } else if (o.delivery_address && typeof o.delivery_address === 'object') {
       const addr = o.delivery_address;
@@ -1588,6 +1591,12 @@ document.addEventListener('DOMContentLoaded', () => {
           <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
             info@marjaah.com</a>
+          </li>
+          <li class="pt-2 border-t border-slate-700/40">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+              CR No. 228717 • Qatar
+            </span>
           </li>
         </ul>
       </div>

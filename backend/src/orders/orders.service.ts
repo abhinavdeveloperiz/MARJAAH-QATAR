@@ -38,16 +38,78 @@ export class OrdersService {
     let customerEmail = (body.email || body.customer_email || delivery?.email || currentUser?.email || guest?.email || '').toLowerCase().trim();
     let customerPhone = (body.phone || body.customer_phone || delivery?.phone || currentUser?.phone || guest?.phone || '').trim();
 
-    // 3. Delivery address snapshot
-    const deliveryAddress = {
-      full_name: delivery?.full_name || customerName,
-      phone: delivery?.phone || customerPhone,
-      building: delivery?.building || '',
-      street: delivery?.street || '',
-      zone: delivery?.zone || '',
-      city: delivery?.city || 'Doha',
-      country: delivery?.country || 'Qatar',
-    };
+    // 3. Fulfillment Method: Doorstep Delivery vs Store Pickup (Requirement 1)
+    const isStorePickup = body.fulfillment_type === 'store_pickup' || body.delivery_method === 'pickup' || body.payment_method === 'pay_at_store';
+    let pickupDetails: any = null;
+
+    if (isStorePickup) {
+      const locId = body.pickup_location_id || body.pickup_location?.id || body.pickup_location?.location_id;
+      if (locId) {
+        const locDoc = await this.firestore.doc('store_locations', String(locId)).get();
+        if (locDoc.exists) {
+          const locData = locDoc.data() || {};
+          pickupDetails = {
+            location_id: locDoc.id,
+            name: locData.name,
+            address: locData.address,
+            zone: locData.zone || 'Doha',
+            city: locData.city || 'Doha',
+            phone: locData.phone,
+            opening_hours: locData.opening_hours,
+            pickup_instructions: locData.pickup_instructions,
+          };
+        }
+      }
+
+      // If no valid location found by ID, check if location payload is passed or pick default store
+      if (!pickupDetails) {
+        if (body.pickup_location && body.pickup_location.name) {
+          pickupDetails = body.pickup_location;
+        } else {
+          // Fetch default active location
+          const defSnap = await this.firestore.collection('store_locations')
+            .where('is_active', '==', true)
+            .limit(1)
+            .get();
+          if (!defSnap.empty) {
+            const locData = defSnap.docs[0].data();
+            pickupDetails = {
+              location_id: defSnap.docs[0].id,
+              name: locData.name,
+              address: locData.address,
+              zone: locData.zone,
+              city: locData.city,
+              phone: locData.phone,
+              opening_hours: locData.opening_hours,
+              pickup_instructions: locData.pickup_instructions,
+            };
+          } else {
+            throw new BadRequestException('Please select a valid store pickup location to proceed.');
+          }
+        }
+      }
+    }
+
+    // Delivery address snapshot
+    const deliveryAddress = isStorePickup
+      ? {
+          full_name: customerName,
+          phone: customerPhone,
+          building: pickupDetails?.name || 'Store Pickup Desk',
+          street: pickupDetails?.address || 'Marjaah Store',
+          zone: pickupDetails?.zone || 'Al Sadd',
+          city: pickupDetails?.city || 'Doha',
+          country: 'Qatar',
+        }
+      : {
+          full_name: delivery?.full_name || customerName,
+          phone: delivery?.phone || customerPhone,
+          building: delivery?.building || '',
+          street: delivery?.street || '',
+          zone: delivery?.zone || '',
+          city: delivery?.city || 'Doha',
+          country: delivery?.country || 'Qatar',
+        };
 
     // 4. Generate order sequence number
     const countSnap = await this.firestore.collection('orders').get();
@@ -63,15 +125,28 @@ export class OrdersService {
       customer_email: customerEmail,
       customer_phone: customerPhone,
       delivery_address: deliveryAddress,
+      fulfillment_type: isStorePickup ? 'store_pickup' : 'delivery',
+      delivery_method: isStorePickup ? 'pickup' : 'doorstep',
+      pickup_location: pickupDetails,
       items: validatedCart.items,
       subtotal: validatedCart.subtotal,
-      shipping: validatedCart.shipping,
+      shipping: 0, // Store Pickup and Free Doorstep Delivery across Qatar
       total: validatedCart.total,
       item_count: validatedCart.count,
-      payment_method: payment_method || 'cash',
-      payment_status: payment_method === 'cash' ? 'cod' : 'pending',
+      payment_method: payment_method || (isStorePickup ? 'pay_at_store' : 'cash'),
+      payment_status: (payment_method === 'cash' || payment_method === 'pay_at_store') ? 'cod' : 'pending',
       status: 'placed',
       notes: notes || '',
+      timeline: [
+        {
+          status: 'placed',
+          title: isStorePickup ? 'Order Placed (Store Pickup)' : 'Order Placed (Doorstep Delivery)',
+          note: isStorePickup
+            ? `Store Pickup selected at ${pickupDetails?.name || 'Marjaah Store'}`
+            : 'Order received and waiting for processing.',
+          timestamp: now,
+        },
+      ],
       created_at: now,
       updated_at: now,
     };
@@ -365,6 +440,59 @@ export class OrdersService {
       success: true,
       message: 'Order cancelled successfully and inventory restored',
       id,
+    };
+  }
+
+  async deleteOrder(id: string, currentUser?: any, restock = true) {
+    const isAdmin = currentUser?.is_staff || currentUser?.role === 'admin' || currentUser?.is_superuser;
+    if (!isAdmin) {
+      throw new ForbiddenException('Admin access required to delete orders');
+    }
+
+    let docRef = this.firestore.doc('orders', id);
+    let doc = await docRef.get();
+    if (!doc.exists) {
+      const q = await this.firestore.collection('orders').where('order_number', '==', id).limit(1).get();
+      if (!q.empty) {
+        doc = q.docs[0];
+        docRef = doc.ref;
+      } else {
+        throw new NotFoundException(`Order not found: ${id}`);
+      }
+    }
+
+    const order = doc.data() || {};
+    const orderNumber = order.order_number || doc.id;
+
+    // Restock products if requested and order wasn't cancelled
+    if (restock && order.status !== 'cancelled' && Array.isArray(order.items)) {
+      for (const item of order.items) {
+        try {
+          const pid = item.id || item.product_id;
+          if (pid) {
+            const prodRef = this.firestore.doc('products', pid);
+            const prodDoc = await prodRef.get();
+            if (prodDoc.exists) {
+              const currentStock = Number(prodDoc.data()?.stock_count) || 0;
+              const qty = Number(item.quantity) || 1;
+              await prodRef.update({
+                stock_count: currentStock + qty,
+                in_stock: true,
+                updated_at: new Date().toISOString(),
+              });
+            }
+          }
+        } catch (e) {}
+      }
+    }
+
+    await docRef.delete();
+
+    return {
+      success: true,
+      message: `Order #${orderNumber} deleted successfully`,
+      id: doc.id,
+      order_number: orderNumber,
     };
   }
 }

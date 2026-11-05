@@ -18,6 +18,9 @@ import { UploadModule } from './upload/upload.module';
 import { MailModule } from './mail/mail.module';
 import { SeoModule } from './seo/seo.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { StoreLocationsModule } from './store-locations/store-locations.module';
+import { PromotionalSectionsModule } from './promotional-sections/promotional-sections.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -47,6 +50,9 @@ import { ReviewsModule } from './reviews/reviews.module';
     UploadModule,
     SeoModule,
     ReviewsModule,
+    StoreLocationsModule,
+    PromotionalSectionsModule,
+    AnalyticsModule,
   ],
   providers: [
     {

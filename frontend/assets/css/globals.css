@@ -1,9 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700;800;900&family=Urbanist:wght@600;700;800;900&family=Syne:wght@700;800&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 *, *::before, *::after {
   box-sizing: border-box;
 }
@@ -50,6 +46,15 @@ html, body {
   --selection-bg:   #4063B2;
   --selection-text: #ffffff;
 
+  /* Primary Button (White Mode): Deep Royal Indigo Gradient + Solid Border */
+  --btn-primary-bg:           linear-gradient(135deg, #2A4893 0%, #3D61BD 50%, #5275D9 100%);
+  --btn-primary-bg-hover:     linear-gradient(135deg, #1E356D 0%, #3151A6 50%, #4063B2 100%);
+  --btn-primary-border:       #1E356D;
+  --btn-primary-border-hover: #15254D;
+  --btn-primary-text:         #FFFFFF;
+  --btn-primary-shadow:       0 4px 14px -2px rgba(42, 72, 147, 0.4), 0 2px 6px -1px rgba(0, 0, 0, 0.08);
+  --btn-primary-shadow-hover: 0 8px 24px -2px rgba(42, 72, 147, 0.55);
+
   --font-guminert: 'Space Grotesk', 'Outfit', 'Urbanist', system-ui, sans-serif;
   --font-condenso: 'Space Grotesk', 'Outfit', sans-serif;
   --font-tall:     'Space Grotesk', 'Outfit', sans-serif;
@@ -95,6 +100,15 @@ html, body {
 
   --selection-bg:   #4063B2;
   --selection-text: #ffffff;
+
+  /* Primary Button (Dark Mode): Electric Sapphire Indigo Gradient + Luminous Border */
+  --btn-primary-bg:           linear-gradient(135deg, #3655A3 0%, #4C70D2 50%, #688EF5 100%);
+  --btn-primary-bg-hover:     linear-gradient(135deg, #4366BF 0%, #5B7FE0 50%, #7B9EFA 100%);
+  --btn-primary-border:       rgba(141, 156, 245, 0.65);
+  --btn-primary-border-hover: rgba(168, 180, 248, 0.95);
+  --btn-primary-text:         #FFFFFF;
+  --btn-primary-shadow:       0 4px 20px -2px rgba(76, 112, 210, 0.5), 0 0 16px rgba(104, 142, 245, 0.3);
+  --btn-primary-shadow-hover: 0 6px 26px 0 rgba(76, 112, 210, 0.65), 0 0 22px rgba(104, 142, 245, 0.45);
 }
 
 /* â”€â”€â”€ RTL Support â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -171,8 +185,7 @@ html, body {
   text-align: center;
 }
 
-/* â”€â”€â”€ Base Styles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@layer base {
+/* ─── Base Styles ────────────────────────────────────────── */
   * {
     box-sizing: border-box;
     margin: 0;
@@ -248,10 +261,8 @@ html, body {
     letter-spacing: -0.03em;
     line-height: 0.95;
   }
-}
 
-/* â”€â”€â”€ Component Layer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
-@layer components {
+/* ─── Component Styles ───────────────────────────────────── */
   /* Text Stroke / Outline Utility */
   .text-outline {
     color: transparent;
@@ -268,50 +279,98 @@ html, body {
     -webkit-text-stroke: 1.5px var(--bg-base);
   }
 
-  /* Button Styles */
-  .btn-primary {
-    background: linear-gradient(to right, #4063B2, #5A7BEA, #8D9CF5);
-    color: #ffffff;
-    font-family: Inter, Outfit, system-ui, -apple-system, sans-serif;
+  /* ─── Button Styles ───────────────────────────────────────── */
+  .btn-primary,
+  button.btn-primary,
+  a.btn-primary,
+  #product-add-to-cart-btn {
+    background: var(--btn-primary-bg) !important;
+    background-image: var(--btn-primary-bg) !important;
+    color: var(--btn-primary-text) !important;
+    border: 1.5px solid var(--btn-primary-border) !important;
+    font-family: var(--font-inter, 'Inter'), 'Outfit', system-ui, -apple-system, sans-serif;
     font-size: 0.75rem;
     text-transform: uppercase;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
-    transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--btn-primary-shadow) !important;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    text-decoration: none;
+    outline: none;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .btn-primary:hover {
-    background: linear-gradient(to right, #35529A, #5A7BEA, #7B8BE5);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  .btn-primary:hover,
+  button.btn-primary:hover,
+  a.btn-primary:hover,
+  #product-add-to-cart-btn:hover:not(:disabled) {
+    background: var(--btn-primary-bg-hover) !important;
+    background-image: var(--btn-primary-bg-hover) !important;
+    border-color: var(--btn-primary-border-hover) !important;
+    box-shadow: var(--btn-primary-shadow-hover) !important;
+    transform: translateY(-1.5px);
+    color: var(--btn-primary-text) !important;
   }
 
-  .btn-secondary {
-    background-color: var(--bg-surface-2);
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    font-family: Inter, Outfit, system-ui, -apple-system, sans-serif;
+  .btn-primary:active,
+  button.btn-primary:active,
+  a.btn-primary:active,
+  #product-add-to-cart-btn:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .btn-primary svg,
+  button.btn-primary svg,
+  a.btn-primary svg,
+  #product-add-to-cart-btn svg {
+    stroke: var(--btn-primary-text) !important;
+    color: var(--btn-primary-text) !important;
+  }
+
+  .btn-primary:disabled,
+  button.btn-primary:disabled,
+  #product-add-to-cart-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none !important;
+  }
+
+  .btn-secondary,
+  button.btn-secondary,
+  a.btn-secondary {
+    background-color: var(--bg-surface-2) !important;
+    border: 1.5px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    font-family: var(--font-inter, 'Inter'), 'Outfit', system-ui, -apple-system, sans-serif;
     font-size: 0.75rem;
     text-transform: uppercase;
     font-weight: 700;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
-    transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1);
     cursor: pointer;
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    text-decoration: none;
   }
 
-  .btn-secondary:hover {
-    border-color: rgba(141, 156, 245, 0.5);
+  .btn-secondary:hover,
+  button.btn-secondary:hover,
+  a.btn-secondary:hover {
+    border-color: rgba(141, 156, 245, 0.6) !important;
+    background-color: var(--bg-surface-3) !important;
+    transform: translateY(-1px);
   }
 
   .btn-ghost {
@@ -404,9 +463,11 @@ html, body {
     border: 1.5px solid var(--border-strong);
     color: var(--text-primary);
     border-radius: 0.75rem;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1.125rem !important;
     font-size: 0.875rem;
+    line-height: 1.5;
     outline: none;
+    box-sizing: border-box !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
     transition: all 200ms ease;
   }
@@ -587,7 +648,6 @@ html, body {
     transition: colors 200ms ease;
     cursor: pointer;
   }
-}
 
 /* Hide Next.js Development Indicator */
 nextjs-portal,
@@ -1100,3 +1160,68 @@ footer ul li a:hover {
 }
 
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MODERN IMAGE SHIMMER & SKELETON LOADING (Requirement 12)
+   ═══════════════════════════════════════════════════════════════════════════ */
+.img-shimmer-wrap {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-surface-2, #111827);
+  display: block;
+  width: 100%;
+}
+
+.img-shimmer-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  background-size: 200% 100%;
+  animation: imgSkeletonShimmer 1.6s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 1;
+  transition: opacity 0.4s ease-out;
+}
+
+html:not(.dark) .img-shimmer-wrap::before {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.05) 50%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.img-shimmer-wrap.img-loaded::before {
+  opacity: 0;
+  animation: none;
+  visibility: hidden;
+}
+
+.img-shimmer-wrap img {
+  opacity: 0;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-shimmer-wrap.img-loaded img {
+  opacity: 1;
+}
+
+@keyframes imgSkeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

@@ -55,7 +55,7 @@
     return `
       <div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300 ${!inStock ? 'opacity-90' : ''}"
            style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:${delay}ms">
-        <a href="${productHref}" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
+        <a href="${productHref}" class="relative overflow-hidden block img-shimmer-wrap" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
           ${isFeatured ? `
             <div class="absolute ${starPos} z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shadow-sm pointer-events-none transition-transform group-hover:scale-105"
                  style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)"
@@ -70,7 +70,7 @@
             style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="${isSaved ? '#ef4444' : 'none'}" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
-          <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108 ${!inStock ? 'grayscale-[25%]' : ''}" loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
+          <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108 ${!inStock ? 'grayscale-[25%]' : ''}" loading="lazy" onload="this.parentElement.classList.add('img-loaded')" onerror="this.src='/assets/images/products/placeholder.svg';this.parentElement.classList.add('img-loaded')" />
         </a>
         <div class="p-3 sm:p-4 flex flex-col flex-1">
           <div class="mb-2">
@@ -141,7 +141,9 @@
     viewMode: 'categories', // 'categories' | 'products'
     category: '',
     categoryName: '',
+    subcategory: '',
     brand: '',
+    attributes: {},
     minPrice: '',
     maxPrice: '',
     inStock: false,
@@ -211,8 +213,8 @@
                loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/hero-mobile.jpg'" />
           <div class="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/40 to-transparent"></div>
           <div class="absolute top-3.5 right-3.5">
-            <span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md ${pCount > 0 ? 'bg-[#4063B2]/85 text-white shadow-sm' : 'bg-slate-800/80 text-slate-300'}">
-              ${pCount > 0 ? `${pCount} ${isRtl ? 'منتج' : 'Products'}` : (isRtl ? 'استكشف' : 'Explore')}
+            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 text-white/90 border border-white/15">
+              ${isRtl ? 'استكشف' : 'Explore'}
             </span>
           </div>
         </div>
@@ -396,11 +398,11 @@
     }
 
     let list = (categoryState.all || []).slice();
-    // Sort categories by product_count desc, then order asc
+    // Sort categories by order asc, then name
     list.sort((a, b) => {
-      const pDiff = (b.product_count || 0) - (a.product_count || 0);
-      if (pDiff !== 0) return pDiff;
-      return (a.order || 0) - (b.order || 0);
+      const oDiff = (a.order || 0) - (b.order || 0);
+      if (oDiff !== 0) return oDiff;
+      return (a.name || '').localeCompare(b.name || '');
     });
 
     const query = (categoryState.search || '').trim().toLowerCase();
@@ -452,6 +454,9 @@
   function selectShopCategory(slug) {
     shopState.viewMode = 'products';
     shopState.category = (slug || '').trim().toLowerCase();
+    shopState.subcategory = '';
+    shopState.brand = '';
+    shopState.attributes = {};
     shopState.page = 1;
 
     const found = (categoryState.all || []).find(c => (c.slug || c.id || '').toLowerCase() === shopState.category);
@@ -463,6 +468,7 @@
 
     syncShopUrlParams();
     updateShopViewMode();
+    loadShopBrands();
     renderShop();
     loadShopCategories();
 
@@ -474,7 +480,9 @@
     shopState.viewMode = 'categories';
     shopState.category = '';
     shopState.categoryName = '';
+    shopState.subcategory = '';
     shopState.brand = '';
+    shopState.attributes = {};
     shopState.search = '';
     categoryState.search = '';
     shopState.page = 1;
@@ -482,6 +490,7 @@
 
     syncShopUrlParams();
     updateShopViewMode();
+    loadShopBrands();
     renderShopCategories();
     loadShopCategories();
 
@@ -641,6 +650,23 @@
       `);
     }
 
+    // Dynamic Attribute Chips (Requirement 4)
+    if (shopState.attributes && typeof shopState.attributes === 'object') {
+      for (const [attrKey, vals] of Object.entries(shopState.attributes)) {
+        const valArr = Array.isArray(vals) ? vals : [vals];
+        valArr.forEach(v => {
+          activeCount++;
+          const labelKey = attrKey.replace(/_/g, ' ').toUpperCase();
+          chips.push(`
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+              <span>${labelKey}: <strong>${v}</strong></span>
+              <button type="button" data-clear-attr="${attrKey}" data-clear-val="${v}" aria-label="Remove ${labelKey} filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
+            </span>
+          `);
+        });
+      }
+    }
+
     [mobileCount, shopFilterCount].forEach(badge => {
       if (!badge) return;
       if (activeCount > 0) {
@@ -699,6 +725,29 @@
           shopState.page = 1;
           syncShopInputs();
           syncShopUrlParams();
+          renderActiveFilterChips();
+          renderShop();
+        });
+      });
+
+      bar.querySelectorAll('[data-clear-attr]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const k = btn.getAttribute('data-clear-attr');
+          const v = btn.getAttribute('data-clear-val');
+          if (shopState.attributes && shopState.attributes[k]) {
+            let arr = Array.isArray(shopState.attributes[k]) ? shopState.attributes[k] : [shopState.attributes[k]];
+            arr = arr.filter(item => item !== v);
+            if (arr.length > 0) {
+              shopState.attributes[k] = arr;
+            } else {
+              delete shopState.attributes[k];
+            }
+          }
+          shopState.page = 1;
+          syncShopInputs();
+          syncShopUrlParams();
+          loadShopBrands();
+          renderActiveFilterChips();
           renderShop();
         });
       });
@@ -706,7 +755,7 @@
       const clearAllBtn = document.getElementById('shop-clear-all-filters');
       if (clearAllBtn) {
         clearAllBtn.addEventListener('click', () => {
-          returnToShopCategories();
+          clearAllShopFilters();
         });
       }
     } else {
@@ -829,54 +878,72 @@
     }
   }
 
+  function clearAllShopFilters() {
+    shopState.category = '';
+    shopState.categoryName = '';
+    shopState.subcategory = '';
+    shopState.brand = '';
+    shopState.attributes = {};
+    shopState.minPrice = '';
+    shopState.maxPrice = '';
+    shopState.inStock = false;
+    shopState.isOffer = false;
+    shopState.search = '';
+    shopState.page = 1;
+    const sInput = document.getElementById('shop-search-input');
+    if (sInput) sInput.value = '';
+    syncShopInputs();
+    syncShopUrlParams();
+    loadShopBrands();
+    renderActiveFilterChips();
+    renderShop();
+    loadShopCategories();
+  }
+  global.clearAllShopFilters = clearAllShopFilters;
+  window.clearAllShopFilters = clearAllShopFilters;
+
   async function loadShopBrands() {
     const listDesk = document.getElementById('filter-brand-list');
     const listMob = document.getElementById('mobile-filter-brand-list');
-    if (!listDesk && !listMob) return;
+    const attrSec = document.getElementById('filter-attributes-section');
+    const attrContainer = document.getElementById('filter-attributes-container');
+    if (!listDesk && !listMob && !attrSec) return;
 
-    const defaultBrands = [
-      { name: 'HP', count: 258 },
-      { name: 'Lenovo', count: 219 },
-      { name: 'Platinum', count: 119 },
-      { name: 'D-Link', count: 91 },
-      { name: 'Resto', count: 88 },
-      { name: 'HyperX', count: 29 },
-      { name: 'NowGo', count: 18 },
-      { name: 'Transformers', count: 11 },
-      { name: 'Kingston', count: 9 },
-      { name: 'Ricoh', count: 5 },
-      { name: 'Apple' },
-      { name: 'Dell' },
-      { name: 'Samsung' },
-      { name: 'ASUS' },
-      { name: 'Alienware' },
-      { name: 'Anker' },
-      { name: 'Belkin' },
-      { name: 'Razer' },
-      { name: 'Corsair' },
-      { name: 'TP-Link' },
-      { name: 'Logitech' },
-      { name: 'Acer' },
-      { name: 'MSI' },
-      { name: 'Sony' }
-    ];
+    let brandsList = [];
+    let attributesList = [];
 
-    let brandsList = defaultBrands;
     try {
-      const res = await fetch('/api/brands');
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        brandsList = data.map(b => ({
-          name: b.name,
-          count: b.product_count !== undefined ? b.product_count : (b.count || 0)
-        }));
+      const qParams = new URLSearchParams();
+      if (shopState.category) qParams.set('category', shopState.category);
+      if (shopState.subcategory) qParams.set('subcategory', shopState.subcategory);
+      if (shopState.search) qParams.set('search', shopState.search);
+
+      const res = await fetch(`/api/products/filters?${qParams.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        brandsList = data.brands || [];
+        attributesList = data.attributes || [];
+      } else {
+        throw new Error('Filters API returned ' + res.status);
       }
     } catch (e) {
-      console.warn('Could not load brands from API for shop sidebar, using defaults:', e);
+      console.warn('Could not load dynamic category filters, falling back:', e);
+      try {
+        const res2 = await fetch('/api/brands');
+        const bData = await res2.json();
+        if (Array.isArray(bData)) {
+          brandsList = bData.map(b => ({ name: b.name, count: b.product_count || 0 }));
+        }
+      } catch (err) {}
     }
 
+    // Render Dynamic Brands
     const renderBrandItems = (container) => {
       if (!container) return;
+      if (brandsList.length === 0) {
+        container.innerHTML = `<p class="text-[11px] text-slate-400 py-1 italic">${isRtl ? 'لا توجد علامات تجارية لهذه الفئة' : 'No brands available in this category'}</p>`;
+        return;
+      }
       const selected = (shopState.brand || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
 
       container.innerHTML = brandsList.map(b => {
@@ -887,7 +954,7 @@
               <input type="checkbox" data-brand-name="${b.name}" ${isChecked ? 'checked' : ''} class="w-3.5 h-3.5 rounded border-slate-600 text-[#4063B2] focus:ring-0 cursor-pointer" />
               <span class="font-medium" style="color:var(--text-primary)">${b.name}</span>
             </div>
-            ${b.count ? `<span class="text-[10px] text-slate-400 font-mono">(${b.count})</span>` : ''}
+            ${b.count !== undefined ? `<span class="text-[10px] text-slate-400 font-mono">(${b.count})</span>` : ''}
           </label>
         `;
       }).join('');
@@ -907,6 +974,7 @@
           shopState.page = 1;
           syncShopInputs();
           syncShopUrlParams();
+          renderActiveFilterChips();
           renderShop();
         });
       });
@@ -914,6 +982,69 @@
 
     renderBrandItems(listDesk);
     renderBrandItems(listMob);
+
+    // Render Category-Specific Attributes (RAM, Storage, Processor, Screen Size, Capacity, etc.)
+    if (attrSec && attrContainer) {
+      if (attributesList.length > 0) {
+        attrSec.classList.remove('hidden');
+        attrContainer.innerHTML = attributesList.map(attr => {
+          const attrKey = attr.key || attr.name.toLowerCase().replace(/[^a-z0-9]+/g, '_');
+          const currentVals = (shopState.attributes && shopState.attributes[attrKey]) || [];
+          const selectedVals = Array.isArray(currentVals) ? currentVals.map(v => String(v).toLowerCase()) : [String(currentVals).toLowerCase()];
+
+          return `
+            <div class="space-y-2 py-2 border-t first:border-t-0" style="border-color:var(--border-color)">
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">${attr.label || attr.name}</span>
+              </div>
+              <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                ${attr.options.map(opt => {
+                  const isChecked = selectedVals.includes(String(opt.value).toLowerCase());
+                  return `
+                    <label class="flex items-center justify-between text-xs py-1 px-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer transition-colors">
+                      <div class="flex items-center gap-2">
+                        <input type="checkbox" data-attr-key="${attrKey}" data-attr-val="${opt.value}" ${isChecked ? 'checked' : ''} class="w-3.5 h-3.5 rounded border-slate-600 text-[#4063B2] focus:ring-0 cursor-pointer" />
+                        <span class="font-medium text-slate-200">${opt.value}</span>
+                      </div>
+                      ${opt.count !== undefined ? `<span class="text-[10px] text-slate-400 font-mono">(${opt.count})</span>` : ''}
+                    </label>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        attrContainer.querySelectorAll('[data-attr-key]').forEach(cb => {
+          cb.addEventListener('change', () => {
+            const key = cb.getAttribute('data-attr-key');
+            const val = cb.getAttribute('data-attr-val');
+            if (!shopState.attributes) shopState.attributes = {};
+            let arr = shopState.attributes[key] || [];
+            if (!Array.isArray(arr)) arr = [arr];
+
+            if (cb.checked) {
+              if (!arr.includes(val)) arr.push(val);
+            } else {
+              arr = arr.filter(v => v !== val);
+            }
+
+            if (arr.length > 0) {
+              shopState.attributes[key] = arr;
+            } else {
+              delete shopState.attributes[key];
+            }
+
+            shopState.page = 1;
+            renderActiveFilterChips();
+            renderShop();
+          });
+        });
+      } else {
+        attrSec.classList.add('hidden');
+        attrContainer.innerHTML = '';
+      }
+    }
 
     const brandSearchInput = document.getElementById('filter-brand-search-input');
     if (brandSearchInput) {
@@ -1065,16 +1196,21 @@
       sort: shopState.sort
     };
     if (shopState.category) params.category = shopState.category;
+    if (shopState.subcategory) params.subcategory = shopState.subcategory;
     if (shopState.brand) params.brand = shopState.brand;
     if (shopState.minPrice) params.minPrice = shopState.minPrice;
     if (shopState.maxPrice) params.maxPrice = shopState.maxPrice;
     if (shopState.inStock) params.inStock = 'true';
     if (shopState.isOffer) params.isOffer = 'true';
     if (shopState.search) params.search = shopState.search;
+    if (shopState.attributes && Object.keys(shopState.attributes).length > 0) {
+      params.attributes = JSON.stringify(shopState.attributes);
+    }
 
     const cacheKey = JSON.stringify(params);
 
     function displayCatalogData(data) {
+      container.style.opacity = '1';
       const items = data.products || data.items || data.data || (Array.isArray(data) ? data : []);
       shopState.total = data.total !== undefined ? data.total : items.length;
       shopState.totalPages = data.totalPages || 1;
@@ -1117,22 +1253,31 @@
     shopAbortController = new AbortController();
     const { signal } = shopAbortController;
 
-    // Centered modern dual-ring loading state across all screen sizes
-    container.innerHTML = `
-      <div class="col-span-full w-full min-h-[420px] flex flex-col items-center justify-center py-20 px-4 text-center my-auto">
-        <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
-          <div class="absolute inset-0 rounded-full border-4 border-[#8D9CF5]/20"></div>
-          <div class="absolute inset-0 rounded-full border-4 border-[#4063B2] border-t-transparent animate-spin"></div>
-          <div class="w-6 h-6 rounded-full bg-[#4063B2]/20 animate-pulse"></div>
+    // Subtle loading indicator when refining search; full dual-ring spinner when switching modes/loading initially
+    const isSearching = Boolean(shopState.search);
+    const hasExistingContent = container.children.length > 0 && !container.querySelector('.animate-spin');
+
+    if (hasExistingContent && isSearching) {
+      container.style.opacity = '0.5';
+      container.style.transition = 'opacity 0.15s ease';
+    } else {
+      container.style.opacity = '1';
+      container.innerHTML = `
+        <div class="col-span-full w-full min-h-[420px] flex flex-col items-center justify-center py-20 px-4 text-center my-auto">
+          <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full border-4 border-[#8D9CF5]/20"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-[#4063B2] border-t-transparent animate-spin"></div>
+            <div class="w-6 h-6 rounded-full bg-[#4063B2]/20 animate-pulse"></div>
+          </div>
+          <h4 class="font-display font-bold text-base sm:text-lg tracking-tight" style="color:var(--text-primary)">
+            ${isRtl ? 'جاري تحميل المنتجات...' : 'Loading Products...'}
+          </h4>
+          <p class="text-xs text-slate-400 font-medium max-w-xs mt-1">
+            ${isRtl ? 'يرجى الانتظار، جاري جلب أحدث المنتجات...' : 'Fetching the latest catalog items'}
+          </p>
         </div>
-        <h4 class="font-display font-bold text-base sm:text-lg tracking-tight" style="color:var(--text-primary)">
-          ${isRtl ? 'جاري تحميل المنتجات...' : 'Loading Products...'}
-        </h4>
-        <p class="text-xs text-slate-400 font-medium max-w-xs mt-1">
-          ${isRtl ? 'يرجى الانتظار، جاري جلب أحدث المنتجات...' : 'Fetching the latest catalog items'}
-        </p>
-      </div>
-    `;
+      `;
+    }
 
     try {
       let data;
@@ -1913,7 +2058,7 @@
           addBtn.disabled = false;
           addBtn.removeAttribute('aria-disabled');
           addBtn.setAttribute('data-add-to-cart', product.slug || product.id);
-          addBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          addBtn.classList.remove('opacity-50', 'opacity-60', 'opacity-70', 'cursor-not-allowed');
           addBtn.classList.add('cursor-pointer');
           addBtn.style.pointerEvents = '';
           const span = addBtn.querySelector('span');
@@ -2036,12 +2181,28 @@
         }
       }
 
-      // Related Products
+      // ════ Dynamic "You May Also Like" Recommendations (Requirement 5) ════
       const relContainer = document.getElementById('product-related-container');
-      if (relContainer && Array.isArray(product.related) && product.related.length > 0) {
-        relContainer.innerHTML = product.related.map((rp, i) => renderProductCard(rp, i)).join('');
-        if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
-          window.Wishlist.sync();
+      if (relContainer) {
+        try {
+          const recRes = await fetch(`/api/products/${encodeURIComponent(slug)}/recommendations?limit=8`);
+          const recData = await recRes.json();
+          const recItems = Array.isArray(recData) ? recData : (Array.isArray(product.related) ? product.related : []);
+          if (recItems.length > 0) {
+            relContainer.innerHTML = recItems.map((rp, i) => renderProductCard(rp, i)).join('');
+            if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
+              window.Wishlist.sync();
+            }
+          } else {
+            relContainer.innerHTML = `
+              <div class="col-span-full py-8 text-center text-xs text-slate-400">
+                ${isRtl ? 'لا توجد منتجات مشابهة حالياً.' : 'No similar products found at this moment.'}
+              </div>`;
+          }
+        } catch (e) {
+          if (Array.isArray(product.related) && product.related.length > 0) {
+            relContainer.innerHTML = product.related.map((rp, i) => renderProductCard(rp, i)).join('');
+          }
         }
       }
     } catch (err) {
@@ -2099,7 +2260,7 @@
       const primName = (isArabic && primary.name_ar) ? primary.name_ar : primary.name;
       const primImg = primary.image || defaultCatImages[primSlug] || defaultCatImages[primary.id] || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/categories/cat-laptops.jpg';
       const primHref = `${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(primSlug)}`;
-      const primCount = primary.product_count !== undefined ? `${primary.product_count} ${isArabic ? 'منتج' : 'Products'}` : (isArabic ? 'مجموعة مميزة' : 'Featured Collection');
+      const primCount = isArabic ? 'مجموعة مميزة' : 'Featured Collection';
 
       let html = `
         <!-- Big Featured Category Card -->
@@ -2130,7 +2291,7 @@
         const name = (isArabic && cat.name_ar) ? cat.name_ar : cat.name;
         const img = cat.image || defaultCatImages[slug] || defaultCatImages[cat.id] || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
         const href = `${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(slug)}`;
-        const countBadge = cat.product_count !== undefined ? `${cat.product_count} ${isArabic ? 'منتج' : 'Products'}` : (cat.name_ar || '');
+        const countBadge = (isArabic && cat.name_ar) ? cat.name_ar : (isArabic ? 'تصفح الفئة' : 'Explore Category');
 
         html += `
           <div>
@@ -2476,8 +2637,278 @@
     }
   });
 
+  // ─── 2.56 DYNAMIC HERO BANNER HYDRATION (Requirement 3 & 1) ────────────────
+  // Implements instant local storage hydration and smart DB change detection to skip continuous fetching.
+  async function loadDynamicHeroBanner() {
+    const headlineEl = document.getElementById('hero-headline');
+    const subtitleEl = document.getElementById('hero-subtitle');
+    const bgImgEl = document.getElementById('hero-bg-img');
+    const actionsEl = document.getElementById('hero-actions');
+    const heroSection = document.getElementById('hero-section');
+    if (!headlineEl && !subtitleEl && !bgImgEl) return;
+
+    const HERO_STORAGE_KEY = 'marjaah_hero_banner_cache';
+    const isRtl = document.documentElement.dir === 'rtl' || window.location.pathname.startsWith('/ar');
+
+    function getLocalHeroCache() {
+      try {
+        const raw = localStorage.getItem(HERO_STORAGE_KEY);
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.banner || (parsed.allBanners && parsed.allBanners.length))) {
+          return parsed;
+        }
+      } catch (e) {
+        console.warn('[HeroBanner] Cache read error:', e);
+      }
+      return null;
+    }
+
+    function saveLocalHeroCache(version, banners) {
+      try {
+        if (!banners || !banners.length) return;
+        const payload = {
+          version: String(version || Date.now()),
+          savedAt: Date.now(),
+          banner: banners[0],
+          allBanners: banners,
+        };
+        localStorage.setItem(HERO_STORAGE_KEY, JSON.stringify(payload));
+      } catch (e) {
+        console.warn('[HeroBanner] Cache write error:', e);
+      }
+    }
+
+    function applyBanner(b) {
+      if (!b) return;
+      const isMobile = window.innerWidth < 640;
+
+      // 1. Headline / Hero Title
+      const headlineText = isRtl && b.headline_ar ? b.headline_ar : (b.headline || b.title);
+      if (headlineText && headlineEl) {
+        const span = headlineEl.querySelector('span');
+        if (span) {
+          span.textContent = headlineText;
+        } else {
+          headlineEl.textContent = headlineText;
+        }
+      }
+
+      // 2. Subtitle
+      const subText = isRtl && b.subtitle_ar ? b.subtitle_ar : (b.subtitle || b.description);
+      if (subText && subtitleEl) {
+        subtitleEl.textContent = subText;
+      }
+
+      // 3. Desktop / Mobile background image
+      const targetImg = isMobile
+        ? (b.image_mobile || b.mobile_image || b.image_desktop || b.image || b.image_url)
+        : (b.image_desktop || b.image || b.image_url || b.image_mobile);
+      if (targetImg && bgImgEl) {
+        bgImgEl.style.backgroundImage = "url('" + targetImg + "')";
+      }
+
+      // 4. CTA Buttons
+      const primaryText = isRtl && (b.cta_text_ar || b.button_text_ar)
+        ? (b.cta_text_ar || b.button_text_ar)
+        : (b.cta_text || b.button_text || 'Shop All Collections');
+      const primaryLink = b.cta_link || b.link_url || '/shop/';
+
+      if (actionsEl) {
+        let btnsHtml = '<a href="' + primaryLink + '" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#4063B2] to-[#8D9CF5] text-white text-xs font-bold uppercase tracking-wider hover:brightness-110 shadow-lg shadow-[#4063B2]/20 transition-all duration-200">' +
+          '<span>' + primaryText + '</span>' +
+          '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>' +
+        '</a>';
+
+        const secText = isRtl && b.secondary_cta_text_ar ? b.secondary_cta_text_ar : b.secondary_cta_text;
+        const secLink = b.secondary_cta_link || '/shop/?category=home-appliances';
+        if (secText) {
+          btnsHtml += '<a href="' + secLink + '" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/20 backdrop-blur-md transition-all duration-200">' +
+            '<span>' + secText + '</span>' +
+          '</a>';
+        }
+        actionsEl.innerHTML = btnsHtml;
+      }
+    }
+
+    let rotationTimer = null;
+    function setupBannerRotation(activeBanners) {
+      if (!activeBanners || activeBanners.length <= 1 || !heroSection) return;
+      if (rotationTimer) clearInterval(rotationTimer);
+
+      let currentIdx = 0;
+      let dotsContainer = document.getElementById('hero-banner-dots');
+      if (!dotsContainer) {
+        dotsContainer = document.createElement('div');
+        dotsContainer.id = 'hero-banner-dots';
+        dotsContainer.className = 'absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2';
+        heroSection.appendChild(dotsContainer);
+      }
+
+      const renderDots = () => {
+        dotsContainer.innerHTML = activeBanners.map((_, i) => `
+          <button type="button" data-hero-slide="${i}" class="w-2.5 h-2.5 rounded-full transition-all cursor-pointer ${i === currentIdx ? 'bg-indigo-400 w-8' : 'bg-white/40 hover:bg-white/70'}" aria-label="Go to slide ${i + 1}"></button>
+        `).join('');
+
+        dotsContainer.querySelectorAll('[data-hero-slide]').forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            currentIdx = Number(btn.getAttribute('data-hero-slide'));
+            applyBanner(activeBanners[currentIdx]);
+            renderDots();
+          });
+        });
+      };
+
+      renderDots();
+
+      // Auto rotate every 6 seconds
+      rotationTimer = setInterval(() => {
+        currentIdx = (currentIdx + 1) % activeBanners.length;
+        applyBanner(activeBanners[currentIdx]);
+        renderDots();
+      }, 6000);
+    }
+
+    // ── STEP 1: FAST 0ms HYDRATION FROM LOCAL STORAGE ──
+    const cached = getLocalHeroCache();
+    let hasRenderedFromCache = false;
+
+    if (cached && (cached.banner || (cached.allBanners && cached.allBanners.length))) {
+      const bannerToApply = cached.banner || cached.allBanners[0];
+      applyBanner(bannerToApply);
+      hasRenderedFromCache = true;
+      if (cached.allBanners && cached.allBanners.length > 1) {
+        setupBannerRotation(cached.allBanners);
+      }
+    }
+
+    // ── STEP 2: CHECK DB VERSION (Skip continuous fetching if DB unchanged) ──
+    try {
+      let dbVersion = null;
+      try {
+        const verRes = await fetch('/api/banners/version?type=hero');
+        if (verRes.ok) {
+          const verData = await verRes.json();
+          dbVersion = verData && verData.version ? String(verData.version) : null;
+        }
+      } catch (err) {
+        // Network offline or version endpoint unreachable; cache already shown!
+      }
+
+      // If local cache is active and DB version hasn't changed, SKIP full fetch!
+      if (hasRenderedFromCache && dbVersion && cached && cached.version && String(cached.version) === dbVersion) {
+        return; // Fast path: Zero full-fetch overhead, identical database state!
+      }
+
+      // ── STEP 3: FETCH FROM DB (Only when changed or no cache) ──
+      const res = await fetch('/api/banners?type=hero');
+      if (!res.ok) return;
+      const banners = await res.json();
+      if (!Array.isArray(banners) || banners.length === 0) return;
+      const activeBanners = banners.filter(b => b.is_active !== false && b.status !== 'inactive');
+      if (activeBanners.length === 0) return;
+
+      // Save fresh data & version to local storage
+      saveLocalHeroCache(dbVersion || String(Date.now()), activeBanners);
+
+      // Render fresh banner
+      applyBanner(activeBanners[0]);
+
+      if (activeBanners.length > 1) {
+        setupBannerRotation(activeBanners);
+      }
+    } catch (e) {
+      console.warn('[HeroBanner] Sync error:', e);
+    }
+  }
+
+  // ─── 2.57 DYNAMIC PROMOTIONAL SECTIONS HYDRATION (Requirement 6) ────────
+  async function loadDynamicPromotionalSections() {
+    const container = document.getElementById('dynamic-promotional-sections');
+    if (!container) return;
+
+    try {
+      const res = await fetch('/api/promotional-sections');
+      if (!res.ok) return;
+      const sections = await res.json();
+      if (!Array.isArray(sections) || sections.length === 0) return;
+
+      const isRtl = document.documentElement.dir === 'rtl';
+      const isMobile = window.innerWidth < 768;
+
+      container.innerHTML = sections.map(function(sec) {
+        const title = isRtl && sec.title_ar ? sec.title_ar : (sec.title || 'ULTRA RIGS & WORKSTATIONS');
+        const badge = isRtl && sec.badge_ar ? sec.badge_ar : (sec.badge || 'AUTHORIZED GCC DISTRIBUTION');
+        const subtitle = isRtl && sec.subtitle_ar ? sec.subtitle_ar : (sec.subtitle || '');
+        const img = isMobile ? (sec.image_mobile || sec.image_desktop || '/assets/images/products/asus-rog-g16.jpg') : (sec.image_desktop || '/assets/images/products/asus-rog-g16.jpg');
+        const ctaText = isRtl && sec.cta_text_ar ? sec.cta_text_ar : (sec.cta_text || 'DISCOVER ALL PRODUCTS');
+        const ctaLink = sec.cta_link || '/shop/';
+        const secCtaText = isRtl && sec.secondary_cta_text_ar ? sec.secondary_cta_text_ar : (sec.secondary_cta_text || 'WHATSAPP HARDWARE DESK');
+        const secCtaLink = sec.secondary_cta_link || 'https://wa.me/97477991013';
+
+        const cardTag = sec.card_tag || 'ROG STRIX SCAR 18';
+        const cardPrice = sec.card_price || 'QAR 12,499';
+        const cardLink = sec.card_link || '/shop/';
+
+        let titleHtml = title;
+        if (title.indexOf('&') !== -1) {
+          const parts = title.split('&');
+          titleHtml = parts[0].trim() + ' &amp;<br /><span class="text-outline">' + parts.slice(1).join('&').trim() + '</span>';
+        }
+
+        return '<section class="py-24 md:py-36 px-6 sm:px-12 md:px-16 overflow-hidden" style="background-color:var(--bg-surface);border-top:1px solid var(--border-color);color:var(--text-primary)">' +
+          '<div class="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center max-w-[1440px] mx-auto">' +
+            '<div class="lg:col-span-6 relative cursor-pointer group">' +
+              '<div class="absolute w-full h-full bg-gradient-to-br from-[#4063B2]/20 to-[#8D9CF5]/20 rounded-3xl pointer-events-none -top-8 -left-8 md:-top-12 md:-left-12 z-0"></div>' +
+              '<div class="relative z-10 aspect-[4/5] overflow-hidden rounded-2xl bg-surface-2 transition-transform duration-500 ease-out">' +
+                '<img src="' + img + '" alt="' + title.replace(/"/g, '&quot;') + '" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />' +
+                '<div class="absolute inset-0 bg-black/20 pointer-events-none"></div>' +
+                '<div class="absolute bottom-6 left-6 right-6 p-4 bg-[#070B14]/85 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-between rounded-xl">' +
+                  '<div>' +
+                    '<p class="text-[10px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">' + cardTag + '</p>' +
+                    (cardPrice ? '<p class="font-display text-lg text-white font-bold">' + cardPrice + '</p>' : '') +
+                  '</div>' +
+                  '<a href="' + cardLink + '" class="text-xs font-sans font-bold uppercase tracking-widest text-white underline underline-offset-4">EXPLORE</a>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+            '<div class="lg:col-span-6 space-y-8">' +
+              '<span class="font-display text-sm md:text-base uppercase tracking-widest text-[#8D9CF5] font-bold block">' + badge + '</span>' +
+              '<h2 class="font-display text-5xl sm:text-6xl md:text-7xl leading-tight uppercase tracking-tight font-black" style="color:var(--text-primary)">' +
+                titleHtml +
+              '</h2>' +
+              '<p class="text-base sm:text-lg font-sans leading-relaxed max-w-xl" style="color:var(--text-secondary)">' +
+                subtitle +
+              '</p>' +
+              '<div class="pt-4 flex flex-wrap items-center gap-6">' +
+                '<a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300" style="color:var(--text-primary)" href="' + ctaLink + '">' +
+                  '<span>' + ctaText + '</span>' +
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>' +
+                '</a>' +
+                (secCtaText ? '<a href="' + secCtaLink + '" target="_blank" rel="noopener noreferrer" class="text-xs font-sans font-bold tracking-widest uppercase text-slate-400 hover:text-white underline underline-offset-4 transition-colors">' + secCtaText + '</a>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</section>';
+      }).join('');
+    } catch (e) {
+      // Graceful fallback to static section
+    }
+  }
+
   function initAll() {
-    // 0. Browse by category on home page
+    // 0. Hero Banner dynamic updates (home page)
+    if (document.getElementById('hero-headline') || document.getElementById('hero-bg-img')) {
+      loadDynamicHeroBanner();
+    }
+
+    // 0.2 Dynamic Promotional Sections (home page)
+    if (document.getElementById('dynamic-promotional-sections')) {
+      loadDynamicPromotionalSections();
+    }
+
+    // 0.3 Browse by category on home page
     if (document.getElementById('home-categories-grid')) {
       loadHomeCategoriesGrid();
     }
@@ -2533,4 +2964,6 @@
   global.selectShopCategory = selectShopCategory;
   global.returnToShopCategories = returnToShopCategories;
   global.renderShopCategories = renderShopCategories;
+  global.loadDynamicHeroBanner = loadDynamicHeroBanner;
+  global.loadDynamicPromotionalSections = loadDynamicPromotionalSections;
 })(window);

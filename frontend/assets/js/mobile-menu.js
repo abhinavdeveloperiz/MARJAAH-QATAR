@@ -58,20 +58,47 @@
   updateNavbar();
   window.addEventListener('scroll', updateNavbar, { passive: true });
 
-  // Search overlay
+  // Search overlay & instant debounced preview
   const searchBtn = document.getElementById('search-btn');
   const searchOverlay = document.getElementById('search-overlay');
   const searchClose = document.getElementById('search-close');
   const searchInput = document.getElementById('search-input');
 
+  let liveResultsContainer = document.getElementById('search-live-results');
+  if (!liveResultsContainer && searchOverlay) {
+    const formEl = searchOverlay.querySelector('form');
+    if (formEl) {
+      liveResultsContainer = document.createElement('div');
+      liveResultsContainer.id = 'search-live-results';
+      liveResultsContainer.className = 'hidden mt-4 max-h-72 overflow-y-auto space-y-2 pr-1';
+      formEl.parentNode.insertBefore(liveResultsContainer, formEl.nextSibling);
+    }
+  }
+
+  let searchDebounceTimer = null;
+  let searchAbortController = null;
+
   if (searchBtn) searchBtn.addEventListener('click', function() {
     searchOverlay.classList.remove('hidden');
     setTimeout(() => searchInput?.focus(), 50);
   });
-  if (searchClose) searchClose.addEventListener('click', function() { searchOverlay.classList.add('hidden'); });
-  if (searchOverlay) searchOverlay.addEventListener('click', function(e) {
-    if (e.target === searchOverlay) searchOverlay.classList.add('hidden');
+  if (searchClose) searchClose.addEventListener('click', function() {
+    searchOverlay.classList.add('hidden');
+    if (liveResultsContainer) {
+      liveResultsContainer.classList.add('hidden');
+      liveResultsContainer.innerHTML = '';
+    }
   });
+  if (searchOverlay) searchOverlay.addEventListener('click', function(e) {
+    if (e.target === searchOverlay) {
+      searchOverlay.classList.add('hidden');
+      if (liveResultsContainer) {
+        liveResultsContainer.classList.add('hidden');
+        liveResultsContainer.innerHTML = '';
+      }
+    }
+  });
+
   const searchForm = searchOverlay ? searchOverlay.querySelector('form') : null;
   if (searchForm) {
     searchForm.addEventListener('submit', function(e) {
@@ -82,6 +109,7 @@
       }
     });
   }
+
   if (searchInput) {
     searchInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
@@ -90,7 +118,89 @@
         if (q) {
           window.location.href = `${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}`;
         }
+      } else if (e.key === 'Escape') {
+        if (searchOverlay) searchOverlay.classList.add('hidden');
       }
+    });
+
+    searchInput.addEventListener('input', function(e) {
+      clearTimeout(searchDebounceTimer);
+      const q = (e.target.value || '').trim();
+
+      if (q.length < 2) {
+        if (liveResultsContainer) {
+          liveResultsContainer.classList.add('hidden');
+          liveResultsContainer.innerHTML = '';
+        }
+        return;
+      }
+
+      searchDebounceTimer = setTimeout(async () => {
+        if (searchAbortController) searchAbortController.abort();
+        searchAbortController = new AbortController();
+
+        if (liveResultsContainer) {
+          liveResultsContainer.classList.remove('hidden');
+          liveResultsContainer.innerHTML = `
+            <div class="p-3 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+              <span class="w-3.5 h-3.5 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+              <span>${isArPage ? 'جاري البحث في الكتالوج...' : 'Searching catalog...'}</span>
+            </div>
+          `;
+        }
+
+        try {
+          const res = await fetch(`/api/products?search=${encodeURIComponent(q)}&limit=5`, {
+            signal: searchAbortController.signal,
+          });
+          if (!res.ok) throw new Error('Search failed');
+          const data = await res.json();
+          const items = data.products || data.items || data.data || [];
+
+          if (!liveResultsContainer) return;
+
+          if (items.length === 0) {
+            liveResultsContainer.innerHTML = `
+              <div class="p-4 rounded-2xl border border-dashed border-slate-700/80 text-center text-xs text-slate-400">
+                ${isArPage ? `لم يتم العثور على نتائج تطابق "${q}"` : `No products matching "${q}"`}
+              </div>
+            `;
+            return;
+          }
+
+          liveResultsContainer.innerHTML = `
+            <div class="space-y-1.5">
+              ${items.map(p => {
+                const prodUrl = `${isArPage ? '/ar' : ''}/product/?slug=${encodeURIComponent(p.slug || p.id)}`;
+                const price = Number(p.price || 0).toLocaleString();
+                const img = p.image || '/assets/images/products/placeholder.svg';
+                return `
+                  <a href="${prodUrl}" class="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 transition group">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <img src="${img}" class="w-10 h-10 object-cover rounded-xl border border-slate-700/60 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                      <div class="min-w-0">
+                        <div class="text-xs font-bold text-white group-hover:text-indigo-400 transition truncate">${p.name || ''}</div>
+                        <div class="text-[10px] text-slate-400 truncate">${p.brand || p.category || 'Catalog item'}</div>
+                      </div>
+                    </div>
+                    <div class="text-right flex-shrink-0 pl-3">
+                      <div class="text-xs font-black text-indigo-400 font-mono">${price} <span class="text-[9px] text-slate-400">QAR</span></div>
+                    </div>
+                  </a>
+                `;
+              }).join('')}
+              <div class="pt-2 text-center">
+                <a href="${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition py-1">
+                  <span>${isArPage ? 'عرض جميع النتائج المطابقة في الكتالوج' : 'View all matching items in Catalog'} &rarr;</span>
+                </a>
+              </div>
+            </div>
+          `;
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          console.warn('Live search error:', err);
+        }
+      }, 250);
     });
   }
 

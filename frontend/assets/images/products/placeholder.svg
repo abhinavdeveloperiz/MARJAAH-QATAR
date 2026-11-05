@@ -1,22 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
   <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0B1120" />
-      <stop offset="50%" stop-color="#111827" />
-      <stop offset="100%" stop-color="#1E293B" />
+    <linearGradient id="neutralBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#334155" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#1E293B" stop-opacity="0.4" />
     </linearGradient>
-    <linearGradient id="accentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4063B2" />
-      <stop offset="100%" stop-color="#8D9CF5" />
+    <linearGradient id="iconGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#94A3B8" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#64748B" stop-opacity="0.4" />
     </linearGradient>
   </defs>
-  <rect width="400" height="300" fill="url(#bgGrad)" rx="12" />
-  <circle cx="200" cy="130" r="44" fill="#1E293B" stroke="#334155" stroke-width="2" />
-  <g transform="translate(182, 112)" stroke="url(#accentGrad)" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
-    <rect width="36" height="26" x="0" y="0" rx="3" />
-    <circle cx="9" cy="8" r="2.5" />
-    <path d="m36 20-10-10-16 16" />
+  <rect width="400" height="300" fill="url(#neutralBg)" rx="8" />
+  <g transform="translate(176, 126)" stroke="url(#iconGlow)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <rect width="48" height="48" rx="8" />
+    <circle cx="16" cy="16" r="4" />
+    <path d="M48 34 34 20 12 42" />
+    <path d="m30 28 6 6" />
   </g>
-  <text x="200" y="210" text-anchor="middle" fill="#94A3B8" font-family="system-ui, -apple-system, sans-serif" font-size="14" font-weight="600" letter-spacing="1">M.SHOP QATAR</text>
-  <text x="200" y="232" text-anchor="middle" fill="#64748B" font-family="system-ui, -apple-system, sans-serif" font-size="11">Hardware &amp; Computers</text>
 </svg>

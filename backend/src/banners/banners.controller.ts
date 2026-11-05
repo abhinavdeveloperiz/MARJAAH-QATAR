@@ -1,15 +1,33 @@
-import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Param,
+  Query,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { BannersService } from './banners.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AdminGuard } from '../auth/guards/admin.guard';
+import { RbacGuard } from '../admin/rbac/rbac.guard';
+import { RequirePermission } from '../admin/rbac/require-permission.decorator';
 
 @Controller('api/banners')
 export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
 
   @Get()
-  async findAll(@Query('type') type?: string) {
-    return this.bannersService.findAll(type);
+  async findAll(@Query('type') type?: string, @Query('includeInactive') includeInactive?: string) {
+    return this.bannersService.findAll(type, String(includeInactive).toLowerCase() === 'true');
+  }
+
+  @Get('version')
+  async getVersion(@Query('type') type?: string) {
+    return this.bannersService.getVersion(type);
   }
 
   @Get(':id')
@@ -17,21 +35,31 @@ export class BannersController {
     return this.bannersService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RbacGuard)
+  @RequirePermission('banners', 'create')
   @Post()
-  async create(@Body() body: any) {
-    return this.bannersService.create(body);
+  async create(@Body() body: any, @Request() req: any) {
+    return this.bannersService.create(body, req.user);
   }
 
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RbacGuard)
+  @RequirePermission('banners', 'edit')
   @Put(':id')
-  async update(@Param('id') id: string, @Body() body: any) {
-    return this.bannersService.update(id, body);
+  async update(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.bannersService.update(id, body, req.user);
   }
 
-  @UseGuards(JwtAuthGuard, AdminGuard)
+  @UseGuards(JwtAuthGuard, RbacGuard)
+  @RequirePermission('banners', 'edit')
+  @Patch(':id')
+  async patchUpdate(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.bannersService.update(id, body, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, RbacGuard)
+  @RequirePermission('banners', 'delete')
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.bannersService.remove(id);
+  async remove(@Param('id') id: string, @Request() req: any) {
+    return this.bannersService.remove(id, req.user);
   }
 }

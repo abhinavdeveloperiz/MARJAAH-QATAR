@@ -605,11 +605,56 @@
       <!-- Left Column: Delivery & Payment Details -->
       <div class="lg:col-span-2 space-y-6">
 
-        <!-- 1. Delivery Address -->
+        <!-- 1. Fulfillment Method & Customer Details -->
         <div class="rounded-3xl p-5 sm:p-6 shadow-sm" style="background:var(--bg-surface);border:1px solid var(--border-color)">
           <div class="flex items-center gap-3 mb-5">
             <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-primary-500/10 text-primary-400 font-bold text-sm">1</div>
-            <h2 class="font-bold text-base sm:text-lg" style="color:var(--text-primary)">Delivery Address</h2>
+            <h2 class="font-bold text-base sm:text-lg" style="color:var(--text-primary)">Fulfillment &amp; Delivery</h2>
+          </div>
+
+          <!-- Fulfillment Selector: Delivery vs Store Pickup (Requirement 1) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6" id="fulfillment-selector">
+            <!-- Option A: Doorstep Delivery -->
+            <label class="relative flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all duration-200 shadow-sm fulfillment-option active" data-type="delivery" style="background:var(--bg-surface-2);border-color:var(--color-accent, #6366f1)">
+              <input type="radio" name="fulfillment_type" value="delivery" checked class="accent-primary-500 w-5 h-5 cursor-pointer" />
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="13" x="1" y="6" rx="2"/><path d="M17 12h4l2 4v3h-6v-7z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold" style="color:var(--text-primary)">Doorstep Delivery</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Qatar</span>
+                </div>
+                <p class="text-[11px] mt-0.5" style="color:var(--text-secondary)">Express delivery to your home or office</p>
+              </div>
+            </label>
+
+            <!-- Option B: Store Pickup -->
+            <label class="relative flex items-center gap-3 p-4 rounded-2xl border cursor-pointer transition-all duration-200 shadow-sm fulfillment-option" data-type="store_pickup" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+              <input type="radio" name="fulfillment_type" value="store_pickup" class="accent-primary-500 w-5 h-5 cursor-pointer" />
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="text-sm font-bold" style="color:var(--text-primary)">Store Pickup</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Free</span>
+                </div>
+                <p class="text-[11px] mt-0.5" style="color:var(--text-secondary)">Click &amp; Collect directly from store</p>
+              </div>
+            </label>
+          </div>
+
+          <!-- Store Pickup Locations Container (Visible when Store Pickup selected) -->
+          <div id="store-pickup-panel" class="hidden mb-6 p-4 sm:p-5 rounded-2xl border space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            <div class="flex items-center justify-between">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300">Select Pickup Location *</h3>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">No delivery fee</span>
+            </div>
+            <div id="pickup-locations-list" class="space-y-3">
+              <!-- Dynamically populated from /api/store-locations -->
+              <div class="text-xs text-slate-400 py-3 text-center">Loading store locations...</div>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -625,25 +670,27 @@
               <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Email Address (optional)</label>
               <input type="email" name="email" class="input" placeholder="email@example.com" maxlength="320" id="id_email">
             </div>
-            <div>
-              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Building / Villa No.</label>
-              <input type="text" name="building" class="input" placeholder="Building / Villa No." id="id_building">
-            </div>
-            <div>
-              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Street Name</label>
-              <input type="text" name="street" class="input" placeholder="Street Name" id="id_street">
-            </div>
-            <div>
-              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Area / Zone *</label>
-              <input type="text" name="zone" class="input" placeholder="Zone / Area" required id="id_zone">
-            </div>
-            <div>
-              <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">City *</label>
-              <input type="text" name="city" value="Doha" class="input" required id="id_city">
+
+            <!-- Doorstep Delivery Address Fields (hidden when Store Pickup is active) -->
+            <div id="delivery-address-fields" class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Building / Villa No.</label>
+                <input type="text" name="building" class="input" placeholder="Building / Villa No." id="id_building">
+              </div>
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Street Name</label>
+                <input type="text" name="street" class="input" placeholder="Street Name" id="id_street">
+              </div>
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Area / Zone *</label>
+                <input type="text" name="zone" class="input" placeholder="Zone / Area" required id="id_zone">
+              </div>
+              <div>
+                <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">City *</label>
+                <input type="text" name="city" value="Doha" class="input" required id="id_city">
+              </div>
             </div>
           </div>
-
-          
         </div>
 
         <!-- 2. Payment Method & Step-by-Step Channel -->
@@ -927,6 +974,109 @@ document.addEventListener('DOMContentLoaded', function () {
       });
     });
   }
+  // ── Store Pickup Locations State & Loader (Requirement 1) ──
+  let storeLocations = [];
+  let selectedPickupLocation = null;
+  let activeFulfillment = 'delivery'; // 'delivery' | 'store_pickup'
+
+  async function loadStoreLocations() {
+    try {
+      const res = await fetch('/api/store-locations');
+      if (res.ok) {
+        storeLocations = await res.json();
+      }
+    } catch (e) {
+      console.warn('Failed to load store locations:', e);
+    }
+    renderPickupLocations();
+  }
+
+  function renderPickupLocations() {
+    const list = document.getElementById('pickup-locations-list');
+    if (!list) return;
+
+    if (!storeLocations || storeLocations.length === 0) {
+      list.innerHTML = `
+        <div class="p-4 rounded-xl border border-amber-500/20 bg-amber-500/10 text-amber-300 text-xs">
+          No pickup locations currently active. Please select Doorstep Delivery.
+        </div>
+      `;
+      return;
+    }
+
+    if (!selectedPickupLocation && storeLocations.length > 0) {
+      selectedPickupLocation = storeLocations[0];
+    }
+
+    list.innerHTML = storeLocations.map((loc) => {
+      const isSelected = selectedPickupLocation && (selectedPickupLocation.id === loc.id);
+      return `
+        <label class="flex flex-col sm:flex-row sm:items-start justify-between p-4 rounded-xl border cursor-pointer transition-all duration-200 pickup-location-card ${isSelected ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700/60 hover:border-slate-500'}" data-loc-id="${loc.id}">
+          <div class="flex items-start gap-3">
+            <input type="radio" name="pickup_location_radio" value="${loc.id}" ${isSelected ? 'checked' : ''} class="accent-emerald-500 mt-1 cursor-pointer" />
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-bold text-sm text-slate-100">${loc.name}</h4>
+                ${loc.is_primary ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold uppercase tracking-wider">Main Hub</span>` : ''}
+              </div>
+              <p class="text-xs text-slate-300 mt-1 flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                ${loc.address}, ${loc.city || 'Doha'}
+              </p>
+              <div class="flex flex-wrap gap-y-1 gap-x-3 text-[11px] text-slate-400 mt-1.5">
+                ${loc.phone ? `<span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${loc.phone}</span>` : ''}
+                ${loc.working_hours ? `<span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="10" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${loc.working_hours}</span>` : ''}
+              </div>
+              ${loc.instructions ? `
+                <div class="mt-2 text-[11px] bg-slate-900/60 p-2 rounded-lg text-emerald-300/90 border border-emerald-500/20">
+                  <strong>Pickup Instructions:</strong> ${loc.instructions}
+                </div>
+              ` : ''}
+            </div>
+          </div>
+        </label>
+      `;
+    }).join('');
+
+    list.querySelectorAll('.pickup-location-card').forEach(card => {
+      card.addEventListener('click', () => {
+        const locId = card.getAttribute('data-loc-id');
+        selectedPickupLocation = storeLocations.find(l => l.id === locId) || null;
+        renderPickupLocations();
+      });
+    });
+  }
+
+  // Bind Fulfillment Selector
+  document.querySelectorAll('input[name="fulfillment_type"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      activeFulfillment = e.target.value;
+      const deliveryFields = document.getElementById('delivery-address-fields');
+      const pickupPanel = document.getElementById('store-pickup-panel');
+      const zoneInput = document.getElementById('id_zone');
+      const cityInput = document.getElementById('id_city');
+
+      document.querySelectorAll('.fulfillment-option').forEach(card => {
+        const isThis = card.getAttribute('data-type') === activeFulfillment;
+        card.style.borderColor = isThis ? 'var(--color-accent, #6366f1)' : 'var(--border-color)';
+      });
+
+      if (activeFulfillment === 'store_pickup') {
+        if (deliveryFields) deliveryFields.classList.add('hidden');
+        if (pickupPanel) pickupPanel.classList.remove('hidden');
+        if (zoneInput) zoneInput.removeAttribute('required');
+        if (cityInput) cityInput.removeAttribute('required');
+        loadStoreLocations();
+      } else {
+        if (deliveryFields) deliveryFields.classList.remove('hidden');
+        if (pickupPanel) pickupPanel.classList.add('hidden');
+        if (zoneInput) zoneInput.setAttribute('required', 'required');
+        if (cityInput) cityInput.setAttribute('required', 'required');
+      }
+      renderCheckoutSummary();
+    });
+  });
+
   function renderCheckoutSummary() {
     const items = window.cart ? window.cart.getItems() : [];
     const container = document.getElementById('checkout-items-list');
@@ -961,8 +1111,14 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.cart) {
       const summary = window.cart.getSummary();
       if (subtotalEl) subtotalEl.textContent = summary.subtotal.toFixed(0) + ' QAR';
-      if (shippingEl) shippingEl.textContent = summary.shipping === 0 ? 'FREE Express 🎉' : summary.shipping.toFixed(0) + ' QAR';
-      if (totalEl) totalEl.textContent = summary.total.toFixed(0) + ' QAR';
+
+      if (activeFulfillment === 'store_pickup') {
+        if (shippingEl) shippingEl.textContent = 'FREE (Store Pickup) 🎉';
+        if (totalEl) totalEl.textContent = summary.subtotal.toFixed(0) + ' QAR';
+      } else {
+        if (shippingEl) shippingEl.textContent = summary.shipping === 0 ? 'FREE Express 🎉' : summary.shipping.toFixed(0) + ' QAR';
+        if (totalEl) totalEl.textContent = summary.total.toFixed(0) + ' QAR';
+      }
     }
   }
 
@@ -1001,9 +1157,17 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
       }
 
+      // Store Pickup Validation
+      if (activeFulfillment === 'store_pickup' && !selectedPickupLocation) {
+        const errMsg = isRtl ? 'يرجى اختيار موقع الاستلام من المتجر للمتابعة.' : 'Please select a store pickup location to proceed.';
+        if (window.Toast) window.Toast.error(errMsg);
+        else alert(errMsg);
+        return;
+      }
+
       const submitBtn = document.getElementById('btn-submit-order');
       const submitText = document.getElementById('submit-btn-text');
-      const originalText = submitText ? submitText.textContent : (isRtl ? 'تأكيد وإتمام الطلب (الدفع عند الاستلام)' : 'Place Order (Cash on Delivery)');
+      const originalText = submitText ? submitText.textContent : (isRtl ? 'تأكيد وإتمام الطلب' : 'Place Order');
       if (submitBtn) submitBtn.disabled = true;
       if (submitText) submitText.textContent = isRtl ? 'جاري تأكيد الطلب...' : 'Placing Order...';
 
@@ -1012,12 +1176,16 @@ document.addEventListener('DOMContentLoaded', function () {
           full_name: document.getElementById('id_full_name').value.trim(),
           phone: document.getElementById('id_phone').value.trim(),
           email: document.getElementById('id_email')?.value?.trim() || undefined,
-          building: document.getElementById('id_building')?.value?.trim() || '',
-          street: document.getElementById('id_street')?.value?.trim() || '',
-          zone: document.getElementById('id_zone').value.trim(),
-          city: document.getElementById('id_city')?.value?.trim() || 'Doha',
+          fulfillment_type: activeFulfillment,
+          store_pickup_location_id: activeFulfillment === 'store_pickup' ? selectedPickupLocation.id : undefined,
+          store_pickup_location: activeFulfillment === 'store_pickup' ? selectedPickupLocation : undefined,
+          building: activeFulfillment === 'store_pickup' ? '' : (document.getElementById('id_building')?.value?.trim() || ''),
+          street: activeFulfillment === 'store_pickup' ? '' : (document.getElementById('id_street')?.value?.trim() || ''),
+          zone: activeFulfillment === 'store_pickup' ? (selectedPickupLocation?.city || 'Al Sadd') : document.getElementById('id_zone').value.trim(),
+          city: activeFulfillment === 'store_pickup' ? (selectedPickupLocation?.city || 'Doha') : (document.getElementById('id_city')?.value?.trim() || 'Doha'),
           payment_method: document.querySelector('input[name="payment_method"]:checked')?.value || 'cash',
           notes: document.getElementById('id_notes')?.value?.trim() || '',
+          shipping_cost: activeFulfillment === 'store_pickup' ? 0 : undefined,
           items: items.map(i => ({
             product_id: i.id || i.slug,
             slug: i.slug,
@@ -1333,6 +1501,12 @@ document.addEventListener('DOMContentLoaded', function () {
           <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
             info@marjaah.com</a>
+          </li>
+          <li class="pt-2 border-t border-slate-700/40">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+              CR No. 228717 • Qatar
+            </span>
           </li>
         </ul>
       </div>

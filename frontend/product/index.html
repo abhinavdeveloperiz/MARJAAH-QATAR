@@ -99,6 +99,72 @@
     .translate-x-full { transform: translateX(100%) !important; }
     .translate-x-0 { transform: translateX(0) !important; }
 
+    /* ═══ Add to Cart Button (White Mode vs Dark Mode) ═══ */
+    #product-add-to-cart-btn {
+      min-height: 48px !important;
+      height: 48px !important;
+      border-radius: 1rem !important;
+      font-family: var(--font-inter, 'Inter'), 'Outfit', system-ui, -apple-system, sans-serif !important;
+      font-weight: 700 !important;
+      font-size: 0.8125rem !important;
+      letter-spacing: 0.08em !important;
+      text-transform: uppercase !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      gap: 0.625rem !important;
+      padding: 0 1.5rem !important;
+      transition: all 250ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+      cursor: pointer !important;
+    }
+
+    /* Light (White) Mode: Deep Royal Indigo Gradient + Solid Border */
+    :root:not(.dark) #product-add-to-cart-btn,
+    .light #product-add-to-cart-btn {
+      background: linear-gradient(135deg, #2A4893 0%, #3D61BD 50%, #5275D9 100%) !important;
+      border: 1.5px solid #1E356D !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 16px -2px rgba(42, 72, 147, 0.45), 0 2px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    }
+    :root:not(.dark) #product-add-to-cart-btn:hover:not(:disabled),
+    .light #product-add-to-cart-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #1E356D 0%, #3151A6 50%, #4063B2 100%) !important;
+      border-color: #15254D !important;
+      box-shadow: 0 8px 24px -2px rgba(42, 72, 147, 0.6) !important;
+      transform: translateY(-1.5px);
+    }
+
+    /* Dark Mode: Electric Sapphire Indigo Gradient + Luminous Border */
+    .dark #product-add-to-cart-btn {
+      background: linear-gradient(135deg, #3655A3 0%, #4C70D2 50%, #688EF5 100%) !important;
+      border: 1.5px solid rgba(141, 156, 245, 0.65) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 22px 0 rgba(76, 112, 210, 0.5), 0 0 16px rgba(104, 142, 245, 0.35) !important;
+    }
+    .dark #product-add-to-cart-btn:hover:not(:disabled) {
+      background: linear-gradient(135deg, #4366BF 0%, #5B7FE0 50%, #7B9EFA 100%) !important;
+      border-color: rgba(168, 180, 248, 0.95) !important;
+      box-shadow: 0 8px 28px 0 rgba(76, 112, 210, 0.65), 0 0 24px rgba(104, 142, 245, 0.5) !important;
+      transform: translateY(-1.5px);
+    }
+
+    #product-add-to-cart-btn:active:not(:disabled) {
+      transform: translateY(0) scale(0.98) !important;
+    }
+
+    #product-add-to-cart-btn svg {
+      stroke: #FFFFFF !important;
+      color: #FFFFFF !important;
+      flex-shrink: 0;
+    }
+
+    #product-add-to-cart-btn:disabled {
+      opacity: 0.6 !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
     /* ═══ Navbar Dynamic Theme Adaptations ═══ */
     /* Dark mode defaults */
     html.dark #main-navbar.navbar-transparent {
@@ -713,11 +779,11 @@
 
         <!-- Actions -->
         <div class="flex gap-3 mb-8">
-          <button id="product-add-to-cart-btn" disabled aria-disabled="true" class="btn-primary flex-1 justify-center opacity-70 cursor-not-allowed flex items-center gap-2" style="pointer-events:none">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          <button id="product-add-to-cart-btn" disabled aria-disabled="true" class="btn-primary flex-1 h-12 px-6 rounded-2xl justify-center items-center gap-2 font-bold text-xs sm:text-sm tracking-wider uppercase opacity-60 cursor-not-allowed transition-all" style="pointer-events:none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <span>Add to Cart</span>
           </button>
-          <button id="product-wishlist-btn" aria-label="Add to Wishlist" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer " style="border-color:var(--border-color);background:var(--bg-surface-2)">
+          <button id="product-wishlist-btn" aria-label="Add to Wishlist" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shrink-0" style="border-color:var(--border-color);background:var(--bg-surface-2)">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
         </div>
@@ -769,113 +835,14 @@
     <div class="mt-16">
       <h2 class="text-xl sm:text-2xl font-display font-black mb-6 sm:mb-8" style="color:var(--text-primary)">You May Also Like</h2>
       <div id="product-related-container" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        
-<div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
-     style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:0ms">
-  <a href="/product/alienware-m18-r2-gaming-laptop/" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
-    <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shadow-sm pointer-events-none transition-transform group-hover:scale-105"
-         style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)"
-         title="Featured Product" aria-label="Featured Product">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    </div>
-    <button data-wishlist-toggle="alienware-m18-r2-gaming-laptop" aria-label="Toggle wishlist"
-      class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
-      style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-    </button>
-    <img src="/assets/images/products/placeholder.svg" alt="Alienware m18 R2 Gaming Laptop"
-      class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
-      loading="lazy"
-      onerror="this.src='/assets/images/products/placeholder.svg'" />
-  </a>
-  <div class="p-3 sm:p-4 flex flex-col flex-1">
-    <div class="mb-2">
-      <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block truncate" style="color:var(--color-accent)">Alienware</span>
-      <a href="/product/alienware-m18-r2-gaming-laptop/" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
-        Alienware m18 R2 Gaming Laptop
-      </a>
-    </div>
-    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 mt-auto">
-      <span class="font-display font-black text-base sm:text-lg md:text-xl" style="color:var(--text-primary)">QAR 12499</span>
-      <span class="text-[11px] sm:text-xs line-through" style="color:var(--text-tertiary)">QAR 13999</span>
-    </div>
-    <button data-add-to-cart="alienware-m18-r2-gaming-laptop" class="btn-primary w-full justify-center text-xs font-bold py-2 sm:py-2.5 px-2 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      <span class="truncate">Add to Cart</span>
-    </button>
-  </div>
-</div>
-
-<div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
-     style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:50ms">
-  <a href="/product/dell-xps-15-9530/" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
-    <div class="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shadow-sm pointer-events-none transition-transform group-hover:scale-105"
-         style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)"
-         title="Featured Product" aria-label="Featured Product">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    </div>
-    <button data-wishlist-toggle="dell-xps-15-9530" aria-label="Toggle wishlist"
-      class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
-      style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-    </button>
-    <img src="/assets/images/products/placeholder.svg" alt="Dell XPS 15 9530"
-      class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
-      loading="lazy"
-      onerror="this.src='/assets/images/products/placeholder.svg'" />
-  </a>
-  <div class="p-3 sm:p-4 flex flex-col flex-1">
-    <div class="mb-2">
-      <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block truncate" style="color:var(--color-accent)">Dell</span>
-      <a href="/product/dell-xps-15-9530/" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
-        Dell XPS 15 9530
-      </a>
-    </div>
-    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 mt-auto">
-      <span class="font-display font-black text-base sm:text-lg md:text-xl" style="color:var(--text-primary)">QAR 7499</span>
-      <span class="text-[11px] sm:text-xs line-through" style="color:var(--text-tertiary)">QAR 8199</span>
-    </div>
-    <button data-add-to-cart="dell-xps-15-9530" class="btn-primary w-full justify-center text-xs font-bold py-2 sm:py-2.5 px-2 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      <span class="truncate">Add to Cart</span>
-    </button>
-  </div>
-</div>
-
-<div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
-     style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:100ms">
-  <a href="/product/hp-envy-x360-15/" class="relative overflow-hidden block" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
-    <button data-wishlist-toggle="hp-envy-x360-15" aria-label="Toggle wishlist"
-      class="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
-      style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
-      <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
-    </button>
-    <img src="/assets/images/products/placeholder.svg" alt="HP ENVY x360 15 2-in-1 Laptop"
-      class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108"
-      loading="lazy"
-      onerror="this.src='/assets/images/products/placeholder.svg'" />
-  </a>
-  <div class="p-3 sm:p-4 flex flex-col flex-1">
-    <div class="mb-2">
-      <span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block truncate" style="color:var(--color-accent)">HP</span>
-      <a href="/product/hp-envy-x360-15/" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
-        HP ENVY x360 15 2-in-1 Laptop
-      </a>
-    </div>
-    <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 mt-auto">
-      <span class="font-display font-black text-base sm:text-lg md:text-xl" style="color:var(--text-primary)">QAR 4599</span>
-      <span class="text-[11px] sm:text-xs line-through" style="color:var(--text-tertiary)">QAR 5099</span>
-    </div>
-    <button data-add-to-cart="hp-envy-x360-15" class="btn-primary w-full justify-center text-xs font-bold py-2 sm:py-2.5 px-2 rounded-xl cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-1.5 sm:gap-2">
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
-      <span class="truncate">Add to Cart</span>
-    </button>
-  </div>
-</div>
+        <!-- Dynamic database-driven recommendations will be rendered here by products.js -->
+        <div class="col-span-full py-12 text-center text-slate-400 text-xs font-medium">
+          <div class="inline-flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#8D9CF5] animate-pulse"></span>
+            <span>Loading recommended products...</span>
+          </div>
+        </div>
+      </div>
     
   </div>
 </div>
@@ -1270,6 +1237,12 @@
               </svg>
               info@marjaah.com
             </a>
+          </li>
+          <li class="pt-2 border-t border-slate-700/40">
+            <span class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-300">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h6"/></svg>
+              CR No. 228717 • Qatar
+            </span>
           </li>
         </ul>
       </div>
