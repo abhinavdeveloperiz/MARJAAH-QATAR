@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Delete, Param, Body, Query, UseGuards, Request, Optional } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Put, Delete, Param, Body, Query, UseGuards, Request, Optional } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -40,6 +40,36 @@ export class OrdersController {
     return res.items || res;
   }
 
+  // ─── DYNAMIC POLICIES & NOTIFICATIONS (Placed before :idOrNumber wildcard) ──
+  @Get('policies')
+  async getPolicies() {
+    return this.ordersService.getOrderPolicySettings();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('notifications')
+  async getCustomerNotifications(@Request() req: any) {
+    return this.ordersService.getCustomerNotifications(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin/returns-and-cancellations')
+  async getReturnsAndCancellations(@Query() query: any) {
+    return this.ordersService.getReturnsAndCancellations(query);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Get('admin/policies')
+  async getAdminPolicies() {
+    return this.ordersService.getOrderPolicySettings();
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Put('admin/policies')
+  async updateAdminPolicies(@Body() body: any, @Request() req: any) {
+    return this.ordersService.updateOrderPolicySettings(body, req.user);
+  }
+
   @Get(':idOrNumber')
   async findOne(@Param('idOrNumber') idOrNumber: string, @Query('phone') phone: string, @Request() req: any) {
     return this.ordersService.findOne(idOrNumber, req.user, phone);
@@ -53,8 +83,20 @@ export class OrdersController {
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/cancel')
-  async cancel(@Param('id') id: string, @Request() req: any) {
-    return this.ordersService.cancelOrder(id, req.user);
+  async cancel(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.ordersService.cancelOrder(id, req.user, body?.reason, body?.notes);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/return')
+  async requestReturn(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.ordersService.requestReturn(id, req.user, body);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch(':id/return-review')
+  async reviewReturn(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.ordersService.reviewReturnRequest(id, req.user, body);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)

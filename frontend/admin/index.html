@@ -103,6 +103,72 @@
       color: #FFFFFF !important;
       border-color: #6366F1;
     }
+
+    /* ── Professional Tax Invoice Print Formatting ── */
+    @media print {
+      body {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        overflow: visible !important;
+        height: auto !important;
+      }
+      #admin-sidebar,
+      #admin-topbar,
+      main,
+      #order-details-modal,
+      #create-order-modal,
+      #product-modal,
+      #banner-modal,
+      #location-modal,
+      #approval-modal,
+      #customer-details-modal,
+      #admin-toast-container,
+      .invoice-toolbar,
+      .invoice-no-print {
+        display: none !important;
+      }
+      #order-invoice-modal {
+        position: static !important;
+        inset: auto !important;
+        background: transparent !important;
+        padding: 0 !important;
+        display: block !important;
+        overflow: visible !important;
+        z-index: auto !important;
+      }
+      #order-invoice-modal-card {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        max-height: none !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+      }
+      #order-invoice-modal-body {
+        background: transparent !important;
+        padding: 0 !important;
+        overflow: visible !important;
+      }
+      #order-invoice-printable {
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        background: #FFFFFF !important;
+        color: #0F172A !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm;
+      }
+    }
   </style>
 </head>
 
@@ -163,6 +229,16 @@
                 <span>Orders &amp; Pickup</span>
               </div>
               <span id="badge-pending-orders" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">0</span>
+            </a>
+          </li>
+
+          <li data-admin-module="orders">
+            <a href="#returns-cancellations" data-tab="returns-cancellations" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+              <div class="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                <span>Returns &amp; Cancellations</span>
+              </div>
+              <span id="badge-pending-returns" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">0</span>
             </a>
           </li>
 
@@ -609,7 +685,208 @@
       </div>
 
       <!-- ─────────────────────────────────────────────────────────────────── -->
-            <!-- 3.5 PANE: CUSTOMER ANALYTICS & DIRECTORY (Requirements 2.A - 2.E)   -->
+      <!-- 3.1 PANE: RETURNS & CANCELLATIONS MANAGEMENT                         -->
+      <!-- ─────────────────────────────────────────────────────────────────── -->
+      <div id="pane-returns-cancellations" class="admin-tab-pane hidden space-y-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="font-black text-xl text-white">Returns &amp; Cancellations Management</h2>
+            <p class="text-xs text-slate-400">Configure dynamic customer return and cancellation policies, process RMA requests, and oversee restock actions</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="AdminReturns.load()" class="px-3.5 py-1.5 rounded-xl border border-admin-border hover:bg-white/5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+              <span>🔄</span> Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- 1. Dynamic Return & Cancellation Policies Configuration Card -->
+        <div class="admin-card p-5 sm:p-6 space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-admin-border">
+            <div>
+              <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                <span>⚙️</span> Dynamic Order Policies Configuration
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">Control the exact timeframe and order statuses where customers can cancel or request returns</p>
+            </div>
+            <button type="button" id="btn-save-policies" onclick="AdminReturns.savePolicies()" class="btn-admin-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-md self-start sm:self-auto cursor-pointer">
+              <span>💾</span> Save Policy Settings
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Return Window Setting -->
+            <div class="p-4 rounded-2xl bg-admin-surface2 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">↩️</span>
+                <div>
+                  <h4 class="font-bold text-xs text-white">Return Policy Window</h4>
+                  <p class="text-[10px] text-slate-400">Allowed return period after delivery</p>
+                </div>
+              </div>
+              <div>
+                <label class="block text-[11px] font-bold text-slate-300 mb-1">Return Window (Days)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="policy-return-window-days" min="0" max="180" value="14" class="admin-input flex-1 font-mono font-bold" />
+                  <span class="text-xs text-slate-400 font-bold">Days</span>
+                </div>
+                <p class="text-[10px] text-indigo-300 mt-1.5">
+                  Customers can only request returns once their order status is <strong>DELIVERED</strong> and within this window.
+                </p>
+              </div>
+            </div>
+
+            <!-- Cancellation Window Setting -->
+            <div class="p-4 rounded-2xl bg-admin-surface2 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">⏱️</span>
+                <div>
+                  <h4 class="font-bold text-xs text-white">Cancellation Timeframe</h4>
+                  <p class="text-[10px] text-slate-400">Duration from order placement</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-300 mb-1">Window Value</label>
+                  <input type="number" id="policy-cancel-window-val" min="1" max="500" value="24" class="admin-input w-full font-mono font-bold" />
+                </div>
+                <div>
+                  <label class="block text-[11px] font-bold text-slate-300 mb-1">Time Unit</label>
+                  <select id="policy-cancel-window-unit" class="admin-input w-full">
+                    <option value="hours">Hours</option>
+                    <option value="days">Days</option>
+                    <option value="weeks">Weeks</option>
+                  </select>
+                </div>
+              </div>
+              <p class="text-[10px] text-slate-400 mt-1">
+                Order placement timestamp is checked dynamically against this duration.
+              </p>
+            </div>
+
+            <!-- Allowed Cancellation Statuses -->
+            <div class="p-4 rounded-2xl bg-admin-surface2 border border-slate-800 space-y-3">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🚫</span>
+                <div>
+                  <h4 class="font-bold text-xs text-white">Allowed Cancel Statuses</h4>
+                  <p class="text-[10px] text-slate-400">Restrict cancellation by stage</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
+                  <input type="checkbox" value="placed" class="cancel-status-checkbox rounded text-indigo-600 focus:ring-0" checked />
+                  <span class="text-slate-200">Placed</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
+                  <input type="checkbox" value="pending" class="cancel-status-checkbox rounded text-indigo-600 focus:ring-0" checked />
+                  <span class="text-slate-200">Pending</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
+                  <input type="checkbox" value="processing" class="cancel-status-checkbox rounded text-indigo-600 focus:ring-0" />
+                  <span class="text-slate-200">Processing</span>
+                </label>
+                <label class="flex items-center gap-2 p-2 rounded-xl bg-slate-900/60 border border-slate-800 cursor-pointer hover:border-slate-700">
+                  <input type="checkbox" value="shipped" class="cancel-status-checkbox rounded text-indigo-600 focus:ring-0" />
+                  <span class="text-slate-200">Dispatched</span>
+                </label>
+              </div>
+              <p class="text-[10px] text-rose-300">
+                Uncheck <em>Dispatched</em> so customers cannot cancel once the parcel is out for delivery.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. KPI Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="admin-card p-4 sm:p-5">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-1">Pending RMA Returns</span>
+            <div class="flex items-baseline gap-2">
+              <span id="returns-kpi-pending" class="text-2xl font-black text-white font-mono">0</span>
+              <span class="text-[10px] text-slate-400">Needs review</span>
+            </div>
+          </div>
+
+          <div class="admin-card p-4 sm:p-5">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-1">Approved Returns</span>
+            <div class="flex items-baseline gap-2">
+              <span id="returns-kpi-approved" class="text-2xl font-black text-white font-mono">0</span>
+              <span class="text-[10px] text-slate-400">Restocked</span>
+            </div>
+          </div>
+
+          <div class="admin-card p-4 sm:p-5">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-rose-400 block mb-1">Total Cancellations</span>
+            <div class="flex items-baseline gap-2">
+              <span id="returns-kpi-cancelled" class="text-2xl font-black text-white font-mono">0</span>
+              <span class="text-[10px] text-slate-400">Order cancelled</span>
+            </div>
+          </div>
+
+          <div class="admin-card p-4 sm:p-5">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400 block mb-1">Active Policy</span>
+            <span id="returns-kpi-policy-summary" class="text-xs font-bold text-white block mt-1 truncate">Cancel: 24 hours • Return: 14 Days</span>
+          </div>
+        </div>
+
+        <!-- 3. Returns & Cancellations Table & Filter Bar -->
+        <div class="admin-card overflow-hidden">
+          <div class="p-4 border-b border-admin-border flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <!-- Filter Tabs -->
+            <div class="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-admin-surface2 border border-slate-800 text-xs font-bold">
+              <button type="button" onclick="AdminReturns.setFilter('all')" data-filter="all" class="returns-filter-tab px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition cursor-pointer">
+                All Records
+              </button>
+              <button type="button" onclick="AdminReturns.setFilter('pending_returns')" data-filter="pending_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+                Pending Returns
+              </button>
+              <button type="button" onclick="AdminReturns.setFilter('approved_returns')" data-filter="approved_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+                Approved Returns
+              </button>
+              <button type="button" onclick="AdminReturns.setFilter('declined_returns')" data-filter="declined_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+                Declined Returns
+              </button>
+              <button type="button" onclick="AdminReturns.setFilter('cancellations')" data-filter="cancellations" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+                Cancellations
+              </button>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-64">
+              <input type="text" id="returns-search-input" oninput="AdminReturns.renderTable()" placeholder="Search Order #, customer..."
+                class="admin-input w-full pl-9 text-xs" />
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="absolute left-3 top-3 text-slate-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </div>
+          </div>
+
+          <!-- Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-900/60 border-b border-admin-border text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+                <tr>
+                  <th class="py-3 px-4">Order # &amp; Date</th>
+                  <th class="py-3 px-4">Customer</th>
+                  <th class="py-3 px-4">Request Type</th>
+                  <th class="py-3 px-4">Reason &amp; Notes</th>
+                  <th class="py-3 px-4">Total Amount</th>
+                  <th class="py-3 px-4">Status</th>
+                  <th class="py-3 px-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="returns-table-body">
+                <tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">Loading returns &amp; cancellations...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ─────────────────────────────────────────────────────────────────── -->
+      <!-- 3.5 PANE: CUSTOMER ANALYTICS & DIRECTORY (Requirements 2.A - 2.E)   -->
       <!-- ─────────────────────────────────────────────────────────────────── -->
       <div id="pane-customers" class="admin-tab-pane hidden space-y-6 pt-2">
         
@@ -1427,7 +1704,13 @@
           <h3 id="order-modal-title" class="font-bold text-base text-white">Order Details</h3>
           <p class="text-xs text-slate-400">View fulfillment details &amp; update live order status</p>
         </div>
-        <button type="button" onclick="AdminOrders.closeDetailsModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="AdminOrders.openInvoiceModal(AdminOrders.selectedOrder?.id)" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Generate &amp; View Official Tax Invoice">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>Invoice / PDF</span>
+          </button>
+          <button type="button" onclick="AdminOrders.closeDetailsModal()" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+        </div>
       </div>
 
       <div class="py-4 space-y-4 flex-1 overflow-y-auto">
@@ -1482,6 +1765,86 @@
             <span>Delete Order</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4.1 Order Official Tax Invoice Modal (Preview & PDF Generation) -->
+  <div id="order-invoice-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden" onclick="if(event.target === this) AdminOrders.closeInvoiceModal()">
+    <div id="order-invoice-modal-card" class="w-full max-w-4xl bg-slate-900 border border-slate-700/80 rounded-2xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Toolbar Header (Hidden when printing) -->
+      <div class="p-4 sm:px-6 bg-slate-900/95 border-b border-slate-800 flex items-center justify-between flex-shrink-0 invoice-toolbar">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm sm:text-base text-white flex items-center gap-2">
+              <span>Official Tax Invoice</span>
+              <span id="invoice-modal-order-number-badge" class="font-mono text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">MTQ-00000</span>
+            </h3>
+            <p class="text-[11px] text-slate-400">Marjaah Trading W.L.L. &bull; Compliant with State of Qatar Commercial Standards</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- Download PDF Button -->
+          <button type="button" id="btn-download-invoice-pdf" onclick="AdminOrders.downloadInvoicePDF()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-indigo-600/20 cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            <span id="btn-download-invoice-pdf-text">Download PDF</span>
+          </button>
+
+          <!-- Print Invoice Button -->
+          <button type="button" onclick="AdminOrders.printInvoice()" class="px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 hover:text-white transition flex items-center gap-1.5 cursor-pointer" title="Print or Save via Browser Dialog">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <span class="hidden sm:inline">Print</span>
+          </button>
+
+          <!-- Close Button -->
+          <button type="button" onclick="AdminOrders.closeInvoiceModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer" title="Close Invoice">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Scrollable Preview Body -->
+      <div id="order-invoice-modal-body" class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-950/60">
+        <!-- Printable White Invoice Canvas (A4 Standard) -->
+        <div id="order-invoice-printable" class="bg-white text-slate-900 mx-auto max-w-3xl p-6 sm:p-10 rounded-2xl shadow-xl border border-slate-200">
+          <!-- Populated dynamically via AdminOrders.openInvoiceModal -->
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 4.2 RMA Return Decline Modal -->
+  <div id="return-decline-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-md admin-card p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between pb-3 border-b border-admin-border">
+        <div class="flex items-center gap-2">
+          <span class="text-rose-400 font-bold text-base">✕</span>
+          <h3 class="font-bold text-sm text-white">Decline Return Request</h3>
+          <span id="decline-modal-order-num" class="font-mono text-xs text-indigo-400">#MTQ-00000</span>
+        </div>
+        <button type="button" onclick="AdminReturns.closeDeclineModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+      </div>
+
+      <input type="hidden" id="decline-target-order-id" value="" />
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1.5">Decline Reason &amp; Customer Note <span class="text-rose-400">*</span></label>
+        <textarea id="decline-reason-notes" rows="3" required placeholder="e.g. Item opened and beyond return window, missing original box..."
+          class="admin-input w-full text-xs resize-none"></textarea>
+      </div>
+
+      <div class="pt-2 flex items-center justify-end gap-2">
+        <button type="button" onclick="AdminReturns.closeDeclineModal()" class="px-3.5 py-2 rounded-xl border border-slate-700 text-xs font-bold text-slate-300 hover:bg-white/5 transition cursor-pointer">
+          Cancel
+        </button>
+        <button type="button" id="btn-confirm-decline" onclick="AdminReturns.submitDecline()" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition shadow-md cursor-pointer">
+          Confirm Decline
+        </button>
       </div>
     </div>
   </div>
@@ -1977,11 +2340,15 @@
   <!-- Toast Notification Container -->
   <div id="admin-toast-container" class="fixed bottom-6 right-6 z-[120] flex flex-col gap-2 pointer-events-none"></div>
 
+  <!-- PDF Generation Engine -->
+  <script src="/assets/js/html2pdf.bundle.min.js"></script>
+
   <!-- Modular Scripts -->
   <script src="/admin/admin.js"></script>
   <script src="/admin/admin-rbac.js"></script>
   <script src="/admin/admin-approvals.js"></script>
   <script src="/admin/admin-orders.js"></script>
+  <script src="/admin/admin-returns.js"></script>
   <script src="/admin/admin-customers.js"></script>
   <script src="/admin/admin-products.js"></script>
   <script src="/admin/admin-content.js"></script>

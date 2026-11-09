@@ -183,7 +183,8 @@
 
     // ── 5. NAVIGATION / TAB DISPATCHER ──
     navigateTo(tabName) {
-      if (!this.can(tabName, 'view') && tabName !== 'dashboard') {
+      const permModule = tabName === 'returns-cancellations' ? 'orders' : tabName;
+      if (!this.can(permModule, 'view') && tabName !== 'dashboard') {
         this.toast('You do not have permission to view this section.', 'error');
         return;
       }
@@ -236,6 +237,9 @@
         case 'orders':
           if (window.AdminOrders) window.AdminOrders.load();
           break;
+        case 'returns-cancellations':
+          if (window.AdminReturns) window.AdminReturns.load();
+          break;
         case 'customers':
           if (window.AdminCustomers) window.AdminCustomers.load();
           break;
@@ -274,6 +278,7 @@
         dashboard: 'Executive Overview',
         products: 'Products Catalog',
         orders: 'Orders & Fulfillment',
+        'returns-cancellations': 'Returns & Cancellations Hub',
         customers: 'Customer Analytics & Directory',
         approvals: 'Approval Workflows',
         categories: 'Categories & Brands',
@@ -291,10 +296,11 @@
     // ── 6. PENDING COUNTERS & NOTIFICATION BADGES ──
     async updatePendingBadges() {
       try {
-        const [approvalsRes, ordersRes, custRes] = await Promise.allSettled([
+        const [approvalsRes, ordersRes, custRes, returnsRes] = await Promise.allSettled([
           this.api('/api/admin/approvals?status=pending'),
           this.api('/api/orders?status=placed'),
           this.api('/api/admin/customers/analytics'),
+          this.api('/api/orders/admin/returns-and-cancellations?type=return_pending'),
         ]);
 
         if (approvalsRes.status === 'fulfilled') {
@@ -326,6 +332,16 @@
           if (badge) {
             badge.textContent = `${onlineCount} Online`;
             badge.style.display = onlineCount > 0 ? 'inline-flex' : 'none';
+          }
+        }
+
+        if (returnsRes.status === 'fulfilled') {
+          const items = Array.isArray(returnsRes.value) ? returnsRes.value : (returnsRes.value?.items || []);
+          const pendingCount = items.filter(it => it.type === 'return' && it.return_status === 'pending').length;
+          const badge = document.getElementById('badge-pending-returns');
+          if (badge) {
+            badge.textContent = pendingCount;
+            badge.style.display = pendingCount > 0 ? 'inline-flex' : 'none';
           }
         }
       } catch (e) {

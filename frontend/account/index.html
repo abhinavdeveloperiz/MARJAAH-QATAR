@@ -843,40 +843,46 @@ window.showTab = function(tabName) {
   } catch (e) {}
 };
 
-async function cancelUserOrder(orderId) {
-  const confirmMsg = 'Are you sure you want to cancel this order? Any reserved stock will be automatically restocked.';
-  if (!confirm(confirmMsg)) return;
+// ── Dynamic Order Policies Cache ──
+window.currentOrderPolicies = {
+  cancellation_window_value: 24,
+  cancellation_window_unit: 'hours',
+  cancellation_allowed_statuses: ['placed', 'pending'],
+  return_window_days: 14,
+  return_allowed_statuses: ['delivered'],
+};
 
-  const btn = document.getElementById('cancel-btn-' + orderId);
-  if (btn) {
-    btn.disabled = true;
-    btn.style.opacity = '0.5';
-    btn.innerText = 'Cancelling…';
-  }
+window.openCustomerCancelModal = function(orderId, orderNum) {
+  const modal = document.getElementById('customer-cancel-modal');
+  const targetId = document.getElementById('cancel-target-order-id');
+  const numEl = document.getElementById('cancel-modal-order-num');
+  if (targetId) targetId.value = orderId;
+  if (numEl) numEl.textContent = `#${orderNum}`;
+  if (modal) modal.classList.remove('hidden');
+};
 
-  try {
-    const res = await window.api.cancelOrder(orderId);
-    if (window.Toast) {
-      window.Toast.success(res?.message || 'Order cancelled successfully.');
-    } else {
-      alert('Order cancelled successfully.');
-    }
-    await loadAccountData();
-    window.showTab('orders');
-  } catch (e) {
-    if (btn) {
-      btn.disabled = false;
-      btn.style.opacity = '1';
-      btn.innerText = 'Cancel Order';
-    }
-    const errMsg = e.message || 'Failed to cancel order.';
-    if (window.Toast) {
-      window.Toast.error(errMsg);
-    } else {
-      alert(errMsg);
-    }
+window.closeCustomerCancelModal = function() {
+  const modal = document.getElementById('customer-cancel-modal');
+  if (modal) modal.classList.add('hidden');
+};
+
+window.openCustomerReturnModal = function(orderId, orderNum) {
+  const modal = document.getElementById('customer-return-modal');
+  const targetId = document.getElementById('return-target-order-id');
+  const numEl = document.getElementById('return-modal-order-num');
+  const noticeEl = document.getElementById('return-modal-policy-notice');
+  if (targetId) targetId.value = orderId;
+  if (numEl) numEl.textContent = `#${orderNum}`;
+  if (noticeEl && window.currentOrderPolicies) {
+    noticeEl.textContent = `Returns accepted within ${window.currentOrderPolicies.return_window_days || 14} days of delivery in original packaging with brand accessories.`;
   }
-}
+  if (modal) modal.classList.remove('hidden');
+};
+
+window.closeCustomerReturnModal = function() {
+  const modal = document.getElementById('customer-return-modal');
+  if (modal) modal.classList.add('hidden');
+};
 
 function applyUserData(u) {
   if (!u) return;
@@ -954,6 +960,16 @@ function applyUserData(u) {
 async function loadOrdersList() {
   const ordersContainer = document.getElementById('user-orders-container');
   if (!ordersContainer) return;
+
+  // 1. Fetch dynamic return & cancellation policies
+  try {
+    if (window.api && typeof window.api.getOrderPolicies === 'function') {
+      const pol = await window.api.getOrderPolicies();
+      if (pol) window.currentOrderPolicies = { ...window.currentOrderPolicies, ...pol };
+    }
+  } catch (errPol) {
+    console.warn('Could not fetch dynamic order policies:', errPol);
+  }
 
   let orders = [];
   let isError = false;
@@ -1053,10 +1069,13 @@ async function loadOrdersList() {
             ${latestItems.length > 2 ? `<p class="text-[11px] text-primary-400 font-semibold">+${latestItems.length - 2} more item(s)</p>` : ''}
           </div>
 
-          <div class="flex items-center gap-2 pt-2 border-t" style="border-color:var(--border-color)">
+          <div class="flex flex-wrap items-center gap-2 pt-2 border-t" style="border-color:var(--border-color)">
             <a href="/track-order/?id=${encodeURIComponent(latestNum)}" class="btn-primary text-xs px-3.5 py-1.5 rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm">
-              <span>📦</span> Track Shipment
+              <span>📦</span> Track
             </a>
+            <button onclick="if(window.CustomerInvoice)window.CustomerInvoice.open('${encodeURIComponent(latestNum)}');" class="text-xs px-3.5 py-1.5 rounded-xl border border-indigo-500/40 hover:border-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 transition font-bold inline-flex items-center gap-1">
+              <span>📄</span> Invoice (PDF)
+            </button>
             <button onclick="showTab('orders')" class="text-xs px-3.5 py-1.5 rounded-xl border hover:bg-white/5 transition font-semibold" style="border-color:var(--border-color);color:var(--text-secondary)">
               View Details
             </button>
@@ -1104,10 +1123,42 @@ async function loadOrdersList() {
     return;
   }
 
+  const pol = window.currentOrderPolicies || {};
+
   ordersContainer.innerHTML = orders.map(o => {
     const orderNum = o.order_number || (o.id ? (String(o.id).startsWith('MTQ-') ? o.id : `MTQ-${String(o.id).padStart(5, '0')}`) : 'MTQ-00000');
     const status = (o.status || 'placed').toLowerCase();
-    const canCancel = (status === 'placed' || status === 'pending' || status === 'processing');
+
+    // ── Dynamic Cancellation Eligibility ──
+    const createdTime = o.created_at ? new Date(o.created_at).getTime() : Date.now();
+    const elapsedCancelMs = Math.max(0, Date.now() - createdTime);
+    const cancelVal = Number(pol.cancellation_window_value) || 24;
+    const cancelUnit = (pol.cancellation_window_unit || 'hours').toLowerCase();
+    let maxCancelMs = cancelVal * 3600 * 1000;
+    if (cancelUnit === 'days') maxCancelMs = cancelVal * 24 * 3600 * 1000;
+    else if (cancelUnit === 'weeks') maxCancelMs = cancelVal * 7 * 24 * 3600 * 1000;
+
+    const allowedCancelStatuses = Array.isArray(pol.cancellation_allowed_statuses)
+      ? pol.cancellation_allowed_statuses.map(s => s.toLowerCase())
+      : ['placed', 'pending'];
+
+    const isCancelStatusOk = allowedCancelStatuses.includes(status);
+    const isCancelTimeOk = elapsedCancelMs <= maxCancelMs;
+    const hasActiveReturn = o.return_request && (o.return_request.status === 'pending' || o.return_request.status === 'approved');
+    const canCancel = !hasActiveReturn && status !== 'cancelled' && status !== 'delivered' && isCancelStatusOk && isCancelTimeOk;
+
+    // ── Dynamic Return Eligibility ──
+    const returnDays = Number(pol.return_window_days) || 14;
+    const maxReturnMs = returnDays * 24 * 3600 * 1000;
+    const deliveredTime = o.delivered_at || o.updated_at || o.created_at ? new Date(o.delivered_at || o.updated_at || o.created_at).getTime() : Date.now();
+    const elapsedReturnMs = Math.max(0, Date.now() - deliveredTime);
+    const allowedReturnStatuses = Array.isArray(pol.return_allowed_statuses)
+      ? pol.return_allowed_statuses.map(s => s.toLowerCase())
+      : ['delivered'];
+
+    const isReturnStatusOk = allowedReturnStatuses.includes(status);
+    const isReturnTimeOk = elapsedReturnMs <= maxReturnMs;
+    const canReturn = !hasActiveReturn && isReturnStatusOk && isReturnTimeOk;
     
     let badgeClass = 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
     let statusText = 'PLACED';
@@ -1141,6 +1192,39 @@ async function loadOrdersList() {
     } else if (o.delivery_address && typeof o.delivery_address === 'object') {
       const addr = o.delivery_address;
       addrText = [addr.building, addr.street, addr.zone ? `Zone ${addr.zone}` : '', addr.city || 'Doha', addr.country || 'Qatar'].filter(Boolean).join(', ');
+    }
+
+    // Return request banner if RMA filed
+    let returnRequestHtml = '';
+    if (o.return_request) {
+      const rrStatus = (o.return_request.status || 'pending').toLowerCase();
+      let rrBadge = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      let rrText = 'RMA RETURN REQUESTED';
+      let rrIcon = '⏳';
+      if (rrStatus === 'approved') {
+        rrBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+        rrText = 'RMA RETURN APPROVED & RESTOCKED';
+        rrIcon = '✅';
+      } else if (rrStatus === 'declined') {
+        rrBadge = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+        rrText = 'RETURN REQUEST DECLINED';
+        rrIcon = '✕';
+      }
+
+      returnRequestHtml = `
+        <div class="p-3 rounded-2xl border text-xs flex flex-wrap items-start justify-between gap-2.5 ${rrBadge}">
+          <div class="space-y-0.5">
+            <div class="flex items-center gap-1.5 font-bold">
+              <span>${rrIcon}</span>
+              <span>${rrText}</span>
+            </div>
+            <p class="text-[11px] opacity-90"><strong>Reason:</strong> ${o.return_request.reason || 'General Return'}</p>
+            ${o.return_request.notes ? `<p class="text-[11px] opacity-80 italic">"${o.return_request.notes}"</p>` : ''}
+            ${o.return_request.admin_notes ? `<p class="text-[11px] font-semibold text-white/90"><strong>Team Note:</strong> ${o.return_request.admin_notes}</p>` : ''}
+          </div>
+          <span class="text-[10px] font-mono opacity-70">${o.return_request.requested_at ? new Date(o.return_request.requested_at).toLocaleDateString('en-GB') : ''}</span>
+        </div>
+      `;
     }
 
     return `
@@ -1182,6 +1266,9 @@ async function loadOrdersList() {
           `).join('')}
         </div>
 
+        <!-- Return Request Info (if active) -->
+        ${returnRequestHtml}
+
         <!-- Address Snippet -->
         ${addrText ? `
           <div class="text-[11px] text-slate-400 flex items-center gap-1.5 pt-1">
@@ -1195,8 +1282,13 @@ async function loadOrdersList() {
           <div class="flex flex-wrap items-center gap-2">
             <a href="/track-order/?id=${encodeURIComponent(orderNum)}"
               class="btn-primary text-xs px-3.5 py-1.5 rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm">
-              <span>📦</span> Track Shipment
+              <span>📦</span> Track
             </a>
+
+            <button type="button" onclick="if(window.CustomerInvoice)window.CustomerInvoice.open('${encodeURIComponent(orderNum)}');"
+              class="text-xs px-3 py-1.5 rounded-xl border border-indigo-500/40 hover:border-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 transition font-bold inline-flex items-center gap-1.5 cursor-pointer">
+              <span>📄</span> Invoice / PDF
+            </button>
 
             <a href="https://wa.me/97477991013?text=${encodeURIComponent('Hi M.SHOP Qatar, inquiry regarding Order #' + orderNum)}" target="_blank"
               class="text-xs px-3 py-1.5 rounded-xl border hover:border-emerald-500/50 hover:bg-emerald-500/10 transition inline-flex items-center gap-1.5 text-slate-300" style="border-color:var(--border-color)">
@@ -1204,12 +1296,21 @@ async function loadOrdersList() {
             </a>
           </div>
 
-          ${canCancel ? `
-            <button id="cancel-btn-${o.id}" onclick="cancelUserOrder('${o.id}')"
-              class="text-xs px-3 py-1.5 rounded-xl border text-rose-400 hover:bg-rose-500/10 transition font-bold" style="border-color:rgba(244,63,94,0.3)">
-              Cancel Order
-            </button>
-          ` : ''}
+          <div class="flex flex-wrap items-center gap-2">
+            ${canReturn ? `
+              <button type="button" onclick="openCustomerReturnModal('${o.id}', '${orderNum}')"
+                class="text-xs px-3 py-1.5 rounded-xl border text-amber-400 hover:bg-amber-500/10 transition font-bold cursor-pointer" style="border-color:rgba(245,158,11,0.3)">
+                Return Product
+              </button>
+            ` : ''}
+
+            ${canCancel ? `
+              <button id="cancel-btn-${o.id}" type="button" onclick="openCustomerCancelModal('${o.id}', '${orderNum}')"
+                class="text-xs px-3 py-1.5 rounded-xl border text-rose-400 hover:bg-rose-500/10 transition font-bold cursor-pointer" style="border-color:rgba(244,63,94,0.3)">
+                Cancel Order
+              </button>
+            ` : ''}
+          </div>
         </div>
 
       </div>
@@ -1311,8 +1412,198 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // ── Customer Cancellation Form ──
+  const cancelForm = document.getElementById('customer-cancel-form');
+  if (cancelForm) {
+    cancelForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const orderId = document.getElementById('cancel-target-order-id')?.value;
+      const reason = document.getElementById('cancel-reason-select')?.value;
+      const notes = document.getElementById('cancel-notes-input')?.value;
+      const submitBtn = document.getElementById('cancel-submit-btn');
+
+      if (!orderId) return;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Cancelling…';
+      }
+
+      try {
+        const res = await window.api.cancelOrder(orderId, reason, notes);
+        window.closeCustomerCancelModal();
+        if (window.Toast) {
+          window.Toast.success(res?.message || 'Order cancelled successfully.');
+        } else {
+          alert(res?.message || 'Order cancelled successfully.');
+        }
+        await loadAccountData();
+        window.showTab('orders');
+      } catch (err) {
+        const errMsg = err?.message || 'Failed to cancel order.';
+        if (window.Toast) window.Toast.error(errMsg);
+        else alert(errMsg);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Confirm Cancellation';
+        }
+      }
+    });
+  }
+
+  // ── Customer Return (RMA) Form ──
+  const returnForm = document.getElementById('customer-return-form');
+  if (returnForm) {
+    returnForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const orderId = document.getElementById('return-target-order-id')?.value;
+      const reason = document.getElementById('return-reason-select')?.value;
+      const notes = document.getElementById('return-notes-input')?.value;
+      const submitBtn = document.getElementById('return-submit-btn');
+
+      if (!orderId) return;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Submitting RMA…';
+      }
+
+      try {
+        const res = await window.api.requestReturn(orderId, { reason, notes });
+        window.closeCustomerReturnModal();
+        if (window.Toast) {
+          window.Toast.success(res?.message || 'Return request submitted successfully. Our team will review it.');
+        } else {
+          alert(res?.message || 'Return request submitted successfully.');
+        }
+        await loadAccountData();
+        window.showTab('orders');
+      } catch (err) {
+        const errMsg = err?.message || 'Failed to submit return request.';
+        if (window.Toast) window.Toast.error(errMsg);
+        else alert(errMsg);
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Submit Return Request';
+        }
+      }
+    });
+  }
 });
 </script>
+
+    <!-- ═══ Customer Cancel Order Confirmation Modal (Responsive, max-w-md on desktop) ═══ -->
+    <div id="customer-cancel-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition-opacity">
+      <div class="w-full max-w-md rounded-3xl border p-6 sm:p-7 shadow-2xl space-y-4 animate-fade-in-up"
+           style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary);">
+        <div class="flex items-center justify-between pb-3 border-b" style="border-color:var(--border-color)">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-rose-500/10 text-rose-400 font-bold text-base">✕</div>
+            <div>
+              <h3 class="font-display font-bold text-base">Cancel Order</h3>
+              <p id="cancel-modal-order-num" class="text-xs font-mono text-primary-400">#MTQ-00000</p>
+            </div>
+          </div>
+          <button type="button" onclick="window.closeCustomerCancelModal()" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+        </div>
+
+        <div class="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300">
+          <p class="font-bold">Cancellation Policy</p>
+          <p class="text-[11px] text-amber-200/80 mt-0.5">Orders can only be cancelled within the allowed policy timeframe before dispatch. Any reserved stock is automatically restocked.</p>
+        </div>
+
+        <form id="customer-cancel-form" class="space-y-3.5">
+          <input type="hidden" id="cancel-target-order-id" value="" />
+          <div>
+            <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Reason for Cancellation <span class="text-rose-400">*</span></label>
+            <select id="cancel-reason-select" required class="input w-full px-3.5 py-2.5 text-xs rounded-xl focus:outline-none transition-all">
+              <option value="Found a better price / alternative">Found a better price / alternative</option>
+              <option value="Ordered by mistake / wrong specifications">Ordered by mistake / wrong specifications</option>
+              <option value="Delivery timeframe too long">Delivery timeframe too long</option>
+              <option value="Changed delivery address or recipient">Changed delivery address or recipient</option>
+              <option value="Duplicate order placed">Duplicate order placed</option>
+              <option value="Changed my mind">Changed my mind</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Additional Comments (Optional)</label>
+            <textarea id="cancel-notes-input" rows="2" placeholder="Let us know how we can improve..."
+              class="input w-full px-3.5 py-2 text-xs rounded-xl focus:outline-none transition-all resize-none"></textarea>
+          </div>
+
+          <div class="pt-2 flex items-center justify-end gap-2.5">
+            <button type="button" onclick="window.closeCustomerCancelModal()"
+              class="px-4 py-2.5 rounded-xl text-xs font-bold border hover:bg-white/5 transition" style="border-color:var(--border-color);color:var(--text-secondary)">
+              Keep Order
+            </button>
+            <button type="submit" id="cancel-submit-btn"
+              class="px-5 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-500 text-white transition inline-flex items-center gap-1.5 shadow-md">
+              Confirm Cancellation
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- ═══ Customer Return Order (RMA) Confirmation Modal (Responsive, max-w-md on desktop) ═══ -->
+    <div id="customer-return-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm transition-opacity">
+      <div class="w-full max-w-md rounded-3xl border p-6 sm:p-7 shadow-2xl space-y-4 animate-fade-in-up"
+           style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary);">
+        <div class="flex items-center justify-between pb-3 border-b" style="border-color:var(--border-color)">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400 font-bold text-base">↩️</div>
+            <div>
+              <h3 class="font-display font-bold text-base">Request Return (RMA)</h3>
+              <p id="return-modal-order-num" class="text-xs font-mono text-primary-400">#MTQ-00000</p>
+            </div>
+          </div>
+          <button type="button" onclick="window.closeCustomerReturnModal()" class="text-slate-400 hover:text-white text-lg p-1">✕</button>
+        </div>
+
+        <div class="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300">
+          <p class="font-bold">M.SHOP 100% Genuine Return Policy</p>
+          <p id="return-modal-policy-notice" class="text-[11px] text-indigo-200/80 mt-0.5">
+            Returns accepted within dynamic policy timeframe in original packaging with manufacturer accessories.
+          </p>
+        </div>
+
+        <form id="customer-return-form" class="space-y-3.5">
+          <input type="hidden" id="return-target-order-id" value="" />
+          <div>
+            <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Reason for Return <span class="text-rose-400">*</span></label>
+            <select id="return-reason-select" required class="input w-full px-3.5 py-2.5 text-xs rounded-xl focus:outline-none transition-all">
+              <option value="Defective / Hardware malfunction">Defective / Hardware malfunction</option>
+              <option value="Received wrong item or specification mismatch">Received wrong item or specification mismatch</option>
+              <option value="Damaged in transit / broken box">Damaged in transit / broken box</option>
+              <option value="Missing accessories or parts">Missing accessories or parts</option>
+              <option value="Performance not as expected / incompatible">Performance not as expected / incompatible</option>
+              <option value="Changed mind / unused item">Changed mind / unused item</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Detailed Explanation &amp; Item Condition <span class="text-rose-400">*</span></label>
+            <textarea id="return-notes-input" required rows="3" placeholder="Please describe the defect or issue in detail..."
+              class="input w-full px-3.5 py-2 text-xs rounded-xl focus:outline-none transition-all resize-none"></textarea>
+          </div>
+
+          <div class="pt-2 flex items-center justify-end gap-2.5">
+            <button type="button" onclick="window.closeCustomerReturnModal()"
+              class="px-4 py-2.5 rounded-xl text-xs font-bold border hover:bg-white/5 transition" style="border-color:var(--border-color);color:var(--text-secondary)">
+              Cancel
+            </button>
+            <button type="submit" id="return-submit-btn"
+              class="btn-primary px-5 py-2.5 rounded-xl text-xs font-bold inline-flex items-center gap-1.5 shadow-md">
+              Submit Return Request
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
   </main>
 
@@ -1638,6 +1929,9 @@ document.addEventListener('DOMContentLoaded', () => {
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js"></script>
   <script src="/assets/js/carousel.js"></script>
+  <script src="/assets/js/html2pdf.bundle.min.js"></script>
+  <script src="/assets/js/customer-invoice.js"></script>
+  <script src="/assets/js/customer-notifications.js"></script>
   
 
 </body>

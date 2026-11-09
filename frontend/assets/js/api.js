@@ -217,7 +217,10 @@
     getOrder(idOrNumber) { return this.get(`/api/orders/${idOrNumber}`); }
     getOrders(params) { return this.get('/api/orders', params); }
     updateOrderStatus(id, status) { return this.patch(`/api/orders/${id}/status`, { status }); }
-    cancelOrder(id) { return this.post(`/api/orders/${id}/cancel`, {}); }
+    cancelOrder(id, reason = '', notes = '') { return this.post(`/api/orders/${id}/cancel`, { reason, notes }); }
+    requestReturn(id, data = {}) { return this.post(`/api/orders/${id}/return`, data); }
+    getOrderPolicies() { return this.get('/api/orders/policies'); }
+    getOrderNotifications() { return this.get('/api/orders/notifications'); }
     getProfile() { return this.get('/api/auth/me'); }
     updateProfile(data) { return this.patch('/api/auth/me', data); }
     login(credentials) { return this.post('/api/auth/login', credentials); }

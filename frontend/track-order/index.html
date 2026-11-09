@@ -569,6 +569,7 @@
       }
 
       function renderOrderSuccess(order) {
+        window.currentTrackedOrder = order;
         const orderNumber = order.order_number || order.id;
         const status = (order.status || 'placed').toLowerCase();
         const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', {
@@ -786,6 +787,10 @@
               </div>
 
               <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="if(window.CustomerInvoice)window.CustomerInvoice.open(window.currentTrackedOrder || '${escapeHtml(orderNumber)}');"
+                  class="px-4 py-2.5 rounded-xl text-xs font-bold bg-primary-600 hover:bg-primary-500 text-white transition inline-flex items-center gap-1.5 shadow-md cursor-pointer">
+                  <span>📄</span> Tax Invoice (PDF)
+                </button>
                 <a href="${waOrderUrl}" target="_blank"
                   class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#25D366] text-white hover:bg-[#20bd5a] transition inline-flex items-center gap-2 shadow-md">
                   <span>💬</span> Inquire on WhatsApp
@@ -803,5 +808,9 @@
     });
   </script>
 
+  <!-- PDF Engine & Customer Notifs/Invoice -->
+  <script src="/assets/js/html2pdf.bundle.min.js"></script>
+  <script src="/assets/js/customer-invoice.js"></script>
+  <script src="/assets/js/customer-notifications.js"></script>
 </body>
 </html>

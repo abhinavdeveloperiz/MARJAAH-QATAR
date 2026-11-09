@@ -395,40 +395,175 @@ export class OrdersService {
     };
   }
 
-  async cancelOrder(id: string, currentUser?: any) {
-    const docRef = this.firestore.doc('orders', id);
-    const doc = await docRef.get();
+  // ═════════════════════════════════════════════════════════════════════════
+  // DYNAMIC ORDER POLICIES (CANCELLATION & RETURN WINDOWS)
+  // ═════════════════════════════════════════════════════════════════════════
+  async getOrderPolicySettings() {
+    try {
+      const doc = await this.firestore.collection('settings').doc('order_policies').get();
+      if (doc.exists) {
+        return {
+          cancellation_window_value: 24,
+          cancellation_window_unit: 'hours',
+          cancellation_allowed_statuses: ['placed', 'pending'],
+          return_window_days: 14,
+          return_allowed_statuses: ['delivered'],
+          cancellation_reasons: [
+            'Ordered by mistake',
+            'Found better price elsewhere',
+            'Delivery time is too long',
+            'Need to change shipping details',
+            'Change of mind / Other',
+          ],
+          return_reasons: [
+            'Defective or damaged product',
+            'Wrong product delivered',
+            'Product does not match description',
+            'Missing accessories/parts',
+            'Changed mind / Not needed',
+            'Other',
+          ],
+          ...doc.data(),
+        };
+      }
+    } catch (e) {}
+
+    return {
+      cancellation_window_value: 24,
+      cancellation_window_unit: 'hours',
+      cancellation_allowed_statuses: ['placed', 'pending'],
+      return_window_days: 14,
+      return_allowed_statuses: ['delivered'],
+      cancellation_reasons: [
+        'Ordered by mistake',
+        'Found better price elsewhere',
+        'Delivery time is too long',
+        'Need to change shipping details',
+        'Change of mind / Other',
+      ],
+      return_reasons: [
+        'Defective or damaged product',
+        'Wrong product delivered',
+        'Product does not match description',
+        'Missing accessories/parts',
+        'Changed mind / Not needed',
+        'Other',
+      ],
+    };
+  }
+
+  async updateOrderPolicySettings(dto: any, currentUser?: any) {
+    const docRef = this.firestore.collection('settings').doc('order_policies');
+    const cleanData = {
+      cancellation_window_value: Math.max(1, Number(dto.cancellation_window_value) || 24),
+      cancellation_window_unit: ['hours', 'days', 'weeks'].includes(dto.cancellation_window_unit) ? dto.cancellation_window_unit : 'hours',
+      cancellation_allowed_statuses: Array.isArray(dto.cancellation_allowed_statuses) && dto.cancellation_allowed_statuses.length > 0 ? dto.cancellation_allowed_statuses : ['placed', 'pending'],
+      return_window_days: Math.max(1, Number(dto.return_window_days) || 14),
+      return_allowed_statuses: Array.isArray(dto.return_allowed_statuses) && dto.return_allowed_statuses.length > 0 ? dto.return_allowed_statuses : ['delivered'],
+      updated_at: new Date().toISOString(),
+      updated_by: currentUser?.username || currentUser?.email || 'admin',
+    };
+
+    await docRef.set(cleanData, { merge: true });
+    return cleanData;
+  }
+
+  async cancelOrder(id: string, currentUser?: any, reason?: string, notes?: string) {
+    let docRef = this.firestore.doc('orders', id);
+    let doc = await docRef.get();
     if (!doc.exists) {
-      throw new NotFoundException(`Order not found: ${id}`);
+      const q = await this.firestore.collection('orders').where('order_number', '==', id).limit(1).get();
+      if (!q.empty) {
+        doc = q.docs[0];
+        docRef = doc.ref;
+      } else {
+        throw new NotFoundException(`Order not found: ${id}`);
+      }
     }
 
-    const order = doc.data();
-    const isAdmin = currentUser?.is_staff || currentUser?.role === 'admin';
-    if (!isAdmin && currentUser && order?.user_id !== currentUser.id) {
-      throw new ForbiddenException('You cannot cancel another user\'s order');
+    const order = doc.data() || {};
+    const isAdmin = currentUser?.is_staff || currentUser?.role === 'admin' || currentUser?.is_superuser;
+    if (!isAdmin && currentUser) {
+      const ordUid = String(order.user_id || order.userId || '').trim();
+      const ordEmail = (order.customer_email || order.email || '').toLowerCase().trim();
+      const curUid = String(currentUser.id || currentUser.sub || '').trim();
+      const curEmail = (currentUser.email || '').toLowerCase().trim();
+      if (ordUid && curUid && ordUid !== curUid && ordEmail !== curEmail) {
+        throw new ForbiddenException('You cannot cancel another user\'s order');
+      }
     }
 
-    if (order?.status !== 'pending' && order?.status !== 'placed' && order?.status !== 'processing') {
-      throw new BadRequestException(`Order cannot be cancelled because it is already ${order?.status}`);
+    if (order.status === 'cancelled') {
+      throw new BadRequestException('Order is already cancelled');
     }
+
+    // Dynamic Policy Checks for regular customers
+    if (!isAdmin) {
+      const policy = await this.getOrderPolicySettings();
+      const allowedStatuses = (policy.cancellation_allowed_statuses || ['placed', 'pending']).map((s: string) => s.toLowerCase());
+      const currentStatus = (order.status || 'placed').toLowerCase();
+
+      if (!allowedStatuses.includes(currentStatus)) {
+        throw new BadRequestException(
+          `Order cannot be cancelled because it is already "${order.status.toUpperCase()}". Once an order is being shipped or delivered, cancellation is no longer permitted.`
+        );
+      }
+
+      // Check time window
+      const createdAtMs = new Date(order.created_at || order.createdAt || Date.now()).getTime();
+      let windowMs = (policy.cancellation_window_value || 24) * 60 * 60 * 1000;
+      if (policy.cancellation_window_unit === 'days') {
+        windowMs = (policy.cancellation_window_value || 1) * 24 * 60 * 60 * 1000;
+      } else if (policy.cancellation_window_unit === 'weeks') {
+        windowMs = (policy.cancellation_window_value || 1) * 7 * 24 * 60 * 60 * 1000;
+      }
+
+      if (Date.now() - createdAtMs > windowMs) {
+        throw new BadRequestException(
+          `The cancellation window (${policy.cancellation_window_value} ${policy.cancellation_window_unit}) has elapsed. This order can no longer be self-cancelled.`
+        );
+      }
+    }
+
+    const nowIso = new Date().toISOString();
+    const timeline = Array.isArray(order.timeline) ? [...order.timeline] : [];
+    const reasonText = reason ? `${reason}${notes ? ` (${notes})` : ''}` : 'Customer requested cancellation';
+
+    timeline.push({
+      status: 'cancelled',
+      title: 'Order Cancelled',
+      note: reasonText,
+      timestamp: nowIso,
+    });
 
     await docRef.update({
       status: 'cancelled',
-      updated_at: new Date().toISOString(),
+      cancellation: {
+        cancelled_at: nowIso,
+        cancelled_by: isAdmin ? 'admin' : 'customer',
+        reason: reason || 'Customer requested cancellation',
+        notes: notes || '',
+      },
+      cancellation_reason: reason || 'Customer requested cancellation',
+      cancellation_notes: notes || '',
+      timeline,
+      updated_at: nowIso,
     });
 
     // Restock products
-    if (Array.isArray(order?.items)) {
+    if (Array.isArray(order.items)) {
       for (const item of order.items) {
         try {
-          if (item.id) {
-            const prodRef = this.firestore.doc('products', item.id);
+          const pid = item.id || item.product_id;
+          if (pid) {
+            const prodRef = this.firestore.doc('products', pid);
             const prodDoc = await prodRef.get();
             if (prodDoc.exists) {
-              const currentStock = prodDoc.data()?.stock_count || 0;
+              const currentStock = Number(prodDoc.data()?.stock_count) || 0;
               await prodRef.update({
-                stock_count: currentStock + (item.quantity || 1),
+                stock_count: currentStock + (Number(item.quantity) || 1),
                 in_stock: true,
+                updated_at: nowIso,
               });
             }
           }
@@ -439,7 +574,347 @@ export class OrdersService {
     return {
       success: true,
       message: 'Order cancelled successfully and inventory restored',
-      id,
+      id: doc.id,
+      order_number: order.order_number || doc.id,
+    };
+  }
+
+  async requestReturn(id: string, currentUser?: any, body?: any) {
+    let docRef = this.firestore.doc('orders', id);
+    let doc = await docRef.get();
+    if (!doc.exists) {
+      const q = await this.firestore.collection('orders').where('order_number', '==', id).limit(1).get();
+      if (!q.empty) {
+        doc = q.docs[0];
+        docRef = doc.ref;
+      } else {
+        throw new NotFoundException(`Order not found: ${id}`);
+      }
+    }
+
+    const order = doc.data() || {};
+    const isAdmin = currentUser?.is_staff || currentUser?.role === 'admin' || currentUser?.is_superuser;
+    if (!isAdmin && currentUser) {
+      const ordUid = String(order.user_id || order.userId || '').trim();
+      const ordEmail = (order.customer_email || order.email || '').toLowerCase().trim();
+      const curUid = String(currentUser.id || currentUser.sub || '').trim();
+      const curEmail = (currentUser.email || '').toLowerCase().trim();
+      if (ordUid && curUid && ordUid !== curUid && ordEmail !== curEmail) {
+        throw new ForbiddenException('You cannot request a return for another user\'s order');
+      }
+    }
+
+    if (order.status === 'cancelled') {
+      throw new BadRequestException('Cancelled orders cannot be returned.');
+    }
+
+    if (order.return_request && order.return_request.status === 'pending') {
+      throw new BadRequestException('A return request is already pending review for this order.');
+    }
+
+    if (order.return_request && order.return_request.status === 'approved') {
+      throw new BadRequestException('This order has already been returned and approved.');
+    }
+
+    // Dynamic Policy Checks
+    if (!isAdmin) {
+      const policy = await this.getOrderPolicySettings();
+      const allowedStatuses = (policy.return_allowed_statuses || ['delivered']).map((s: string) => s.toLowerCase());
+      const currentStatus = (order.status || 'placed').toLowerCase();
+
+      if (!allowedStatuses.includes(currentStatus)) {
+        throw new BadRequestException(
+          `Returns can only be requested after the order has been delivered. Current order status: "${order.status.toUpperCase()}".`
+        );
+      }
+
+      // Check return window
+      const deliveredEvent = Array.isArray(order.timeline) ? order.timeline.find((t: any) => t.status === 'delivered') : null;
+      const refTime = new Date(deliveredEvent?.timestamp || order.updated_at || order.created_at || Date.now()).getTime();
+      const windowMs = (policy.return_window_days || 14) * 24 * 60 * 60 * 1000;
+
+      if (Date.now() - refTime > windowMs) {
+        throw new BadRequestException(
+          `The return window of ${policy.return_window_days} days from delivery has expired. This order is no longer eligible for return.`
+        );
+      }
+    }
+
+    const nowIso = new Date().toISOString();
+    const requestId = `RMA-${order.order_number || doc.id}-${Date.now().toString(36).toUpperCase().slice(-4)}`;
+    const reason = body?.reason || 'Product Return Request';
+    const notes = body?.notes || '';
+
+    const returnRequest = {
+      request_id: requestId,
+      requested_at: nowIso,
+      reason,
+      notes,
+      status: 'pending',
+      items: Array.isArray(body?.items) && body.items.length > 0 ? body.items : order.items || [],
+      customer_name: order.customer_name || currentUser?.username || 'Customer',
+      customer_phone: order.customer_phone || currentUser?.phone || '',
+    };
+
+    const timeline = Array.isArray(order.timeline) ? [...order.timeline] : [];
+    timeline.push({
+      status: 'return_requested',
+      title: 'Return Requested (RMA)',
+      note: `${requestId}: ${reason}${notes ? ` (${notes})` : ''}`,
+      timestamp: nowIso,
+    });
+
+    await docRef.update({
+      return_status: 'requested',
+      return_request: returnRequest,
+      timeline,
+      updated_at: nowIso,
+    });
+
+    return {
+      success: true,
+      message: 'Return request submitted successfully. Our team will review your request.',
+      request_id: requestId,
+      order_id: doc.id,
+      order_number: order.order_number || doc.id,
+    };
+  }
+
+  async reviewReturnRequest(
+    id: string,
+    currentUser: any,
+    body: {
+      status: 'approved' | 'rejected' | 'declined';
+      notes?: string;
+      admin_notes?: string;
+      restock?: boolean;
+      restock_items?: boolean;
+    },
+  ) {
+    let docRef = this.firestore.doc('orders', id);
+    let doc = await docRef.get();
+    if (!doc.exists) {
+      const q = await this.firestore.collection('orders').where('order_number', '==', id).limit(1).get();
+      if (!q.empty) {
+        doc = q.docs[0];
+        docRef = doc.ref;
+      } else {
+        throw new NotFoundException(`Order not found: ${id}`);
+      }
+    }
+
+    const order = doc.data() || {};
+    if (!order.return_request) {
+      throw new BadRequestException('No return request found for this order.');
+    }
+
+    const nowIso = new Date().toISOString();
+    const timeline = Array.isArray(order.timeline) ? [...order.timeline] : [];
+
+    if (body.status === 'approved') {
+      const updatedReturnRequest = {
+        ...order.return_request,
+        status: 'approved',
+        approved_at: nowIso,
+        admin_notes: body.notes || 'Return approved by administration',
+        reviewed_by: currentUser?.username || currentUser?.email || 'admin',
+      };
+
+      timeline.push({
+        status: 'return_approved',
+        title: 'Return Request Approved (RMA)',
+        note: body.notes || 'Return request approved. Goods returned & inventory restored.',
+        timestamp: nowIso,
+      });
+
+      await docRef.update({
+        status: 'returned',
+        return_status: 'approved',
+        return_request: updatedReturnRequest,
+        timeline,
+        updated_at: nowIso,
+      });
+
+      // Restock items if requested (default true)
+      if (body.restock !== false && body.restock_items !== false && Array.isArray(order.items)) {
+        for (const item of order.items) {
+          try {
+            const pid = item.id || item.product_id;
+            if (pid) {
+              const prodRef = this.firestore.doc('products', pid);
+              const prodDoc = await prodRef.get();
+              if (prodDoc.exists) {
+                const cur = Number(prodDoc.data()?.stock_count) || 0;
+                await prodRef.update({
+                  stock_count: cur + (Number(item.quantity) || 1),
+                  in_stock: true,
+                  updated_at: nowIso,
+                });
+              }
+            }
+          } catch (e) {}
+        }
+      }
+
+      return {
+        success: true,
+        message: `Return request for Order #${order.order_number || doc.id} has been approved.`,
+        order_id: doc.id,
+        status: 'approved',
+      };
+    } else if (body.status === 'rejected' || body.status === 'declined') {
+      const updatedReturnRequest = {
+        ...order.return_request,
+        status: 'declined',
+        declined_at: nowIso,
+        rejection_reason: body.notes || body.admin_notes || 'Conditions for return not met.',
+        admin_notes: body.notes || body.admin_notes || 'Conditions for return not met.',
+        reviewed_by: currentUser?.username || currentUser?.email || 'admin',
+      };
+
+      timeline.push({
+        status: 'return_declined',
+        title: 'Return Request Declined',
+        note: body.notes || body.admin_notes || 'Return request declined after review.',
+        timestamp: nowIso,
+      });
+
+      await docRef.update({
+        return_status: 'declined',
+        return_request: updatedReturnRequest,
+        timeline,
+        updated_at: nowIso,
+      });
+
+      return {
+        success: true,
+        message: `Return request for Order #${order.order_number || doc.id} has been declined.`,
+        order_id: doc.id,
+        status: 'declined',
+      };
+    } else {
+      throw new BadRequestException('Status must be either "approved" or "declined"');
+    }
+  }
+
+  async getReturnsAndCancellations(query?: any) {
+    const snap = await this.firestore.collection('orders').get();
+    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
+
+    const records = all
+      .filter((o) => o.status === 'cancelled' || o.return_request || o.return_status)
+      .map((o) => {
+        const isCancellation = o.status === 'cancelled';
+        const rr = o.return_request || {};
+        return {
+          order_id: o.id,
+          order_number: o.order_number || o.id,
+          customer_name: o.customer_name || o.full_name || 'Customer',
+          customer_phone: o.customer_phone || o.phone || '',
+          customer_email: o.customer_email || o.email || '',
+          total: Number(o.total || 0),
+          order_status: o.status,
+          type: isCancellation ? 'cancellation' : 'return',
+          request_id: rr.request_id || (isCancellation ? `CAN-${o.order_number || o.id}` : null),
+          reason: isCancellation ? (o.cancellation?.reason || 'Cancelled by customer') : (rr.reason || 'Return request'),
+          notes: isCancellation ? (o.cancellation?.notes || '') : (rr.notes || ''),
+          requested_at: isCancellation ? (o.cancellation?.cancelled_at || o.updated_at || o.created_at) : (rr.requested_at || o.updated_at),
+          return_status: isCancellation ? 'cancelled' : (rr.status || 'pending'),
+          return_request: o.return_request || null,
+          items: o.items || [],
+          created_at: o.created_at,
+        };
+      });
+
+    // Sort newest first
+    records.sort((a, b) => new Date(b.requested_at || b.created_at).getTime() - new Date(a.requested_at || a.created_at).getTime());
+
+    const stats = {
+      total_cancellations: records.filter((r) => r.type === 'cancellation').length,
+      total_returns: records.filter((r) => r.type === 'return').length,
+      pending_returns: records.filter((r) => r.type === 'return' && r.return_status === 'pending').length,
+      approved_returns: records.filter((r) => r.type === 'return' && r.return_status === 'approved').length,
+      rejected_returns: records.filter((r) => r.type === 'return' && r.return_status === 'rejected').length,
+    };
+
+    return {
+      items: records,
+      stats,
+    };
+  }
+
+  async getCustomerNotifications(currentUser: any) {
+    if (!currentUser) return { notifications: [], total: 0 };
+
+    const uId = String(currentUser.id || currentUser.sub || '').trim();
+    const uEmail = (currentUser.email || '').toLowerCase().trim();
+    const uPhone = (currentUser.phone || '').replace(/\D/g, '');
+
+    const snap = await this.firestore.collection('orders').get();
+    const userOrders = snap.docs
+      .map((d) => ({ id: d.id, ...d.data() } as any))
+      .filter((o) => {
+        const oUid = String(o.user_id || o.userId || '').trim();
+        const oEmail = (o.customer_email || o.email || '').toLowerCase().trim();
+        const oPhone = (o.customer_phone || o.phone || '').replace(/\D/g, '');
+        return (uId && oUid === uId) || (uEmail && oEmail === uEmail) || (uPhone && oPhone && oPhone.slice(-8) === uPhone.slice(-8));
+      });
+
+    const notifications: any[] = [];
+
+    for (const o of userOrders) {
+      const orderNum = o.order_number || o.id;
+
+      // Timeline events
+      if (Array.isArray(o.timeline) && o.timeline.length > 0) {
+        for (const t of o.timeline) {
+          notifications.push({
+            id: `notif-${o.id}-${t.status}-${new Date(t.timestamp || Date.now()).getTime()}`,
+            order_id: o.id,
+            order_number: orderNum,
+            type: t.status,
+            title: t.title || `Order #${orderNum} Update`,
+            message: t.note || `Order #${orderNum} status is now ${String(t.status).toUpperCase()}`,
+            timestamp: t.timestamp || o.created_at,
+          });
+        }
+      } else {
+        notifications.push({
+          id: `notif-${o.id}-${o.status}`,
+          order_id: o.id,
+          order_number: orderNum,
+          type: o.status || 'placed',
+          title: `Order #${orderNum}`,
+          message: `Your order #${orderNum} is currently ${String(o.status || 'placed').toUpperCase()}`,
+          timestamp: o.updated_at || o.created_at,
+        });
+      }
+
+      // Return requests
+      if (o.return_request) {
+        const rr = o.return_request;
+        notifications.push({
+          id: `notif-${o.id}-return-${rr.status}-${new Date(rr.updated_at || rr.requested_at || Date.now()).getTime()}`,
+          order_id: o.id,
+          order_number: orderNum,
+          type: `return_${rr.status}`,
+          title: rr.status === 'approved' ? `Return Approved #${orderNum}` : (rr.status === 'rejected' ? `Return Declined #${orderNum}` : `Return Requested #${orderNum}`),
+          message: rr.status === 'approved'
+            ? `Your return request (${rr.request_id}) for #${orderNum} has been APPROVED.`
+            : (rr.status === 'rejected'
+              ? `Your return request (${rr.request_id}) for #${orderNum} was declined: ${rr.rejection_reason || 'Conditions not met.'}`
+              : `Your return request (${rr.request_id}) for #${orderNum} has been received and is pending review.`),
+          timestamp: rr.approved_at || rr.rejected_at || rr.requested_at,
+        });
+      }
+    }
+
+    // Sort newest first
+    notifications.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    return {
+      notifications: notifications.slice(0, 30),
+      total: notifications.length,
     };
   }
 

@@ -237,6 +237,36 @@ export class AdminController {
     return this.adminService.updateCustomerStatus(id, status, req.user);
   }
 
+  // ─── RETURNS & CANCELLATIONS MANAGEMENT ─────────────────────────────────────
+  @Get('returns-and-cancellations')
+  @RequirePermission('orders', 'view')
+  async getReturnsAndCancellations(@Query() query: any) {
+    return this.adminService.getReturnsAndCancellations(query);
+  }
+
+  @Patch('orders/:id/return-review')
+  @RequirePermission('orders', 'edit')
+  async reviewReturnRequest(
+    @Param('id') id: string,
+    @Body() body: { status: 'approved' | 'rejected'; notes?: string; restock?: boolean },
+    @Request() req: any,
+  ) {
+    return this.adminService.reviewReturnRequest(id, req.user, body);
+  }
+
+  // ─── DYNAMIC ORDER POLICIES (CANCELLATION & RETURN CONFIG) ──────────────────
+  @Get('order-policies')
+  @RequirePermission('settings', 'view')
+  async getOrderPolicies() {
+    return this.adminService.getOrderPolicySettings();
+  }
+
+  @Put('order-policies')
+  @RequirePermission('settings', 'edit')
+  async updateOrderPolicies(@Body() body: any, @Request() req: any) {
+    return this.adminService.updateOrderPolicySettings(body, req.user);
+  }
+
   // ─── STORE SETTINGS & CR NUMBER (Requirement 7) ─────────────────────────────
   @Get('settings')
   @RequirePermission('settings', 'view')

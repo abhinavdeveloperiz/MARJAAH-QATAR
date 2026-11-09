@@ -582,7 +582,12 @@
               const oStatus = o.status || 'placed';
               return `
                 <tr class="border-b border-admin-border/50 hover:bg-white/5 transition-colors">
-                  <td class="py-2.5 px-3 font-mono font-bold text-indigo-400">#${oNum}</td>
+                  <td class="py-2.5 px-3">
+                    <button type="button" onclick="AdminOrders.openInvoiceModal('${o.id || oNum}')" class="font-mono font-bold text-indigo-400 hover:text-indigo-300 hover:underline inline-flex items-center gap-1 cursor-pointer" title="View &amp; Download Invoice">
+                      <span>#${oNum}</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </button>
+                  </td>
                   <td class="py-2.5 px-3 text-slate-400">${oDate}</td>
                   <td class="py-2.5 px-3 text-slate-300">${itemsCount} item${itemsCount > 1 ? 's' : ''}</td>
                   <td class="py-2.5 px-3 font-bold text-white font-mono">${Number(o.total || 0).toLocaleString()} QAR</td>
