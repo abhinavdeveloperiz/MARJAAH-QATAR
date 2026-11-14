@@ -142,11 +142,11 @@
       document.querySelectorAll('.returns-filter-tab').forEach((tab) => {
         const f = tab.getAttribute('data-filter');
         if (f === filter) {
-          tab.classList.add('bg-indigo-600', 'text-white');
-          tab.classList.remove('text-slate-400', 'hover:text-white');
+          tab.classList.add('bg-primary', 'text-white');
+          tab.classList.remove('text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
         } else {
-          tab.classList.remove('bg-indigo-600', 'text-white');
-          tab.classList.add('text-slate-400', 'hover:text-white');
+          tab.classList.remove('bg-primary', 'text-white');
+          tab.classList.add('text-slate-600', 'hover:text-slate-900', 'hover:bg-slate-100');
         }
       });
       this.renderTable();

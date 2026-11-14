@@ -17,7 +17,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <!-- Centralized Admin App Colors -->
-  <script src="/admin/shared/admin-colors.js?v=20261114_11"></script>
+  <script src="/admin/shared/admin-colors.js?v=20261114_15"></script>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -563,11 +563,6 @@
         </a>
       </div>
     </header>
-          <span>Live Store</span>
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
-        </a>
-      </div>
-    </header>
 
     <!-- Content Workspace -->
     <main class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 sm:space-y-8">
@@ -581,69 +576,69 @@
         <div class="grid grid-cols-2 sm:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4">
           
           <!-- KPI 1: Gross Revenue -->
-          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Gross Revenue: Cumulative turnover recorded across all valid customer orders in Firestore (excluding cancelled/refunded)">
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-300 transition-all cursor-default" title="Gross Revenue: Cumulative turnover recorded across all valid customer orders in Firestore (excluding cancelled/refunded)">
             <div class="flex items-center justify-between gap-1 mb-1">
-              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Gross Revenue</span>
-              <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" title="Live telemetry synced with Firestore"></span>
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-500">Gross Revenue</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/40" title="Live telemetry synced with Firestore"></span>
             </div>
-            <p id="kpi-gross-revenue" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0 QAR</p>
-            <div class="flex items-center gap-1.5 text-[10px] font-medium text-emerald-400" title="Synced in real time with customer order events">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <p id="kpi-gross-revenue" class="text-lg sm:text-xl font-extrabold text-slate-900 font-mono tracking-tight my-1">0 QAR</p>
+            <div class="flex items-center gap-1.5 text-[10px] font-medium text-emerald-600" title="Synced in real time with customer order events">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               <span>Real Time</span>
             </div>
           </div>
 
           <!-- KPI 2: Net Orders -->
-          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Net Orders: Total count of customer orders processed through home delivery across Qatar and store pickup locations">
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-300 transition-all cursor-default" title="Net Orders: Total count of customer orders processed through home delivery across Qatar and store pickup locations">
             <div class="flex items-center justify-between gap-1 mb-1">
-              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Net Orders</span>
-              <span class="w-2 h-2 rounded-full bg-primary shadow-sm shadow-blue-500/50" title="Active fulfillment pipeline"></span>
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-500">Net Orders</span>
+              <span class="w-2 h-2 rounded-full bg-primary shadow-sm shadow-blue-500/40" title="Active fulfillment pipeline"></span>
             </div>
-            <p id="kpi-total-orders" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0</p>
-            <span class="text-[10px] font-medium text-slate-400" title="All delivery zones and store pickup hubs">Qatar &amp; Store Pickup</span>
+            <p id="kpi-total-orders" class="text-lg sm:text-xl font-extrabold text-slate-900 font-mono tracking-tight my-1">0</p>
+            <span class="text-[10px] font-medium text-slate-500" title="All delivery zones and store pickup hubs">Qatar &amp; Store Pickup</span>
           </div>
 
           <!-- KPI 3: Average Order Value -->
-          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Average Order Value: Mean customer spend per order (Gross Revenue ÷ Net Orders)">
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-300 transition-all cursor-default" title="Average Order Value: Mean customer spend per order (Gross Revenue ÷ Net Orders)">
             <div class="flex items-center justify-between gap-1 mb-1">
-              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Average Order</span>
-              <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50" title="Customer basket size indicator"></span>
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-500">Average Order</span>
+              <span class="w-2 h-2 rounded-full bg-cyan-500 shadow-sm shadow-cyan-500/40" title="Customer basket size indicator"></span>
             </div>
-            <p id="kpi-aov" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0 QAR</p>
-            <span class="text-[10px] font-medium text-slate-400" title="Calculated across all customer baskets in QAR">Across all baskets</span>
+            <p id="kpi-aov" class="text-lg sm:text-xl font-extrabold text-slate-900 font-mono tracking-tight my-1">0 QAR</p>
+            <span class="text-[10px] font-medium text-slate-500" title="Calculated across all customer baskets in QAR">Across all baskets</span>
           </div>
 
           <!-- KPI 4: Catalog Products -->
-          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Catalog Items: Total active products currently registered and live in the store catalog">
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-300 transition-all cursor-default" title="Catalog Items: Total active products currently registered and live in the store catalog">
             <div class="flex items-center justify-between gap-1 mb-1">
-              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Catalog Items</span>
-              <span class="w-2 h-2 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400/50" title="Active catalog inventory"></span>
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-500">Catalog Items</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/40" title="Active catalog inventory"></span>
             </div>
-            <p id="kpi-total-products" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0</p>
-            <span class="text-[10px] font-medium text-slate-400" title="Items indexed across all product categories">Active inventory</span>
+            <p id="kpi-total-products" class="text-lg sm:text-xl font-extrabold text-slate-900 font-mono tracking-tight my-1">0</p>
+            <span class="text-[10px] font-medium text-slate-500" title="Items indexed across all product categories">Active inventory</span>
           </div>
 
           <!-- KPI 5: Pending Approvals -->
-          <div class="admin-card p-4 flex flex-col justify-between cursor-pointer hover:border-amber-500/40 transition-all group" title="Pending Approvals: Products, price edits, or content submitted by staff awaiting super administrator review" onclick="AdminApp.navigateTo('approvals')">
+          <div class="admin-card p-4 flex flex-col justify-between cursor-pointer hover:border-amber-400 transition-all group" title="Pending Approvals: Products, price edits, or content submitted by staff awaiting super administrator review" onclick="AdminApp.navigateTo('approvals')">
             <div class="flex items-center justify-between gap-1 mb-1">
-              <span class="text-[11px] uppercase font-semibold tracking-wider text-amber-400 group-hover:text-amber-300">Approvals</span>
-              <span class="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" title="Review queue counter"></span>
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-amber-600 group-hover:text-amber-700">Approvals</span>
+              <span class="w-2 h-2 rounded-full bg-amber-500 shadow-sm shadow-amber-500/40" title="Review queue counter"></span>
             </div>
-            <p id="kpi-pending-approvals" class="text-lg sm:text-xl font-extrabold text-amber-300 font-mono tracking-tight my-1">0</p>
-            <span class="text-[10px] font-medium text-amber-400/90 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform" title="Click to open the Approvals Queue">
+            <p id="kpi-pending-approvals" class="text-lg sm:text-xl font-extrabold text-amber-600 font-mono tracking-tight my-1">0</p>
+            <span class="text-[10px] font-medium text-amber-600 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform" title="Click to open the Approvals Queue">
               Action required &rarr;
             </span>
           </div>
 
           <!-- KPI 6: Active Staff -->
-          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Active Staff: Authenticated administrative accounts with verified role-based access control (RBAC) permissions">
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-300 transition-all cursor-default" title="Active Staff: Authenticated administrative accounts with verified role-based access control (RBAC) permissions">
             <div class="flex items-center justify-between gap-1 mb-1">
-              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Active Staff</span>
-              <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" title="RBAC security active"></span>
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-500">Active Staff</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-500 shadow-sm shadow-emerald-500/40" title="RBAC security active"></span>
             </div>
-            <p id="kpi-active-staff" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">1</p>
-            <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1" title="Protected by RBAC permissions matrix">
-              <svg class="w-2.5 h-2.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <p id="kpi-active-staff" class="text-lg sm:text-xl font-extrabold text-slate-900 font-mono tracking-tight my-1">1</p>
+            <span class="text-[10px] font-medium text-slate-500 flex items-center gap-1" title="Protected by RBAC permissions matrix">
+              <svg class="w-2.5 h-2.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
               RBAC secured
             </span>
           </div>
@@ -654,54 +649,54 @@
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div class="admin-card p-4 sm:p-6 xl:col-span-2 space-y-4 min-w-0 overflow-hidden">
             <!-- Header Row with Controls -->
-            <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-admin-border/60">
+            <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-admin-border">
               <div>
-                <h3 class="font-bold text-sm text-white flex items-center gap-2" title="Daily Revenue &amp; Sales Velocity: Daily gross turnover recorded in QAR">
+                <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2" title="Daily Revenue &amp; Sales Velocity: Daily gross turnover recorded in QAR">
                   <span>Daily Revenue &amp; Sales Velocity</span>
-                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold" title="Live telemetry synced with Firestore">Live</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 font-bold" title="Live telemetry synced with Firestore">Live</span>
                 </h3>
-                <p class="text-xs text-slate-400" title="Order amounts recorded at checkout and collection">Daily gross turnover from customer orders recorded in Firestore</p>
+                <p class="text-xs text-slate-500" title="Order amounts recorded at checkout and collection">Daily gross turnover from customer orders recorded in Firestore</p>
               </div>
 
               <div class="flex items-center gap-2 flex-wrap">
                 <!-- Visualization Mode: Bar vs Line -->
-                <div class="inline-flex items-center rounded-lg bg-admin-surface2 p-0.5 border border-admin-border" id="chart-mode-selector" title="Select visualization type">
+                <div class="inline-flex items-center rounded-lg bg-slate-100 p-0.5 border border-admin-border" id="chart-mode-selector" title="Select visualization type">
                   <button type="button" class="chart-mode-btn active px-2.5 py-1 text-[11px] font-bold rounded-md bg-primary text-white transition cursor-pointer shadow-sm flex items-center gap-1.5" onclick="AdminDashboard.setChartType('bar')" title="Bar Diagram: View revenue as discrete daily columns with height proportional to sales">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                     <span>Bar Diagram</span>
                   </button>
-                  <button type="button" class="chart-mode-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1.5" onclick="AdminDashboard.setChartType('line')" title="Trend Line: View sales trajectory as a continuous smooth curve">
+                  <button type="button" class="chart-mode-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer flex items-center gap-1.5" onclick="AdminDashboard.setChartType('line')" title="Trend Line: View sales trajectory as a continuous smooth curve">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
                     <span>Trend Line</span>
                   </button>
                 </div>
 
                 <!-- Timeframe Selector -->
-                <div class="inline-flex items-center rounded-lg bg-admin-surface2 p-0.5 border border-admin-border" id="revenue-timeframe-selector" title="Select historical timeframe">
+                <div class="inline-flex items-center rounded-lg bg-slate-100 p-0.5 border border-admin-border" id="revenue-timeframe-selector" title="Select historical timeframe">
                   <button type="button" class="timeframe-btn active px-2.5 py-1 text-[11px] font-bold rounded-md bg-primary text-white transition cursor-pointer shadow-sm" onclick="AdminDashboard.setTimeframe('7d')" title="Last 7 Days: Focus on recent weekly sales pace">7D</button>
-                  <button type="button" class="timeframe-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition cursor-pointer" onclick="AdminDashboard.setTimeframe('14d')" title="Last 14 Days: Bi-weekly performance review">14D</button>
-                  <button type="button" class="timeframe-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition cursor-pointer" onclick="AdminDashboard.setTimeframe('30d')" title="Last 30 Days: Full monthly turnover analysis">30D</button>
+                  <button type="button" class="timeframe-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer" onclick="AdminDashboard.setTimeframe('14d')" title="Last 14 Days: Bi-weekly performance review">14D</button>
+                  <button type="button" class="timeframe-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-600 hover:text-slate-900 transition cursor-pointer" onclick="AdminDashboard.setTimeframe('30d')" title="Last 30 Days: Full monthly turnover analysis">30D</button>
                 </div>
               </div>
             </div>
 
             <!-- 4-Stat Metric Summary Strip -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
-              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Period Total: Sum of gross revenue generated across all orders placed in this timeframe">
-                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Period Total</span>
-                <span id="chart-stat-total" class="text-sm sm:text-base font-black text-white font-mono block mt-0.5">0 QAR</span>
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200" title="Period Total: Sum of gross revenue generated across all orders placed in this timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-500 block">Period Total</span>
+                <span id="chart-stat-total" class="text-sm sm:text-base font-black text-slate-900 font-mono block mt-0.5">0 QAR</span>
               </div>
-              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Daily Average: Mean revenue generated per day during the selected timeframe">
-                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Daily Average</span>
-                <span id="chart-stat-avg" class="text-sm sm:text-base font-black text-primary-light font-mono block mt-0.5">0 QAR/day</span>
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200" title="Daily Average: Mean revenue generated per day during the selected timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-500 block">Daily Average</span>
+                <span id="chart-stat-avg" class="text-sm sm:text-base font-black text-primary font-mono block mt-0.5">0 QAR/day</span>
               </div>
-              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Period Orders: Total count of customer orders placed in this timeframe">
-                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Period Orders</span>
-                <span id="chart-stat-orders" class="text-sm sm:text-base font-black text-white font-mono block mt-0.5">0 Orders</span>
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200" title="Period Orders: Total count of customer orders placed in this timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-500 block">Period Orders</span>
+                <span id="chart-stat-orders" class="text-sm sm:text-base font-black text-slate-900 font-mono block mt-0.5">0 Orders</span>
               </div>
-              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Highest Day: Single calendar date with the largest revenue turnover in this timeframe">
-                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Highest Day</span>
-                <span id="chart-stat-peak" class="text-sm sm:text-base font-black text-emerald-400 font-mono block mt-0.5">0 QAR</span>
+              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200" title="Highest Day: Single calendar date with the largest revenue turnover in this timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-500 block">Highest Day</span>
+                <span id="chart-stat-peak" class="text-sm sm:text-base font-black text-emerald-600 font-mono block mt-0.5">0 QAR</span>
               </div>
             </div>
 
@@ -711,11 +706,11 @@
             </div>
 
             <!-- Plain-English Explanatory Guide -->
-            <div class="p-3 rounded-xl bg-admin-surface2/40 border border-admin-borderSubtle flex items-start gap-2.5 text-xs text-slate-300">
-              <span class="text-primary-light flex-shrink-0 mt-0.5">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-start gap-2.5 text-xs text-slate-600">
+              <span class="text-primary flex-shrink-0 mt-0.5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               </span>
-              <p class="leading-relaxed text-[11px] text-slate-300">
+              <p class="leading-relaxed text-[11px] text-slate-600">
                 <strong>How to interpret this diagram:</strong> Each vertical column displays total sales (in QAR) generated from customer orders on that date. Days with zero sales show a faint baseline marker. Hover over any bar to inspect exact daily revenue, order frequency, and average order value.
               </p>
             </div>
@@ -724,10 +719,10 @@
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Order Status Breakdown: Proportions of orders in active fulfillment pipelines">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-white" title="Order Status Breakdown across fulfillment pipelines">Order Status Breakdown</h3>
-                <p class="text-xs text-slate-400">Current fulfillment pipelines</p>
+                <h3 class="font-bold text-sm text-slate-900" title="Order Status Breakdown across fulfillment pipelines">Order Status Breakdown</h3>
+                <p class="text-xs text-slate-500">Current fulfillment pipelines</p>
               </div>
-              <span id="order-status-total-badge" class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary-light border border-primary/20 font-bold font-mono" title="Total order volume tracked across all pipeline stages">0 Orders</span>
+              <span id="order-status-total-badge" class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-bold font-mono" title="Total order volume tracked across all pipeline stages">0 Orders</span>
             </div>
             <div id="order-status-breakdown" class="space-y-3 pt-2">
               <div class="text-xs text-slate-400 text-center py-6">Calculating status ratios...</div>
@@ -742,15 +737,15 @@
           <div class="admin-card p-4 sm:p-6 space-y-4 lg:col-span-2 xl:col-span-1 min-w-0 overflow-hidden" title="Top Selling Products: Best-performing catalog items ranked by units sold and gross revenue">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-white">Top Selling Products</h3>
-                <p class="text-xs text-slate-400">Best-performing catalog items</p>
+                <h3 class="font-bold text-sm text-slate-900">Top Selling Products</h3>
+                <p class="text-xs text-slate-500">Best-performing catalog items</p>
               </div>
-              <span class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary-light border border-primary/20 font-bold" title="Sorted by total quantity of units sold across customer orders">By Units</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-bold" title="Sorted by total quantity of units sold across customer orders">By Units</span>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left">
                 <thead>
-                  <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-admin-border">
+                  <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-admin-border">
                     <th class="py-2 px-1 w-6 text-center" title="Sales rank">#</th>
                     <th class="py-2 px-2" title="Catalog item title and brand">Product</th>
                     <th class="py-2 px-2 text-right" title="Gross turnover and total quantity sold">Sales &amp; Revenue</th>
@@ -766,8 +761,8 @@
           <!-- Category Breakdown -->
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Category Distribution: Proportion of active catalog items in each category">
             <div>
-              <h3 class="font-bold text-sm text-white" title="Inventory share across categories">Category Distribution</h3>
-              <p class="text-xs text-slate-400">Inventory share across categories</p>
+              <h3 class="font-bold text-sm text-slate-900" title="Inventory share across categories">Category Distribution</h3>
+              <p class="text-xs text-slate-500">Inventory share across categories</p>
             </div>
             <div id="category-distribution-container" class="space-y-3 pt-2">
               <div class="text-xs text-slate-400 text-center py-6">Aggregating categories...</div>
@@ -777,22 +772,22 @@
           <!-- Traffic & Privacy-Conscious Visitor Stats -->
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden lg:col-span-2 xl:col-span-1" title="Storefront Visitors Today: Aggregated privacy-compliant visitor analytics">
             <div>
-              <h3 class="font-bold text-sm text-white">Storefront Visitors Today</h3>
-              <p class="text-xs text-slate-400">Privacy-compliant visitor analytics</p>
+              <h3 class="font-bold text-sm text-slate-900">Storefront Visitors Today</h3>
+              <p class="text-xs text-slate-500">Privacy-compliant visitor analytics</p>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
               <div class="admin-card-inner p-3 text-center min-w-0" title="Distinct customer browsing sessions recorded in the last 24 hours">
-                <span class="text-[10px] uppercase font-bold text-slate-400 block truncate">Visitors</span>
-                <span id="kpi-traffic-visitors" class="text-lg sm:text-xl font-black text-white font-mono block truncate">0</span>
+                <span class="text-[10px] uppercase font-bold text-slate-500 block truncate">Visitors</span>
+                <span id="kpi-traffic-visitors" class="text-lg sm:text-xl font-black text-slate-900 font-mono block truncate">0</span>
               </div>
               <div class="admin-card-inner p-3 text-center min-w-0" title="Total pages, categories, and products viewed today across storefront">
-                <span class="text-[10px] uppercase font-bold text-slate-400 block truncate">Page Views</span>
-                <span id="kpi-traffic-pageviews" class="text-lg sm:text-xl font-black text-primary-light font-mono block truncate">0</span>
+                <span class="text-[10px] uppercase font-bold text-slate-500 block truncate">Page Views</span>
+                <span id="kpi-traffic-pageviews" class="text-lg sm:text-xl font-black text-primary font-mono block truncate">0</span>
               </div>
             </div>
-            <div class="pt-2 text-xs text-slate-400 flex items-center justify-between border-t border-admin-border" title="Percentage of storefront browsing sessions from smartphones and tablets">
+            <div class="pt-2 text-xs text-slate-500 flex items-center justify-between border-t border-admin-border" title="Percentage of storefront browsing sessions from smartphones and tablets">
               <span>Mobile Device Share:</span>
-              <strong id="kpi-traffic-mobile-share" class="text-white font-mono">68%</strong>
+              <strong id="kpi-traffic-mobile-share" class="text-slate-900 font-mono">68%</strong>
             </div>
           </div>
         </div>
@@ -802,16 +797,16 @@
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Customer Online Presence: Heartbeat activity of shoppers within the last 30 seconds">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
                   <span>Customer Online Presence</span>
-                  <span id="dashboard-online-pulse" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Shopper sessions authenticated and active within the past 30 seconds">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span id="dashboard-online-pulse" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200" title="Shopper sessions authenticated and active within the past 30 seconds">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="dashboard-online-badge">0 Online</span>
                   </span>
                 </h3>
-                <p class="text-xs text-slate-400">Live heartbeat presence &amp; recency distribution</p>
+                <p class="text-xs text-slate-500">Live heartbeat presence &amp; recency distribution</p>
               </div>
-              <button type="button" onclick="AdminApp.navigateTo('customers')" class="text-xs font-semibold text-primary-light hover:text-white transition flex items-center gap-1 cursor-pointer" title="Navigate to full customer directory and CRM analytics">
+              <button type="button" onclick="AdminApp.navigateTo('customers')" class="text-xs font-semibold text-primary hover:text-primary-hover transition flex items-center gap-1 cursor-pointer" title="Navigate to full customer directory and CRM analytics">
                 <span>View Directory</span> &rarr;
               </button>
             </div>
@@ -823,10 +818,10 @@
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Activity &amp; Buying Frequency: Analysis of customer purchase cycles and repeat buyer distribution">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-white">Activity &amp; Buying Frequency</h3>
-                <p class="text-xs text-slate-400">7-day active customers &amp; repeat buyer breakdown</p>
+                <h3 class="font-bold text-sm text-slate-900">Activity &amp; Buying Frequency</h3>
+                <p class="text-xs text-slate-500">7-day active customers &amp; repeat buyer breakdown</p>
               </div>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary-light border border-primary/20 font-bold" title="Breakdown of customer base from first-time shoppers to repeat VIP buyers">Frequency Curve</span>
+              <span class="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold" title="Breakdown of customer base from first-time shoppers to repeat VIP buyers">Frequency Curve</span>
             </div>
             <div id="dashboard-customer-frequency-chart" class="pt-2">
               <div class="h-44 flex items-center justify-center text-xs text-slate-400">Rendering frequency diagram...</div>
@@ -843,7 +838,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Products Catalog</h2>
+            <h2 class="font-black text-xl text-slate-900">Products Catalog</h2>
             <p class="text-xs text-slate-400">Manage catalog inventory, prices, duplication, and publication approvals</p>
           </div>
           <button type="button" onclick="AdminProducts.openModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer self-start sm:self-auto">
@@ -914,7 +909,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Orders &amp; Store Pickup</h2>
+            <h2 class="font-black text-xl text-slate-900">Orders &amp; Store Pickup</h2>
             <p class="text-xs text-slate-400">Track shipments, Click &amp; Collect pickups, and issue staff orders with stock deduction</p>
           </div>
           <button type="button" onclick="AdminOrders.openCreateOrderModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer self-start sm:self-auto">
@@ -975,11 +970,11 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Returns &amp; Cancellations Management</h2>
-            <p class="text-xs text-slate-400">Configure dynamic customer return and cancellation policies, process RMA requests, and oversee restock actions</p>
+            <h2 class="font-black text-xl text-slate-900">Returns &amp; Cancellations Management</h2>
+            <p class="text-xs text-slate-500">Configure dynamic customer return and cancellation policies, process RMA requests, and oversee restock actions</p>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="AdminReturns.load()" class="px-3.5 py-1.5 rounded-xl border border-admin-border hover:bg-white/5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer flex items-center gap-1.5">
+            <button type="button" onclick="AdminReturns.load()" class="px-3.5 py-1.5 rounded-xl border border-admin-border bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-slate-900 transition cursor-pointer flex items-center gap-1.5">
               <span>🔄</span> Refresh
             </button>
           </div>
@@ -1119,20 +1114,20 @@
         <div class="admin-card overflow-hidden">
           <div class="p-4 border-b border-admin-border flex flex-col md:flex-row md:items-center justify-between gap-4">
             <!-- Filter Tabs -->
-            <div class="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-admin-surface2 border border-slate-800 text-xs font-bold">
-              <button type="button" onclick="AdminReturns.setFilter('all')" data-filter="all" class="returns-filter-tab px-3 py-1.5 rounded-lg bg-indigo-600 text-white transition cursor-pointer">
+            <div class="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold">
+              <button type="button" onclick="AdminReturns.setFilter('all')" data-filter="all" class="returns-filter-tab px-3 py-1.5 rounded-lg bg-primary text-white transition cursor-pointer">
                 All Records
               </button>
-              <button type="button" onclick="AdminReturns.setFilter('pending_returns')" data-filter="pending_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+              <button type="button" onclick="AdminReturns.setFilter('pending_returns')" data-filter="pending_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition cursor-pointer">
                 Pending Returns
               </button>
-              <button type="button" onclick="AdminReturns.setFilter('approved_returns')" data-filter="approved_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+              <button type="button" onclick="AdminReturns.setFilter('approved_returns')" data-filter="approved_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition cursor-pointer">
                 Approved Returns
               </button>
-              <button type="button" onclick="AdminReturns.setFilter('declined_returns')" data-filter="declined_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+              <button type="button" onclick="AdminReturns.setFilter('declined_returns')" data-filter="declined_returns" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition cursor-pointer">
                 Declined Returns
               </button>
-              <button type="button" onclick="AdminReturns.setFilter('cancellations')" data-filter="cancellations" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition cursor-pointer">
+              <button type="button" onclick="AdminReturns.setFilter('cancellations')" data-filter="cancellations" class="returns-filter-tab px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-slate-200 transition cursor-pointer">
                 Cancellations
               </button>
             </div>
@@ -1176,14 +1171,14 @@
         <!-- Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Customer Analytics &amp; Directory</h2>
-            <p class="text-xs text-slate-400">Real-time database aggregation, presence tracking, order frequency, and account governance</p>
+            <h2 class="font-black text-xl text-slate-900">Customer Analytics &amp; Directory</h2>
+            <p class="text-xs text-slate-500">Real-time database aggregation, presence tracking, order frequency, and account governance</p>
           </div>
           <div class="flex items-center gap-2">
-            <button type="button" onclick="AdminCustomers.exportCSV()" class="px-3 py-1.5 rounded-xl border border-admin-border hover:bg-white/5 text-xs font-semibold text-slate-300 hover:text-white transition cursor-pointer">
+            <button type="button" onclick="AdminCustomers.exportCSV()" class="px-3 py-1.5 rounded-xl border border-admin-border bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 hover:text-slate-900 transition cursor-pointer">
               &darr; Export CSV
             </button>
-            <button type="button" onclick="AdminCustomers.load()" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
+            <button type="button" onclick="AdminCustomers.load()" class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary-hover text-xs font-bold text-white transition shadow-sm cursor-pointer">
               &#x21bb; Refresh Analytics
             </button>
           </div>
@@ -1192,42 +1187,42 @@
         <!-- 2.A Customer Overview Dashboard (7 Live KPI Cards - Responsive & Non-truncated) -->
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 sm:gap-4">
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden" title="Total registered customers in database">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Total Users</span>
-            <p id="kpi-cust-total" class="text-lg sm:text-xl font-black text-white font-mono truncate">0</p>
-            <span class="text-[10px] text-slate-400 mt-0.5 block truncate">Registered</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1 truncate">Total Users</span>
+            <p id="kpi-cust-total" class="text-lg sm:text-xl font-black text-slate-900 font-mono truncate">0</p>
+            <span class="text-[10px] text-slate-500 mt-0.5 block truncate">Registered</span>
           </div>
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden" title="Customers in good standing">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-indigo-400 block mb-1 truncate">Active Accounts</span>
-            <p id="kpi-cust-active" class="text-lg sm:text-xl font-black text-indigo-300 font-mono truncate">0</p>
-            <span class="text-[10px] text-indigo-400 font-semibold mt-0.5 block truncate">Good standing</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-primary block mb-1 truncate">Active Accounts</span>
+            <p id="kpi-cust-active" class="text-lg sm:text-xl font-black text-primary font-mono truncate">0</p>
+            <span class="text-[10px] text-primary font-semibold mt-0.5 block truncate">Good standing</span>
           </div>
-          <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden border-emerald-500/30 bg-emerald-500/5" title="Online within last 30 seconds">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-1 truncate flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden border-emerald-200 bg-emerald-50/50" title="Online within last 30 seconds">
+            <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-700 block mb-1 truncate flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
               Online Now
             </span>
-            <p id="kpi-cust-online" class="text-lg sm:text-xl font-black text-emerald-400 font-mono truncate">0</p>
-            <span class="text-[10px] text-emerald-300/80 mt-0.5 block truncate">&le;30s presence</span>
+            <p id="kpi-cust-online" class="text-lg sm:text-xl font-black text-emerald-600 font-mono truncate">0</p>
+            <span class="text-[10px] text-emerald-600 mt-0.5 block truncate">&le;30s presence</span>
           </div>
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden" title="No active session right now">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Offline</span>
-            <p id="kpi-cust-offline" class="text-lg sm:text-xl font-black text-slate-300 font-mono truncate">0</p>
-            <span class="text-[10px] text-slate-500 mt-0.5 block truncate">Inactive</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-500 block mb-1 truncate">Offline</span>
+            <p id="kpi-cust-offline" class="text-lg sm:text-xl font-black text-slate-700 font-mono truncate">0</p>
+            <span class="text-[10px] text-slate-400 mt-0.5 block truncate">Inactive</span>
           </div>
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden" title="Registered within past 30 days">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-purple-400 block mb-1 truncate">New (30d)</span>
-            <p id="kpi-cust-new" class="text-lg sm:text-xl font-black text-purple-300 font-mono truncate">0</p>
-            <span class="text-[10px] text-purple-400 font-semibold mt-0.5 block truncate">Past 30 days</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-purple-600 block mb-1 truncate">New (30d)</span>
+            <p id="kpi-cust-new" class="text-lg sm:text-xl font-black text-purple-600 font-mono truncate">0</p>
+            <span class="text-[10px] text-purple-600 font-semibold mt-0.5 block truncate">Past 30 days</span>
           </div>
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden" title="Customers with 2 or more completed orders">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-1 truncate">Repeat (2+)</span>
-            <p id="kpi-cust-returning" class="text-lg sm:text-xl font-black text-amber-300 font-mono truncate">0</p>
-            <span class="text-[10px] text-amber-400 font-semibold mt-0.5 block truncate">&ge; 2 orders</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-600 block mb-1 truncate">Repeat (2+)</span>
+            <p id="kpi-cust-returning" class="text-lg sm:text-xl font-black text-amber-600 font-mono truncate">0</p>
+            <span class="text-[10px] text-amber-600 font-semibold mt-0.5 block truncate">&ge; 2 orders</span>
           </div>
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden col-span-2 sm:col-span-1" title="Seen or active within past 24 hours">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-cyan-400 block mb-1 truncate">Active (24h)</span>
-            <p id="kpi-cust-recent" class="text-lg sm:text-xl font-black text-cyan-300 font-mono truncate">0</p>
-            <span class="text-[10px] text-cyan-400 font-semibold mt-0.5 block truncate">Past 24 hours</span>
+            <span class="text-[10px] uppercase font-bold tracking-wider text-cyan-600 block mb-1 truncate">Active (24h)</span>
+            <p id="kpi-cust-recent" class="text-lg sm:text-xl font-black text-cyan-600 font-mono truncate">0</p>
+            <span class="text-[10px] text-cyan-600 font-semibold mt-0.5 block truncate">Past 24 hours</span>
           </div>
         </div>
 
@@ -1236,14 +1231,14 @@
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                <h3 class="font-bold text-sm text-slate-900 flex items-center gap-2">
                   <span>Customer Online Presence Breakdown</span>
-                  <span id="customers-online-badge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                  <span id="customers-online-badge" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span id="customers-online-badge-text">0 Online</span>
                   </span>
                 </h3>
-                <p class="text-xs text-slate-400">Real-time session heartbeat (&le;30s) vs Active Today (&le;24h) vs Idle</p>
+                <p class="text-xs text-slate-500">Real-time session heartbeat (&le;30s) vs Active Today (&le;24h) vs Idle</p>
               </div>
             </div>
             <div id="customers-presence-chart" class="pt-2">
@@ -1254,10 +1249,10 @@
           <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden">
             <div class="flex items-center justify-between">
               <div>
-                <h3 class="font-bold text-sm text-white">Customer Frequency &amp; Engagement</h3>
-                <p class="text-xs text-slate-400">7-day active customer trends &amp; purchasing frequency segments</p>
+                <h3 class="font-bold text-sm text-slate-900">Customer Frequency &amp; Engagement</h3>
+                <p class="text-xs text-slate-500">7-day active customer trends &amp; purchasing frequency segments</p>
               </div>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-bold">Frequency Curve</span>
+              <span class="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary border border-primary/20 font-bold">Frequency Curve</span>
             </div>
             <div id="customers-frequency-chart" class="pt-2">
               <div class="h-44 flex items-center justify-center text-xs text-slate-400">Rendering frequency diagram...</div>
@@ -1280,13 +1275,13 @@
 
             <!-- Pop-up Menu Button -->
             <div class="relative inline-block text-left w-full sm:w-auto" id="customers-filter-menu-container">
-              <button type="button" id="customers-filter-btn" onclick="AdminCustomers.toggleFilterMenu()" class="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-2.5 px-4 py-2 rounded-xl border border-admin-border bg-admin-surface hover:bg-white/5 text-xs font-semibold text-white transition shadow-sm cursor-pointer">
+              <button type="button" id="customers-filter-btn" onclick="AdminCustomers.toggleFilterMenu()" class="w-full sm:w-auto inline-flex items-center justify-between sm:justify-center gap-2.5 px-4 py-2 rounded-xl border border-admin-border bg-white hover:bg-slate-50 text-xs font-semibold text-slate-700 transition shadow-sm cursor-pointer">
                 <div class="flex items-center gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary">
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
                   </svg>
                   <span>Filter Options</span>
-                  <span id="customers-filter-active-count" style="display:none;" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-500 text-white leading-none">0</span>
+                  <span id="customers-filter-active-count" style="display:none;" class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-primary text-white leading-none">0</span>
                 </div>
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 transition-transform duration-200" id="customers-filter-chevron">
                   <path d="m6 9 6 6 6-6"/>
@@ -1294,28 +1289,28 @@
               </button>
 
               <!-- POP-UP MENU DROPDOWN (POPOVER) -->
-              <div id="customers-filter-popover" class="hidden absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-[#0F172A] border border-slate-700/80 shadow-2xl p-4 sm:p-5 z-50 space-y-4 backdrop-blur-xl">
-                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+              <div id="customers-filter-popover" class="hidden absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl bg-white border border-admin-border shadow-2xl p-4 sm:p-5 z-50 space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-admin-border">
                   <div class="flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-400"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-                    <span class="font-bold text-xs text-white uppercase tracking-wider">Directory Filter Options</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                    <span class="font-bold text-xs text-slate-900 uppercase tracking-wider">Directory Filter Options</span>
                   </div>
-                  <button type="button" onclick="AdminCustomers.resetFilters()" class="text-[11px] text-slate-400 hover:text-indigo-300 font-semibold transition cursor-pointer">
+                  <button type="button" onclick="AdminCustomers.resetFilters()" class="text-[11px] text-slate-500 hover:text-primary font-semibold transition cursor-pointer">
                     Reset All
                   </button>
                 </div>
 
                 <!-- 1. Presence Options -->
                 <div class="space-y-1.5">
-                  <label class="text-[11px] font-bold text-slate-300 block">Customer Presence</label>
+                  <label class="text-[11px] font-bold text-slate-700 block">Customer Presence</label>
                   <div class="grid grid-cols-3 gap-1.5">
-                    <button type="button" data-filter-key="presence" data-filter-val="all" onclick="AdminCustomers.setFilter('presence', 'all')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-600 text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="presence" data-filter-val="all" onclick="AdminCustomers.setFilter('presence', 'all')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-primary bg-primary text-white transition text-center cursor-pointer">
                       All
                     </button>
-                    <button type="button" data-filter-key="presence" data-filter-val="online" onclick="AdminCustomers.setFilter('presence', 'online')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="presence" data-filter-val="online" onclick="AdminCustomers.setFilter('presence', 'online')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       🟢 Online
                     </button>
-                    <button type="button" data-filter-key="presence" data-filter-val="offline" onclick="AdminCustomers.setFilter('presence', 'offline')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="presence" data-filter-val="offline" onclick="AdminCustomers.setFilter('presence', 'offline')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       ⚫ Offline
                     </button>
                   </div>
@@ -1323,15 +1318,15 @@
 
                 <!-- 2. Account Status Options -->
                 <div class="space-y-1.5">
-                  <label class="text-[11px] font-bold text-slate-300 block">Account Status</label>
+                  <label class="text-[11px] font-bold text-slate-700 block">Account Status</label>
                   <div class="grid grid-cols-3 gap-1.5">
-                    <button type="button" data-filter-key="status" data-filter-val="all" onclick="AdminCustomers.setFilter('status', 'all')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-600 text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="status" data-filter-val="all" onclick="AdminCustomers.setFilter('status', 'all')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-primary bg-primary text-white transition text-center cursor-pointer">
                       All
                     </button>
-                    <button type="button" data-filter-key="status" data-filter-val="active" onclick="AdminCustomers.setFilter('status', 'active')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="status" data-filter-val="active" onclick="AdminCustomers.setFilter('status', 'active')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       Active
                     </button>
-                    <button type="button" data-filter-key="status" data-filter-val="suspended" onclick="AdminCustomers.setFilter('status', 'suspended')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="status" data-filter-val="suspended" onclick="AdminCustomers.setFilter('status', 'suspended')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       Suspended
                     </button>
                   </div>
@@ -1339,21 +1334,21 @@
 
                 <!-- 3. Registration Date Range -->
                 <div class="space-y-1.5">
-                  <label class="text-[11px] font-bold text-slate-300 block">Joined Date Range</label>
+                  <label class="text-[11px] font-bold text-slate-700 block">Joined Date Range</label>
                   <div class="grid grid-cols-3 gap-1.5">
-                    <button type="button" data-filter-key="date_range" data-filter-val="all" onclick="AdminCustomers.setFilter('date_range', 'all')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-600 text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="date_range" data-filter-val="all" onclick="AdminCustomers.setFilter('date_range', 'all')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-primary bg-primary text-white transition text-center cursor-pointer">
                       All Time
                     </button>
-                    <button type="button" data-filter-key="date_range" data-filter-val="today" onclick="AdminCustomers.setFilter('date_range', 'today')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="date_range" data-filter-val="today" onclick="AdminCustomers.setFilter('date_range', 'today')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       Today
                     </button>
-                    <button type="button" data-filter-key="date_range" data-filter-val="7d" onclick="AdminCustomers.setFilter('date_range', '7d')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="date_range" data-filter-val="7d" onclick="AdminCustomers.setFilter('date_range', '7d')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       Last 7 Days
                     </button>
-                    <button type="button" data-filter-key="date_range" data-filter-val="30d" onclick="AdminCustomers.setFilter('date_range', '30d')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer">
+                    <button type="button" data-filter-key="date_range" data-filter-val="30d" onclick="AdminCustomers.setFilter('date_range', '30d')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer">
                       Last 30 Days
                     </button>
-                    <button type="button" data-filter-key="date_range" data-filter-val="90d" onclick="AdminCustomers.setFilter('date_range', '90d')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer col-span-2">
+                    <button type="button" data-filter-key="date_range" data-filter-val="90d" onclick="AdminCustomers.setFilter('date_range', '90d')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-center cursor-pointer col-span-2">
                       Last 90 Days
                     </button>
                   </div>
@@ -1361,32 +1356,32 @@
 
                 <!-- 4. Sort By Options -->
                 <div class="space-y-1.5">
-                  <label class="text-[11px] font-bold text-slate-300 block">Sort By</label>
+                  <label class="text-[11px] font-bold text-slate-700 block">Sort By</label>
                   <div class="grid grid-cols-2 gap-1.5">
-                    <button type="button" data-filter-key="sort" data-filter-val="created_at-desc" onclick="AdminCustomers.setFilter('sort', 'created_at-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-indigo-500 bg-indigo-600 text-white transition text-left cursor-pointer">
+                    <button type="button" data-filter-key="sort" data-filter-val="created_at-desc" onclick="AdminCustomers.setFilter('sort', 'created_at-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-primary bg-primary text-white transition text-left cursor-pointer">
                       Newest First
                     </button>
-                    <button type="button" data-filter-key="sort" data-filter-val="created_at-asc" onclick="AdminCustomers.setFilter('sort', 'created_at-asc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-left cursor-pointer">
+                    <button type="button" data-filter-key="sort" data-filter-val="created_at-asc" onclick="AdminCustomers.setFilter('sort', 'created_at-asc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-left cursor-pointer">
                       Oldest First
                     </button>
-                    <button type="button" data-filter-key="sort" data-filter-val="last_seen-desc" onclick="AdminCustomers.setFilter('sort', 'last_seen-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-left cursor-pointer">
+                    <button type="button" data-filter-key="sort" data-filter-val="last_seen-desc" onclick="AdminCustomers.setFilter('sort', 'last_seen-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-left cursor-pointer">
                       Recently Active
                     </button>
-                    <button type="button" data-filter-key="sort" data-filter-val="spent-desc" onclick="AdminCustomers.setFilter('sort', 'spent-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-left cursor-pointer">
+                    <button type="button" data-filter-key="sort" data-filter-val="spent-desc" onclick="AdminCustomers.setFilter('sort', 'spent-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-left cursor-pointer">
                       Highest Spent
                     </button>
-                    <button type="button" data-filter-key="sort" data-filter-val="orders-desc" onclick="AdminCustomers.setFilter('sort', 'orders-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-left cursor-pointer">
+                    <button type="button" data-filter-key="sort" data-filter-val="orders-desc" onclick="AdminCustomers.setFilter('sort', 'orders-desc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-left cursor-pointer">
                       Most Orders
                     </button>
-                    <button type="button" data-filter-key="sort" data-filter-val="name-asc" onclick="AdminCustomers.setFilter('sort', 'name-asc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-left cursor-pointer">
+                    <button type="button" data-filter-key="sort" data-filter-val="name-asc" onclick="AdminCustomers.setFilter('sort', 'name-asc')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition text-left cursor-pointer">
                       Name (A-Z)
                     </button>
                   </div>
                 </div>
 
                 <!-- Footer -->
-                <div class="pt-2 border-t border-slate-800 flex items-center justify-end">
-                  <button type="button" onclick="AdminCustomers.closeFilterMenu()" class="w-full px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition text-center cursor-pointer shadow-sm">
+                <div class="pt-2 border-t border-admin-border flex items-center justify-end">
+                  <button type="button" onclick="AdminCustomers.closeFilterMenu()" class="w-full px-3 py-2 rounded-xl bg-primary hover:bg-primary-hover text-xs font-bold text-white transition text-center cursor-pointer shadow-sm">
                     Done / Close Menu
                   </button>
                 </div>
@@ -1395,7 +1390,7 @@
           </div>
 
           <!-- Active Filter Pills Bar (Shown dynamically when any filter is active) -->
-          <div id="customers-active-pills" class="hidden flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/60"></div>
+          <div id="customers-active-pills" class="hidden flex flex-wrap items-center gap-2 pt-2 border-t border-admin-border"></div>
         </div>
 
         
@@ -1446,23 +1441,23 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Approval Workflows &amp; Governance</h2>
-            <p class="text-xs text-slate-400">Review before-and-after change diffs and approve or reject administrative submissions</p>
+            <h2 class="font-black text-xl text-slate-900">Approval Workflows &amp; Governance</h2>
+            <p class="text-xs text-slate-500">Review before-and-after change diffs and approve or reject administrative submissions</p>
           </div>
         </div>
 
         <!-- Queue Status Tabs -->
         <div class="flex items-center gap-2 border-b border-admin-border pb-3">
-          <button type="button" data-status="pending" onclick="AdminApprovals.setStatusTab('pending')" class="approval-tab-btn active px-4 py-2 rounded-xl border border-indigo-500 bg-indigo-600/10 text-xs font-bold text-white transition">
+          <button type="button" data-status="pending" onclick="AdminApprovals.setStatusTab('pending')" class="approval-tab-btn active px-4 py-2 rounded-xl border border-primary bg-primary/10 text-xs font-bold text-primary transition cursor-pointer">
             Pending Approvals
           </button>
-          <button type="button" data-status="approved" onclick="AdminApprovals.setStatusTab('approved')" class="approval-tab-btn px-4 py-2 rounded-xl border border-transparent text-slate-400 hover:text-white text-xs font-bold transition">
+          <button type="button" data-status="approved" onclick="AdminApprovals.setStatusTab('approved')" class="approval-tab-btn px-4 py-2 rounded-xl border border-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
             Approved Submissions
           </button>
-          <button type="button" data-status="rejected" onclick="AdminApprovals.setStatusTab('rejected')" class="approval-tab-btn px-4 py-2 rounded-xl border border-transparent text-slate-400 hover:text-white text-xs font-bold transition">
+          <button type="button" data-status="rejected" onclick="AdminApprovals.setStatusTab('rejected')" class="approval-tab-btn px-4 py-2 rounded-xl border border-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
             Rejected Submissions
           </button>
-          <button type="button" data-status="all" onclick="AdminApprovals.setStatusTab('all')" class="approval-tab-btn px-4 py-2 rounded-xl border border-transparent text-slate-400 hover:text-white text-xs font-bold transition">
+          <button type="button" data-status="all" onclick="AdminApprovals.setStatusTab('all')" class="approval-tab-btn px-4 py-2 rounded-xl border border-transparent text-slate-500 hover:text-slate-900 hover:bg-slate-100 text-xs font-bold transition cursor-pointer">
             All History
           </button>
         </div>
@@ -1525,7 +1520,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Hero Banners Management</h2>
+            <h2 class="font-black text-xl text-slate-900">Hero Banners Management</h2>
             <p class="text-xs text-slate-400">Manage headline, subtitle, mobile/desktop imagery, CTA buttons, and scheduling</p>
           </div>
           <div class="flex items-center gap-3">
@@ -1569,7 +1564,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Dynamic Promotional Sections</h2>
+            <h2 class="font-black text-xl text-slate-900">Dynamic Promotional Sections</h2>
             <p class="text-xs text-slate-400">Manage ULTRA RIGS &amp; WORKSTATIONS and additional homepage promotional features</p>
           </div>
           <button type="button" onclick="AdminContent.openPromotionModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer">
@@ -1606,7 +1601,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Store Pickup Locations</h2>
+            <h2 class="font-black text-xl text-slate-900">Store Pickup Locations</h2>
             <p class="text-xs text-slate-400">Configure physical stores in Qatar where customers can collect orders free of charge</p>
           </div>
           <button type="button" onclick="AdminContent.openLocationModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer">
@@ -1643,7 +1638,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">Admin Staff Accounts</h2>
+            <h2 class="font-black text-xl text-slate-900">Admin Staff Accounts</h2>
             <p class="text-xs text-slate-400">Manage administrator accounts, assign IAM roles, reset passwords, and revoke active sessions</p>
           </div>
           <button type="button" onclick="AdminUsers.openCreateModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer">
@@ -1692,7 +1687,7 @@
         
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="font-black text-xl text-white">IAM Roles &amp; Permissions Matrix</h2>
+            <h2 class="font-black text-xl text-slate-900">IAM Roles &amp; Permissions Matrix</h2>
             <p class="text-xs text-slate-400">Create custom roles (Product Manager, Order Manager, Finance, etc.) with granular section permissions</p>
           </div>
           <button type="button" onclick="AdminRoles.openCreateModal()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer">
@@ -1713,7 +1708,7 @@
       <div id="pane-settings" class="admin-tab-pane hidden space-y-6">
         
         <div>
-          <h2 class="font-black text-xl text-white">Store Settings &amp; Legal Registration</h2>
+          <h2 class="font-black text-xl text-slate-900">Store Settings &amp; Legal Registration</h2>
           <p class="text-xs text-slate-400">Configure business information, contact channels, and Commercial Registration (CR No. 228717)</p>
         </div>
 
@@ -1770,7 +1765,7 @@
       <div id="pane-audit" class="admin-tab-pane hidden space-y-6">
         
         <div>
-          <h2 class="font-black text-xl text-white">Immutable Audit Trail</h2>
+          <h2 class="font-black text-xl text-slate-900">Immutable Audit Trail</h2>
           <p class="text-xs text-slate-400">Cryptographically verifiable log of all administrative actions, logins, updates, and approvals</p>
         </div>
 
@@ -1866,7 +1861,7 @@
           <h3 id="diff-modal-title" class="font-bold text-base text-white">Review Submission Changes</h3>
           <p id="diff-modal-meta" class="text-xs text-slate-400 mt-0.5"></p>
         </div>
-        <button type="button" onclick="AdminApprovals.closeDiffModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminApprovals.closeDiffModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 py-4 flex-1 overflow-y-auto">
@@ -1892,7 +1887,7 @@
           <h3 class="font-bold text-base text-white">Staff Order Creation (Inventory Deduction)</h3>
           <p class="text-xs text-slate-400">Place orders for customers via walk-in, phone, or WhatsApp</p>
         </div>
-        <button type="button" onclick="AdminOrders.closeCreateOrderModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminOrders.closeCreateOrderModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <form id="create-order-form" onsubmit="AdminOrders.submitCreateOrder(event)" class="grid grid-cols-1 lg:grid-cols-12 gap-6 py-4 flex-1 overflow-y-auto">
@@ -2160,7 +2155,7 @@
           <h3 class="font-bold text-sm text-slate-900">Decline Return Request</h3>
           <span id="decline-modal-order-num" class="font-mono text-xs text-indigo-400">#MTQ-00000</span>
         </div>
-        <button type="button" onclick="AdminReturns.closeDeclineModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminReturns.closeDeclineModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <input type="hidden" id="decline-target-order-id" value="" />
@@ -2186,7 +2181,7 @@
     <div class="w-full max-w-2xl admin-card p-6 sm:p-8 max-h-[92vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-4 border-b border-admin-border flex-shrink-0">
         <h3 id="product-modal-title" class="font-bold text-base text-white">Product Configuration</h3>
-        <button type="button" onclick="AdminProducts.closeModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminProducts.closeModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <form id="product-modal-form" onsubmit="AdminProducts.saveProduct(event)" class="py-4 space-y-4 flex-1 overflow-y-auto">
@@ -2245,7 +2240,7 @@
     <div class="w-full max-w-lg admin-card p-6 sm:p-8 max-h-[90vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-4 border-b border-admin-border flex-shrink-0">
         <h3 id="user-modal-title" class="font-bold text-base text-white">Admin Staff User</h3>
-        <button type="button" onclick="AdminUsers.closeModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminUsers.closeModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <form id="user-modal-form" onsubmit="AdminUsers.saveUser(event)" class="py-4 space-y-4 flex-1 overflow-y-auto">
@@ -2265,7 +2260,7 @@
             </div>
             <div class="relative">
               <input type="password" id="user-modal-password" class="admin-input w-full pr-11 font-mono" />
-              <button type="button" id="user-modal-toggle-pw" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer select-none" aria-label="Toggle password visibility">
+              <button type="button" id="user-modal-toggle-pw" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-700 transition-colors cursor-pointer select-none" aria-label="Toggle password visibility">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
             </div>
@@ -2314,7 +2309,7 @@
           <h3 id="role-modal-title" class="font-bold text-base text-white">IAM Role Configuration</h3>
           <p class="text-xs text-slate-400">Configure granular 18-module permissions for this administrative role</p>
         </div>
-        <button type="button" onclick="AdminRoles.closeMatrixModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminRoles.closeMatrixModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <form id="role-modal-form" onsubmit="AdminRoles.saveRole(event)" class="py-4 space-y-4 flex-1 overflow-y-auto">
@@ -2378,7 +2373,7 @@
           <h3 id="banner-modal-title" class="font-bold text-base text-white">Hero Banner Configuration</h3>
           <p class="text-[11px] text-slate-400">Updates sync in real-time with the M.SHOP storefront hero banner</p>
         </div>
-        <button type="button" id="banner-modal-close-x" onclick="AdminContent.closeBannerModal()" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+        <button type="button" id="banner-modal-close-x" onclick="AdminContent.closeBannerModal()" class="text-slate-400 hover:text-slate-700 p-1 text-base">✕</button>
       </div>
 
       <!-- Real-time Loading / Status Notification Alert -->
@@ -2448,7 +2443,7 @@
     <div class="w-full max-w-lg admin-card p-6 sm:p-8 max-h-[90vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-4 border-b border-admin-border flex-shrink-0">
         <h3 id="promo-modal-title" class="font-bold text-base text-white">Promotional Section Configuration</h3>
-        <button type="button" onclick="AdminContent.closePromotionModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminContent.closePromotionModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <!-- Real-time Loading / Status Notification Alert -->
@@ -2515,7 +2510,7 @@
     <div class="w-full max-w-lg admin-card p-6 sm:p-8 max-h-[90vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-4 border-b border-admin-border flex-shrink-0">
         <h3 id="location-modal-title" class="font-bold text-base text-white">Store Location Configuration</h3>
-        <button type="button" onclick="AdminContent.closeLocationModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminContent.closeLocationModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
 
       <form id="location-modal-form" onsubmit="AdminContent.saveLocation(event)" class="py-4 space-y-4 flex-1 overflow-y-auto">
@@ -2571,7 +2566,7 @@
     <div class="w-full max-w-2xl admin-card p-6 sm:p-8 max-h-[90vh] flex flex-col shadow-2xl">
       <div class="flex items-center justify-between pb-4 border-b border-admin-border flex-shrink-0">
         <h3 id="audit-modal-title" class="font-bold text-base text-white">Audit Event Details</h3>
-        <button type="button" onclick="AdminAudit.closePayloadModal()" class="text-slate-400 hover:text-white p-1">✕</button>
+        <button type="button" onclick="AdminAudit.closePayloadModal()" class="text-slate-400 hover:text-slate-700 p-1">✕</button>
       </div>
       <div class="py-4 flex-1 overflow-y-auto">
         <pre id="audit-modal-json" class="admin-card-inner p-4 text-[11px] font-mono text-indigo-300 overflow-x-auto leading-relaxed"></pre>
@@ -2595,7 +2590,7 @@
             <p id="cust-modal-email" class="text-xs text-slate-400">customer@email.com</p>
           </div>
         </div>
-        <button type="button" onclick="AdminCustomers.closeModal()" class="text-slate-400 hover:text-white p-1 text-lg">✕</button>
+        <button type="button" onclick="AdminCustomers.closeModal()" class="text-slate-400 hover:text-slate-700 p-1 text-lg">✕</button>
       </div>
 
       <!-- Customer Content Scrollable Body -->
@@ -2708,20 +2703,20 @@
   <script src="/assets/js/html2pdf.bundle.min.js"></script>
 
   <!-- Smart Caching Engine -->
-  <script src="/admin/shared/admin-cache.js?v=20261114_11"></script>
+  <script src="/admin/shared/admin-cache.js?v=20261114_15"></script>
 
   <!-- Modular Scripts (Restructured Architecture) -->
-  <script src="/admin/shared/admin-core.js?v=20261114_11"></script>
-  <script src="/admin/auth/admin-auth.js?v=20261114_11"></script>
-  <script src="/admin/roles/admin-roles.js?v=20261114_11"></script>
-  <script src="/admin/users/admin-users.js?v=20261114_11"></script>
-  <script src="/admin/dashboard/admin-dashboard.js?v=20261114_11"></script>
-  <script src="/admin/products/admin-products.js?v=20261114_11"></script>
-  <script src="/admin/orders/admin-orders.js?v=20261114_11"></script>
-  <script src="/admin/orders/admin-returns.js?v=20261114_11"></script>
-  <script src="/admin/customers/admin-customers.js?v=20261114_11"></script>
-  <script src="/admin/content/admin-approvals.js?v=20261114_11"></script>
-  <script src="/admin/content/admin-content.js?v=20261114_11"></script>
+  <script src="/admin/shared/admin-core.js?v=20261114_15"></script>
+  <script src="/admin/auth/admin-auth.js?v=20261114_15"></script>
+  <script src="/admin/roles/admin-roles.js?v=20261114_15"></script>
+  <script src="/admin/users/admin-users.js?v=20261114_15"></script>
+  <script src="/admin/dashboard/admin-dashboard.js?v=20261114_15"></script>
+  <script src="/admin/products/admin-products.js?v=20261114_15"></script>
+  <script src="/admin/orders/admin-orders.js?v=20261114_15"></script>
+  <script src="/admin/orders/admin-returns.js?v=20261114_15"></script>
+  <script src="/admin/customers/admin-customers.js?v=20261114_15"></script>
+  <script src="/admin/content/admin-approvals.js?v=20261114_15"></script>
+  <script src="/admin/content/admin-content.js?v=20261114_15"></script>
 
 </body>
 </html>
