@@ -47,7 +47,7 @@ export class StoreLocationsService implements OnModuleInit {
           city: 'Doha',
           zone: 'Zone 39',
           phone: '+974 7799 1013',
-          email: 'support@marjaah.qa',
+          email: 'info@marjaah.com',
           opening_hours: 'Saturday – Thursday: 9:00 AM – 10:00 PM | Friday: 2:00 PM – 10:00 PM',
           opening_hours_ar: 'السبت – الخميس: 9:00 صباحاً – 10:00 مساءً | الجمعة: 2:00 ظهراً – 10:00 مساءً',
           pickup_instructions: 'Please present your Order Confirmation Number (MTQ-XXXXX) and your QID or SMS confirmation at the collection desk.',

@@ -6,10 +6,10 @@ import { Response, Request } from 'express';
 export class SeoController {
   constructor(private readonly seoService: SeoService) {}
 
-  @Get('sitemap.xml')
+  @Get(['sitemap.xml', 'api/sitemap.xml'])
   async getSitemapXml(@Req() req: Request, @Res() res: Response) {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host || 'mshop.qa';
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'www.marjaah.shop';
     const baseUrl = `${protocol}://${host}`;
 
     const xml = await this.seoService.generateSitemapXml(baseUrl);
@@ -18,10 +18,10 @@ export class SeoController {
     return res.send(xml);
   }
 
-  @Get('robots.txt')
+  @Get(['robots.txt', 'api/robots.txt'])
   getRobotsTxt(@Req() req: Request, @Res() res: Response) {
     const protocol = req.headers['x-forwarded-proto'] || req.protocol || 'https';
-    const host = req.headers['x-forwarded-host'] || req.headers.host || 'mshop.qa';
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'www.marjaah.shop';
     const baseUrl = `${protocol}://${host}`;
 
     const txt = this.seoService.getRobotsTxt(baseUrl);

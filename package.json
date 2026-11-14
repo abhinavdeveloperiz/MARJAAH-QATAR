@@ -3,6 +3,7 @@
   "version": "2.0.0",
   "description": "MARJAAH Qatar E-Commerce Platform (NestJS + Firebase Firestore)",
   "scripts": {
+    "generate:sitemap": "node backend/scripts/generate-sitemap.js",
     "start": "cd backend && node dist/main.js",
     "start:backend": "cd backend && npm run start:prod",
     "dev:backend": "cd backend && npm run start:dev",

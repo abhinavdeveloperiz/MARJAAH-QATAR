@@ -204,9 +204,10 @@
     const pCount = cat.product_count !== undefined ? Number(cat.product_count) : 0;
     const imgUrl = cat.image || categoryImageFallbacks[slug] || categoryImageFallbacks.default;
     const delay = (idx % 8) * 40;
+    const catHref = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(slug)}/`;
 
     return `
-      <div data-category-card="${slug}" class="group relative rounded-3xl overflow-hidden border flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-[#8D9CF5] cursor-pointer"
+      <a href="${catHref}" data-category-card="${slug}" class="group relative rounded-3xl overflow-hidden border flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-[#8D9CF5] cursor-pointer block text-inherit no-underline"
            style="background:var(--bg-surface);border-color:var(--border-color);animation-delay:${delay}ms">
         <div class="relative h-48 overflow-hidden" style="background:var(--bg-surface-2)">
           <img src="${imgUrl}" alt="${name}" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
@@ -229,7 +230,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
           </div>
         </div>
-      </div>
+      </a>
     `;
   }
 
@@ -442,7 +443,10 @@
     container.innerHTML = pageCategories.map((c, idx) => renderCategoryCard(c, idx)).join('');
 
     container.querySelectorAll('[data-category-card]').forEach(card => {
-      card.addEventListener('click', () => {
+      card.addEventListener('click', (e) => {
+        if (!e.metaKey && !e.ctrlKey && !e.shiftKey) {
+          e.preventDefault();
+        }
         const slug = card.getAttribute('data-category-card');
         selectShopCategory(slug);
       });
@@ -1714,6 +1718,23 @@
       const seoDesc = (isRtl && product.metaDescriptionAr) || product.metaDescription || product.meta_description || pShortDesc || (pDesc ? pDesc.replace(/<[^>]+>/g, '').slice(0, 160) : '');
       if (metaDescEl && seoDesc) metaDescEl.setAttribute('content', seoDesc);
 
+      // Open Graph & Twitter Cards (for WhatsApp & social previews)
+      const ogTitle = document.getElementById('og-title') || document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.setAttribute('content', seoTitle);
+      const ogDesc = document.getElementById('og-desc') || document.querySelector('meta[property="og:description"]');
+      if (ogDesc && seoDesc) ogDesc.setAttribute('content', seoDesc);
+      const ogUrl = document.getElementById('og-url') || document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.setAttribute('content', `${siteBaseUrl}/product/${encodeURIComponent(cleanSlug)}/`);
+      const ogImg = document.getElementById('og-image') || document.querySelector('meta[property="og:image"]');
+      if (ogImg && primaryImage) ogImg.setAttribute('content', primaryImage);
+
+      const twTitle = document.getElementById('tw-title') || document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) twTitle.setAttribute('content', seoTitle);
+      const twDesc = document.getElementById('tw-desc') || document.querySelector('meta[name="twitter:description"]');
+      if (twDesc && seoDesc) twDesc.setAttribute('content', seoDesc);
+      const twImg = document.getElementById('tw-image') || document.querySelector('meta[name="twitter:image"]');
+      if (twImg && primaryImage) twImg.setAttribute('content', primaryImage);
+
       // 3. Schema.org JSON-LD Structured Data
       const schemaEl = document.getElementById('product-schema-jsonld');
       if (schemaEl) {
@@ -2432,13 +2453,8 @@
       if (!el) return;
       const bucket = cols[idx];
       if (bucket.length === 0) return;
-      // Ensure unit block is at least 6 items (>500px, exceeds 420px container height)
-      let unit = [...bucket];
-      while (unit.length < 6) {
-        unit = unit.concat(bucket);
-      }
-      // Exactly 3 identical unit sets for the 0% -> -33.333% CSS marquee animation
-      const repeated = [...unit, ...unit, ...unit];
+      // Exactly 3 identical sets for the 0% -> -33.333% CSS marquee animation
+      const repeated = [...bucket, ...bucket, ...bucket];
       el.innerHTML = repeated.map(b => createBrandCardHtml(b)).join('');
     });
   }
@@ -2838,18 +2854,18 @@
       const isMobile = window.innerWidth < 768;
 
       container.innerHTML = sections.map(function(sec) {
-        const title = isRtl && sec.title_ar ? sec.title_ar : (sec.title || 'ULTRA RIGS & WORKSTATIONS');
-        const badge = isRtl && sec.badge_ar ? sec.badge_ar : (sec.badge || 'AUTHORIZED GCC DISTRIBUTION');
-        const subtitle = isRtl && sec.subtitle_ar ? sec.subtitle_ar : (sec.subtitle || '');
-        const img = isMobile ? (sec.image_mobile || sec.image_desktop || '/assets/images/products/asus-rog-g16.jpg') : (sec.image_desktop || '/assets/images/products/asus-rog-g16.jpg');
-        const ctaText = isRtl && sec.cta_text_ar ? sec.cta_text_ar : (sec.cta_text || 'DISCOVER ALL PRODUCTS');
-        const ctaLink = sec.cta_link || '/shop/';
-        const secCtaText = isRtl && sec.secondary_cta_text_ar ? sec.secondary_cta_text_ar : (sec.secondary_cta_text || 'WHATSAPP HARDWARE DESK');
+        const title = isRtl && sec.title_ar ? sec.title_ar : (sec.title || 'NEXT-GEN MOBILE & POWER ESSENTIALS');
+        const badge = isRtl && sec.badge_ar ? sec.badge_ar : (sec.badge || 'PREMIUM MOBILE ESSENTIALS • إكسسوارات الجوال الأصلية');
+        const subtitle = isRtl && sec.subtitle_ar ? sec.subtitle_ar : (sec.subtitle || 'Genuine high-speed fast chargers, high-capacity power banks, and accessories across Qatar.');
+        const img = isMobile ? (sec.image_mobile || sec.image_desktop || '/assets/images/banners/hero-mobile.jpg') : (sec.image_desktop || '/assets/images/banners/hero-mobile.jpg');
+        const ctaText = isRtl && sec.cta_text_ar ? sec.cta_text_ar : (sec.cta_text || 'SHOP MOBILE ACCESSORIES');
+        const ctaLink = sec.cta_link || '/shop/?category=mobile-accessories';
+        const secCtaText = isRtl && sec.secondary_cta_text_ar ? sec.secondary_cta_text_ar : (sec.secondary_cta_text || 'CHAT ON WHATSAPP');
         const secCtaLink = sec.secondary_cta_link || 'https://wa.me/97477991013';
 
-        const cardTag = sec.card_tag || 'ROG STRIX SCAR 18';
-        const cardPrice = sec.card_price || 'QAR 12,499';
-        const cardLink = sec.card_link || '/shop/';
+        const cardTag = sec.card_tag || 'FAST CHARGING & POWER';
+        const cardPrice = sec.card_price || 'FROM QAR 49';
+        const cardLink = sec.card_link || '/shop/?category=mobile-accessories';
 
         let titleHtml = title;
         if (title.indexOf('&') !== -1) {

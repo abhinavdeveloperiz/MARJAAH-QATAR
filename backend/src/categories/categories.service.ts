@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, BadRequestException, OnModuleInit, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, OnModuleInit, Logger, Optional, Inject, forwardRef } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { FirestoreService } from '../firebase/firestore.service';
 import { UploadService } from '../upload/upload.service';
+import { SeoService } from '../seo/seo.service';
 
 @Injectable()
 export class CategoriesService implements OnModuleInit {
@@ -11,6 +12,7 @@ export class CategoriesService implements OnModuleInit {
   constructor(
     private readonly firestore: FirestoreService,
     private readonly uploadService: UploadService,
+    @Optional() @Inject(forwardRef(() => SeoService)) private readonly seoService?: SeoService,
   ) {}
 
   private cachedCategories: any[] | null = null;
@@ -42,6 +44,9 @@ export class CategoriesService implements OnModuleInit {
   invalidateCache() {
     this.cachedCategories = null;
     this.cacheExpiresAt = 0;
+    try {
+      this.seoService?.invalidateSitemapCache();
+    } catch (_) {}
     try {
       if (fs.existsSync(this.DISK_CACHE_PATH)) {
         fs.unlinkSync(this.DISK_CACHE_PATH);

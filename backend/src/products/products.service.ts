@@ -4,6 +4,7 @@ import * as path from 'path';
 import { FirestoreService } from '../firebase/firestore.service';
 import { UploadService } from '../upload/upload.service';
 import { AdminService } from '../admin/admin.service';
+import { SeoService } from '../seo/seo.service';
 
 export interface ProductFilterQuery {
   page?: number;
@@ -43,6 +44,7 @@ export class ProductsService implements OnModuleInit {
     private readonly firestore: FirestoreService,
     private readonly uploadService: UploadService,
     @Optional() @Inject(forwardRef(() => AdminService)) private readonly adminService?: AdminService,
+    @Optional() @Inject(forwardRef(() => SeoService)) private readonly seoService?: SeoService,
   ) {}
 
   private cachedProducts: any[] | null = null;
@@ -75,6 +77,9 @@ export class ProductsService implements OnModuleInit {
   invalidateCache() {
     this.cachedProducts = null;
     this.cacheExpiresAt = 0;
+    try {
+      this.seoService?.invalidateSitemapCache();
+    } catch (_) {}
     try {
       if (fs.existsSync(this.DISK_CACHE_PATH)) {
         fs.unlinkSync(this.DISK_CACHE_PATH);

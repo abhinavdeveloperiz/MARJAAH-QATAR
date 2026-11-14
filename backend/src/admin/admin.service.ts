@@ -132,7 +132,7 @@ export class AdminService implements OnModuleInit {
           address: 'Building 42, Al Mirqab Al Jadeed St, Al Sadd, Doha, Qatar',
           phone: '+974 7799 1013',
           whatsapp: '+974 7799 1013',
-          email: 'support@marjaah.qa',
+          email: 'info@marjaah.com',
           admin_email: 'admin@marjaah.qa',
           footer_cr_text: 'CR No. 228717 • Qatar',
           currency: 'QAR',
@@ -1951,7 +1951,7 @@ export class AdminService implements OnModuleInit {
       cr_number: '228717',
       footer_cr_text: 'CR No. 228717 • Qatar',
       phone: '+974 7799 1013',
-      email: 'support@marjaah.qa',
+      email: 'info@marjaah.com',
     };
   }
 
