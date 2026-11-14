@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr" class="dark">
+<html lang="en" dir="ltr" class="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,6 +16,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
+  <!-- Centralized Admin App Colors -->
+  <script src="/admin/shared/admin-colors.js?v=20261114_11"></script>
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -25,17 +28,33 @@
         extend: {
           colors: {
             admin: {
-              base: '#0B132B',
-              surface: '#111C38',
-              surface2: '#1C2541',
-              surface3: '#263457',
-              border: 'rgba(255, 255, 255, 0.08)',
-              borderStrong: 'rgba(255, 255, 255, 0.16)',
+              base: 'var(--admin-bg-base)',
+              surface: 'var(--admin-bg-surface)',
+              surface2: 'var(--admin-bg-surface2)',
+              surface3: 'var(--admin-bg-surface3)',
+              active: 'var(--admin-bg-active)',
+              border: 'var(--admin-border)',
+              borderSubtle: 'var(--admin-border-subtle)',
+              borderStrong: 'var(--admin-border-strong)',
             },
             primary: {
-              DEFAULT: '#4F46E5',
-              hover: '#4338CA',
-              light: '#818CF8',
+              DEFAULT: 'var(--admin-primary)',
+              hover: 'var(--admin-primary-hover)',
+              light: 'var(--admin-primary-light)',
+              subtle: 'var(--admin-primary-subtle)',
+              border: 'var(--admin-primary-border)',
+            },
+            indigo: {
+              50: 'var(--admin-primary-subtle)',
+              100: 'var(--admin-primary-subtle)',
+              200: 'var(--admin-primary-light)',
+              300: 'var(--admin-primary-light)',
+              400: 'var(--admin-primary-light)',
+              500: 'var(--admin-primary)',
+              600: 'var(--admin-primary)',
+              700: 'var(--admin-primary-hover)',
+              800: 'var(--admin-primary-hover)',
+              900: 'var(--admin-bg-surface2)',
             },
           },
           fontFamily: {
@@ -49,45 +68,82 @@
 
   <style>
     :root {
-      color-scheme: dark;
+      color-scheme: light;
+
+      --admin-bg-base: #F8FAFC;
+      --admin-bg-surface: #FFFFFF;
+      --admin-bg-surface2: #F8FAFC;
+      --admin-bg-surface3: #F1F5F9;
+      --admin-bg-active: #EFF6FF;
+
+      --admin-border: #E2E8F0;
+      --admin-border-subtle: #F1F5F9;
+      --admin-border-strong: #CBD5E1;
+
+      --admin-primary: #2563EB;
+      --admin-primary-hover: #1D4ED8;
+      --admin-primary-light: #DBEAFE;
+      --admin-primary-subtle: #EFF6FF;
+      --admin-primary-border: #BFDBFE;
+      --admin-primary-text: #FFFFFF;
+
+      --admin-text-main: #0F172A;
+      --admin-text-secondary: #475569;
+      --admin-text-muted: #94A3B8;
+
+      --admin-success: #10B981;
+      --admin-success-subtle: #ECFDF5;
+      --admin-warning: #F59E0B;
+      --admin-warning-subtle: #FFFBEB;
+      --admin-danger: #EF4444;
+      --admin-danger-subtle: #FEF2F2;
+      --admin-info: #0284C7;
+      --admin-info-subtle: #F0F9FF;
     }
+
     body {
-      background-color: #0B132B;
-      color: #F8FAFC;
+      background-color: var(--admin-bg-base);
+      color: var(--admin-text-main);
       font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       margin: 0;
       padding: 0;
       overflow-x: hidden;
     }
-    /* Custom Scrollbar for Admin Panels */
+
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
     }
     ::-webkit-scrollbar-track {
-      background: #0B132B;
+      background: var(--admin-bg-surface2);
     }
     ::-webkit-scrollbar-thumb {
-      background: #263457;
+      background: #CBD5E1;
       border-radius: 9999px;
     }
     ::-webkit-scrollbar-thumb:hover {
-      background: #4F46E5;
+      background: var(--admin-primary);
     }
+
     .admin-card {
-      background: #111C38;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 1.25rem;
+      background: var(--admin-bg-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 1rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .admin-card:hover {
+      border-color: var(--admin-border-strong);
     }
     .admin-card-inner {
-      background: #1C2541;
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 1rem;
+      background: var(--admin-bg-surface2);
+      border: 1px solid var(--admin-border-subtle);
+      border-radius: 0.75rem;
     }
     .admin-input {
-      background: #0B132B;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      color: #F8FAFC;
+      background: var(--admin-bg-surface);
+      border: 1px solid var(--admin-border);
+      color: var(--admin-text-main);
       border-radius: 0.75rem;
       padding: 0.5rem 0.875rem;
       font-size: 0.8125rem;
@@ -95,13 +151,133 @@
     }
     .admin-input:focus {
       outline: none;
-      border-color: #6366F1;
-      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+      border-color: var(--admin-primary);
+      box-shadow: 0 0 0 3px var(--admin-primary-subtle);
+    }
+    .sidebar-nav-item {
+      color: var(--admin-text-secondary);
+      border-left: 3px solid transparent;
+      transition: all 0.15s ease-in-out;
+    }
+    .sidebar-nav-item:hover:not(.active) {
+      background: var(--admin-bg-surface3);
+      color: var(--admin-text-main);
     }
     .sidebar-nav-item.active {
-      background: rgba(79, 70, 229, 0.16);
+      background: var(--admin-primary-subtle);
+      color: var(--admin-primary) !important;
+      border-left-color: var(--admin-primary) !important;
+      font-weight: 700;
+    }
+
+    h1, h2, h3, h4, h5, h6,
+    .admin-card h1, .admin-card h2, .admin-card h3, .admin-card h4, .admin-card h5, .admin-card h6 {
+      color: var(--admin-text-main);
+    }
+
+    .admin-card .text-white:not(button):not(.btn):not([type="submit"]):not(.avatar):not(#admin-staff-avatar):not(.bg-primary *):not([data-keep-white]) {
+      color: var(--admin-text-main) !important;
+    }
+
+    #admin-topbar .text-white:not(button):not(.btn):not([data-keep-white]) {
+      color: var(--admin-text-main) !important;
+    }
+
+    .admin-card-inner .text-white:not(button):not(.btn):not([data-keep-white]) {
+      color: var(--admin-text-main) !important;
+    }
+
+    .bg-slate-900,
+    .bg-slate-900\/60,
+    .bg-slate-900\/80,
+    .bg-slate-900\/90,
+    .bg-slate-900\/95,
+    .bg-slate-800,
+    .bg-slate-800\/80,
+    .bg-slate-800\/60,
+    .bg-slate-800\/40,
+    .bg-slate-800\/30,
+    .bg-slate-950,
+    .bg-slate-950\/80,
+    .bg-slate-950\/40 {
+      background-color: var(--admin-bg-surface2) !important;
+    }
+
+    .border-slate-800,
+    .border-slate-800\/60,
+    .border-slate-800\/50,
+    .border-slate-700,
+    .border-slate-700\/80,
+    .border-slate-700\/60,
+    .border-slate-700\/40 {
+      border-color: var(--admin-border) !important;
+    }
+
+    tr.hover\:bg-slate-800\/30:hover,
+    tr.hover\:bg-slate-800\/40:hover,
+    tr:hover {
+      background-color: #F8FAFC;
+    }
+
+    tr.border-b {
+      border-color: var(--admin-border-subtle) !important;
+    }
+
+    .bg-admin-base\/90,
+    .bg-black\/85,
+    .bg-black\/80,
+    .bg-black\/70 {
+      background-color: rgba(15, 23, 42, 0.45) !important;
+      backdrop-filter: blur(8px);
+    }
+
+    #order-details-modal > div,
+    #create-order-modal > div,
+    #product-modal > div,
+    #user-modal > div,
+    #role-modal > div,
+    #banner-modal > div,
+    #location-modal > div,
+    #approval-diff-modal > div,
+    #customer-details-modal > div,
+    #admin-login-modal > div {
+      background-color: #FFFFFF !important;
+      border-color: var(--admin-border) !important;
+    }
+
+    #order-details-modal label,
+    #create-order-modal label,
+    #product-modal label,
+    #user-modal label,
+    #role-modal label,
+    #banner-modal label,
+    #location-modal label,
+    #admin-login-modal label,
+    #customer-details-modal label {
+      color: var(--admin-text-secondary) !important;
+    }
+
+    #order-details-modal .text-white,
+    #create-order-modal .text-white,
+    #product-modal .text-white,
+    #user-modal .text-white,
+    #role-modal .text-white,
+    #banner-modal .text-white,
+    #location-modal .text-white,
+    #customer-details-modal .text-white {
+      color: var(--admin-text-main);
+    }
+
+    #order-details-modal button.text-white,
+    #create-order-modal button.text-white,
+    #product-modal button.text-white,
+    #user-modal button.text-white,
+    #role-modal button.text-white,
+    #banner-modal button.text-white,
+    #location-modal button.text-white,
+    #customer-details-modal button.text-white,
+    #admin-login-submit-btn {
       color: #FFFFFF !important;
-      border-color: #6366F1;
     }
 
     /* ── Professional Tax Invoice Print Formatting ── */
@@ -172,23 +348,23 @@
   </style>
 </head>
 
-<body class="flex h-screen overflow-hidden selection:bg-indigo-600 selection:text-white">
+<body class="flex h-screen overflow-hidden selection:bg-primary selection:text-white bg-slate-50 text-slate-900">
 
   <!-- ═══ SIDEBAR NAVIGATION (Desktop Fixed, Mobile Drawer) ═══════════════════ -->
-  <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-admin-surface border-r border-admin-border flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static flex-shrink-0 shadow-2xl lg:shadow-none">
+  <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-admin-border flex flex-col transition-transform duration-300 -translate-x-full lg:translate-x-0 lg:static flex-shrink-0 shadow-xl lg:shadow-none">
     
     <!-- Brand Header -->
     <div class="h-16 px-6 border-b border-admin-border flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-600/30">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-sky-500 flex items-center justify-center shadow-md shadow-blue-500/20">
           <span class="font-black text-lg text-white">M</span>
         </div>
         <div>
-          <span class="font-black text-sm tracking-wider text-white block leading-tight">MARJAAH</span>
-          <span class="text-[9px] uppercase tracking-widest text-indigo-400 font-bold">Executive Admin</span>
+          <span class="font-black text-sm tracking-wider text-slate-900 block leading-tight">MARJAAH</span>
+          <span class="text-[9px] uppercase tracking-widest text-primary font-bold">Executive Admin</span>
         </div>
       </div>
-      <button type="button" onclick="AdminApp.toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1">
+      <button type="button" onclick="AdminApp.toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 p-1">
         ✕
       </button>
     </div>
@@ -198,10 +374,10 @@
       
       <!-- Group: Main -->
       <div>
-        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Overview</p>
+        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1.5">Overview</p>
         <ul class="space-y-1">
           <li>
-            <a href="#dashboard" data-tab="dashboard" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#dashboard" data-tab="dashboard" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
               <span>Executive Dashboard</span>
             </a>
@@ -211,10 +387,10 @@
 
       <!-- Group: Commerce -->
       <div>
-        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Store Operations</p>
+        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1.5">Store Operations</p>
         <ul class="space-y-1">
           <li data-admin-module="products">
-            <a href="#products" data-tab="products" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#products" data-tab="products" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>
                 <span>Products Catalog</span>
@@ -223,47 +399,47 @@
           </li>
 
           <li data-admin-module="orders">
-            <a href="#orders" data-tab="orders" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#orders" data-tab="orders" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                 <span>Orders &amp; Pickup</span>
               </div>
-              <span id="badge-pending-orders" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">0</span>
+              <span id="badge-pending-orders" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">0</span>
             </a>
           </li>
 
           <li data-admin-module="orders">
-            <a href="#returns-cancellations" data-tab="returns-cancellations" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#returns-cancellations" data-tab="returns-cancellations" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
                 <span>Returns &amp; Cancellations</span>
               </div>
-              <span id="badge-pending-returns" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">0</span>
+              <span id="badge-pending-returns" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">0</span>
             </a>
           </li>
 
           <li data-admin-module="customers">
-            <a href="#customers" data-tab="customers" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#customers" data-tab="customers" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
                 <span>Customer Analytics</span>
               </div>
-              <span id="badge-online-customers" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">0 Online</span>
+              <span id="badge-online-customers" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">0 Online</span>
             </a>
           </li>
 
           <li data-admin-module="approvals">
-            <a href="#approvals" data-tab="approvals" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#approvals" data-tab="approvals" class="sidebar-nav-item flex items-center justify-between px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <div class="flex items-center gap-3">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
                 <span>Approvals Queue</span>
               </div>
-              <span id="badge-pending-approvals" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">0</span>
+              <span id="badge-pending-approvals" style="display:none;" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 animate-pulse">0</span>
             </a>
           </li>
 
           <li data-admin-module="store_locations">
-            <a href="#locations" data-tab="locations" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#locations" data-tab="locations" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
               <span>Pickup Locations</span>
             </a>
@@ -273,17 +449,17 @@
 
       <!-- Group: Content & Marketing -->
       <div>
-        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Content &amp; Marketing</p>
+        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1.5">Content &amp; Marketing</p>
         <ul class="space-y-1">
           <li data-admin-module="banners">
-            <a href="#banners" data-tab="banners" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#banners" data-tab="banners" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
               <span>Hero Banners</span>
             </a>
           </li>
 
           <li data-admin-module="promotional_sections">
-            <a href="#promotions" data-tab="promotions" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#promotions" data-tab="promotions" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               <span>Promotions (Ultra Rigs)</span>
             </a>
@@ -293,31 +469,31 @@
 
       <!-- Group: Security & IAM -->
       <div>
-        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-500 mb-1.5">Security &amp; IAM</p>
+        <p class="px-3 text-[10px] uppercase font-bold tracking-widest text-slate-400 mb-1.5">Security &amp; IAM</p>
         <ul class="space-y-1">
           <li data-admin-module="admin_users">
-            <a href="#users" data-tab="users" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#users" data-tab="users" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
               <span>Admin Staff</span>
             </a>
           </li>
 
           <li data-admin-module="roles_permissions">
-            <a href="#roles" data-tab="roles" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#roles" data-tab="roles" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>
               <span>Custom Roles &amp; Matrix</span>
             </a>
           </li>
 
           <li data-admin-module="audit_logs">
-            <a href="#audit" data-tab="audit" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#audit" data-tab="audit" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
               <span>Audit Trail (Immutable)</span>
             </a>
           </li>
 
           <li data-admin-module="settings">
-            <a href="#settings" data-tab="settings" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+            <a href="#settings" data-tab="settings" class="sidebar-nav-item flex items-center gap-3 px-3 py-2.5 rounded-xl border-l-2 border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               <span>Store Settings &amp; CR</span>
             </a>
@@ -329,15 +505,15 @@
 
     <!-- Staff Profile Card -->
     <div class="p-3 border-t border-admin-border flex-shrink-0">
-      <div class="p-3 rounded-2xl bg-admin-surface2 border border-white/5 flex items-center justify-between">
+      <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
         <div class="flex items-center gap-2.5 min-w-0">
-          <div id="admin-staff-avatar" class="w-8 h-8 rounded-xl bg-indigo-600 font-bold text-white flex items-center justify-center text-xs flex-shrink-0 shadow-md">A</div>
+          <div id="admin-staff-avatar" class="w-8 h-8 rounded-xl bg-primary font-bold text-white flex items-center justify-center text-xs flex-shrink-0 shadow-sm">A</div>
           <div class="min-w-0">
-            <p id="admin-staff-name" class="font-bold text-xs text-white truncate">Administrator</p>
-            <p id="admin-staff-role" class="text-[10px] text-indigo-300 font-semibold truncate">Super Admin</p>
+            <p id="admin-staff-name" class="font-bold text-xs text-slate-900 truncate">Administrator</p>
+            <p id="admin-staff-role" class="text-[10px] text-slate-500 font-medium truncate">Super Admin</p>
           </div>
         </div>
-        <button type="button" data-admin-action="logout" title="Sign Out" class="p-1.5 rounded-lg hover:bg-rose-500/20 text-slate-400 hover:text-rose-400 transition cursor-pointer">
+        <button type="button" data-admin-action="logout" title="Sign Out" class="p-1.5 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition cursor-pointer">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         </button>
       </div>
@@ -345,41 +521,48 @@
   </aside>
 
   <!-- Sidebar Overlay for mobile -->
-  <div id="admin-sidebar-overlay" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 hidden lg:hidden"></div>
+  <div id="admin-sidebar-overlay" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 hidden lg:hidden"></div>
 
   <!-- ═══ MAIN WORKSPACE & TOP BAR ════════════════════════════════════════════ -->
   <div class="flex-1 flex flex-col min-w-0 overflow-hidden">
     
     <!-- Executive Top Bar -->
-    <header class="h-16 px-4 sm:px-8 border-b border-admin-border bg-admin-surface flex items-center justify-between flex-shrink-0 gap-4">
+    <header id="admin-topbar" class="h-16 px-4 sm:px-8 border-b border-admin-border bg-white flex items-center justify-between flex-shrink-0 gap-4">
       
       <div class="flex items-center gap-3">
-        <button id="sidebar-toggle-btn" type="button" class="lg:hidden p-2 rounded-xl border border-admin-border hover:bg-white/5 text-slate-300">
+        <button id="sidebar-toggle-btn" type="button" class="lg:hidden p-2 rounded-xl border border-admin-border hover:bg-slate-100 text-slate-600">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
         </button>
         <div class="flex items-center gap-2 text-xs font-semibold text-slate-400">
-          <span class="text-slate-500">Admin</span>
+          <span class="text-slate-400">Admin</span>
           <span>/</span>
-          <span id="admin-breadcrumb-current" class="text-white font-bold">Executive Overview</span>
+          <span id="admin-breadcrumb-current" class="text-slate-900 font-bold">Executive Overview</span>
         </div>
       </div>
 
       <!-- Quick Actions, Notifications & Storefront Link -->
-      <div class="flex items-center gap-3">
-        <button id="topbar-btn-new-order" type="button" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs font-bold text-indigo-300 hover:text-white transition shadow-sm cursor-pointer">
-          <span>+ Create Order</span>
+      <div class="flex items-center gap-2.5">
+        <button id="topbar-btn-new-order" type="button" title="Create a new manual customer or phone order with stock reservation" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-admin-border bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 hover:text-slate-900 transition shadow-sm cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>Create Order</span>
         </button>
 
-        <button id="topbar-btn-new-product" type="button" class="hidden sm:inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition shadow-md cursor-pointer">
-          <span>+ New Product</span>
+        <button id="topbar-btn-new-product" type="button" title="Open product editor modal to add an item to catalog" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary hover:bg-primary-hover text-xs font-semibold text-white transition shadow-sm cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          <span>New Product</span>
         </button>
 
-        <button id="topbar-notification-bell" type="button" title="Pending Approvals" class="relative p-2 rounded-xl border border-admin-border hover:bg-white/5 text-slate-300 hover:text-white transition cursor-pointer">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          <span id="topbar-pending-badge" style="display:none;" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-slate-900 font-black text-[9px] flex items-center justify-center">0</span>
+        <button id="topbar-notification-bell" type="button" title="Pending catalog approvals, low stock alerts, and RMA requests" class="relative p-2 rounded-lg border border-admin-border hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+          <span id="topbar-pending-badge" style="display:none;" class="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-amber-500 text-white font-black text-[9px] flex items-center justify-center">0</span>
         </button>
 
-        <a href="/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-admin-border hover:bg-white/5 text-xs font-semibold text-slate-300 hover:text-white transition">
+        <a href="/" target="_blank" rel="noopener noreferrer" title="Open live Marjaah customer-facing storefront in a new tab" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-admin-border hover:bg-slate-100 text-xs font-semibold text-slate-700 hover:text-slate-900 transition">
+          <span>Live Store</span>
+          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
+        </a>
+      </div>
+    </header>
           <span>Live Store</span>
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" x2="21" y1="14" y2="3"/></svg>
         </a>
@@ -394,58 +577,158 @@
       <!-- ─────────────────────────────────────────────────────────────────── -->
       <div id="pane-dashboard" class="admin-tab-pane space-y-6">
         
-        <!-- Live KPI Cards -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
-          <div class="admin-card p-4 sm:p-5 min-w-0 overflow-hidden">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Gross Revenue</span>
-            <p id="kpi-gross-revenue" class="text-lg sm:text-xl xl:text-2xl font-black text-white font-mono truncate">0 QAR</p>
-            <span class="text-[10px] text-emerald-400 font-semibold mt-1 block truncate">Real Time</span>
+        <!-- Live KPI Cards (Non-truncated, Responsive SaaS Grid) -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 2xl:grid-cols-6 gap-3 sm:gap-4">
+          
+          <!-- KPI 1: Gross Revenue -->
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Gross Revenue: Cumulative turnover recorded across all valid customer orders in Firestore (excluding cancelled/refunded)">
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Gross Revenue</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" title="Live telemetry synced with Firestore"></span>
+            </div>
+            <p id="kpi-gross-revenue" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0 QAR</p>
+            <div class="flex items-center gap-1.5 text-[10px] font-medium text-emerald-400" title="Synced in real time with customer order events">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>Real Time</span>
+            </div>
           </div>
-          <div class="admin-card p-4 sm:p-5 min-w-0 overflow-hidden">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Net Orders</span>
-            <p id="kpi-total-orders" class="text-lg sm:text-xl xl:text-2xl font-black text-white font-mono truncate">0</p>
-            <span class="text-[10px] text-indigo-300 font-semibold mt-1 block truncate">Qatar &amp; Store Pickup</span>
+
+          <!-- KPI 2: Net Orders -->
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Net Orders: Total count of customer orders processed through home delivery across Qatar and store pickup locations">
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Net Orders</span>
+              <span class="w-2 h-2 rounded-full bg-primary shadow-sm shadow-blue-500/50" title="Active fulfillment pipeline"></span>
+            </div>
+            <p id="kpi-total-orders" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0</p>
+            <span class="text-[10px] font-medium text-slate-400" title="All delivery zones and store pickup hubs">Qatar &amp; Store Pickup</span>
           </div>
-          <div class="admin-card p-4 sm:p-5 min-w-0 overflow-hidden">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Average Order Value</span>
-            <p id="kpi-aov" class="text-lg sm:text-xl xl:text-2xl font-black text-white font-mono truncate">0 QAR</p>
-            <span class="text-[10px] text-slate-400 mt-1 block truncate">Across all baskets</span>
+
+          <!-- KPI 3: Average Order Value -->
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Average Order Value: Mean customer spend per order (Gross Revenue ÷ Net Orders)">
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Average Order</span>
+              <span class="w-2 h-2 rounded-full bg-cyan-400 shadow-sm shadow-cyan-400/50" title="Customer basket size indicator"></span>
+            </div>
+            <p id="kpi-aov" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0 QAR</p>
+            <span class="text-[10px] font-medium text-slate-400" title="Calculated across all customer baskets in QAR">Across all baskets</span>
           </div>
-          <div class="admin-card p-4 sm:p-5 min-w-0 overflow-hidden">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Catalog Products</span>
-            <p id="kpi-total-products" class="text-lg sm:text-xl xl:text-2xl font-black text-white font-mono truncate">0</p>
-            <span class="text-[10px] text-slate-400 mt-1 block truncate">Active inventory</span>
+
+          <!-- KPI 4: Catalog Products -->
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Catalog Items: Total active products currently registered and live in the store catalog">
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Catalog Items</span>
+              <span class="w-2 h-2 rounded-full bg-indigo-400 shadow-sm shadow-indigo-400/50" title="Active catalog inventory"></span>
+            </div>
+            <p id="kpi-total-products" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">0</p>
+            <span class="text-[10px] font-medium text-slate-400" title="Items indexed across all product categories">Active inventory</span>
           </div>
-          <div class="admin-card p-4 sm:p-5 cursor-pointer hover:border-amber-500/50 transition min-w-0 overflow-hidden" onclick="AdminApp.navigateTo('approvals')">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-amber-400 block mb-1 truncate">Pending Approvals</span>
-            <p id="kpi-pending-approvals" class="text-lg sm:text-xl xl:text-2xl font-black text-amber-300 font-mono truncate">0</p>
-            <span class="text-[10px] text-amber-400 font-semibold mt-1 block truncate">Action required &rarr;</span>
+
+          <!-- KPI 5: Pending Approvals -->
+          <div class="admin-card p-4 flex flex-col justify-between cursor-pointer hover:border-amber-500/40 transition-all group" title="Pending Approvals: Products, price edits, or content submitted by staff awaiting super administrator review" onclick="AdminApp.navigateTo('approvals')">
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-amber-400 group-hover:text-amber-300">Approvals</span>
+              <span class="w-2 h-2 rounded-full bg-amber-400 shadow-sm shadow-amber-400/50" title="Review queue counter"></span>
+            </div>
+            <p id="kpi-pending-approvals" class="text-lg sm:text-xl font-extrabold text-amber-300 font-mono tracking-tight my-1">0</p>
+            <span class="text-[10px] font-medium text-amber-400/90 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform" title="Click to open the Approvals Queue">
+              Action required &rarr;
+            </span>
           </div>
-          <div class="admin-card p-4 sm:p-5 min-w-0 overflow-hidden">
-            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Active Staff</span>
-            <p id="kpi-active-staff" class="text-lg sm:text-xl xl:text-2xl font-black text-white font-mono truncate">1</p>
-            <span class="text-[10px] text-indigo-300 font-semibold mt-1 block truncate">RBAC secured</span>
+
+          <!-- KPI 6: Active Staff -->
+          <div class="admin-card p-4 flex flex-col justify-between hover:border-slate-700/80 transition-all cursor-default" title="Active Staff: Authenticated administrative accounts with verified role-based access control (RBAC) permissions">
+            <div class="flex items-center justify-between gap-1 mb-1">
+              <span class="text-[11px] uppercase font-semibold tracking-wider text-slate-400">Active Staff</span>
+              <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" title="RBAC security active"></span>
+            </div>
+            <p id="kpi-active-staff" class="text-lg sm:text-xl font-extrabold text-white font-mono tracking-tight my-1">1</p>
+            <span class="text-[10px] font-medium text-slate-400 flex items-center gap-1" title="Protected by RBAC permissions matrix">
+              <svg class="w-2.5 h-2.5 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              RBAC secured
+            </span>
           </div>
+
         </div>
 
-        <!-- Middle Grid: Revenue Time-Series & Order Breakdown -->
+        <!-- Middle Grid: Revenue Bar Diagram & Order Status Donut/Pipeline -->
         <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
           <div class="admin-card p-4 sm:p-6 xl:col-span-2 space-y-4 min-w-0 overflow-hidden">
-            <div class="flex items-center justify-between">
+            <!-- Header Row with Controls -->
+            <div class="flex items-center justify-between flex-wrap gap-3 pb-2 border-b border-admin-border/60">
               <div>
-                <h3 class="font-bold text-sm text-white">Revenue Timeline</h3>
-                <p class="text-xs text-slate-400">Daily gross turnover recorded in Firestore</p>
+                <h3 class="font-bold text-sm text-white flex items-center gap-2" title="Daily Revenue &amp; Sales Velocity: Daily gross turnover recorded in QAR">
+                  <span>Daily Revenue &amp; Sales Velocity</span>
+                  <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold" title="Live telemetry synced with Firestore">Live</span>
+                </h3>
+                <p class="text-xs text-slate-400" title="Order amounts recorded at checkout and collection">Daily gross turnover from customer orders recorded in Firestore</p>
               </div>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-bold">Interactive SVG</span>
+
+              <div class="flex items-center gap-2 flex-wrap">
+                <!-- Visualization Mode: Bar vs Line -->
+                <div class="inline-flex items-center rounded-lg bg-admin-surface2 p-0.5 border border-admin-border" id="chart-mode-selector" title="Select visualization type">
+                  <button type="button" class="chart-mode-btn active px-2.5 py-1 text-[11px] font-bold rounded-md bg-primary text-white transition cursor-pointer shadow-sm flex items-center gap-1.5" onclick="AdminDashboard.setChartType('bar')" title="Bar Diagram: View revenue as discrete daily columns with height proportional to sales">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Bar Diagram</span>
+                  </button>
+                  <button type="button" class="chart-mode-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition cursor-pointer flex items-center gap-1.5" onclick="AdminDashboard.setChartType('line')" title="Trend Line: View sales trajectory as a continuous smooth curve">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                    <span>Trend Line</span>
+                  </button>
+                </div>
+
+                <!-- Timeframe Selector -->
+                <div class="inline-flex items-center rounded-lg bg-admin-surface2 p-0.5 border border-admin-border" id="revenue-timeframe-selector" title="Select historical timeframe">
+                  <button type="button" class="timeframe-btn active px-2.5 py-1 text-[11px] font-bold rounded-md bg-primary text-white transition cursor-pointer shadow-sm" onclick="AdminDashboard.setTimeframe('7d')" title="Last 7 Days: Focus on recent weekly sales pace">7D</button>
+                  <button type="button" class="timeframe-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition cursor-pointer" onclick="AdminDashboard.setTimeframe('14d')" title="Last 14 Days: Bi-weekly performance review">14D</button>
+                  <button type="button" class="timeframe-btn px-2.5 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition cursor-pointer" onclick="AdminDashboard.setTimeframe('30d')" title="Last 30 Days: Full monthly turnover analysis">30D</button>
+                </div>
+              </div>
             </div>
+
+            <!-- 4-Stat Metric Summary Strip -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1">
+              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Period Total: Sum of gross revenue generated across all orders placed in this timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Period Total</span>
+                <span id="chart-stat-total" class="text-sm sm:text-base font-black text-white font-mono block mt-0.5">0 QAR</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Daily Average: Mean revenue generated per day during the selected timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Daily Average</span>
+                <span id="chart-stat-avg" class="text-sm sm:text-base font-black text-primary-light font-mono block mt-0.5">0 QAR/day</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Period Orders: Total count of customer orders placed in this timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Period Orders</span>
+                <span id="chart-stat-orders" class="text-sm sm:text-base font-black text-white font-mono block mt-0.5">0 Orders</span>
+              </div>
+              <div class="p-2.5 rounded-xl bg-admin-surface2/60 border border-admin-borderSubtle" title="Highest Day: Single calendar date with the largest revenue turnover in this timeframe">
+                <span class="text-[10px] uppercase font-semibold text-slate-400 block">Highest Day</span>
+                <span id="chart-stat-peak" class="text-sm sm:text-base font-black text-emerald-400 font-mono block mt-0.5">0 QAR</span>
+              </div>
+            </div>
+
+            <!-- The Chart Container -->
             <div id="revenue-chart-container" class="pt-2">
-              <div class="h-48 flex items-center justify-center text-xs text-slate-400">Rendering chart...</div>
+              <div class="h-64 flex items-center justify-center text-xs text-slate-400">Rendering diagram...</div>
+            </div>
+
+            <!-- Plain-English Explanatory Guide -->
+            <div class="p-3 rounded-xl bg-admin-surface2/40 border border-admin-borderSubtle flex items-start gap-2.5 text-xs text-slate-300">
+              <span class="text-primary-light flex-shrink-0 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </span>
+              <p class="leading-relaxed text-[11px] text-slate-300">
+                <strong>How to interpret this diagram:</strong> Each vertical column displays total sales (in QAR) generated from customer orders on that date. Days with zero sales show a faint baseline marker. Hover over any bar to inspect exact daily revenue, order frequency, and average order value.
+              </p>
             </div>
           </div>
 
-          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden">
-            <h3 class="font-bold text-sm text-white">Order Status Breakdown</h3>
-            <p class="text-xs text-slate-400">Current fulfillment pipelines</p>
+          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Order Status Breakdown: Proportions of orders in active fulfillment pipelines">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-sm text-white" title="Order Status Breakdown across fulfillment pipelines">Order Status Breakdown</h3>
+                <p class="text-xs text-slate-400">Current fulfillment pipelines</p>
+              </div>
+              <span id="order-status-total-badge" class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary-light border border-primary/20 font-bold font-mono" title="Total order volume tracked across all pipeline stages">0 Orders</span>
+            </div>
             <div id="order-status-breakdown" class="space-y-3 pt-2">
               <div class="text-xs text-slate-400 text-center py-6">Calculating status ratios...</div>
             </div>
@@ -456,21 +739,21 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           
           <!-- Top Products -->
-          <div class="admin-card p-4 sm:p-6 space-y-4 lg:col-span-2 xl:col-span-1 min-w-0 overflow-hidden">
+          <div class="admin-card p-4 sm:p-6 space-y-4 lg:col-span-2 xl:col-span-1 min-w-0 overflow-hidden" title="Top Selling Products: Best-performing catalog items ranked by units sold and gross revenue">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="font-bold text-sm text-white">Top Selling Products</h3>
                 <p class="text-xs text-slate-400">Best-performing catalog items</p>
               </div>
-              <span class="text-[10px] px-2 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-bold">By Units</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-md bg-primary/10 text-primary-light border border-primary/20 font-bold" title="Sorted by total quantity of units sold across customer orders">By Units</span>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left">
                 <thead>
-                  <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-800">
-                    <th class="py-2 px-1 w-6 text-center">#</th>
-                    <th class="py-2 px-2">Product</th>
-                    <th class="py-2 px-2 text-right">Sales &amp; Revenue</th>
+                  <tr class="text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-admin-border">
+                    <th class="py-2 px-1 w-6 text-center" title="Sales rank">#</th>
+                    <th class="py-2 px-2" title="Catalog item title and brand">Product</th>
+                    <th class="py-2 px-2 text-right" title="Gross turnover and total quantity sold">Sales &amp; Revenue</th>
                   </tr>
                 </thead>
                 <tbody id="top-products-tbody">
@@ -481,9 +764,9 @@
           </div>
 
           <!-- Category Breakdown -->
-          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden">
+          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Category Distribution: Proportion of active catalog items in each category">
             <div>
-              <h3 class="font-bold text-sm text-white">Category Distribution</h3>
+              <h3 class="font-bold text-sm text-white" title="Inventory share across categories">Category Distribution</h3>
               <p class="text-xs text-slate-400">Inventory share across categories</p>
             </div>
             <div id="category-distribution-container" class="space-y-3 pt-2">
@@ -492,22 +775,22 @@
           </div>
 
           <!-- Traffic & Privacy-Conscious Visitor Stats -->
-          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden lg:col-span-2 xl:col-span-1">
+          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden lg:col-span-2 xl:col-span-1" title="Storefront Visitors Today: Aggregated privacy-compliant visitor analytics">
             <div>
               <h3 class="font-bold text-sm text-white">Storefront Visitors Today</h3>
               <p class="text-xs text-slate-400">Privacy-compliant visitor analytics</p>
             </div>
             <div class="grid grid-cols-2 gap-3 pt-2">
-              <div class="admin-card-inner p-3 text-center min-w-0">
+              <div class="admin-card-inner p-3 text-center min-w-0" title="Distinct customer browsing sessions recorded in the last 24 hours">
                 <span class="text-[10px] uppercase font-bold text-slate-400 block truncate">Visitors</span>
                 <span id="kpi-traffic-visitors" class="text-lg sm:text-xl font-black text-white font-mono block truncate">0</span>
               </div>
-              <div class="admin-card-inner p-3 text-center min-w-0">
+              <div class="admin-card-inner p-3 text-center min-w-0" title="Total pages, categories, and products viewed today across storefront">
                 <span class="text-[10px] uppercase font-bold text-slate-400 block truncate">Page Views</span>
-                <span id="kpi-traffic-pageviews" class="text-lg sm:text-xl font-black text-indigo-400 font-mono block truncate">0</span>
+                <span id="kpi-traffic-pageviews" class="text-lg sm:text-xl font-black text-primary-light font-mono block truncate">0</span>
               </div>
             </div>
-            <div class="pt-2 text-xs text-slate-400 flex items-center justify-between border-t border-slate-800">
+            <div class="pt-2 text-xs text-slate-400 flex items-center justify-between border-t border-admin-border" title="Percentage of storefront browsing sessions from smartphones and tablets">
               <span>Mobile Device Share:</span>
               <strong id="kpi-traffic-mobile-share" class="text-white font-mono">68%</strong>
             </div>
@@ -516,19 +799,19 @@
 
         <!-- Customer Analytics: Real-Time Online Presence & Frequency Diagrams in Executive Dashboard -->
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden">
+          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Customer Online Presence: Heartbeat activity of shoppers within the last 30 seconds">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="font-bold text-sm text-white flex items-center gap-2">
                   <span>Customer Online Presence</span>
-                  <span id="dashboard-online-pulse" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  <span id="dashboard-online-pulse" class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Shopper sessions authenticated and active within the past 30 seconds">
                     <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                     <span id="dashboard-online-badge">0 Online</span>
                   </span>
                 </h3>
                 <p class="text-xs text-slate-400">Live heartbeat presence &amp; recency distribution</p>
               </div>
-              <button type="button" onclick="AdminApp.navigateTo('customers')" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition flex items-center gap-1 cursor-pointer">
+              <button type="button" onclick="AdminApp.navigateTo('customers')" class="text-xs font-semibold text-primary-light hover:text-white transition flex items-center gap-1 cursor-pointer" title="Navigate to full customer directory and CRM analytics">
                 <span>View Directory</span> &rarr;
               </button>
             </div>
@@ -537,13 +820,13 @@
             </div>
           </div>
 
-          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden">
+          <div class="admin-card p-4 sm:p-6 space-y-4 min-w-0 overflow-hidden" title="Activity &amp; Buying Frequency: Analysis of customer purchase cycles and repeat buyer distribution">
             <div class="flex items-center justify-between">
               <div>
                 <h3 class="font-bold text-sm text-white">Activity &amp; Buying Frequency</h3>
                 <p class="text-xs text-slate-400">7-day active customers &amp; repeat buyer breakdown</p>
               </div>
-              <span class="text-[10px] px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 font-bold">Frequency Curve</span>
+              <span class="text-[10px] px-2.5 py-1 rounded-full bg-primary/10 text-primary-light border border-primary/20 font-bold" title="Breakdown of customer base from first-time shoppers to repeat VIP buyers">Frequency Curve</span>
             </div>
             <div id="dashboard-customer-frequency-chart" class="pt-2">
               <div class="h-44 flex items-center justify-center text-xs text-slate-400">Rendering frequency diagram...</div>
@@ -918,13 +1201,13 @@
             <p id="kpi-cust-active" class="text-lg sm:text-xl font-black text-indigo-300 font-mono truncate">0</p>
             <span class="text-[10px] text-indigo-400 font-semibold mt-0.5 block truncate">Good standing</span>
           </div>
-          <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden border-emerald-500/30 bg-emerald-500/5" title="Online within last 15 minutes">
+          <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden border-emerald-500/30 bg-emerald-500/5" title="Online within last 30 seconds">
             <span class="text-[10px] uppercase font-bold tracking-wider text-emerald-400 block mb-1 truncate flex items-center gap-1.5">
               <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
               Online Now
             </span>
             <p id="kpi-cust-online" class="text-lg sm:text-xl font-black text-emerald-400 font-mono truncate">0</p>
-            <span class="text-[10px] text-emerald-300/80 mt-0.5 block truncate">&le;15m presence</span>
+            <span class="text-[10px] text-emerald-300/80 mt-0.5 block truncate">&le;30s presence</span>
           </div>
           <div class="admin-card p-3 sm:p-4 min-w-0 overflow-hidden" title="No active session right now">
             <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1 truncate">Offline</span>
@@ -960,7 +1243,7 @@
                     <span id="customers-online-badge-text">0 Online</span>
                   </span>
                 </h3>
-                <p class="text-xs text-slate-400">Real-time session heartbeat (&le;15m) vs Active Today (&le;24h) vs Idle</p>
+                <p class="text-xs text-slate-400">Real-time session heartbeat (&le;30s) vs Active Today (&le;24h) vs Idle</p>
               </div>
             </div>
             <div id="customers-presence-chart" class="pt-2">
@@ -1491,6 +1774,29 @@
           <p class="text-xs text-slate-400">Cryptographically verifiable log of all administrative actions, logins, updates, and approvals</p>
         </div>
 
+        <!-- Audit Filters -->
+        <div class="admin-card p-4 flex flex-col md:flex-row items-center justify-between gap-3">
+          <div class="w-full md:max-w-xs">
+            <input type="text" id="audit-search-input" oninput="AdminAudit.setSearch(this.value)" placeholder="Search staff, action, resource..." class="admin-input w-full" title="Search by staff username, action, module, or target title" />
+          </div>
+          <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+            <select id="audit-module-filter" onchange="AdminAudit.setFilter(this.value)" class="admin-input" title="Filter by system module">
+              <option value="all">All Modules</option>
+              <option value="products">Products</option>
+              <option value="orders">Orders</option>
+              <option value="approvals">Approvals</option>
+              <option value="roles">Roles &amp; Permissions</option>
+              <option value="staff">Staff &amp; Users</option>
+              <option value="banners">Banners</option>
+              <option value="promotions">Promotions</option>
+            </select>
+            <button type="button" onclick="AdminAudit.load()" class="px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-white transition flex items-center gap-1.5 cursor-pointer" title="Refresh audit events">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
         <div class="admin-card overflow-hidden">
           <div class="overflow-x-auto">
             <table class="w-full text-left">
@@ -1697,61 +2003,87 @@
   </div>
 
   <!-- 4. Order Details Modal -->
-  <div id="order-details-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-    <div class="w-full max-w-2xl admin-card p-6 sm:p-8 max-h-[90vh] flex flex-col shadow-2xl">
-      <div class="flex items-center justify-between pb-4 border-b border-admin-border flex-shrink-0">
+  <div id="order-details-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 hidden">
+    <div class="w-full max-w-4xl admin-card p-5 sm:p-7 max-h-[92vh] flex flex-col shadow-2xl border border-admin-border bg-white">
+      <!-- Modal Header -->
+      <div class="flex items-start justify-between pb-4 border-b border-admin-border flex-shrink-0 gap-4">
         <div>
-          <h3 id="order-modal-title" class="font-bold text-base text-white">Order Details</h3>
-          <p class="text-xs text-slate-400">View fulfillment details &amp; update live order status</p>
+          <div class="flex items-center gap-2.5 flex-wrap">
+            <h3 id="order-modal-title" class="font-display font-black text-lg text-slate-900 font-mono tracking-tight">Order Details</h3>
+            <div id="order-modal-badges" class="flex items-center gap-1.5 flex-wrap"></div>
+          </div>
+          <p id="order-modal-subtitle" class="text-xs text-slate-500 font-mono mt-1">Complete order manifest, customer records, and product fulfillment details</p>
         </div>
-        <div class="flex items-center gap-2">
-          <button type="button" onclick="AdminOrders.openInvoiceModal(AdminOrders.selectedOrder?.id)" class="px-3 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Generate &amp; View Official Tax Invoice">
+        <div class="flex items-center gap-2 flex-shrink-0">
+          <button type="button" onclick="AdminOrders.openInvoiceModal(AdminOrders.selectedOrder?.id)" class="px-3 py-1.5 rounded-xl bg-primary hover:bg-primary/90 text-xs font-bold text-white transition flex items-center gap-1.5 shadow-md cursor-pointer" title="Generate &amp; View Official Tax Invoice">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             <span>Invoice / PDF</span>
           </button>
-          <button type="button" onclick="AdminOrders.closeDetailsModal()" class="text-slate-400 hover:text-white p-1 text-base">✕</button>
+          <button type="button" onclick="AdminOrders.closeDetailsModal()" class="text-slate-400 hover:text-slate-800 p-1 text-lg leading-none cursor-pointer">✕</button>
         </div>
       </div>
 
-      <div class="py-4 space-y-4 flex-1 overflow-y-auto">
-        <div id="order-modal-fulfillment-details"></div>
+      <!-- Modal Body (Scrollable) -->
+      <div class="py-4 space-y-5 flex-1 overflow-y-auto pr-1">
+        <!-- 3-Column Executive Information Grid -->
+        <div id="order-modal-info-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3.5"></div>
 
+        <!-- RMA / Cancellation Alerts -->
+        <div id="order-modal-alerts"></div>
+
+        <!-- Package Items Section -->
         <div>
-          <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Package Items</h4>
-          <div id="order-modal-items" class="space-y-2"></div>
+          <div class="flex items-center justify-between mb-2.5">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <span>Package Items &amp; SKU Manifest</span>
+              <span id="order-modal-items-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary border border-primary/20 font-mono">0 items</span>
+            </h4>
+          </div>
+          <div id="order-modal-items" class="space-y-2.5"></div>
         </div>
 
-        <div class="admin-card-inner p-4 space-y-1.5 text-xs">
-          <div class="flex justify-between text-slate-300">
-            <span>Subtotal</span>
-            <span id="order-modal-subtotal" class="font-bold text-white font-mono">0 QAR</span>
+        <!-- Financial Summary Card -->
+        <div class="admin-card-inner p-4.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2 text-xs">
+          <div class="flex justify-between text-slate-600">
+            <span>Items Subtotal</span>
+            <span id="order-modal-subtotal" class="font-bold text-slate-900 font-mono">0 QAR</span>
           </div>
-          <div class="flex justify-between text-slate-300">
-            <span>Shipping</span>
-            <span id="order-modal-shipping" class="font-bold text-emerald-400 font-mono">0 QAR</span>
+          <div class="flex justify-between text-slate-600">
+            <span>Discount / Promotional Savings</span>
+            <span id="order-modal-discount" class="font-bold text-emerald-600 font-mono">0 QAR</span>
           </div>
-          <div class="flex justify-between text-sm font-bold text-white pt-2 border-t border-slate-700">
-            <span>Total</span>
-            <span id="order-modal-total" class="text-base font-black text-indigo-400 font-mono">0 QAR</span>
+          <div class="flex justify-between text-slate-600">
+            <span>Qatar VAT / Tax (Exempt)</span>
+            <span id="order-modal-tax" class="font-bold text-slate-500 font-mono">0 QAR (0%)</span>
+          </div>
+          <div class="flex justify-between text-slate-600">
+            <span>Delivery &amp; Logistics</span>
+            <span id="order-modal-shipping" class="font-bold text-emerald-600 font-mono">Free Express</span>
+          </div>
+          <div class="flex justify-between text-sm font-bold text-slate-900 pt-2.5 border-t border-slate-200">
+            <span class="text-sm font-bold text-slate-900">Grand Total Amount</span>
+            <span id="order-modal-total" class="text-lg font-black text-primary font-mono">0 QAR</span>
           </div>
         </div>
 
-        <div class="p-4 rounded-xl bg-admin-surface2 border border-slate-700 flex items-center justify-between gap-3">
-          <div>
-            <label class="block text-xs font-bold text-slate-300 mb-1">Update Status</label>
-            <select id="order-modal-status-select" class="admin-input">
-              <option value="placed">Placed</option>
-              <option value="processing">Processing &amp; QC</option>
+        <!-- Operational Status Workflow -->
+        <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Update Live Order Status</label>
+            <select id="order-modal-status-select" class="admin-input text-xs">
+              <option value="placed">Placed (Order Received)</option>
+              <option value="processing">Processing &amp; QC Passed</option>
               <option value="shipped">Shipped / Out for Delivery</option>
               <option value="delivered">Delivered / Collected</option>
               <option value="cancelled">Cancelled</option>
             </select>
           </div>
-          <button type="button" onclick="AdminOrders.updateStatus()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-bold text-xs text-white transition self-end">
+          <button type="button" onclick="AdminOrders.updateStatus()" class="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 font-bold text-xs text-white transition self-end sm:self-center cursor-pointer shadow-md">
             Update Status
           </button>
         </div>
 
+        <!-- Danger Zone: Delete Order (RBAC Checked) -->
         <div id="order-modal-danger-zone" class="p-4 rounded-xl bg-rose-500/10 border border-rose-500/25 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <h5 class="text-xs font-bold text-rose-400 flex items-center gap-1.5">
@@ -1761,7 +2093,7 @@
             <p class="text-[11px] text-slate-400 mt-0.5">Permanently remove this order from system with optional product stock restoration.</p>
           </div>
           <button type="button" onclick="AdminOrders.deleteCurrentOrder()" class="px-3.5 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-600 text-xs font-bold text-white transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md self-start sm:self-auto flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" y1="11" y2="17"/></svg>
             <span>Delete Order</span>
           </button>
         </div>
@@ -1770,46 +2102,46 @@
   </div>
 
   <!-- 4.1 Order Official Tax Invoice Modal (Preview & PDF Generation) -->
-  <div id="order-invoice-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden" onclick="if(event.target === this) AdminOrders.closeInvoiceModal()">
-    <div id="order-invoice-modal-card" class="w-full max-w-4xl bg-slate-900 border border-slate-700/80 rounded-2xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
+  <div id="order-invoice-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 hidden" onclick="if(event.target === this) AdminOrders.closeInvoiceModal()">
+    <div id="order-invoice-modal-card" class="w-full max-w-4xl bg-white border border-admin-border rounded-2xl max-h-[95vh] flex flex-col shadow-2xl overflow-hidden">
       
       <!-- Toolbar Header (Hidden when printing) -->
-      <div class="p-4 sm:px-6 bg-slate-900/95 border-b border-slate-800 flex items-center justify-between flex-shrink-0 invoice-toolbar">
+      <div class="p-4 sm:px-6 bg-white border-b border-slate-200 flex items-center justify-between flex-shrink-0 invoice-toolbar">
         <div class="flex items-center gap-3">
-          <div class="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
+          <div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary flex-shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
           </div>
           <div>
-            <h3 class="font-bold text-sm sm:text-base text-white flex items-center gap-2">
+            <h3 class="font-bold text-sm sm:text-base text-slate-900 flex items-center gap-2">
               <span>Official Tax Invoice</span>
-              <span id="invoice-modal-order-number-badge" class="font-mono text-xs text-indigo-400 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">MTQ-00000</span>
+              <span id="invoice-modal-order-number-badge" class="font-mono text-xs text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">MTQ-00000</span>
             </h3>
-            <p class="text-[11px] text-slate-400">Marjaah Trading W.L.L. &bull; Compliant with State of Qatar Commercial Standards</p>
+            <p class="text-[11px] text-slate-500">Marjaah Trading W.L.L. &bull; Compliant with State of Qatar Commercial Standards</p>
           </div>
         </div>
 
         <div class="flex items-center gap-2">
           <!-- Download PDF Button -->
-          <button type="button" id="btn-download-invoice-pdf" onclick="AdminOrders.downloadInvoicePDF()" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white transition flex items-center gap-2 shadow-lg shadow-indigo-600/20 cursor-pointer">
+          <button type="button" id="btn-download-invoice-pdf" onclick="AdminOrders.downloadInvoicePDF()" class="px-3.5 py-2 rounded-xl bg-primary hover:bg-primary/90 text-xs font-bold text-white transition flex items-center gap-2 shadow-md cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             <span id="btn-download-invoice-pdf-text">Download PDF</span>
           </button>
 
           <!-- Print Invoice Button -->
-          <button type="button" onclick="AdminOrders.printInvoice()" class="px-3 py-2 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 hover:text-white transition flex items-center gap-1.5 cursor-pointer" title="Print or Save via Browser Dialog">
+          <button type="button" onclick="AdminOrders.printInvoice()" class="px-3 py-2 rounded-xl border border-slate-200 bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 hover:text-slate-900 transition flex items-center gap-1.5 cursor-pointer" title="Print or Save via Browser Dialog">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
             <span class="hidden sm:inline">Print</span>
           </button>
 
           <!-- Close Button -->
-          <button type="button" onclick="AdminOrders.closeInvoiceModal()" class="text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-slate-800 transition cursor-pointer" title="Close Invoice">
+          <button type="button" onclick="AdminOrders.closeInvoiceModal()" class="text-slate-400 hover:text-slate-800 p-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer" title="Close Invoice">
             ✕
           </button>
         </div>
       </div>
 
       <!-- Scrollable Preview Body -->
-      <div id="order-invoice-modal-body" class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-950/60">
+      <div id="order-invoice-modal-body" class="flex-1 overflow-y-auto p-4 sm:p-6 bg-slate-100">
         <!-- Printable White Invoice Canvas (A4 Standard) -->
         <div id="order-invoice-printable" class="bg-white text-slate-900 mx-auto max-w-3xl p-6 sm:p-10 rounded-2xl shadow-xl border border-slate-200">
           <!-- Populated dynamically via AdminOrders.openInvoiceModal -->
@@ -1820,12 +2152,12 @@
   </div>
 
   <!-- 4.2 RMA Return Decline Modal -->
-  <div id="return-decline-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+  <div id="return-decline-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 hidden">
     <div class="w-full max-w-md admin-card p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between pb-3 border-b border-admin-border">
         <div class="flex items-center gap-2">
-          <span class="text-rose-400 font-bold text-base">✕</span>
-          <h3 class="font-bold text-sm text-white">Decline Return Request</h3>
+          <span class="text-rose-500 font-bold text-base">✕</span>
+          <h3 class="font-bold text-sm text-slate-900">Decline Return Request</h3>
           <span id="decline-modal-order-num" class="font-mono text-xs text-indigo-400">#MTQ-00000</span>
         </div>
         <button type="button" onclick="AdminReturns.closeDeclineModal()" class="text-slate-400 hover:text-white p-1">✕</button>
@@ -1927,9 +2259,12 @@
             <input type="text" id="user-modal-username" class="admin-input w-full" required />
           </div>
           <div id="user-modal-password-field">
-            <label class="block text-xs font-bold text-slate-300 mb-1">Initial Password *</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-xs font-bold text-slate-300">Initial Password *</label>
+              <button type="button" onclick="AdminUsers.fillGeneratedPassword()" class="text-[11px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer">Auto-Generate</button>
+            </div>
             <div class="relative">
-              <input type="password" id="user-modal-password" class="admin-input w-full pr-11" />
+              <input type="password" id="user-modal-password" class="admin-input w-full pr-11 font-mono" />
               <button type="button" id="user-modal-toggle-pw" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-white transition-colors cursor-pointer select-none" aria-label="Toggle password visibility">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
               </button>
@@ -2337,22 +2672,56 @@
     </div>
   </div>
 
+  <div id="image-lightbox-modal" onclick="window.closeImageLightbox(event)" class="fixed inset-0 z-[200] bg-black/90 backdrop-blur-xl flex flex-col items-center justify-center p-3 sm:p-6 hidden opacity-0 transition-opacity duration-200">
+    <div class="w-full max-w-4xl flex items-center justify-between py-2.5 px-4 mb-3 text-white bg-slate-900/90 border border-slate-700/80 rounded-2xl shadow-2xl backdrop-blur-md" onclick="event.stopPropagation()">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="w-2.5 h-2.5 rounded-full bg-indigo-500 animate-pulse flex-shrink-0"></div>
+        <div class="min-w-0">
+          <h4 id="image-lightbox-title" class="text-xs sm:text-sm font-bold text-white truncate">Product Image Preview</h4>
+          <div class="flex items-center gap-2 text-[11px] text-slate-400">
+            <span id="image-lightbox-sku" class="font-mono text-indigo-300 font-semibold">SKU: —</span>
+            <span class="text-slate-500 hidden sm:inline">&bull; High-Resolution Preview</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <a id="image-lightbox-download" href="#" target="_blank" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/10 transition cursor-pointer" title="Open full resolution in new tab">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </a>
+        <button type="button" onclick="window.closeImageLightbox()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-rose-500/20 hover:text-rose-300 transition cursor-pointer" title="Close (Esc)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="relative max-w-4xl max-h-[80vh] w-full flex items-center justify-center p-2" onclick="event.stopPropagation()">
+      <img id="image-lightbox-img" src="" alt="Product Image Fullscreen" class="max-w-full max-h-[76vh] object-contain rounded-2xl shadow-2xl border border-slate-700/80 bg-slate-950/80" />
+    </div>
+
+    <p class="text-[11px] text-slate-400 mt-2 font-mono">Click background or press Esc to close</p>
+  </div>
+
   <!-- Toast Notification Container -->
   <div id="admin-toast-container" class="fixed bottom-6 right-6 z-[120] flex flex-col gap-2 pointer-events-none"></div>
 
   <!-- PDF Generation Engine -->
   <script src="/assets/js/html2pdf.bundle.min.js"></script>
 
-  <!-- Modular Scripts -->
-  <script src="/admin/admin.js"></script>
-  <script src="/admin/admin-rbac.js"></script>
-  <script src="/admin/admin-approvals.js"></script>
-  <script src="/admin/admin-orders.js"></script>
-  <script src="/admin/admin-returns.js"></script>
-  <script src="/admin/admin-customers.js"></script>
-  <script src="/admin/admin-products.js"></script>
-  <script src="/admin/admin-content.js"></script>
-  <script src="/admin/admin-dashboard.js"></script>
+  <!-- Smart Caching Engine -->
+  <script src="/admin/shared/admin-cache.js?v=20261114_11"></script>
+
+  <!-- Modular Scripts (Restructured Architecture) -->
+  <script src="/admin/shared/admin-core.js?v=20261114_11"></script>
+  <script src="/admin/auth/admin-auth.js?v=20261114_11"></script>
+  <script src="/admin/roles/admin-roles.js?v=20261114_11"></script>
+  <script src="/admin/users/admin-users.js?v=20261114_11"></script>
+  <script src="/admin/dashboard/admin-dashboard.js?v=20261114_11"></script>
+  <script src="/admin/products/admin-products.js?v=20261114_11"></script>
+  <script src="/admin/orders/admin-orders.js?v=20261114_11"></script>
+  <script src="/admin/orders/admin-returns.js?v=20261114_11"></script>
+  <script src="/admin/customers/admin-customers.js?v=20261114_11"></script>
+  <script src="/admin/content/admin-approvals.js?v=20261114_11"></script>
+  <script src="/admin/content/admin-content.js?v=20261114_11"></script>
 
 </body>
 </html>

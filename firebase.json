@@ -23,6 +23,7 @@
     }
   ],
   "hosting": {
+    "site": "dev-demo-url",
     "public": "frontend",
     "predeploy": [
       "node backend/scripts/generate-sitemap.js"

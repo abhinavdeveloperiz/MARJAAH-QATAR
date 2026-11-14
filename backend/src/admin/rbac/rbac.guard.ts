@@ -118,6 +118,10 @@ export class RbacGuard implements CanActivate {
         if (modulePerms.includes('manage') || modulePerms.includes(targetAction) || modulePerms.includes('*')) {
           return true;
         }
+      } else if (typeof modulePerms === 'object' && modulePerms !== null) {
+        if (modulePerms['manage'] || modulePerms[targetAction] || modulePerms['*'] || modulePerms['all']) {
+          return true;
+        }
       }
     }
 

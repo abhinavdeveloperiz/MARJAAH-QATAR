@@ -13,8 +13,7 @@
     const price = product.price;
     const originalPrice = product.original_price;
     const image = product.image || (Array.isArray(product.images) && product.images[0]) || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
-    
-    // Strict stock calculation: checks in_stock, stock_status, and stock_count
+
     const inStock = Boolean(
       product.in_stock !== false &&
       product.in_stock !== 'false' &&
@@ -23,18 +22,46 @@
       (product.stock_count === undefined || product.stock_count === null || Number(product.stock_count) > 0) &&
       (product.stock === undefined || product.stock === null || Number(product.stock) > 0)
     );
+    const stockCount = (product.stock_count !== undefined && product.stock_count !== null) ? Number(product.stock_count) : null;
     const brandName = product.brand || product.brand_name || '';
-    const delay = (index % 8) * 50;
+    const delay = (index % 10) * 35;
 
     const isSaved = (typeof window.Wishlist !== 'undefined' && typeof window.Wishlist.has === 'function')
       ? window.Wishlist.has(slug)
       : false;
 
     const isFeatured = Boolean(product.is_featured || product.featured);
+    const isBestSeller = Boolean(product.is_best_seller || product.bestseller || product.isBestSeller);
+    const isNew = Boolean(product.is_new || product.isNew);
 
-    let priceHtml = `<span class="font-display font-black text-base sm:text-lg md:text-xl" style="color:var(--text-primary)">${formatPrice(price)}</span>`;
-    if (originalPrice && originalPrice > price) {
+    let discountPct = 0;
+    if (originalPrice && Number(originalPrice) > Number(price)) {
+      discountPct = Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100);
+    }
+
+    let priceHtml = `<span class="font-display font-black text-base sm:text-lg" style="color:var(--text-primary)">${formatPrice(price)}</span>`;
+    if (originalPrice && Number(originalPrice) > Number(price)) {
       priceHtml += `<span class="text-[11px] sm:text-xs line-through" style="color:var(--text-tertiary)">${formatPrice(originalPrice)}</span>`;
+    }
+
+    const ratingVal = Number(product.rating || product.average_rating || 0);
+    const reviewCount = Number(product.review_count || product.reviews_count || 0);
+    let ratingHtml = '';
+    if (ratingVal > 0) {
+      ratingHtml = `
+        <div class="flex items-center gap-1 text-[11px] font-bold text-amber-500 my-0.5">
+          <svg class="w-3 h-3 fill-amber-500 shrink-0" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <span>${ratingVal.toFixed(1)}</span>
+          ${reviewCount > 0 ? `<span class="text-slate-400 font-normal text-[10px]">(${reviewCount})</span>` : ''}
+        </div>
+      `;
+    }
+
+    let stockStatusHtml = '';
+    if (!inStock) {
+      stockStatusHtml = `<span class="text-[10px] font-bold text-rose-500 block">${isRtl ? 'نفذت الكمية' : 'Out of stock'}</span>`;
+    } else if (stockCount !== null && stockCount > 0 && stockCount <= 5) {
+      stockStatusHtml = `<span class="text-[10px] font-bold text-amber-500 block">${isRtl ? `متبقي ${stockCount} قطع فقط` : `Only ${stockCount} left`}</span>`;
     }
 
     const actionHtml = inStock
@@ -48,38 +75,45 @@
          </button>`;
 
     const productHref = `${isRtl ? '/ar' : ''}/product/${encodeURIComponent(slug)}/`;
-
-    const starPos = isRtl ? 'top-2.5 right-2.5 sm:top-3 sm:right-3' : 'top-2.5 left-2.5 sm:top-3 sm:left-3';
     const heartPos = isRtl ? 'top-2.5 left-2.5 sm:top-3 sm:left-3' : 'top-2.5 right-2.5 sm:top-3 sm:right-3';
+    const badgePos = isRtl ? 'top-2.5 right-2.5 sm:top-3 sm:right-3' : 'top-2.5 left-2.5 sm:top-3 sm:left-3';
+
+    let cornerBadgeHtml = '';
+    if (isBestSeller) {
+      cornerBadgeHtml = `<span class="px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-amber-500 text-white shadow-xs">${isRtl ? 'الأكثر طلباً' : 'Best Seller'}</span>`;
+    } else if (isNew) {
+      cornerBadgeHtml = `<span class="px-2 py-0.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider bg-blue-600 text-white shadow-xs">${isRtl ? 'جديد' : 'New'}</span>`;
+    } else if (isFeatured) {
+      cornerBadgeHtml = `
+        <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shadow-xs" style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)" title="${isRtl ? 'منتج مميز' : 'Featured Product'}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+      `;
+    }
 
     return `
       <div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300 ${!inStock ? 'opacity-90' : ''}"
            style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:${delay}ms">
         <a href="${productHref}" class="relative overflow-hidden block img-shimmer-wrap" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
-          ${isFeatured ? `
-            <div class="absolute ${starPos} z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center shadow-sm pointer-events-none transition-transform group-hover:scale-105"
-                 style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)"
-                 title="${isRtl ? 'منتج مميز' : 'Featured Product'}" aria-label="${isRtl ? 'منتج مميز' : 'Featured Product'}">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-              </svg>
-            </div>
-          ` : ''}
+          ${cornerBadgeHtml ? `<div class="absolute ${badgePos} z-10 pointer-events-none">${cornerBadgeHtml}</div>` : ''}
+          ${discountPct > 0 ? `<div class="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 z-10 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-black uppercase tracking-wide bg-rose-500 text-white shadow-xs pointer-events-none">-${discountPct}%</div>` : ''}
           <button data-wishlist-toggle="${slug}" aria-label="Toggle liked product" aria-pressed="${isSaved ? 'true' : 'false'}"
-            class="${isSaved ? 'wishlist-active ' : ''}absolute ${heartPos} z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
+            class="${isSaved ? 'wishlist-active ' : ''}absolute ${heartPos} z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
             style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="${isSaved ? '#ef4444' : 'none'}" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="${isSaved ? '#ef4444' : 'none'}" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
           <img src="${image}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-108 ${!inStock ? 'grayscale-[25%]' : ''}" loading="lazy" onload="this.parentElement.classList.add('img-loaded')" onerror="this.src='/assets/images/products/placeholder.svg';this.parentElement.classList.add('img-loaded')" />
         </a>
         <div class="p-3 sm:p-4 flex flex-col flex-1">
-          <div class="mb-2">
+          <div class="mb-1.5">
             ${brandName ? `<span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block truncate" style="color:var(--color-accent)">${brandName}</span>` : ''}
-            <a href="${productHref}" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80" style="color:var(--text-primary)">
+            <a href="${productHref}" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80 break-words" style="color:var(--text-primary)">
               ${name}
             </a>
           </div>
-          <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 mt-auto">
+          ${ratingHtml}
+          ${stockStatusHtml}
+          <div class="flex flex-wrap items-baseline gap-1.5 sm:gap-2 mb-3 mt-auto pt-2">
             ${priceHtml}
           </div>
           ${actionHtml}
@@ -88,42 +122,258 @@
     `;
   }
 
-  // ─── 1. GENERIC PRODUCT LOADER (HOME / SECTIONS) ─────────────────────────
-  async function loadProducts(containerId, queryParams = {}) {
+  function createCursorInfiniteScroll(config) {
+    const container = typeof config.container === 'string'
+      ? document.getElementById(config.container)
+      : config.container;
+    if (!container) return null;
+
+    const endpoint = config.endpoint || '/api/products';
+    const getParams = config.getParams || (() => ({}));
+    const renderCard = config.renderCard || renderProductCard;
+    const limit = config.limit || 15;
+    const prefetchThreshold = config.prefetchThreshold || 450;
+    const onBatchLoaded = config.onBatchLoaded || null;
+    const onEmpty = config.onEmpty || null;
+    const onError = config.onError || null;
+
+    let cursor = null;
+    let hasMore = true;
+    let isLoading = false;
+    let abortCtrl = null;
+    const seenIds = new Set();
+    let retryCount = 0;
+    const maxRetries = 2;
+
+    let sentinelEl = container.querySelector('.cursor-infinite-sentinel');
+    if (!sentinelEl) {
+      sentinelEl = document.createElement('div');
+      sentinelEl.className = 'cursor-infinite-sentinel col-span-full w-full h-1 pointer-events-none opacity-0';
+      container.appendChild(sentinelEl);
+    }
+
+    let loaderEl = container.querySelector('.cursor-infinite-loader');
+    if (!loaderEl) {
+      loaderEl = document.createElement('div');
+      loaderEl.className = 'cursor-infinite-loader col-span-full w-full py-8 flex flex-col items-center justify-center gap-2 hidden';
+      loaderEl.innerHTML = `
+        <div class="relative w-8 h-8 flex items-center justify-center">
+          <div class="absolute inset-0 rounded-full border-2 border-[#8D9CF5]/20"></div>
+          <div class="absolute inset-0 rounded-full border-2 border-[#4063B2] border-t-transparent animate-spin"></div>
+        </div>
+        <span class="text-[11px] font-bold tracking-wide text-slate-400">
+          ${isRtl ? 'جاري جلب المزيد من المنتجات...' : 'Fetching more items...'}
+        </span>
+      `;
+      container.appendChild(loaderEl);
+    }
+
+    async function fetchBatch(isInitial = false) {
+      if (isLoading) return;
+      if (!hasMore && !isInitial) return;
+
+      if (isInitial) {
+        cursor = null;
+        hasMore = true;
+        seenIds.clear();
+        retryCount = 0;
+      }
+
+      isLoading = true;
+
+      if (!isInitial && loaderEl) {
+        loaderEl.classList.remove('hidden');
+      }
+
+      if (abortCtrl) {
+        abortCtrl.abort();
+      }
+      abortCtrl = new AbortController();
+      const { signal } = abortCtrl;
+
+      const baseParams = getParams() || {};
+      const params = new URLSearchParams();
+      for (const [k, v] of Object.entries(baseParams)) {
+        if (v !== undefined && v !== null && v !== '') {
+          params.set(k, String(v));
+        }
+      }
+      params.set('limit', String(limit));
+      if (cursor) {
+        params.set('cursor', cursor);
+      }
+
+      const queryUrl = `${endpoint}?${params.toString()}`;
+
+      try {
+        let data;
+        const res = await fetch(queryUrl, { signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        data = await res.json();
+
+        if (signal.aborted) return;
+
+        const items = data.items || data.products || data.data || (Array.isArray(data) ? data : []);
+        const nextCursor = data.next_cursor || data.nextCursor || null;
+        hasMore = Boolean(data.has_more ?? data.hasMore ?? (nextCursor && items.length >= limit));
+        cursor = nextCursor;
+
+        const uniqueItems = items.filter(it => {
+          const id = String(it.id || it.slug);
+          if (seenIds.has(id)) return false;
+          seenIds.add(id);
+          return true;
+        });
+
+        if (isInitial && uniqueItems.length === 0) {
+          if (loaderEl) loaderEl.classList.add('hidden');
+          isLoading = false;
+          if (typeof onEmpty === 'function') onEmpty(container);
+          return;
+        }
+
+        if (isInitial) {
+          const keepNodes = [sentinelEl, loaderEl];
+          Array.from(container.children).forEach(n => {
+            if (!keepNodes.includes(n)) n.remove();
+          });
+        }
+
+        const startIndex = seenIds.size - uniqueItems.length;
+        const html = uniqueItems.map((p, idx) => renderCard(p, startIndex + idx)).join('');
+        if (html) {
+          const temp = document.createElement('div');
+          temp.innerHTML = html;
+          while (temp.firstChild) {
+            container.insertBefore(temp.firstChild, sentinelEl);
+          }
+        }
+
+        if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
+          window.Wishlist.sync();
+        }
+        if (window.observeAnimations) {
+          window.observeAnimations();
+        }
+        container.querySelectorAll('.card, [data-animate]').forEach(c => c.classList.add('anim-visible'));
+
+        if (loaderEl) loaderEl.classList.add('hidden');
+        isLoading = false;
+        retryCount = 0;
+
+        if (typeof onBatchLoaded === 'function') {
+          onBatchLoaded({
+            items: uniqueItems,
+            totalLoaded: seenIds.size,
+            total: data.total || seenIds.size,
+            hasMore,
+            cursor
+          });
+        }
+
+        if (!hasMore && observer) {
+          observer.unobserve(sentinelEl);
+        }
+      } catch (err) {
+        if (signal.aborted) return;
+        if (loaderEl) loaderEl.classList.add('hidden');
+        isLoading = false;
+
+        if (retryCount < maxRetries) {
+          retryCount++;
+          setTimeout(() => {
+            if (!signal.aborted) fetchBatch(isInitial);
+          }, 1200);
+        } else if (typeof onError === 'function') {
+          onError(err, isInitial);
+        }
+      }
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[0];
+      if (entry && entry.isIntersecting && !isLoading && hasMore) {
+        fetchBatch(false);
+      }
+    }, {
+      root: null,
+      rootMargin: `${prefetchThreshold}px 0px ${prefetchThreshold}px 0px`,
+      threshold: 0
+    });
+
+    observer.observe(sentinelEl);
+
+    let scrollRaf = null;
+    function onScrollCheck() {
+      if (scrollRaf) return;
+      scrollRaf = requestAnimationFrame(() => {
+        scrollRaf = null;
+        if (isLoading || !hasMore) return;
+        const rect = sentinelEl.getBoundingClientRect();
+        if (rect.top <= window.innerHeight + prefetchThreshold) {
+          fetchBatch(false);
+        }
+      });
+    }
+    window.addEventListener('scroll', onScrollCheck, { passive: true });
+
+    return {
+      fetchInitial: () => fetchBatch(true),
+      loadNext: () => fetchBatch(false),
+      reset: () => fetchBatch(true),
+      destroy: () => {
+        if (abortCtrl) abortCtrl.abort();
+        if (observer) observer.disconnect();
+        window.removeEventListener('scroll', onScrollCheck);
+      },
+      hasMore: () => hasMore,
+      isLoading: () => isLoading,
+      getTotalLoaded: () => seenIds.size
+    };
+  }
+
+  async function loadProducts(containerId, queryParams = {}, sectionId = null) {
     const container = document.getElementById(containerId);
     if (!container) return;
+    const section = sectionId ? document.getElementById(sectionId) : container.closest('section');
 
     try {
       let data;
-      if (global.api && typeof global.api.getProducts === 'function') {
-        data = await global.api.getProducts(queryParams);
-      } else {
-        const queryStr = typeof queryParams === 'string' ? queryParams : '?' + new URLSearchParams(queryParams).toString();
-        const base = global.API_BASE_URL || (global.api && global.api.config && global.api.config.baseUrl) || '';
-        const endpoint = base.endsWith('/api') ? `${base}/products${queryStr}` : `${base}/api/products${queryStr}`;
-        const res = await fetch(endpoint);
+      const queryStr = typeof queryParams === 'string' ? queryParams : '?' + new URLSearchParams(queryParams).toString();
+      try {
+        const res = await fetch(`/api/products${queryStr}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         data = await res.json();
+      } catch (err) {
+        if (global.api && typeof global.api.getProducts === 'function') {
+          data = await global.api.getProducts(queryParams);
+        } else {
+          throw err;
+        }
       }
 
       let items = [];
       if (Array.isArray(data)) {
         items = data;
-      } else if (data && Array.isArray(data.products)) {
-        items = data.products;
       } else if (data && Array.isArray(data.items)) {
         items = data.items;
+      } else if (data && Array.isArray(data.products)) {
+        items = data.products;
       } else if (data && Array.isArray(data.data)) {
         items = data.data;
       }
 
-      // If featured requested but returned 0 items, fallback to real items from catalogue
-      if (items.length === 0 && queryParams.isFeatured) {
-        return loadProducts(containerId, { limit: queryParams.limit || 8 });
+      if (items.length === 0) {
+        if (section) {
+          section.style.display = 'none';
+        } else {
+          container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium">${isRtl ? 'لم يتم العثور على منتجات.' : 'No products found.'}</div>`;
+        }
+        return;
       }
 
-      if (items.length === 0) {
-        container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium">${isRtl ? 'لم يتم العثور على منتجات.' : 'No products found.'}</div>`;
-        return;
+      if (section) {
+        section.style.display = '';
       }
 
       container.innerHTML = items.map((p, idx) => renderProductCard(p, idx)).join('');
@@ -132,7 +382,11 @@
       container.querySelectorAll('.card, [data-animate]').forEach(card => card.classList.add('anim-visible'));
     } catch (err) {
       console.error('Error loading products for #' + containerId, err);
-      container.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 font-medium">${isRtl ? 'فشل تحميل المنتجات.' : 'Failed to load products.'}</div>`;
+      if (section) {
+        section.style.display = 'none';
+      } else {
+        container.innerHTML = `<div class="col-span-full py-12 text-center text-rose-500 font-medium">${isRtl ? 'فشل تحميل المنتجات.' : 'Failed to load products.'}</div>`;
+      }
     }
   }
 
@@ -1161,17 +1415,22 @@
     });
   }
 
+  let shopInfiniteScroller = null;
+
   async function renderShop() {
     const container = document.getElementById('shop-products-container');
     if (!container) return;
 
     if (shopState.viewMode === 'categories') {
+      if (shopInfiniteScroller) {
+        shopInfiniteScroller.destroy();
+        shopInfiniteScroller = null;
+      }
       return renderShopCategories();
     }
 
     updateShopViewMode();
 
-    // Keep active filters bar hidden while loading products
     const activeFiltersBar = document.getElementById('shop-active-filters-bar');
     if (activeFiltersBar) activeFiltersBar.classList.add('hidden');
 
@@ -1183,142 +1442,93 @@
         filterSidebar.classList.add('lg:block', 'opacity-100', 'pointer-events-auto');
       }
       const mobFilterBtn = document.getElementById('mobile-filter-btn');
-      if (mobFilterBtn) {
-        mobFilterBtn.style.display = '';
-      }
+      if (mobFilterBtn) mobFilterBtn.style.display = '';
       const shopFilterOpenBtn = document.getElementById('shop-filter-open-btn');
-      if (shopFilterOpenBtn) {
-        shopFilterOpenBtn.style.display = '';
-      }
+      if (shopFilterOpenBtn) shopFilterOpenBtn.style.display = '';
       renderActiveFilterChips();
       syncShopInputs();
     }
 
-    const params = {
-      page: shopState.page,
-      limit: shopState.limit,
-      sort: shopState.sort
-    };
-    if (shopState.category) params.category = shopState.category;
-    if (shopState.subcategory) params.subcategory = shopState.subcategory;
-    if (shopState.brand) params.brand = shopState.brand;
-    if (shopState.minPrice) params.minPrice = shopState.minPrice;
-    if (shopState.maxPrice) params.maxPrice = shopState.maxPrice;
-    if (shopState.inStock) params.inStock = 'true';
-    if (shopState.isOffer) params.isOffer = 'true';
-    if (shopState.search) params.search = shopState.search;
-    if (shopState.attributes && Object.keys(shopState.attributes).length > 0) {
-      params.attributes = JSON.stringify(shopState.attributes);
+    revealShopFilters();
+
+    if (shopInfiniteScroller) {
+      shopInfiniteScroller.destroy();
+      shopInfiniteScroller = null;
     }
 
-    const cacheKey = JSON.stringify(params);
-
-    function displayCatalogData(data) {
-      container.style.opacity = '1';
-      const items = data.products || data.items || data.data || (Array.isArray(data) ? data : []);
-      shopState.total = data.total !== undefined ? data.total : items.length;
-      shopState.totalPages = data.totalPages || 1;
-
-      // Update counters
-      const counterEl = document.getElementById('shop-items-counter');
-      if (counterEl) {
-        const start = shopState.total === 0 ? 0 : (shopState.page - 1) * shopState.limit + 1;
-        const end = Math.min(shopState.page * shopState.limit, shopState.total);
-        counterEl.innerHTML = `<span>${isRtl ? 'عرض' : 'Showing'} <strong style="color:var(--text-primary)">${start}–${end}</strong> ${isRtl ? 'من أصل' : 'of'} <strong style="color:var(--text-primary)">${shopState.total}</strong> ${isRtl ? 'منتج' : 'items'}</span>`;
-      }
-
-      if (items.length === 0) {
-        container.innerHTML = `<div class="col-span-full w-full py-20 text-center text-slate-400 font-medium">${isRtl ? 'لم يتم العثور على منتجات مطابقة لخياراتك.' : 'No products found matching your selection.'}</div>`;
-        renderPagination();
-        revealShopFilters();
-        return;
-      }
-
-      container.innerHTML = items.map((p, idx) => renderProductCard(p, idx)).join('');
-      if (window.Wishlist && typeof window.Wishlist.sync === 'function') window.Wishlist.sync();
-      renderPagination();
-      if (window.observeAnimations) window.observeAnimations();
-      container.querySelectorAll('.card, [data-animate]').forEach(card => card.classList.add('anim-visible'));
-      
-      revealShopFilters();
-    }
-
-    // Check fast client-side in-memory cache for instant filter responses
-    const cachedEntry = shopCatalogCache.get(cacheKey);
-    if (cachedEntry && (Date.now() - cachedEntry.timestamp < SHOP_CACHE_TTL_MS)) {
-      displayCatalogData(cachedEntry.data);
-      return;
-    }
-
-    // Cancel in-flight request if another filter was tapped rapidly
-    if (shopAbortController) {
-      shopAbortController.abort();
-    }
-    shopAbortController = new AbortController();
-    const { signal } = shopAbortController;
-
-    // Subtle loading indicator when refining search; full dual-ring spinner when switching modes/loading initially
-    const isSearching = Boolean(shopState.search);
-    const hasExistingContent = container.children.length > 0 && !container.querySelector('.animate-spin');
-
-    if (hasExistingContent && isSearching) {
-      container.style.opacity = '0.5';
-      container.style.transition = 'opacity 0.15s ease';
-    } else {
-      container.style.opacity = '1';
-      container.innerHTML = `
-        <div class="col-span-full w-full min-h-[420px] flex flex-col items-center justify-center py-20 px-4 text-center my-auto">
-          <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
-            <div class="absolute inset-0 rounded-full border-4 border-[#8D9CF5]/20"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-[#4063B2] border-t-transparent animate-spin"></div>
-            <div class="w-6 h-6 rounded-full bg-[#4063B2]/20 animate-pulse"></div>
-          </div>
-          <h4 class="font-display font-bold text-base sm:text-lg tracking-tight" style="color:var(--text-primary)">
-            ${isRtl ? 'جاري تحميل المنتجات...' : 'Loading Products...'}
-          </h4>
-          <p class="text-xs text-slate-400 font-medium max-w-xs mt-1">
-            ${isRtl ? 'يرجى الانتظار، جاري جلب أحدث المنتجات...' : 'Fetching the latest catalog items'}
-          </p>
+    container.style.opacity = '1';
+    container.innerHTML = `
+      <div class="col-span-full w-full min-h-[420px] flex flex-col items-center justify-center py-20 px-4 text-center my-auto">
+        <div class="relative w-14 h-14 mb-4 flex items-center justify-center">
+          <div class="absolute inset-0 rounded-full border-4 border-[#8D9CF5]/20"></div>
+          <div class="absolute inset-0 rounded-full border-4 border-[#4063B2] border-t-transparent animate-spin"></div>
+          <div class="w-6 h-6 rounded-full bg-[#4063B2]/20 animate-pulse"></div>
         </div>
-      `;
-    }
+        <h4 class="font-display font-bold text-base sm:text-lg tracking-tight" style="color:var(--text-primary)">
+          ${isRtl ? 'جاري تحميل المنتجات...' : 'Loading Products...'}
+        </h4>
+        <p class="text-xs text-slate-400 font-medium max-w-xs mt-1">
+          ${isRtl ? 'يرجى الانتظار، جاري جلب أحدث المنتجات...' : 'Fetching the latest catalog items'}
+        </p>
+      </div>
+    `;
 
-    try {
-      let data;
-      const queryStr = '?' + new URLSearchParams(params).toString();
-      try {
-        // Fast primary fetch directly from local proxied endpoint with instant abort signal
-        const res = await fetch(`/api/products${queryStr}`, { signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        data = await res.json();
-      } catch (primaryErr) {
-        if (signal.aborted) return;
-        if (global.api && typeof global.api.getProducts === 'function') {
-          try {
-            data = await global.api.getProducts(params);
-          } catch (apiErr) {
-            console.warn('api.getProducts fallback failed, using cloud fallback...', apiErr);
-            const res = await fetch(`https://api-44oukcn4rq-uc.a.run.app/api/products${queryStr}`, { signal });
-            data = await res.json();
+    shopInfiniteScroller = createCursorInfiniteScroll({
+      container,
+      endpoint: '/api/products',
+      limit: 15,
+      prefetchThreshold: 450,
+      getParams: () => {
+        const p = {
+          sort: shopState.sort
+        };
+        if (shopState.category) p.category = shopState.category;
+        if (shopState.subcategory) p.subcategory = shopState.subcategory;
+        if (shopState.brand) p.brand = shopState.brand;
+        if (shopState.minPrice) p.minPrice = shopState.minPrice;
+        if (shopState.maxPrice) p.maxPrice = shopState.maxPrice;
+        if (shopState.inStock) p.inStock = 'true';
+        if (shopState.isOffer) p.isOffer = 'true';
+        if (shopState.search) p.search = shopState.search;
+        if (shopState.attributes && Object.keys(shopState.attributes).length > 0) {
+          p.attributes = JSON.stringify(shopState.attributes);
+        }
+        return p;
+      },
+      renderCard: renderProductCard,
+      onBatchLoaded: ({ totalLoaded, total, hasMore }) => {
+        shopState.total = total;
+        const counterEl = document.getElementById('shop-items-counter');
+        if (counterEl) {
+          counterEl.innerHTML = `<span>${isRtl ? 'عرض' : 'Showing'} <strong style="color:var(--text-primary)">${totalLoaded}</strong> ${isRtl ? 'من أصل' : 'of'} <strong style="color:var(--text-primary)">${total}</strong> ${isRtl ? 'منتج' : 'items'}</span>`;
+        }
+        const paginationContainer = document.getElementById('shop-pagination-container');
+        if (paginationContainer) {
+          if (!hasMore && totalLoaded > 0) {
+            paginationContainer.innerHTML = `<div class="col-span-full py-8 text-center text-xs text-slate-400 font-bold tracking-wider uppercase">${isRtl ? 'تم عرض جميع المنتجات' : "You've viewed all products"}</div>`;
+          } else {
+            paginationContainer.innerHTML = '';
           }
-        } else {
-          console.warn('Primary products fetch failed, attempting cloud backend direct fallback...', primaryErr);
-          const res = await fetch(`https://api-44oukcn4rq-uc.a.run.app/api/products${queryStr}`, { signal });
-          data = await res.json();
+        }
+      },
+      onEmpty: (cnt) => {
+        cnt.innerHTML = `<div class="col-span-full w-full py-20 text-center text-slate-400 font-medium">${isRtl ? 'لم يتم العثور على منتجات مطابقة لخياراتك.' : 'No products found matching your selection.'}</div>`;
+        const counterEl = document.getElementById('shop-items-counter');
+        if (counterEl) {
+          counterEl.innerHTML = `<span>${isRtl ? 'عرض' : 'Showing'} <strong style="color:var(--text-primary)">0</strong> ${isRtl ? 'منتج' : 'items'}</span>`;
+        }
+        const paginationContainer = document.getElementById('shop-pagination-container');
+        if (paginationContainer) paginationContainer.innerHTML = '';
+      },
+      onError: (err, isInitial) => {
+        if (isInitial) {
+          container.innerHTML = `<div class="col-span-full w-full py-20 text-center text-rose-500 font-medium">${isRtl ? 'تعذر تحميل المنتجات.' : 'Unable to load products from server.'}</div>`;
         }
       }
+    });
 
-      if (signal.aborted) return;
-
-      // Save into fast client-side cache
-      shopCatalogCache.set(cacheKey, { timestamp: Date.now(), data });
-
-      displayCatalogData(data);
-    } catch (err) {
-      if (signal.aborted) return;
-      console.error('Failed to load shop catalog:', err);
-      container.innerHTML = `<div class="col-span-full w-full py-20 text-center text-rose-500 font-medium">${isRtl ? 'تعذر تحميل المنتجات.' : 'Unable to load products from server.'}</div>`;
-      revealShopFilters();
+    if (shopInfiniteScroller) {
+      shopInfiniteScroller.fetchInitial();
     }
   }
 
@@ -2724,10 +2934,13 @@
         bgImgEl.style.backgroundImage = "url('" + targetImg + "')";
       }
 
-      // 4. CTA Buttons
-      const primaryText = isRtl && (b.cta_text_ar || b.button_text_ar)
+      let rawPrimaryText = isRtl && (b.cta_text_ar || b.button_text_ar)
         ? (b.cta_text_ar || b.button_text_ar)
         : (b.cta_text || b.button_text || 'Shop All Collections');
+      if (rawPrimaryText === 'Explore Catalog') {
+        rawPrimaryText = 'Shop All Collections';
+      }
+      const primaryText = rawPrimaryText;
       const primaryLink = b.cta_link || b.link_url || '/shop/';
 
       if (actionsEl) {
@@ -2934,14 +3147,20 @@
       loadHomeBrands();
     }
 
-    // 1. Featured products on home page
     if (document.getElementById('featured-products-container')) {
-      loadProducts('featured-products-container', { isFeatured: true, limit: 8 });
+      loadProducts('featured-products-container', { isFeatured: true, limit: 10 }, 'featured-products-section');
     }
 
-    // 2. New arrivals if container exists
+    if (document.getElementById('bestsellers-products-container')) {
+      loadProducts('bestsellers-products-container', { isBestSeller: true, limit: 10 }, 'bestsellers-products-section');
+    }
+
+    if (document.getElementById('newarrivals-products-container')) {
+      loadProducts('newarrivals-products-container', { isNew: true, sort: 'newest', limit: 10 }, 'newarrivals-products-section');
+    }
+
     if (document.getElementById('new-arrivals-container')) {
-      loadProducts('new-arrivals-container', { limit: 8, sort: 'newest' });
+      loadProducts('new-arrivals-container', { limit: 10, sort: 'newest' });
     }
 
     // 3. Shop Catalog Page
@@ -2980,6 +3199,7 @@
   global.selectShopCategory = selectShopCategory;
   global.returnToShopCategories = returnToShopCategories;
   global.renderShopCategories = renderShopCategories;
+  global.createCursorInfiniteScroll = createCursorInfiniteScroll;
   global.loadDynamicHeroBanner = loadDynamicHeroBanner;
   global.loadDynamicPromotionalSections = loadDynamicPromotionalSections;
 })(window);

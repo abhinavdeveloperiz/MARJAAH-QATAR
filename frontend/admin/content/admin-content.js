@@ -1,7 +1,4 @@
-/**
- * MARJAAH QATAR — Admin Content, Locations & Settings Controller (Requirements 1, 3, 6, 7)
- * Handles Hero Banners, Promotional Sections, Store Pickup Locations, and Store Settings (CR No. 228717).
- */
+
 
 (function () {
   'use strict';
@@ -12,9 +9,6 @@
     locations: [],
     settings: {},
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 1. HERO BANNERS (Requirement 3)
-    // ═════════════════════════════════════════════════════════════════════════
     async loadBanners() {
       const container = document.getElementById('banners-table-body');
       const refreshBtn = document.getElementById('btn-refresh-banners');
@@ -96,36 +90,36 @@
       container.innerHTML = this.banners.map((b) => {
         const isActive = b.is_active !== false && b.status !== 'inactive';
         return `
-          <tr id="banner-row-${b.id}" class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-all duration-200">
+          <tr id="banner-row-${b.id}" class="border-b border-slate-200 hover:bg-slate-50 transition-all duration-200">
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
-                <img src="${b.image || b.image_desktop || '/assets/images/products/placeholder.svg'}" class="w-14 h-9 object-cover rounded-lg border border-slate-700 bg-slate-900 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                <img src="${b.image || b.image_desktop || '/assets/images/products/placeholder.svg'}" class="w-14 h-9 object-cover rounded-lg border border-slate-200 bg-slate-100 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
                 <div class="min-w-0">
-                  <p class="font-bold text-xs text-white truncate max-w-xs">${b.headline || b.title || 'Hero Banner'}</p>
-                  <p class="text-[11px] text-slate-400 truncate max-w-xs">${b.subtitle || '—'}</p>
+                  <p class="font-bold text-xs text-slate-900 truncate max-w-xs">${b.headline || b.title || 'Hero Banner'}</p>
+                  <p class="text-[11px] text-slate-500 truncate max-w-xs">${b.subtitle || '—'}</p>
                 </div>
               </div>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-300">
-              <span class="px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 text-[10px] font-bold border border-indigo-500/20">${b.cta_text || 'Shop Now'}</span>
-              <p class="text-[10px] text-slate-400 font-mono mt-0.5 truncate max-w-[180px]">${b.cta_link || '/shop/'}</p>
+            <td class="py-3 px-4 text-xs text-slate-700">
+              <span class="px-2 py-0.5 rounded bg-primary/10 text-primary text-[10px] font-bold border border-primary/20">${b.cta_text || 'Shop Now'}</span>
+              <p class="text-[10px] text-slate-500 font-mono mt-0.5 truncate max-w-[180px]">${b.cta_link || '/shop/'}</p>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-300 font-mono">${b.order !== undefined ? b.order : 0}</td>
+            <td class="py-3 px-4 text-xs text-slate-700 font-mono">${b.order !== undefined ? b.order : 0}</td>
             <td class="py-3 px-4">
-              <button type="button" id="banner-toggle-${b.id}" onclick="AdminContent.toggleBannerStatus('${b.id}', ${isActive})" title="Click to toggle banner status" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition cursor-pointer ${isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20' : 'bg-slate-700/30 text-slate-400 border border-slate-700 hover:bg-slate-700/50'}">
-                <span id="banner-toggle-indicator-${b.id}" class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}"></span>
+              <button type="button" id="banner-toggle-${b.id}" onclick="AdminContent.toggleBannerStatus('${b.id}', ${isActive})" title="Click to toggle banner status" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold transition cursor-pointer ${isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100' : 'bg-slate-100 text-slate-600 border border-slate-200 hover:bg-slate-200'}">
+                <span id="banner-toggle-indicator-${b.id}" class="w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}"></span>
                 <span id="banner-toggle-text-${b.id}">${isActive ? 'ACTIVE' : 'INACTIVE'}</span>
               </button>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-400">
+            <td class="py-3 px-4 text-xs text-slate-500">
               ${b.start_date ? `${new Date(b.start_date).toLocaleDateString()} &ndash; ${b.end_date ? new Date(b.end_date).toLocaleDateString() : 'Ongoing'}` : 'Permanent'}
             </td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-1.5">
-                <button type="button" id="banner-edit-btn-${b.id}" onclick="AdminContent.openBannerModal('${b.id}')" title="Edit Banner" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-slate-700/40 text-slate-300 hover:text-white transition cursor-pointer">
+                <button type="button" id="banner-edit-btn-${b.id}" onclick="AdminContent.openBannerModal('${b.id}')" title="Edit Banner" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button type="button" id="banner-del-btn-${b.id}" onclick="AdminContent.deleteBanner('${b.id}')" title="Delete Banner" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer">
+                <button type="button" id="banner-del-btn-${b.id}" onclick="AdminContent.deleteBanner('${b.id}')" title="Delete Banner" class="p-1.5 rounded-lg border border-slate-200 hover:bg-rose-50 text-rose-500 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -228,7 +222,6 @@
 
       const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
 
-      // ── 1. Enter Loading State ──
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
@@ -329,7 +322,6 @@
       const editBtn = document.getElementById('banner-edit-btn-' + bannerId);
       const toggleBtn = document.getElementById('banner-toggle-' + bannerId);
 
-      // ── 1. Enter Row Loading State ──
       if (rowEl) {
         rowEl.classList.add('opacity-40', 'pointer-events-none', 'transition-opacity');
       }
@@ -354,7 +346,7 @@
       } catch (err) {
         console.error('Delete banner error:', err);
         AdminApp.toast(err.message || 'Failed to delete banner', 'error');
-        // Restore row state on error
+
         if (rowEl) rowEl.classList.remove('opacity-40', 'pointer-events-none');
         if (delBtn) {
           delBtn.disabled = false;
@@ -398,9 +390,6 @@
       }
     },
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 2. PROMOTIONAL SECTIONS (Requirement 6)
-    // ═════════════════════════════════════════════════════════════════════════
     async loadPromotions() {
       const container = document.getElementById('promotions-table-body');
       if (container) {
@@ -431,34 +420,34 @@
       container.innerHTML = this.promotions.map((p) => {
         const isActive = p.is_active !== false;
         return `
-          <tr id="promo-row-${p.id}" class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-all duration-200">
+          <tr id="promo-row-${p.id}" class="border-b border-slate-200 hover:bg-slate-50 transition-all duration-200">
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
-                <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-12 h-12 object-cover rounded-xl border border-slate-700 bg-slate-900 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-12 h-12 object-cover rounded-xl border border-slate-200 bg-slate-100 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
                 <div class="min-w-0">
-                  <span class="text-[9px] uppercase font-bold tracking-widest text-indigo-400">${p.tag || p.badge || 'PROMOTION'}</span>
-                  <p class="font-bold text-xs text-white truncate max-w-xs">${p.title}</p>
-                  <p class="text-[11px] text-slate-400 truncate max-w-xs">${p.subtitle || '—'}</p>
+                  <span class="text-[9px] uppercase font-bold tracking-widest text-primary">${p.tag || p.badge || 'PROMOTION'}</span>
+                  <p class="font-bold text-xs text-slate-900 truncate max-w-xs">${p.title}</p>
+                  <p class="text-[11px] text-slate-500 truncate max-w-xs">${p.subtitle || '—'}</p>
                 </div>
               </div>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-300">
-              <span class="font-semibold">${p.cta_text || 'DISCOVER ALL'}</span>
-              <p class="text-[10px] text-slate-400 font-mono truncate max-w-[180px]">${p.cta_link || '/shop/'}</p>
+            <td class="py-3 px-4 text-xs text-slate-700">
+              <span class="font-semibold text-slate-900">${p.cta_text || 'DISCOVER ALL'}</span>
+              <p class="text-[10px] text-slate-500 font-mono truncate max-w-[180px]">${p.cta_link || '/shop/'}</p>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-300 font-mono">${p.display_order !== undefined ? p.display_order : 1}</td>
+            <td class="py-3 px-4 text-xs text-slate-700 font-mono">${p.display_order !== undefined ? p.display_order : 1}</td>
             <td class="py-3 px-4">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-700/30 text-slate-400 border border-slate-700'}">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
                 ${isActive ? 'ACTIVE' : 'INACTIVE'}
               </span>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-400 font-mono">${p.product_price ? `QAR ${p.product_price}` : '—'}</td>
+            <td class="py-3 px-4 text-xs text-slate-600 font-mono">${p.product_price ? `QAR ${p.product_price}` : '—'}</td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-1.5">
-                <button type="button" id="promo-edit-btn-${p.id}" onclick="AdminContent.openPromotionModal('${p.id}')" title="Edit Promo Section" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-slate-700/40 text-slate-300 hover:text-white transition cursor-pointer">
+                <button type="button" id="promo-edit-btn-${p.id}" onclick="AdminContent.openPromotionModal('${p.id}')" title="Edit Promo Section" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button type="button" id="promo-del-btn-${p.id}" onclick="AdminContent.deletePromotion('${p.id}')" title="Delete Promo Section" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer">
+                <button type="button" id="promo-del-btn-${p.id}" onclick="AdminContent.deletePromotion('${p.id}')" title="Delete Promo Section" class="p-1.5 rounded-lg border border-slate-200 hover:bg-rose-50 text-rose-500 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -540,7 +529,6 @@
 
       const originalBtnHtml = submitBtn ? submitBtn.innerHTML : '';
 
-      // ── 1. Enter Loading State ──
       if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.classList.add('opacity-80', 'cursor-not-allowed');
@@ -663,9 +651,6 @@
       }
     },
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 3. STORE PICKUP LOCATIONS (Requirement 1)
-    // ═════════════════════════════════════════════════════════════════════════
     async loadLocations() {
       const container = document.getElementById('locations-table-body');
       if (container) {
@@ -696,28 +681,28 @@
       container.innerHTML = this.locations.map((loc) => {
         const isActive = loc.is_active !== false;
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
             <td class="py-3.5 px-4">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-xs text-white">${loc.name}</span>
-                ${loc.is_primary ? `<span class="text-[9px] px-2 py-0.5 rounded bg-blue-500/10 text-blue-300 font-bold uppercase tracking-wider border border-blue-500/20">Main Hub</span>` : ''}
+                <span class="font-bold text-xs text-slate-900">${loc.name}</span>
+                ${loc.is_primary ? `<span class="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider border border-primary/20">Main Hub</span>` : ''}
               </div>
-              <p class="text-[11px] text-slate-400 mt-0.5">${loc.address}, ${loc.city || 'Doha'}</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">${loc.address}, ${loc.city || 'Doha'}</p>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-300 font-mono">${loc.phone || '—'}</td>
-            <td class="py-3.5 px-4 text-xs text-slate-300">${loc.working_hours || '9:00 AM - 10:00 PM'}</td>
-            <td class="py-3.5 px-4 text-xs text-slate-400 italic max-w-xs truncate">${loc.instructions || 'Order ID required'}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-700 font-mono">${loc.phone || '—'}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-700">${loc.working_hours || '9:00 AM - 10:00 PM'}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-500 italic max-w-xs truncate">${loc.instructions || 'Order ID required'}</td>
             <td class="py-3.5 px-4">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-700/30 text-slate-400 border border-slate-700'}">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
                 ${isActive ? 'ACTIVE' : 'INACTIVE'}
               </span>
             </td>
             <td class="py-3.5 px-4 text-right">
               <div class="flex items-center justify-end gap-1.5">
-                <button type="button" onclick="AdminContent.openLocationModal('${loc.id}')" title="Edit Location" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-slate-700/40 text-slate-300 hover:text-white transition cursor-pointer">
+                <button type="button" onclick="AdminContent.openLocationModal('${loc.id}')" title="Edit Location" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button type="button" onclick="AdminContent.deleteLocation('${loc.id}')" title="Delete Location" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer">
+                <button type="button" onclick="AdminContent.deleteLocation('${loc.id}')" title="Delete Location" class="p-1.5 rounded-lg border border-slate-200 hover:bg-rose-50 text-rose-500 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -803,9 +788,6 @@
       }
     },
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 4. STORE SETTINGS & CR NUMBER (Requirement 7)
-    // ═════════════════════════════════════════════════════════════════════════
     async loadSettings() {
       try {
         const data = await AdminApp.api('/api/admin/settings');

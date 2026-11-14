@@ -1,7 +1,4 @@
-/**
- * MARJAAH QATAR — Admin Orders & Fulfillment Controller (Requirement 1 & 11)
- * Handles order tracking, status workflows, Store Pickup display, and Staff Order Creation with live stock deductions.
- */
+
 
 (function () {
   'use strict';
@@ -32,25 +29,95 @@
 
     async load() {
       const container = document.getElementById('orders-table-body');
-      if (container) {
-        container.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">Loading orders &amp; fulfillment...</td></tr>`;
+      if (container && (!this.orders || this.orders.length === 0)) {
+        container.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-xs text-slate-400">
+              <div class="flex flex-col items-center justify-center gap-2.5">
+                <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <span>Loading live orders &amp; fulfillment...</span>
+              </div>
+            </td>
+          </tr>`;
       }
 
-      try {
-        const [ordersRes, locsRes] = await Promise.all([
-          AdminApp.api('/api/orders?limit=100'),
-          AdminApp.api('/api/store-locations'),
-        ]);
+      this.loadStoreLocations();
 
-        this.orders = ordersRes.orders || ordersRes.items || ordersRes.data || ordersRes || [];
-        this.storeLocations = locsRes.locations || locsRes || [];
+      this.preloadCatalogProducts();
+
+      try {
+        const ordersRes = await AdminApp.api('/api/orders?limit=100');
+        this.orders = ordersRes?.items || ordersRes?.orders || ordersRes?.data || (Array.isArray(ordersRes) ? ordersRes : []);
         this.renderTable();
       } catch (err) {
         console.error('Failed to load orders:', err);
         if (container) {
-          container.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-rose-400">Failed to load orders.</td></tr>`;
+          container.innerHTML = `
+            <tr>
+              <td colspan="7" class="py-8 text-center text-xs text-rose-400">
+                <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/25 max-w-md mx-auto space-y-2">
+                  <p class="font-bold text-sm text-rose-300">Failed to load orders</p>
+                  <p class="text-[11px] text-slate-400">${err.message || 'Unable to retrieve live orders from database.'}</p>
+                  <button type="button" onclick="AdminOrders.load()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition">
+                    ↻ Retry Loading Orders
+                  </button>
+                </div>
+              </td>
+            </tr>`;
         }
       }
+    },
+
+    async loadStoreLocations() {
+      try {
+        const locsRes = await AdminApp.api('/api/store-locations').catch(() => null);
+        if (locsRes && (locsRes.locations || Array.isArray(locsRes))) {
+          this.storeLocations = locsRes.locations || locsRes || [];
+          return;
+        }
+      } catch (_) {}
+
+      this.storeLocations = [
+        {
+          id: 'al-sadd-hub',
+          name: 'MARJAAH Tech & Home Experience Hub — Al Sadd',
+          address: 'Building 42, Al Mirqab Al Jadeed St',
+          zone: 'Zone 39',
+          city: 'Doha',
+          country: 'Qatar',
+          phone: '+974 7799 1013',
+          working_hours: 'Saturday – Thursday: 9:00 AM – 10:00 PM | Friday: 2:00 PM – 10:00 PM',
+          instructions: 'Please present your Order Confirmation Number (MTQ-XXXXX) at the collection desk.',
+        },
+        {
+          id: 'mall-of-qatar-hub',
+          name: 'MARJAAH Express Click & Collect — Mall of Qatar',
+          address: 'Ground Floor, Near Gate 4',
+          zone: 'Zone 51',
+          city: 'Al Rayyan',
+          country: 'Qatar',
+          phone: '+974 7799 1013',
+          working_hours: 'Daily: 10:00 AM – 11:00 PM',
+          instructions: 'Show your order SMS or QR code for immediate pickup.',
+        },
+      ];
+    },
+
+    async preloadCatalogProducts() {
+      if (this.catalogProducts && this.catalogProducts.length > 0) return;
+      const cached = window.SmartCache?.getProducts();
+      if (cached && cached.length > 0) {
+        this.catalogProducts = cached;
+        return;
+      }
+      try {
+        const prodData = await AdminApp.api('/api/products?limit=1500&includeHidden=true&status=all').catch(() => null);
+        const list = prodData?.products || prodData?.items || prodData?.data || (Array.isArray(prodData) ? prodData : []);
+        if (list.length > 0) {
+          this.catalogProducts = list;
+          window.SmartCache?.setProducts(list);
+        }
+      } catch (_) {}
     },
 
     renderTable() {
@@ -86,7 +153,7 @@
         const totalVal = Number(o.total || o.subtotal || 0).toFixed(0);
 
         const isPickup = o.fulfillment_type === 'store_pickup';
-        const pickupLoc = o.store_pickup_location || {};
+        const pickupLoc = o.store_pickup_location || o.pickup_location || {};
 
         const statusBadges = {
           placed: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
@@ -118,24 +185,24 @@
 
         const canDelete = AdminApp.can('orders', 'delete');
         const deleteBtn = canDelete
-          ? `<button type="button" onclick="AdminOrders.confirmDeleteOrder('${o.id}', '${orderNum}')" class="p-1.5 rounded-xl border border-rose-500/30 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition cursor-pointer" title="Delete Order">
+          ? `<button type="button" onclick="event.stopPropagation(); AdminOrders.confirmDeleteOrder('${o.id}', '${orderNum}')" class="p-1.5 rounded-xl border border-rose-500/30 hover:border-rose-500 bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 hover:text-rose-300 transition cursor-pointer" title="Delete Order">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
             </button>`
           : '';
 
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer" onclick="AdminOrders.openDetailsModal('${o.id}')">
             <td class="py-3.5 px-4">
-              <span class="font-mono font-bold text-xs text-indigo-400">#${orderNum}</span>
-              <p class="text-[10px] text-slate-500 font-mono mt-0.5">${dateStr}</p>
+              <span class="font-mono font-bold text-xs text-primary hover:underline">#${orderNum}</span>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">${dateStr}</p>
             </td>
             <td class="py-3.5 px-4">
-              <p class="font-bold text-xs text-white">${custName}</p>
-              <p class="text-[11px] text-slate-400 font-mono">${custPhone}</p>
+              <p class="font-bold text-xs text-slate-900">${custName}</p>
+              <p class="text-[11px] text-slate-500 font-mono">${custPhone}</p>
             </td>
             <td class="py-3.5 px-4">${fulfillmentHtml}</td>
             <td class="py-3.5 px-4">
-              <span class="font-display font-black text-xs text-white">${totalVal} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
+              <span class="font-display font-black text-xs text-slate-900">${totalVal} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
               <p class="text-[10px] text-slate-400 capitalize">${o.payment_method || 'Cash'}</p>
             </td>
             <td class="py-3.5 px-4">
@@ -145,9 +212,9 @@
               ${o.return_request ? `
                 <div class="mt-1">
                   <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                    o.return_request.status === 'approved' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
-                    o.return_request.status === 'declined' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' :
-                    'bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse'
+                    o.return_request.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                    o.return_request.status === 'declined' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                    'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
                   }">
                     ↩️ RMA ${(o.return_request.status || 'PENDING').toUpperCase()}
                   </span>
@@ -155,12 +222,12 @@
               ` : ''}
             </td>
             <td class="py-3.5 px-4 text-right">
-              <div class="flex items-center justify-end gap-1.5">
-                <button type="button" onclick="AdminOrders.openInvoiceModal('${o.id}')" class="px-2.5 py-1.5 rounded-xl border border-indigo-500/40 hover:border-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs font-bold text-indigo-300 hover:text-white transition cursor-pointer flex items-center gap-1.5" title="Generate &amp; View Official Tax Invoice">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <div class="flex items-center justify-end gap-1.5" onclick="event.stopPropagation()">
+                <button type="button" onclick="AdminOrders.openInvoiceModal('${o.id}')" class="px-2.5 py-1.5 rounded-xl border border-primary/30 hover:border-primary bg-primary/10 hover:bg-primary/20 text-xs font-bold text-primary transition cursor-pointer flex items-center gap-1.5" title="Generate &amp; View Official Tax Invoice">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                   <span>Invoice</span>
                 </button>
-                <button type="button" onclick="AdminOrders.openDetailsModal('${o.id}')" class="px-3 py-1.5 rounded-xl border border-slate-700/60 hover:bg-slate-700/40 text-xs font-bold text-slate-300 hover:text-white transition cursor-pointer">
+                <button type="button" onclick="AdminOrders.openDetailsModal('${o.id}')" title="Inspect full order items, customer details, and fulfillment lifecycle" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 hover:text-slate-900 transition cursor-pointer">
                   Manage
                 </button>
                 ${deleteBtn}
@@ -177,47 +244,172 @@
       this.selectedOrder = o;
 
       const orderNum = o.order_number || o.id;
-      document.getElementById('order-modal-title').textContent = `Order Details #${orderNum}`;
-      document.getElementById('order-modal-status-select').value = o.status || 'placed';
+      const createdAt = o.created_at ? new Date(o.created_at) : new Date();
+      const dateFormatted = createdAt.toLocaleString('en-GB', {
+        dateStyle: 'medium',
+        timeStyle: 'medium',
+      });
 
-      const isPickup = o.fulfillment_type === 'store_pickup';
-      const loc = o.store_pickup_location || {};
+      const titleEl = document.getElementById('order-modal-title');
+      if (titleEl) titleEl.textContent = `Order #${orderNum}`;
+
+      const subtitleEl = document.getElementById('order-modal-subtitle');
+      if (subtitleEl) {
+        subtitleEl.innerHTML = `Placed on <strong>${dateFormatted}</strong> &bull; Firestore ID: <span class="font-mono text-indigo-300">${o.id}</span>`;
+      }
+
+      const statusSelect = document.getElementById('order-modal-status-select');
+      if (statusSelect) statusSelect.value = o.status || 'placed';
+
+      const badgesContainer = document.getElementById('order-modal-badges');
+      if (badgesContainer) {
+        const statusColors = {
+          placed: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+          pending: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
+          processing: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+          shipped: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
+          delivered: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+          cancelled: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
+        };
+        const stBadge = statusColors[o.status] || statusColors.placed;
+        const payStatus = (o.payment_status || 'cod').toLowerCase();
+        const payBadge =
+          payStatus === 'paid'
+            ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
+            : payStatus === 'cod'
+            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+            : 'bg-slate-700/40 text-slate-300 border-slate-600/40';
+
+        badgesContainer.innerHTML = `
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${stBadge}">
+            ${o.status || 'PLACED'}
+          </span>
+          <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${payBadge}">
+            PAYMENT: ${payStatus.toUpperCase()}
+          </span>
+          <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border border-slate-200 bg-slate-100 text-slate-700 font-mono">
+            ${o.fulfillment_type === 'store_pickup' ? '🏪 STORE PICKUP' : '🚚 EXPRESS DELIVERY'}
+          </span>
+        `;
+      }
+
+      const isPickup = o.fulfillment_type === 'store_pickup' || o.delivery_method === 'pickup';
+      const loc = o.store_pickup_location || o.pickup_location || {};
       const addr = o.delivery_address || {};
+      const custPhone = o.customer_phone || o.phone || addr.phone || '';
+      const cleanPhoneDigits = custPhone.replace(/\D/g, '');
+      const custEmail = o.customer_email || o.email || '';
 
-      const fulfillmentBox = document.getElementById('order-modal-fulfillment-details');
-      if (fulfillmentBox) {
-        fulfillmentBox.innerHTML = isPickup
-          ? `
-            <div class="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-emerald-400 text-sm">🏪 Store Pickup (Click &amp; Collect)</span>
-                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 text-[10px] font-bold">FREE PICKUP</span>
-              </div>
-              <p class="text-white font-medium">${loc.name || 'Main Store Hub'}</p>
-              <p class="text-slate-300">${loc.address || ''}, ${loc.city || 'Doha'}</p>
-              ${loc.phone ? `<p class="text-slate-400">Store Contact: <strong class="text-white">${loc.phone}</strong></p>` : ''}
-              ${loc.working_hours ? `<p class="text-slate-400">Hours: <strong class="text-white">${loc.working_hours}</strong></p>` : ''}
-              ${loc.instructions ? `<p class="text-emerald-300/90 pt-1 border-t border-emerald-500/20 italic">Note: ${loc.instructions}</p>` : ''}
+      const infoGrid = document.getElementById('order-modal-info-grid');
+      if (infoGrid) {
+        infoGrid.innerHTML = `
+          <!-- Card 1: Customer Profile -->
+          <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2 text-xs">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+              <span class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span class="text-primary">👤</span> Customer Details
+              </span>
+              <span class="text-[10px] font-mono text-slate-500">${o.user_id || o.userId ? 'Registered User' : 'Guest'}</span>
             </div>
-          `
-          : `
-            <div class="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-xs space-y-1.5">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-indigo-300 text-sm">🚚 Doorstep Express Delivery</span>
-                <span class="px-2 py-0.5 rounded bg-indigo-500/20 text-indigo-300 text-[10px] font-bold">Qatar Express</span>
+            <div>
+              <p class="font-bold text-slate-900 text-sm">${o.customer_name || o.full_name || addr.full_name || 'Customer'}</p>
+              <div class="mt-1 space-y-1">
+                <div class="flex items-center gap-2">
+                  <a href="tel:${custPhone}" class="text-primary hover:underline font-mono text-xs flex items-center gap-1 font-semibold">
+                    <span>📞</span> ${custPhone || '—'}
+                  </a>
+                  ${
+                    cleanPhoneDigits.length >= 7
+                      ? `<a href="https://wa.me/${cleanPhoneDigits.startsWith('974') ? cleanPhoneDigits : '974' + cleanPhoneDigits}" target="_blank" rel="noopener" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold hover:bg-emerald-100 transition">
+                          💬 WhatsApp
+                        </a>`
+                      : ''
+                  }
+                </div>
+                <p class="text-slate-600 truncate" title="${custEmail}">
+                  <span>✉️</span> ${custEmail ? `<a href="mailto:${custEmail}" class="hover:underline">${custEmail}</a>` : '<span class="italic text-slate-400">Not provided</span>'}
+                </p>
+                <p class="text-[10px] text-slate-500 font-mono truncate">
+                  Account ID: ${o.user_id || o.userId || 'GUEST-ACCOUNT'}
+                </p>
               </div>
-              <p class="text-white font-medium">${o.customer_name || o.full_name || 'Customer'}</p>
-              <p class="text-slate-300">${[addr.building, addr.street, addr.zone ? `Zone ${addr.zone}` : '', addr.city || 'Doha'].filter(Boolean).join(', ')}</p>
-              <p class="text-slate-400">Phone: <strong class="text-white">${o.customer_phone || o.phone || '—'}</strong></p>
-              ${o.notes ? `<p class="text-indigo-200/90 pt-1 border-t border-indigo-500/20 italic">Delivery Note: ${o.notes}</p>` : ''}
             </div>
-          `;
+          </div>
 
+          <!-- Card 2: Delivery & Fulfillment -->
+          <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2 text-xs">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+              <span class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span class="${isPickup ? 'text-emerald-600' : 'text-primary'}">${isPickup ? '🏪' : '🚚'}</span>
+                ${isPickup ? 'Store Pickup Hub' : 'Doorstep Delivery'}
+              </span>
+              <span class="text-[10px] font-bold ${isPickup ? 'text-emerald-700' : 'text-primary'}">Qatar Express</span>
+            </div>
+            ${
+              isPickup
+                ? `
+                  <div>
+                    <p class="font-bold text-emerald-800">${loc.name || 'MARJAAH Experience Hub — Al Sadd'}</p>
+                    <p class="text-slate-600 mt-0.5">${loc.address || 'Building 42, Al Mirqab Al Jadeed St, Zone 39, Doha'}</p>
+                    ${loc.phone ? `<p class="text-slate-500 mt-1">Store Phone: <strong class="text-slate-800">${loc.phone}</strong></p>` : ''}
+                    ${loc.opening_hours || loc.working_hours ? `<p class="text-slate-500">Hours: <span class="text-slate-700 font-mono text-[11px]">${loc.opening_hours || loc.working_hours}</span></p>` : ''}
+                    <p class="text-[11px] text-emerald-700 italic pt-1 mt-1 border-t border-slate-200">
+                      Collection Note: ${loc.pickup_instructions || loc.instructions || 'Bring Order Confirmation & QID.'}
+                    </p>
+                  </div>
+                `
+                : `
+                  <div>
+                    <p class="font-bold text-slate-900">${addr.full_name || o.customer_name || 'Delivery Recipient'}</p>
+                    <p class="text-slate-600 mt-0.5 leading-relaxed">
+                      ${[addr.building ? `Building ${addr.building}` : '', addr.street, addr.zone ? `Zone ${addr.zone}` : '', addr.city || 'Doha', addr.country || 'Qatar'].filter(Boolean).join(', ')}
+                    </p>
+                    <p class="text-slate-500 mt-1 text-[11px]">
+                      Billing: <span class="text-slate-700">${o.billing_address?.street ? [o.billing_address.building, o.billing_address.street, o.billing_address.city].filter(Boolean).join(', ') : 'Same as delivery address'}</span>
+                    </p>
+                    ${o.notes ? `<p class="text-[11px] text-primary italic pt-1 mt-1 border-t border-slate-200">Delivery Note: "${o.notes}"</p>` : ''}
+                  </div>
+                `
+            }
+          </div>
+
+          <!-- Card 3: Payment & Logistics -->
+          <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 space-y-2 text-xs">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-1.5">
+              <span class="font-bold text-slate-900 flex items-center gap-1.5">
+                <span class="text-amber-500">💳</span> Payment &amp; Logistics
+              </span>
+              <span class="text-[10px] font-mono text-emerald-700 uppercase font-bold">${o.payment_status || 'COD'}</span>
+            </div>
+            <div class="space-y-1.5">
+              <div class="flex justify-between">
+                <span class="text-slate-500">Payment Method:</span>
+                <span class="text-slate-900 font-bold capitalize">${o.payment_method === 'pay_at_store' ? 'Pay at Store' : o.payment_method || 'Cash on Delivery'}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Logistics Partner:</span>
+                <span class="text-primary font-medium">Qatar Express Courier</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Tracking Ref:</span>
+                <span class="font-mono text-slate-700 text-[11px]">QEX-${String(orderNum).replace(/^#+/, '')}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-slate-500">Txn Reference:</span>
+                <span class="font-mono text-slate-600 text-[11px]">TXN-${o.id.substring(0, 10).toUpperCase()}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      const alertsContainer = document.getElementById('order-modal-alerts');
+      if (alertsContainer) {
         if (o.return_request) {
           const rr = o.return_request;
           const rrStatus = (rr.status || 'pending').toUpperCase();
-          fulfillmentBox.innerHTML += `
-            <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-2 mt-3">
+          alertsContainer.innerHTML = `
+            <div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-2">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-amber-300 flex items-center gap-1.5 text-xs">
                   <span>↩️</span> RMA Return Request (${rrStatus})
@@ -227,54 +419,150 @@
               <p class="text-slate-200"><strong>Customer Reason:</strong> ${rr.reason || 'General Return'}</p>
               ${rr.notes ? `<p class="text-slate-300 italic">"${rr.notes}"</p>` : ''}
               ${rr.admin_notes ? `<p class="text-indigo-300 font-semibold">Staff Review: ${rr.admin_notes}</p>` : ''}
-              ${rr.status === 'pending' ? `
-                <div class="flex items-center gap-2 pt-2 border-t border-amber-500/20">
-                  <button type="button" onclick="AdminReturns.approveReturn('${o.id}', '${orderNum}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white rounded-xl shadow-sm cursor-pointer">
-                    ✓ Approve &amp; Restock
-                  </button>
-                  <button type="button" onclick="AdminReturns.openDeclineModal('${o.id}', '${orderNum}')" class="px-3 py-1.5 border border-rose-500/40 hover:bg-rose-500/10 text-xs font-bold text-rose-400 rounded-xl cursor-pointer">
-                    ✕ Decline RMA
-                  </button>
-                </div>
-              ` : ''}
+              ${
+                rr.status === 'pending'
+                  ? `
+                    <div class="flex items-center gap-2 pt-2 border-t border-amber-500/20">
+                      <button type="button" onclick="AdminReturns.approveReturn('${o.id}', '${orderNum}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white rounded-xl shadow-sm cursor-pointer transition">
+                        ✓ Approve &amp; Restock
+                      </button>
+                      <button type="button" onclick="AdminReturns.openDeclineModal('${o.id}', '${orderNum}')" class="px-3.5 py-1.5 border border-rose-500/40 hover:bg-rose-500/10 text-xs font-bold text-rose-400 rounded-xl cursor-pointer transition">
+                        ✕ Decline RMA
+                      </button>
+                    </div>
+                  `
+                  : ''
+              }
             </div>
           `;
-        } else if (o.cancellation_reason) {
-          fulfillmentBox.innerHTML += `
-            <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-xs space-y-1 mt-3">
+        } else if (o.cancellation_reason || o.status === 'cancelled') {
+          alertsContainer.innerHTML = `
+            <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/30 text-xs space-y-1">
               <span class="font-bold text-rose-300 flex items-center gap-1.5">
-                <span>✕</span> Order Cancellation Reason
+                <span>✕</span> Order Cancellation Notice
               </span>
-              <p class="text-slate-200"><strong>Reason:</strong> ${o.cancellation_reason}</p>
+              <p class="text-slate-200"><strong>Reason:</strong> ${o.cancellation_reason || 'Order cancelled by customer/system.'}</p>
               ${o.cancellation_notes ? `<p class="text-slate-300 italic">"${o.cancellation_notes}"</p>` : ''}
             </div>
           `;
+        } else {
+          alertsContainer.innerHTML = '';
         }
       }
 
-      // Items list
       const itemsContainer = document.getElementById('order-modal-items');
-      if (itemsContainer && Array.isArray(o.items)) {
-        itemsContainer.innerHTML = o.items.map((it) => `
-          <div class="flex items-center justify-between p-3 rounded-xl border border-slate-800 bg-slate-900/60 text-xs">
-            <div class="flex items-center gap-3">
-              <img src="${it.image || '/assets/images/products/placeholder.svg'}" class="w-10 h-10 object-cover rounded-lg border border-slate-700" onerror="this.src='/assets/images/products/placeholder.svg'" />
-              <div>
-                <p class="font-bold text-white">${it.name}</p>
-                <p class="text-[11px] text-slate-400">Qty: ${it.quantity} &times; ${it.price} QAR</p>
-              </div>
-            </div>
-            <span class="font-bold text-white">${(it.quantity * it.price).toFixed(0)} QAR</span>
-          </div>
-        `).join('');
+      const itemsCountBadge = document.getElementById('order-modal-items-count');
+      const items = Array.isArray(o.items) ? o.items : [];
+
+      if (itemsCountBadge) {
+        itemsCountBadge.textContent = `${items.length} item${items.length === 1 ? '' : 's'}`;
       }
 
-      // Summary totals
-      document.getElementById('order-modal-subtotal').textContent = `${(o.subtotal || o.total || 0).toFixed(0)} QAR`;
-      document.getElementById('order-modal-shipping').textContent = isPickup ? '0 QAR (Free Pickup)' : `${(o.shipping || 0).toFixed(0)} QAR`;
-      document.getElementById('order-modal-total').textContent = `${(o.total || 0).toFixed(0)} QAR`;
+      let subtotalCalc = 0;
+      let totalDiscountCalc = 0;
 
-      // Danger zone delete order visibility based on RBAC
+      if (itemsContainer) {
+        if (items.length === 0) {
+          itemsContainer.innerHTML = `<div class="p-6 rounded-xl border border-slate-800 text-center text-xs text-slate-500 italic">No items recorded in this order package.</div>`;
+        } else {
+          itemsContainer.innerHTML = items
+            .map((it) => {
+
+              const prod = window.SmartCache?.findProduct(it.id || it.slug || it.name) || this.catalogProducts.find((p) => p.id === it.id || p.slug === it.slug || p.name === it.name) || null;
+
+              const sku = it.sku || prod?.sku || prod?.model_number || it.id || 'MTQ-GEN-SKU';
+              const imgUrl = it.image || prod?.image || prod?.images?.[0] || '/assets/images/products/placeholder.svg';
+              const brand = it.brand || prod?.brand || prod?.brand_name || '';
+              const variantName = it.variant || it.selected_variant || it.colour || it.size || prod?.colour || '';
+
+              const unitPrice = Number(it.price || prod?.price || 0);
+              const originalPrice = Number(it.original_price || prod?.original_price || 0);
+              const qty = Number(it.quantity || 1);
+              const lineTotal = Number(it.line_total || unitPrice * qty);
+
+              subtotalCalc += lineTotal;
+
+              const discountPerUnit = originalPrice > unitPrice ? originalPrice - unitPrice : 0;
+              const lineDiscount = discountPerUnit * qty;
+              totalDiscountCalc += lineDiscount;
+
+              return `
+                <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:border-slate-300 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                  <div class="flex items-center gap-3.5 min-w-0 flex-1">
+                    <button type="button" onclick="window.openImageLightbox('${(imgUrl || '').replace(/'/g, "\\'")}', '${(it.name || 'Catalog Item').replace(/'/g, "\\'")}', '${(sku || '').replace(/'/g, "\\'")}')" class="group relative w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 hover:border-primary flex-shrink-0 cursor-zoom-in transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/40" title="Click to view full screen image">
+                      <img src="${imgUrl}" alt="${it.name || 'Product'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                      <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="drop-shadow"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                      </div>
+                    </button>
+                    <div class="min-w-0 flex-1 space-y-1">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-slate-900 text-xs sm:text-sm hover:text-primary transition">${it.name || 'Catalog Item'}</span>
+                        ${brand ? `<span class="px-1.5 py-0.2 rounded text-[9px] font-bold bg-slate-200 text-slate-700 border border-slate-300">${brand}</span>` : ''}
+                      </div>
+                      ${it.name_ar ? `<p class="text-[11px] text-slate-500 font-arabic truncate" dir="rtl">${it.name_ar}</p>` : ''}
+                      
+                      <!-- SKU & Attributes Row -->
+                      <div class="flex items-center gap-2 flex-wrap pt-0.5">
+                        <span class="inline-flex items-center gap-1 font-mono text-[10px] font-bold text-primary bg-primary/10 border border-primary/20 px-2 py-0.5 rounded-md">
+                          <span class="text-slate-500">SKU:</span>
+                          <span>${sku}</span>
+                        </span>
+                        ${
+                          variantName
+                            ? `<span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                                <span>Variant:</span>
+                                <span>${variantName}</span>
+                              </span>`
+                            : ''
+                        }
+                        <span class="text-[10px] text-slate-500 font-mono">
+                          Unit: <strong class="text-slate-900">${unitPrice.toLocaleString()} QAR</strong>
+                          ${originalPrice > unitPrice ? `<span class="line-through text-slate-400 ml-1">${originalPrice} QAR</span>` : ''}
+                        </span>
+                        ${
+                          lineDiscount > 0
+                            ? `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
+                                Saved ${lineDiscount} QAR
+                              </span>`
+                            : ''
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Price & Qty Summary Column -->
+                  <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-200 gap-1 flex-shrink-0 min-w-[110px]">
+                    <span class="text-slate-500 text-[11px] font-mono">Qty: <strong class="text-slate-900 text-xs">${qty}</strong></span>
+                    <span class="font-display font-black text-sm text-primary font-mono">${lineTotal.toLocaleString()} <span class="text-[10px] text-slate-500 font-sans font-normal">QAR</span></span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('');
+        }
+      }
+
+      const orderSubtotal = Number(o.subtotal || subtotalCalc || o.total || 0);
+      const orderTotal = Number(o.total || orderSubtotal);
+      const orderShipping = Number(o.shipping || 0);
+
+      const subtotalEl = document.getElementById('order-modal-subtotal');
+      if (subtotalEl) subtotalEl.textContent = `${orderSubtotal.toLocaleString()} QAR`;
+
+      const discountEl = document.getElementById('order-modal-discount');
+      if (discountEl) {
+        discountEl.textContent = totalDiscountCalc > 0 ? `-${totalDiscountCalc.toLocaleString()} QAR` : '0 QAR';
+      }
+
+      const shippingEl = document.getElementById('order-modal-shipping');
+      if (shippingEl) {
+        shippingEl.textContent = isPickup ? '0 QAR (Free Store Pickup)' : orderShipping > 0 ? `${orderShipping} QAR` : '0 QAR (Free Qatar Express)';
+      }
+
+      const totalEl = document.getElementById('order-modal-total');
+      if (totalEl) totalEl.textContent = `${orderTotal.toLocaleString()} QAR`;
+
       const dangerZone = document.getElementById('order-modal-danger-zone');
       if (dangerZone) {
         dangerZone.style.display = AdminApp.can('orders', 'delete') ? 'flex' : 'none';
@@ -346,15 +634,11 @@
       await this.confirmDeleteOrder(orderId, orderNum);
     },
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 2. ADMIN ORDER CREATION (Requirement 11)
-    // ═════════════════════════════════════════════════════════════════════════
     async openCreateOrderModal() {
       this.orderCart = [];
       document.getElementById('create-order-form').reset();
       this.renderOrderCart();
 
-      // Populate Pickup Location Select
       const locSelect = document.getElementById('create-order-pickup-location');
       if (locSelect) {
         locSelect.innerHTML = this.storeLocations.map((l) => `
@@ -362,7 +646,6 @@
         `).join('');
       }
 
-      // Load products for picker
       if (this.catalogProducts.length === 0) {
         try {
           const res = await AdminApp.api('/api/products?limit=100');
@@ -413,15 +696,15 @@
         const isOutOfStock = stockCount <= 0;
 
         return `
-          <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:border-slate-700 transition">
+          <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50 hover:border-slate-300 transition">
             <div class="flex items-center gap-2.5 min-w-0">
-              <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-9 h-9 object-cover rounded-lg border border-slate-800" onerror="this.src='/assets/images/products/placeholder.svg'" />
+              <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-9 h-9 object-cover rounded-lg border border-slate-200" onerror="this.src='/assets/images/products/placeholder.svg'" />
               <div class="min-w-0">
-                <p class="text-xs font-bold text-white truncate max-w-[200px]">${p.name}</p>
-                <p class="text-[10px] text-slate-400">${p.price} QAR &bull; <span class="${isOutOfStock ? 'text-rose-400 font-bold' : 'text-emerald-400'}">${isOutOfStock ? 'Out of Stock' : `${stockCount} available`}</span></p>
+                <p class="text-xs font-bold text-slate-900 truncate max-w-[200px]">${p.name}</p>
+                <p class="text-[10px] text-slate-500">${p.price} QAR &bull; <span class="${isOutOfStock ? 'text-rose-600 font-bold' : 'text-emerald-600'}">${isOutOfStock ? 'Out of Stock' : `${stockCount} available`}</span></p>
               </div>
             </div>
-            <button type="button" ${isOutOfStock ? 'disabled' : ''} onclick="AdminOrders.addItemToCart('${p.id || p.slug}')" class="px-2.5 py-1 rounded-lg bg-indigo-600 hover:bg-indigo-500 disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold text-white transition">
+            <button type="button" ${isOutOfStock ? 'disabled' : ''} onclick="AdminOrders.addItemToCart('${p.id || p.slug}')" class="px-2.5 py-1 rounded-lg bg-primary hover:bg-primary-hover disabled:opacity-30 disabled:cursor-not-allowed text-xs font-bold text-white transition">
               + Add
             </button>
           </div>
@@ -486,19 +769,19 @@
         const itemTotal = it.price * it.quantity;
         subtotal += itemTotal;
         return `
-          <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 text-xs">
+          <div class="flex items-center justify-between p-2.5 rounded-xl border border-slate-200 bg-slate-50 text-xs">
             <div class="flex items-center gap-2.5">
               <img src="${it.image}" class="w-8 h-8 rounded-lg object-cover" />
               <div>
-                <p class="font-bold text-white truncate max-w-[160px]">${it.name}</p>
-                <p class="text-[10px] text-slate-400">${it.price} QAR each</p>
+                <p class="font-bold text-slate-900 truncate max-w-[160px]">${it.name}</p>
+                <p class="text-[10px] text-slate-500">${it.price} QAR each</p>
               </div>
             </div>
             <div class="flex items-center gap-3">
-              <div class="flex items-center gap-1 bg-slate-800 rounded-lg p-0.5">
-                <button type="button" onclick="AdminOrders.updateCartQty('${it.product_id}', -1)" class="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-white">&minus;</button>
-                <span class="font-bold px-1.5">${it.quantity}</span>
-                <button type="button" onclick="AdminOrders.updateCartQty('${it.product_id}', 1)" class="w-5 h-5 flex items-center justify-center text-slate-300 hover:text-white">&plus;</button>
+              <div class="flex items-center gap-1 bg-slate-200 rounded-lg p-0.5">
+                <button type="button" onclick="AdminOrders.updateCartQty('${it.product_id}', -1)" class="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-900">&minus;</button>
+                <span class="font-bold text-slate-900 px-1.5">${it.quantity}</span>
+                <button type="button" onclick="AdminOrders.updateCartQty('${it.product_id}', 1)" class="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-900">&plus;</button>
               </div>
               <span class="font-bold text-white w-14 text-right">${itemTotal.toFixed(0)} QAR</span>
             </div>
@@ -580,9 +863,6 @@
       }
     },
 
-    // ═════════════════════════════════════════════════════════════════════════
-    // 3. TAX INVOICE GENERATION & PDF EXPORT
-    // ═════════════════════════════════════════════════════════════════════════
     async openInvoiceModal(orderIdOrObj) {
       let order = null;
       if (typeof orderIdOrObj === 'object' && orderIdOrObj !== null) {
@@ -647,7 +927,6 @@
       if (btn) btn.disabled = true;
       if (btnText) btnText.innerHTML = '<span class="inline-block animate-spin mr-1">⏳</span> Generating PDF...';
 
-      // Fallback if html2pdf is missing or blocked
       if (typeof window.html2pdf !== 'function') {
         console.warn('html2pdf.js is not loaded, falling back to browser print dialog');
         AdminApp.toast('PDF engine not ready, opening browser print dialog...', 'info');

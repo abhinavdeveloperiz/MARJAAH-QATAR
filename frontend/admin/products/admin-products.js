@@ -1,7 +1,4 @@
-/**
- * MARJAAH QATAR — Admin Products Catalog Controller (Requirement 4 & 14)
- * Handles catalog browsing, Add/Edit Product, Duplicate Product, and Bulk Actions.
- */
+
 
 (function () {
   'use strict';
@@ -23,26 +20,58 @@
 
     async load() {
       const container = document.getElementById('products-table-body');
-      if (container) {
-        container.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-slate-400">Loading catalog products...</td></tr>`;
+
+      const cachedProds = window.SmartCache?.getProducts();
+      const cachedCats = window.SmartCache?.getCategories();
+      const cachedBrands = window.SmartCache?.getBrands();
+
+      if (cachedProds && cachedProds.length > 0) {
+        this.products = cachedProds;
+        if (cachedCats && cachedCats.length > 0) this.categories = cachedCats;
+        if (cachedBrands && cachedBrands.length > 0) this.brands = cachedBrands;
+        this.populateFilterDropdowns();
+        this.renderTable();
+      } else if (container) {
+        container.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-12 text-center text-xs text-slate-400">
+              <div class="flex flex-col items-center justify-center gap-2">
+                <div class="w-6 h-6 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+                <span>Loading catalog products from cache &amp; cloud...</span>
+              </div>
+            </td>
+          </tr>`;
       }
 
+      this.revalidateCatalog();
+    },
+
+    async revalidateCatalog() {
       try {
         const [prodData, catData, brandData] = await Promise.all([
           AdminApp.api('/api/products?limit=1500&includeHidden=true&status=all'),
-          AdminApp.api('/api/categories'),
-          AdminApp.api('/api/brands'),
+          AdminApp.api('/api/categories').catch(() => ({ categories: [] })),
+          AdminApp.api('/api/brands').catch(() => ({ brands: [] })),
         ]);
 
-        this.products = prodData.products || prodData.items || prodData.data || prodData || [];
-        this.categories = catData.categories || catData.items || catData || [];
-        this.brands = brandData.brands || brandData.items || brandData || [];
+        const freshProds = prodData.products || prodData.items || prodData.data || prodData || [];
+        const freshCats = catData.categories || catData.items || catData || [];
+        const freshBrands = brandData.brands || brandData.items || brandData || [];
+
+        this.products = freshProds;
+        this.categories = freshCats;
+        this.brands = freshBrands;
+
+        window.SmartCache?.setProducts(freshProds);
+        window.SmartCache?.setCategories(freshCats);
+        window.SmartCache?.setBrands(freshBrands);
 
         this.populateFilterDropdowns();
         this.renderTable();
       } catch (err) {
-        console.error('Failed to load products:', err);
-        if (container) {
+        console.warn('Failed to background revalidate products:', err);
+        const container = document.getElementById('products-table-body');
+        if (container && (!this.products || this.products.length === 0)) {
           container.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-rose-400">Failed to load catalog products.</td></tr>`;
         }
       }
@@ -103,38 +132,41 @@
 
         const statusBadges = {
           active: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-          hidden: 'bg-slate-700/30 text-slate-400 border-slate-700',
-          pending_approval: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-          rejected: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+          hidden: 'bg-slate-100 text-slate-600 border-slate-200',
+          pending_approval: 'bg-amber-50 text-amber-700 border-amber-200',
+          rejected: 'bg-rose-50 text-rose-700 border-rose-200',
         };
         const statusBadge = statusBadges[status] || statusBadges.active;
 
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors ${isSelected ? 'bg-indigo-600/10' : ''}">
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors ${isSelected ? 'bg-primary/5' : ''}">
             <td class="py-3 px-3 text-center">
-              <input type="checkbox" data-prod-select="${p.id}" ${isSelected ? 'checked' : ''} onchange="AdminProducts.toggleSelect('${p.id}')" class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer accent-indigo-500" />
+              <input type="checkbox" data-prod-select="${p.id}" ${isSelected ? 'checked' : ''} onchange="AdminProducts.toggleSelect('${p.id}')" class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-0 cursor-pointer accent-primary" />
             </td>
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden border border-slate-800 bg-slate-900 flex-shrink-0">
-                  <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-full h-full object-cover" onerror="this.src='/assets/images/products/placeholder.svg'" />
-                </div>
+                <button type="button" onclick="window.openImageLightbox('${(p.image || '/assets/images/products/placeholder.svg').replace(/'/g, "\\'")}', '${(p.name || 'Product').replace(/'/g, "\\'")}', '${(p.sku || '').replace(/'/g, "\\'")}')" class="group relative w-10 h-10 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0 cursor-zoom-in hover:border-primary transition-all shadow-sm focus:outline-none" title="Click to view full screen image">
+                  <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                  <div class="absolute inset-0 bg-slate-900/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                  </div>
+                </button>
                 <div class="min-w-0">
-                  <p class="font-bold text-xs text-white truncate max-w-xs" title="${p.name}">${p.name}</p>
+                  <p class="font-bold text-xs text-slate-900 truncate max-w-xs" title="${p.name}">${p.name}</p>
                   <p class="text-[10px] text-slate-400 font-mono">${p.sku || p.slug || '—'}</p>
                 </div>
               </div>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-300">
-              <span class="font-medium text-slate-200">${p.category_name || p.category || 'General'}</span>
-              <p class="text-[10px] text-slate-500">${p.brand || '—'}</p>
+            <td class="py-3 px-4 text-xs text-slate-600">
+              <span class="font-medium text-slate-800">${p.category_name || p.category || 'General'}</span>
+              <p class="text-[10px] text-slate-400">${p.brand || '—'}</p>
             </td>
             <td class="py-3 px-4">
-              <span class="font-display font-black text-xs text-white">${Number(p.price || 0).toFixed(0)} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
-              ${p.original_price ? `<p class="text-[10px] text-slate-500 line-through">${p.original_price} QAR</p>` : ''}
+              <span class="font-display font-black text-xs text-slate-900">${Number(p.price || 0).toFixed(0)} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
+              ${p.original_price ? `<p class="text-[10px] text-slate-400 line-through">${p.original_price} QAR</p>` : ''}
             </td>
             <td class="py-3 px-4">
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isOutOfStock ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isOutOfStock ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'}">
                 ${isOutOfStock ? 'Out of Stock' : `${stockCount} in stock`}
               </span>
             </td>
@@ -145,13 +177,13 @@
             </td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-1.5">
-                <button type="button" onclick="AdminProducts.openModal('${p.id}')" title="Edit Product" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-slate-700/40 text-slate-300 hover:text-white transition cursor-pointer">
+                <button type="button" onclick="AdminProducts.openModal('${p.id}')" title="Edit Product" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
                 </button>
-                <button type="button" onclick="AdminProducts.duplicateProduct('${p.id}')" title="Duplicate Product (Req 14)" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-slate-700/40 text-indigo-300 hover:text-white transition cursor-pointer">
+                <button type="button" onclick="AdminProducts.duplicateProduct('${p.id}')" title="Duplicate Product (Req 14)" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-primary hover:text-primary-hover transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
                 </button>
-                <button type="button" onclick="AdminProducts.deleteProduct('${p.id}')" title="Delete Product" class="p-1.5 rounded-lg border border-slate-700/60 hover:bg-rose-500/20 text-rose-400 transition cursor-pointer">
+                <button type="button" onclick="AdminProducts.deleteProduct('${p.id}')" title="Delete Product" class="p-1.5 rounded-lg border border-slate-200 hover:bg-rose-50 text-rose-500 transition cursor-pointer">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -161,7 +193,7 @@
       }).join('');
 
       const noteHtml = filtered.length > 75
-        ? `<tr><td colspan="7" class="py-3 px-4 text-center text-xs text-indigo-400 bg-indigo-500/5 border-t border-slate-800">Showing top 75 of ${filtered.length} matching products. Type in search to refine results.</td></tr>`
+        ? `<tr><td colspan="7" class="py-3 px-4 text-center text-xs text-primary bg-primary/5 border-t border-slate-200">Showing top 75 of ${filtered.length} matching products. Type in search to refine results.</td></tr>`
         : '';
 
       container.innerHTML = rowsHtml + noteHtml;
@@ -289,6 +321,9 @@
             method: 'POST',
             body: JSON.stringify(payload),
           });
+          const created = res.product || { ...payload, id: res.id || 'prod_' + Date.now() };
+          window.SmartCache?.updateProduct(created);
+
           if (res.status === 'pending_approval') {
             AdminApp.toast('Product saved and queued for Administrator Approval.', 'info');
           } else {
@@ -299,6 +334,9 @@
             method: 'PATCH',
             body: JSON.stringify(payload),
           });
+          const updated = res.product || { ...payload, id: this.selectedProdId };
+          window.SmartCache?.updateProduct(updated);
+
           if (res.status === 'pending_approval') {
             AdminApp.toast('Modifications queued for Administrator Approval.', 'info');
           } else {
@@ -319,6 +357,7 @@
         await AdminApp.api(`/api/products/${prodId}`, {
           method: 'DELETE',
         });
+        window.SmartCache?.removeProduct(prodId);
         AdminApp.toast('Product deleted successfully.', 'success');
         await this.load();
       } catch (err) {

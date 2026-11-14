@@ -1,8 +1,4 @@
-/**
- * MARJAAH QATAR — Customer Analytics & Management Controller (Requirement 2)
- * Handles customer overview KPIs, presence tracking (Online/Offline), server-side pagination,
- * customer profile drawers, order history, and account suspension/activation.
- */
+
 
 (function () {
   'use strict';
@@ -36,7 +32,6 @@
       ]);
     },
 
-    // ── 1. CUSTOMER OVERVIEW DASHBOARD (Requirement 2.A) ──
     async loadAnalytics() {
       try {
         const data = await AdminApp.api('/api/admin/customers/analytics');
@@ -60,16 +55,16 @@
       const recentEl = document.getElementById('kpi-cust-recent');
       const badgeOnline = document.getElementById('badge-online-customers');
 
-      if (totalEl) totalEl.textContent = Number(a.total_customers || 0).toLocaleString();
-      if (activeEl) activeEl.textContent = Number(a.active_customers || 0).toLocaleString();
-      if (onlineEl) onlineEl.textContent = Number(a.online_customers || 0).toLocaleString();
-      if (offlineEl) offlineEl.textContent = Number(a.offline_customers || 0).toLocaleString();
-      if (newEl) newEl.textContent = Number(a.new_customers || 0).toLocaleString();
-      if (retEl) retEl.textContent = Number(a.returning_customers || 0).toLocaleString();
-      if (recentEl) recentEl.textContent = Number(a.recently_active || 0).toLocaleString();
+      if (totalEl) totalEl.textContent = Number(a.total_customers ?? 0).toLocaleString();
+      if (activeEl) activeEl.textContent = Number(a.active_customers ?? 0).toLocaleString();
+      if (onlineEl) onlineEl.textContent = Number(a.online_customers ?? 0).toLocaleString();
+      if (offlineEl) offlineEl.textContent = Number(a.offline_customers ?? 0).toLocaleString();
+      if (newEl) newEl.textContent = Number(a.new_customers ?? 0).toLocaleString();
+      if (retEl) retEl.textContent = Number(a.returning_customers ?? 0).toLocaleString();
+      if (recentEl) recentEl.textContent = Number(a.recently_active ?? 0).toLocaleString();
 
       if (badgeOnline) {
-        const count = a.online_customers || 0;
+        const count = Number(a.online_customers ?? 0);
         badgeOnline.textContent = `${count} Online`;
         badgeOnline.style.display = count > 0 ? 'inline-flex' : 'none';
       }
@@ -80,7 +75,6 @@
       }
     },
 
-    // ── 2. PAGINATED CUSTOMER DIRECTORY (Requirements 2.B & 2.E) ──
     async loadCustomers() {
       if (this.abortController) {
         this.abortController.abort();
@@ -153,32 +147,32 @@
         const name = c.name || c.username || 'Customer';
         const initial = name.charAt(0).toUpperCase();
         const avatarHtml = c.avatar
-          ? `<img src="${c.avatar}" class="w-9 h-9 rounded-xl object-cover border border-slate-700 bg-slate-800" onerror="this.outerHTML='<div class=\\'w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 font-bold flex items-center justify-center text-xs\\'>${initial}</div>'" />`
-          : `<div class="w-9 h-9 rounded-xl bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 font-bold flex items-center justify-center text-xs flex-shrink-0">${initial}</div>`;
+          ? `<img src="${c.avatar}" class="w-9 h-9 rounded-xl object-cover border border-slate-200 bg-slate-100" onerror="this.outerHTML='<div class=\\'w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold flex items-center justify-center text-xs\\'>${initial}</div>'" />`
+          : `<div class="w-9 h-9 rounded-xl bg-primary/10 border border-primary/20 text-primary font-bold flex items-center justify-center text-xs flex-shrink-0">${initial}</div>`;
 
         const isOnline = Boolean(c.is_online);
         const presenceBadge = isOnline
-          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>Online Now</span>`
-          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-800 text-slate-400 border border-slate-700/80"><span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>Offline</span>`;
+          ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>Online Now</span>`
+          : `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Offline</span>`;
 
         const lastSeenText = this.formatRelativeTime(c.last_seen);
         const joinedDate = c.created_at ? new Date(c.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
         const isSuspended = c.status === 'suspended';
         const statusBadge = isSuspended
-          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/15 text-rose-300 border border-rose-500/30">Suspended</span>`
-          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">Active</span>`;
+          ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Suspended</span>`
+          : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">Active</span>`;
 
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors text-xs">
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors text-xs">
             <!-- Customer -->
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
                 ${avatarHtml}
                 <div class="min-w-0">
-                  <button type="button" onclick="AdminCustomers.viewDetails('${c.id}')" class="font-bold text-white hover:text-indigo-400 transition text-left block truncate max-w-[180px] cursor-pointer">
+                  <button type="button" onclick="AdminCustomers.viewDetails('${c.id}')" class="font-bold text-slate-900 hover:text-primary transition text-left block truncate max-w-[180px] cursor-pointer">
                     ${name}
                   </button>
-                  <span class="text-[10px] text-slate-500 font-mono block truncate">@${c.username || c.id}</span>
+                  <span class="text-[10px] text-slate-400 font-mono block truncate">@${c.username || c.id}</span>
                 </div>
               </div>
             </td>
@@ -186,7 +180,7 @@
             <!-- Contact -->
             <td class="py-3 px-4">
               <div class="min-w-0">
-                <span class="text-slate-300 block truncate max-w-[200px]">${c.email || '—'}</span>
+                <span class="text-slate-700 block truncate max-w-[200px]">${c.email || '—'}</span>
                 <span class="text-[11px] text-slate-500 font-mono block">${c.phone || '—'}</span>
               </div>
             </td>
@@ -284,7 +278,6 @@
       }, 250);
     },
 
-    // ── FILTER POP-UP MENU CONTROLS ──
     toggleFilterMenu(event) {
       if (event) event.stopPropagation();
       const popover = document.getElementById('customers-filter-popover');
@@ -364,9 +357,9 @@
         const isSelected = (k === 'sort' && v === currentSort) || (k !== 'sort' && this.filters[k] === v);
 
         if (isSelected) {
-          btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold border border-indigo-500 bg-indigo-600 text-white transition text-center cursor-pointer shadow-sm';
+          btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-bold border border-primary bg-primary text-white transition text-center cursor-pointer shadow-sm';
         } else {
-          btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-700/60 bg-slate-800/80 text-slate-300 hover:text-white transition text-center cursor-pointer';
+          btn.className = 'px-2.5 py-1.5 rounded-lg text-xs font-medium border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition text-center cursor-pointer';
         }
       });
 
@@ -380,11 +373,11 @@
           const pills = [];
 
           if (this.filters.presence !== 'all') {
-            const label = this.filters.presence === 'online' ? '🟢 Online (≤15m)' : '⚫ Offline';
+            const label = this.filters.presence === 'online' ? '🟢 Online (≤30s)' : '⚫ Offline';
             pills.push(`
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 border border-slate-700 text-slate-200">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 border border-slate-200 text-slate-700">
                 <span>Presence: <strong>${label}</strong></span>
-                <button type="button" onclick="AdminCustomers.setFilter('presence', 'all')" class="hover:text-rose-400 font-bold transition cursor-pointer">&times;</button>
+                <button type="button" onclick="AdminCustomers.setFilter('presence', 'all')" class="hover:text-rose-500 font-bold transition cursor-pointer">&times;</button>
               </span>
             `);
           }
@@ -392,9 +385,9 @@
           if (this.filters.status !== 'all') {
             const label = this.filters.status === 'active' ? 'Active' : 'Suspended';
             pills.push(`
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 border border-slate-700 text-slate-200">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 border border-slate-200 text-slate-700">
                 <span>Status: <strong>${label}</strong></span>
-                <button type="button" onclick="AdminCustomers.setFilter('status', 'all')" class="hover:text-rose-400 font-bold transition cursor-pointer">&times;</button>
+                <button type="button" onclick="AdminCustomers.setFilter('status', 'all')" class="hover:text-rose-500 font-bold transition cursor-pointer">&times;</button>
               </span>
             `);
           }
@@ -402,9 +395,9 @@
           if (this.filters.date_range !== 'all') {
             const map = { today: 'Today', '7d': 'Last 7 Days', '30d': 'Last 30 Days', '90d': 'Last 90 Days' };
             pills.push(`
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 border border-slate-700 text-slate-200">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 border border-slate-200 text-slate-700">
                 <span>Joined: <strong>${map[this.filters.date_range] || this.filters.date_range}</strong></span>
-                <button type="button" onclick="AdminCustomers.setFilter('date_range', 'all')" class="hover:text-rose-400 font-bold transition cursor-pointer">&times;</button>
+                <button type="button" onclick="AdminCustomers.setFilter('date_range', 'all')" class="hover:text-rose-500 font-bold transition cursor-pointer">&times;</button>
               </span>
             `);
           }
@@ -418,15 +411,15 @@
               'name-asc': 'Name (A-Z)'
             };
             pills.push(`
-              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-800 border border-slate-700 text-slate-200">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-100 border border-slate-200 text-slate-700">
                 <span>Sort: <strong>${sortMap[currentSort] || currentSort}</strong></span>
-                <button type="button" onclick="AdminCustomers.setFilter('sort', 'created_at-desc')" class="hover:text-rose-400 font-bold transition cursor-pointer">&times;</button>
+                <button type="button" onclick="AdminCustomers.setFilter('sort', 'created_at-desc')" class="hover:text-rose-500 font-bold transition cursor-pointer">&times;</button>
               </span>
             `);
           }
 
           pills.push(`
-            <button type="button" onclick="AdminCustomers.resetFilters()" class="text-xs text-indigo-400 hover:text-indigo-300 underline font-semibold transition ml-1 cursor-pointer">
+            <button type="button" onclick="AdminCustomers.resetFilters()" class="text-xs text-primary hover:underline font-semibold transition ml-1 cursor-pointer">
               Clear All Filters
             </button>
           `);
@@ -505,13 +498,11 @@
       }
     },
 
-    // ── 3. INDIVIDUAL CUSTOMER DETAILS (Requirement 2.C) ──
     async viewDetails(customerId) {
       const modal = document.getElementById('customer-details-modal');
       if (!modal) return;
       modal.classList.remove('hidden');
 
-      // Set loading state
       document.getElementById('cust-modal-name').textContent = 'Loading customer profile...';
       document.getElementById('cust-modal-email').textContent = '';
       document.getElementById('cust-modal-orders-list').innerHTML = `<tr><td colspan="5" class="py-6 text-center text-slate-500">Loading order history...</td></tr>`;
@@ -566,7 +557,6 @@
         document.getElementById('cust-modal-last-seen').textContent = `${lastSeenDate} (${this.formatRelativeTime(cust.last_seen)})`;
         document.getElementById('cust-modal-last-login').textContent = lastLoginDate;
 
-        // Render customer's order history
         const ordersBadge = document.getElementById('cust-modal-orders-badge');
         if (ordersBadge) ordersBadge.textContent = `${(cust.orders || []).length} total`;
 
@@ -598,7 +588,6 @@
           }
         }
 
-        // Toggle Status Button
         const toggleBtn = document.getElementById('cust-modal-toggle-status-btn');
         if (toggleBtn) {
           toggleBtn.textContent = isSuspended ? 'Reactivate Account' : 'Suspend Account';
@@ -620,7 +609,6 @@
       this.selectedCustomer = null;
     },
 
-    // ── 4. STATUS TOGGLE (Suspend / Activate) ──
     async toggleStatus(customerId, currentStatus, fromModal = false) {
       const newStatus = currentStatus === 'suspended' ? 'active' : 'suspended';
       const actionName = newStatus === 'suspended' ? 'suspend' : 'reactivate';
@@ -645,7 +633,6 @@
       }
     },
 
-    // ── 5. EXPORT CSV ──
     async exportCSV() {
       try {
         AdminApp.toast('Generating customer export CSV...', 'info');
@@ -685,13 +672,13 @@
       }
     },
 
-    // ── HELPERS ──
     formatRelativeTime(isoDateStr) {
       if (!isoDateStr) return 'Never seen';
       const time = new Date(isoDateStr).getTime();
       if (isNaN(time)) return 'Never seen';
       const diffMs = Date.now() - time;
-      if (diffMs < 60 * 1000) return 'Just now';
+      if (diffMs < 30 * 1000) return 'Online (Just now)';
+      if (diffMs < 60 * 1000) return `${Math.floor(diffMs / 1000)}s ago`;
       const diffMin = Math.floor(diffMs / (60 * 1000));
       if (diffMin < 60) return `${diffMin}m ago`;
       const diffHours = Math.floor(diffMin / 60);

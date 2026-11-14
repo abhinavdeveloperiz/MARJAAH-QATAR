@@ -143,6 +143,7 @@ export class AdminController {
   }
 
   @Put('roles/:id')
+  @Patch('roles/:id')
   @RequirePermission('roles_permissions', 'edit')
   async updateRole(@Param('id') id: string, @Body() body: any, @Request() req: any) {
     return this.adminService.updateRole(id, body, req.user);
@@ -161,9 +162,33 @@ export class AdminController {
     return this.adminService.getApprovalConfigs();
   }
 
+  @Get('approvals/configs')
+  @RequirePermission('approvals', 'view')
+  async getApprovalConfigsPlural() {
+    return this.adminService.getApprovalConfigs();
+  }
+
+  @Post('approvals/configs')
+  @RequirePermission('approvals', 'manage')
+  async saveApprovalConfigs(@Body() body: any, @Request() req: any) {
+    return this.adminService.saveModuleApprovalConfig(body, req.user);
+  }
+
+  @Post('approvals/config')
+  @RequirePermission('approvals', 'manage')
+  async saveApprovalConfigSingle(@Body() body: any, @Request() req: any) {
+    return this.adminService.saveModuleApprovalConfig(body, req.user);
+  }
+
   @Put('approvals/config/:id')
   @RequirePermission('approvals', 'manage')
   async updateApprovalConfig(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.adminService.updateApprovalConfig(id, body, req.user);
+  }
+
+  @Put('approvals/configs/:id')
+  @RequirePermission('approvals', 'manage')
+  async updateApprovalConfigPlural(@Param('id') id: string, @Body() body: any, @Request() req: any) {
     return this.adminService.updateApprovalConfig(id, body, req.user);
   }
 

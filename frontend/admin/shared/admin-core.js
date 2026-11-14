@@ -1,12 +1,6 @@
-/**
- * MARJAAH QATAR — Enterprise Admin Panel Core Controller
- * Handles authentication, routing, RBAC authorization, and module dispatching.
- */
-
 (function () {
   'use strict';
 
-  // Global Admin Application State
   window.AdminApp = {
     token: localStorage.getItem('marjaah_admin_token') || '',
     user: (() => {
@@ -22,7 +16,6 @@
     stats: {},
     refreshInterval: null,
 
-    // ── 1. API HELPER WITH AUTOMATIC AUTH HEADER & ERROR HANDLING ──
     async api(url, options = {}) {
       const opts = { ...options };
       opts.headers = {
@@ -36,19 +29,18 @@
 
       try {
         const res = await fetch(url, opts);
-        
-        // Auto-retry transient gateway/proxy errors (502, 503, 504)
+
         if ((res.status === 502 || res.status === 503 || res.status === 504) && (opts._retryCount || 0) < 2) {
-          console.warn(`[AdminApp] Received ${res.status} on ${url}. Retrying in 1.2s...`);
           await new Promise((r) => setTimeout(r, 1200));
           return this.api(url, { ...opts, _retryCount: (opts._retryCount || 0) + 1 });
         }
 
         if (res.status === 401) {
           if (!opts.skipAuthRedirect) {
-            console.warn('[AdminApp] Unauthorized 401 received. Redirecting to login.');
             this.logout(false);
-            this.showLoginModal('Session expired. Please sign in again.');
+            if (window.AdminAuth) {
+              window.AdminAuth.showLoginModal('Session expired. Please sign in again.');
+            }
           }
           throw new Error('Unauthorized');
         }
@@ -59,12 +51,10 @@
         }
         return data;
       } catch (err) {
-        console.error(`[AdminApp API Error] ${url}:`, err);
         throw err;
       }
     },
 
-    // ── 2. PERMISSION CHECK (IAM RBAC) ──
     can(module, action = 'view') {
       if (!this.user) return false;
       if (
@@ -81,34 +71,42 @@
       if (Array.isArray(modPerms)) {
         return modPerms.includes(action) || modPerms.includes('manage') || modPerms.includes('*');
       }
-      return Boolean(modPerms[action] || modPerms['manage']);
+      if (typeof modPerms === 'object') {
+        return Boolean(modPerms[action] || modPerms['manage'] || modPerms['*']);
+      }
+      return false;
     },
 
-    // ── 3. INITIALIZATION ──
     async init() {
       this.bindGlobalEvents();
 
       if (!this.token) {
-        this.showLoginModal();
+        if (window.AdminAuth) window.AdminAuth.showLoginModal();
         return;
       }
 
       try {
         await this.loadCurrentStaff();
-        this.hideLoginModal();
+        if (window.AdminAuth) window.AdminAuth.hideLoginModal();
         this.updatePendingBadges();
         this.navigateTo(this.getInitialTab());
 
-        // Refresh badges every 60 seconds
+        setTimeout(() => {
+          if (window.SmartCache && window.SmartCache.getProducts().length === 0) {
+            window.AdminOrders?.preloadCatalogProducts();
+          }
+        }, 500);
+
         if (this.refreshInterval) clearInterval(this.refreshInterval);
         this.refreshInterval = setInterval(() => this.updatePendingBadges(), 60000);
       } catch (err) {
-        console.error('[AdminApp] Auth validation failed:', err);
         if (!this.user) {
           this.logout(false);
-          this.showLoginModal('Please sign in to access the Admin Panel.');
+          if (window.AdminAuth) {
+            window.AdminAuth.showLoginModal('Please sign in to access the Admin Panel.');
+          }
         } else {
-          this.hideLoginModal();
+          if (window.AdminAuth) window.AdminAuth.hideLoginModal();
           this.navigateTo(this.getInitialTab());
         }
       }
@@ -119,22 +117,21 @@
       return hash || 'dashboard';
     },
 
-    // ── 4. LOAD CURRENT USER & ROLE ──
     async loadCurrentStaff() {
       let data = null;
       try {
         data = await this.api('/api/admin/me', { skipAuthRedirect: true });
       } catch (err) {
-        console.warn('[AdminApp] /api/admin/me unavailable, falling back to /api/auth/me:', err);
         try {
           data = await this.api('/api/auth/me', { skipAuthRedirect: true });
         } catch (e2) {
           if (this.user) {
-            console.log('[AdminApp] Using cached user session:', this.user);
             data = { user: this.user };
           } else {
             this.logout(false);
-            this.showLoginModal('Session expired. Please sign in again.');
+            if (window.AdminAuth) {
+              window.AdminAuth.showLoginModal('Session expired. Please sign in again.');
+            }
             throw err;
           }
         }
@@ -164,13 +161,11 @@
       if (roleEl) roleEl.textContent = roleName;
       if (avatarEl) avatarEl.textContent = displayName.charAt(0).toUpperCase();
 
-      // Top bar user badge
       const topName = document.getElementById('topbar-staff-name');
       const topRole = document.getElementById('topbar-staff-role');
       if (topName) topName.textContent = displayName;
       if (topRole) topRole.textContent = roleName;
 
-      // Filter sidebar links based on module permissions
       document.querySelectorAll('[data-admin-module]').forEach((item) => {
         const mod = item.getAttribute('data-admin-module');
         if (!this.can(mod, 'view')) {
@@ -181,9 +176,15 @@
       });
     },
 
-    // ── 5. NAVIGATION / TAB DISPATCHER ──
     navigateTo(tabName) {
-      const permModule = tabName === 'returns-cancellations' ? 'orders' : tabName;
+      const permMap = {
+        'returns-cancellations': 'orders',
+        'users': 'admin_users',
+        'roles': 'roles_permissions',
+        'audit': 'audit_logs',
+        'locations': 'store_locations',
+      };
+      const permModule = permMap[tabName] || tabName;
       if (!this.can(permModule, 'view') && tabName !== 'dashboard') {
         this.toast('You do not have permission to view this section.', 'error');
         return;
@@ -192,19 +193,17 @@
       this.activeTab = tabName;
       window.location.hash = tabName;
 
-      // Update sidebar active highlights
       document.querySelectorAll('.sidebar-nav-item').forEach((item) => {
         const itemTab = item.getAttribute('data-tab');
         if (itemTab === tabName) {
-          item.classList.add('active', 'bg-indigo-600/20', 'text-white', 'border-indigo-500');
-          item.classList.remove('text-slate-400', 'border-transparent');
+          item.classList.add('active');
+          item.classList.remove('text-slate-600');
         } else {
-          item.classList.remove('active', 'bg-indigo-600/20', 'text-white', 'border-indigo-500');
-          item.classList.add('text-slate-400', 'border-transparent');
+          item.classList.remove('active');
+          item.classList.add('text-slate-600');
         }
       });
 
-      // Update view panels
       document.querySelectorAll('.admin-tab-pane').forEach((pane) => {
         pane.classList.add('hidden');
       });
@@ -213,20 +212,16 @@
         activePane.classList.remove('hidden');
       }
 
-      // Reset scroll position to top of workspace
       const mainEl = document.querySelector('main');
       if (mainEl) mainEl.scrollTop = 0;
 
-      // Update Breadcrumb
       const bc = document.getElementById('admin-breadcrumb-current');
       if (bc) {
         bc.textContent = this.formatTabTitle(tabName);
       }
 
-      // Close mobile sidebar if open
       this.closeMobileSidebar();
 
-      // Dispatch module loaders
       switch (tabName) {
         case 'dashboard':
           if (window.AdminDashboard) window.AdminDashboard.load();
@@ -293,7 +288,6 @@
       return map[tab] || (tab.charAt(0).toUpperCase() + tab.slice(1));
     },
 
-    // ── 6. PENDING COUNTERS & NOTIFICATION BADGES ──
     async updatePendingBadges() {
       try {
         const [approvalsRes, ordersRes, custRes, returnsRes] = await Promise.allSettled([
@@ -344,88 +338,30 @@
             badge.style.display = pendingCount > 0 ? 'inline-flex' : 'none';
           }
         }
-      } catch (e) {
-        console.warn('Failed to update pending badges:', e);
-      }
+      } catch (e) {}
     },
 
-    // ── 7. LOGIN & LOGOUT ──
     showLoginModal(msg = '') {
-      const modal = document.getElementById('admin-login-modal');
-      const errEl = document.getElementById('admin-login-error');
-      if (modal) modal.classList.remove('hidden');
-      if (errEl) {
-        errEl.textContent = msg;
-        errEl.classList.toggle('hidden', !msg);
-      }
+      if (window.AdminAuth) window.AdminAuth.showLoginModal(msg);
     },
 
     hideLoginModal() {
-      const modal = document.getElementById('admin-login-modal');
-      if (modal) modal.classList.add('hidden');
-    },
-
-    async handleLogin(username, password) {
-      const errEl = document.getElementById('admin-login-error');
-      const submitBtn = document.getElementById('admin-login-submit-btn');
-
-      if (errEl) errEl.classList.add('hidden');
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = 'Verifying credentials...';
-      }
-
-      try {
-        const res = await fetch('/api/auth/admin-login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password }),
-        });
-
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.message || 'Invalid credentials');
-        }
-
-        this.token = data.token;
-        this.user = data.user || null;
-        localStorage.setItem('marjaah_admin_token', this.token);
-        if (this.user) {
-          localStorage.setItem('marjaah_admin_user', JSON.stringify(this.user));
-        }
-        if (window.api && typeof window.api.setToken === 'function') {
-          window.api.setToken(this.token);
-        }
-
-        this.toast('Authentication successful. Welcome to Admin Portal.', 'success');
-        this.hideLoginModal();
-        await this.init();
-      } catch (err) {
-        console.error('Admin login error:', err);
-        if (errEl) {
-          errEl.textContent = err.message || 'Login failed. Please verify credentials.';
-          errEl.classList.remove('hidden');
-        }
-      } finally {
-        if (submitBtn) {
-          submitBtn.disabled = false;
-          submitBtn.innerHTML = 'Sign In to Management';
-        }
-      }
+      if (window.AdminAuth) window.AdminAuth.hideLoginModal();
     },
 
     logout(notify = true) {
-      this.token = '';
-      this.user = null;
-      this.role = null;
-      localStorage.removeItem('marjaah_admin_token');
-      localStorage.removeItem('marjaah_admin_user');
-      if (this.refreshInterval) clearInterval(this.refreshInterval);
-      if (notify) this.toast('Logged out successfully.', 'info');
-      this.showLoginModal();
+      if (window.AdminAuth) {
+        window.AdminAuth.logout(notify);
+      } else {
+        this.token = '';
+        this.user = null;
+        this.role = null;
+        localStorage.removeItem('marjaah_admin_token');
+        localStorage.removeItem('marjaah_admin_user');
+        if (this.refreshInterval) clearInterval(this.refreshInterval);
+      }
     },
 
-    // ── 8. RESPONSIVE SIDEBAR TOGGLE ──
     toggleSidebar() {
       const sidebar = document.getElementById('admin-sidebar');
       const overlay = document.getElementById('admin-sidebar-overlay');
@@ -450,7 +386,6 @@
       if (overlay) overlay.classList.add('hidden');
     },
 
-    // ── 9. TOAST NOTIFICATIONS ──
     toast(message, type = 'info') {
       const container = document.getElementById('admin-toast-container');
       if (!container) {
@@ -490,9 +425,7 @@
       }, 4000);
     },
 
-    // ── 10. GLOBAL EVENT BINDING ──
     bindGlobalEvents() {
-      // Sidebar tab links
       document.querySelectorAll('.sidebar-nav-item').forEach((item) => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
@@ -501,7 +434,6 @@
         });
       });
 
-      // Quick action button (+ New Product, + New Order)
       const btnNewProduct = document.getElementById('topbar-btn-new-product');
       if (btnNewProduct) {
         btnNewProduct.addEventListener('click', () => {
@@ -522,18 +454,6 @@
         });
       }
 
-      // Login form submit
-      const loginForm = document.getElementById('admin-login-form');
-      if (loginForm) {
-        loginForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const u = document.getElementById('admin-login-username').value.trim();
-          const p = document.getElementById('admin-login-password').value;
-          this.handleLogin(u, p);
-        });
-      }
-
-      // Password visibility toggles (Eye icon toggle)
       const setupPasswordToggle = (btnId, inputId) => {
         const btn = document.getElementById(btnId);
         const input = document.getElementById(inputId);
@@ -552,7 +472,6 @@
       setupPasswordToggle('admin-login-toggle-pw', 'admin-login-password');
       setupPasswordToggle('user-modal-toggle-pw', 'user-modal-password');
 
-      // Logout buttons
       document.querySelectorAll('[data-admin-action="logout"]').forEach((btn) => {
         btn.addEventListener('click', (e) => {
           e.preventDefault();
@@ -562,7 +481,6 @@
         });
       });
 
-      // Sidebar collapse toggle
       const toggleBtn = document.getElementById('sidebar-toggle-btn');
       if (toggleBtn) {
         toggleBtn.addEventListener('click', () => this.toggleSidebar());
@@ -572,17 +490,65 @@
         overlay.addEventListener('click', () => this.closeMobileSidebar());
       }
 
-      // Notification bell
       const bell = document.getElementById('topbar-notification-bell');
       if (bell) {
         bell.addEventListener('click', () => {
           this.navigateTo('approvals');
         });
       }
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const lb = document.getElementById('image-lightbox-modal');
+          if (lb && !lb.classList.contains('hidden')) {
+            window.closeImageLightbox();
+          }
+        }
+      });
     },
   };
 
-  // Launch on DOM ready
+  window.openImageLightbox = function (src, title = 'Product Image Preview', sku = '') {
+    const modal = document.getElementById('image-lightbox-modal');
+    const img = document.getElementById('image-lightbox-img');
+    const titleEl = document.getElementById('image-lightbox-title');
+    const skuEl = document.getElementById('image-lightbox-sku');
+    const downloadLink = document.getElementById('image-lightbox-download');
+    if (!modal || !img) return;
+
+    const validSrc = src || '/assets/images/products/placeholder.svg';
+    img.src = validSrc;
+    if (titleEl) titleEl.textContent = title || 'Product Image Preview';
+    if (skuEl) {
+      skuEl.textContent = sku ? `SKU: ${sku}` : '';
+      skuEl.style.display = sku ? 'inline-block' : 'none';
+    }
+    if (downloadLink) {
+      downloadLink.href = validSrc;
+    }
+
+    modal.classList.remove('hidden');
+    requestAnimationFrame(() => {
+      modal.classList.remove('opacity-0');
+      modal.classList.add('opacity-100');
+    });
+  };
+
+  window.closeImageLightbox = function (e) {
+    if (e && e.target && e.target.closest('#image-lightbox-modal > div')) {
+      return;
+    }
+    const modal = document.getElementById('image-lightbox-modal');
+    if (!modal) return;
+    modal.classList.remove('opacity-100');
+    modal.classList.add('opacity-0');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+      const img = document.getElementById('image-lightbox-img');
+      if (img) img.src = '';
+    }, 200);
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
     window.AdminApp.init();
   });

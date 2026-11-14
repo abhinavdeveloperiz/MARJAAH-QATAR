@@ -336,7 +336,7 @@ export class AdminService implements OnModuleInit {
       session_revoked_at: null,
     };
 
-    const docRef = await this.firestore.collection('admin_users').add(payload);
+    await this.firestore.collection('admin_users').doc(username).set(payload);
 
     // Also mirror to admin_credentials for backward compatibility
     await this.firestore.collection('admin_credentials').doc(username).set({
@@ -357,13 +357,13 @@ export class AdminService implements OnModuleInit {
       admin_username: currentAdmin.username || 'admin',
       action: 'create',
       module: 'admin_users',
-      target_id: docRef.id,
+      target_id: username,
       target_title: `${username} (${email})`,
       details: { role_ids: roleIds, roles: roleNames, status: payload.status },
     });
 
     const { password, ...safeUser } = payload;
-    return { id: docRef.id, ...safeUser };
+    return { id: username, ...safeUser };
   }
 
   async updateAdminUser(id: string, dto: Partial<AdminUserDto>, currentAdmin: any) {
@@ -502,7 +502,6 @@ export class AdminService implements OnModuleInit {
     if (username) {
       await this.firestore.collection('admin_credentials').doc(username).set({
         password: hashedPassword,
-        raw_password: newPassword,
         updated_at: now,
       }, { merge: true });
     }
@@ -579,12 +578,12 @@ export class AdminService implements OnModuleInit {
     throw new NotFoundException(`Role "${id}" not found`);
   }
 
-  async createRole(dto: { name: string; description?: string; permissions: Record<string, string[]> }, currentAdmin: any) {
+  async createRole(dto: { name: string; slug?: string; description?: string; permissions: Record<string, string[]> }, currentAdmin: any) {
     if (!dto.name) {
       throw new BadRequestException('Role name is required');
     }
 
-    const slug = dto.name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+    const slug = (dto.slug || dto.name).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
     const snap = await this.firestore.collection('admin_roles').doc(slug).get();
     if (snap.exists || SYSTEM_DEFAULT_ROLES.some((r) => r.id === slug)) {
       throw new BadRequestException(`Role with slug "${slug}" already exists`);
@@ -678,7 +677,50 @@ export class AdminService implements OnModuleInit {
   async getApprovalConfigs() {
     const snap = await this.firestore.collection('approval_configs').get();
     const configs = snap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
-    return configs;
+    return { configs, items: configs };
+  }
+
+  async saveModuleApprovalConfig(dto: { module: string; requires_approval?: boolean; operations?: string[] }, currentAdmin: any) {
+    const module = dto.module;
+    const ops = Array.isArray(dto.operations) ? dto.operations : [];
+    const requires_approval = dto.requires_approval !== undefined ? Boolean(dto.requires_approval) : ops.length > 0;
+    const now = new Date().toISOString();
+
+    const allOps = ['create', 'edit', 'delete'];
+    for (const op of allOps) {
+      const isReq = ops.includes(op);
+      await this.firestore.collection('approval_configs').doc(`${module}_${op}`).set({
+        id: `${module}_${op}`,
+        module,
+        operation: op,
+        requires_approval: isReq,
+        updated_at: now,
+        updated_by: currentAdmin.username || 'admin',
+      }, { merge: true });
+    }
+
+    const summaryRef = this.firestore.collection('approval_configs').doc(module);
+    const summaryData = {
+      id: module,
+      module,
+      requires_approval,
+      operations: ops,
+      updated_at: now,
+      updated_by: currentAdmin.username || 'admin',
+    };
+    await summaryRef.set(summaryData, { merge: true });
+
+    await this.auditService.log({
+      admin_id: String(currentAdmin.id || currentAdmin.sub || 'admin'),
+      admin_username: currentAdmin.username || 'admin',
+      action: 'edit',
+      module: 'approvals',
+      target_id: module,
+      target_title: `Approval Config: ${module}`,
+      details: { module, operations: ops, requires_approval },
+    });
+
+    return summaryData;
   }
 
   async isApprovalRequired(module: string, operation: string): Promise<boolean> {
@@ -980,7 +1022,7 @@ export class AdminService implements OnModuleInit {
   // ═══════════════════════════════════════════════════════════════════════════
   private cachedDashboardAnalytics: Record<string, any> = {};
   private dashboardCacheExpiresAt = 0;
-  private readonly DASHBOARD_CACHE_TTL_MS = 25 * 1000; // 25s fast in-memory cache
+  private readonly DASHBOARD_CACHE_TTL_MS = 5 * 1000;
 
   public invalidateDashboardCache() {
     this.cachedDashboardAnalytics = {};
@@ -1229,7 +1271,15 @@ export class AdminService implements OnModuleInit {
       salesTimeline,
       bestSellers,
       categoryDistribution,
-      lowStockProducts: lowStock.slice(0, 10),
+      lowStockProducts: lowStock.slice(0, 10).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        sku: p.sku || p.id,
+        stock_count: p.stock_count,
+        price: p.price,
+        image: p.image,
+        category: p.category || p.category_name,
+      })),
       recentOrders: allOrders.slice(0, 15),
       traffic: trafficSummary,
       customerMetrics: await this.getCustomerAnalytics(),
@@ -1503,7 +1553,7 @@ export class AdminService implements OnModuleInit {
   private cachedCustomerUsers: any[] | null = null;
   private cachedCustomerOrders: any[] | null = null;
   private customerCacheExpiresAt = 0;
-  private readonly CUSTOMER_CACHE_TTL_MS = 25 * 1000; // 25 seconds fast cache
+  private readonly CUSTOMER_CACHE_TTL_MS = 5 * 1000;
 
   private async getCachedUsersAndOrders(): Promise<[any[], any[]]> {
     const now = Date.now();
@@ -1541,11 +1591,10 @@ export class AdminService implements OnModuleInit {
     const customers = allUsers.filter(u => u.username !== 'admin' && !u.is_superuser);
 
     const now = Date.now();
-    const FIFTEEN_MINUTES = 15 * 60 * 1000;
+    const THIRTY_SECONDS = 35 * 1000;
     const ONE_DAY = 24 * 60 * 60 * 1000;
     const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
-    // Map order counts and spent by user
     const userOrderCounts = new Map<string, number>();
     const userRevenue = new Map<string, number>();
     for (const o of allOrders) {
@@ -1569,29 +1618,24 @@ export class AdminService implements OnModuleInit {
       const spent = userRevenue.get(idKey) || userRevenue.get(emailKey) || 0;
       totalCustomerRevenue += spent;
 
-      // Presence check (actual heartbeat/session within 15 minutes)
       const lastSeenStr = c.last_seen || c.last_activity || c.last_login || null;
       const lastSeenTime = lastSeenStr ? new Date(lastSeenStr).getTime() : 0;
-      const isOnline = lastSeenTime > 0 && (now - lastSeenTime <= FIFTEEN_MINUTES);
+      const isOnline = lastSeenTime > 0 && (now - lastSeenTime <= THIRTY_SECONDS);
       if (isOnline) onlineCount++;
 
-      // Active Customers (active status and either placed an order or was active within 30 days)
       const isStatusActive = (c.status || 'active') === 'active';
       const createdTime = c.created_at ? new Date(c.created_at).getTime() : 0;
       const isActive = isStatusActive && (orderCount > 0 || (lastSeenTime > 0 && (now - lastSeenTime <= THIRTY_DAYS)));
       if (isActive) activeCount++;
 
-      // New Customers (registered within 30 days)
       if (createdTime > 0 && (now - createdTime <= THIRTY_DAYS)) {
         newCount++;
       }
 
-      // Returning Customers (2 or more orders)
       if (orderCount >= 2) {
         returningCount++;
       }
 
-      // Recently Active Customers (activity or login within 24 hours)
       if (lastSeenTime > 0 && (now - lastSeenTime <= ONE_DAY)) {
         recentlyActiveCount++;
       }
@@ -1599,16 +1643,14 @@ export class AdminService implements OnModuleInit {
 
     const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
     
-    // Frequency categories
-    let prospectiveCount = 0; // 0 orders
-    let singleOrderCount = 0; // 1 order
-    let repeatBuyerCount = 0; // 2-4 orders
-    let vipBuyerCount = 0;    // 5+ orders
+    let prospectiveCount = 0;
+    let singleOrderCount = 0;
+    let repeatBuyerCount = 0;
+    let vipBuyerCount = 0;
 
-    // Presence categories
-    let activeTodayCount = 0; // past 24 hours (excluding online)
-    let activeWeekCount = 0;  // past 7 days (excluding today)
-    let idleCount = 0;        // > 7 days or no activity
+    let activeTodayCount = 0;
+    let activeWeekCount = 0;
+    let idleCount = 0;
 
     for (const c of customers) {
       const idKey = String(c.id).toLowerCase();
@@ -1624,8 +1666,7 @@ export class AdminService implements OnModuleInit {
       const lastSeenTime = lastSeenStr ? new Date(lastSeenStr).getTime() : 0;
       const diff = lastSeenTime > 0 ? (now - lastSeenTime) : Infinity;
 
-      if (diff <= FIFTEEN_MINUTES) {
-        // online
+      if (diff <= THIRTY_SECONDS) {
       } else if (diff <= ONE_DAY) {
         activeTodayCount++;
       } else if (diff <= ONE_WEEK) {
@@ -1685,7 +1726,7 @@ export class AdminService implements OnModuleInit {
       retention_rate: retentionRate,
       total_revenue: Math.round(totalCustomerRevenue * 100) / 100,
       average_order_value: averageOrderValue,
-      presence_timeout_minutes: 15,
+      presence_timeout_seconds: 30,
       calculated_at: new Date().toISOString(),
       presence_breakdown: {
         online: onlineCount,
@@ -1733,7 +1774,7 @@ export class AdminService implements OnModuleInit {
     }
 
     const now = Date.now();
-    const FIFTEEN_MINUTES = 15 * 60 * 1000;
+    const THIRTY_SECONDS = 35 * 1000;
 
     let customers = nonAdminUsers.map((u) => {
       const idKey = String(u.id).toLowerCase();
@@ -1743,7 +1784,7 @@ export class AdminService implements OnModuleInit {
 
       const lastSeenStr = u.last_seen || u.last_activity || u.last_login || u.updated_at || null;
       const lastSeenTime = lastSeenStr ? new Date(lastSeenStr).getTime() : 0;
-      const isOnline = lastSeenTime > 0 && (now - lastSeenTime <= FIFTEEN_MINUTES);
+      const isOnline = lastSeenTime > 0 && (now - lastSeenTime <= THIRTY_SECONDS);
 
       const fullName = `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.name || u.username || 'Customer';
 
@@ -1874,7 +1915,7 @@ export class AdminService implements OnModuleInit {
     const now = Date.now();
     const lastSeenStr = userData.last_seen || userData.last_activity || userData.last_login || userData.updated_at || null;
     const lastSeenTime = lastSeenStr ? new Date(lastSeenStr).getTime() : 0;
-    const isOnline = lastSeenTime > 0 && (now - lastSeenTime <= 15 * 60 * 1000);
+    const isOnline = lastSeenTime > 0 && (now - lastSeenTime <= 35 * 1000);
 
     const fullName = `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || userData.name || userData.username || 'Customer';
 

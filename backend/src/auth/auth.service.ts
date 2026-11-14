@@ -528,17 +528,22 @@ export class AuthService implements OnModuleInit {
     const cleanId = String(userId).trim();
     const now = new Date().toISOString();
     try {
-      const userRef = this.firestore.collection('users').doc(cleanId);
-      const doc = await userRef.get();
+      let userRef = this.firestore.collection('users').doc(cleanId);
+      let doc = await userRef.get();
+      if (!doc.exists) {
+        const q = await this.firestore.collection('users').where('email', '==', cleanId.toLowerCase()).limit(1).get();
+        if (!q.empty) {
+          userRef = q.docs[0].ref as any;
+          doc = q.docs[0];
+        }
+      }
       if (doc.exists) {
         await userRef.set({
           last_seen: now,
           last_activity: now,
         }, { merge: true });
       }
-    } catch (e: any) {
-      // Non-blocking
-    }
+    } catch (e: any) {}
   }
 
   async updateProfile(userId: string, dto: { full_name?: string; phone?: string; first_name?: string; last_name?: string; building?: string; street?: string; zone?: string; city?: string }) {

@@ -38,6 +38,9 @@
     setToken(token) {
       if (token) {
         localStorage.setItem(this.config.tokenKey, token);
+        if (typeof this.triggerHeartbeat === 'function') {
+          this.triggerHeartbeat();
+        }
       } else {
         localStorage.removeItem(this.config.tokenKey);
       }
@@ -55,6 +58,9 @@
     setUser(user) {
       if (user) {
         localStorage.setItem(this.config.userKey, JSON.stringify(user));
+        if (typeof this.triggerHeartbeat === 'function') {
+          this.triggerHeartbeat();
+        }
       } else {
         localStorage.removeItem(this.config.userKey);
       }
@@ -329,27 +335,75 @@
       if (this._presenceStarted) return;
       this._presenceStarted = true;
 
-      const ping = async () => {
-        const token = this.getToken();
-        if (!token) return;
-        try {
-          await this.post('/api/auth/heartbeat', {});
-        } catch (e) {}
+      const runHeartbeat = () => {
+        if (typeof window.requestIdleCallback === 'function') {
+          window.requestIdleCallback(() => this.triggerHeartbeat(), { timeout: 2000 });
+        } else {
+          setTimeout(() => this.triggerHeartbeat(), 0);
+        }
       };
 
-      setTimeout(ping, 2000);
+      setTimeout(runHeartbeat, 1500);
 
       setInterval(() => {
-        if (!document.hidden && this.getToken()) {
-          ping();
-        }
-      }, 4 * 60 * 1000);
+        runHeartbeat();
+      }, 30 * 1000);
 
       document.addEventListener('visibilitychange', () => {
-        if (!document.hidden && this.getToken()) {
-          ping();
+        if (!document.hidden) {
+          runHeartbeat();
         }
       });
+
+      window.addEventListener('focus', () => {
+        runHeartbeat();
+      });
+    }
+
+    triggerHeartbeat() {
+      if (this._heartbeatInFlight) return;
+      const now = Date.now();
+      if (this._lastHeartbeat && (now - this._lastHeartbeat < 15000)) return;
+
+      const token = this.getToken();
+      const user = this.getUser();
+      if (!token && !user) return;
+
+      const userId = user?.id || user?._id || user?.uid || '';
+      const email = user?.email || '';
+
+      this._heartbeatInFlight = true;
+      this._lastHeartbeat = now;
+
+      let base = (this.config.baseUrl || '').replace(/\/+$/, '');
+      if (base.endsWith('/api')) base = base.substring(0, base.length - 4);
+      const url = `${base}/api/auth/heartbeat`;
+
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      const timeoutId = controller ? setTimeout(() => controller.abort(), 6000) : null;
+
+      fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          user_id: userId,
+          email: email,
+          timestamp: new Date().toISOString(),
+        }),
+        keepalive: true,
+        signal: controller ? controller.signal : undefined,
+      }).catch(() => {})
+        .finally(() => {
+          if (timeoutId) clearTimeout(timeoutId);
+          this._heartbeatInFlight = false;
+        });
     }
   }
 

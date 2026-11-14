@@ -36,6 +36,21 @@ export class ProductsController {
     return this.productsService.findAll(query);
   }
 
+  @Get('featured')
+  async getFeatured(@Query() query: ProductFilterQuery) {
+    return this.productsService.findAll({ ...query, isFeatured: true });
+  }
+
+  @Get('best-sellers')
+  async getBestSellers(@Query() query: ProductFilterQuery) {
+    return this.productsService.findAll({ ...query, isBestSeller: true, sortBy: 'popular' });
+  }
+
+  @Get('new-arrivals')
+  async getNewArrivals(@Query() query: ProductFilterQuery) {
+    return this.productsService.findAll({ ...query, isNew: true, sortBy: 'newest' });
+  }
+
   @Get(':slugOrId')
   async findOne(@Param('slugOrId') slugOrId: string) {
     return this.productsService.findOne(slugOrId);

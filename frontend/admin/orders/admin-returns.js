@@ -1,7 +1,4 @@
-/**
- * MARJAAH QATAR — Admin Returns & Cancellations Controller
- * Manages dynamic return and cancellation policies, RMA reviews, restock automation, and status reports.
- */
+
 
 (function (global) {
   'use strict';
@@ -50,7 +47,6 @@
         cb.checked = allowed.includes(cb.value);
       });
 
-      // Update KPI Policy Summary
       const summaryEl = document.getElementById('returns-kpi-policy-summary');
       if (summaryEl) {
         summaryEl.textContent = `Cancel: ${this.policies.cancellation_window_value} ${this.policies.cancellation_window_unit} • Return: ${this.policies.return_window_days} Days`;
@@ -163,7 +159,7 @@
       const q = (document.getElementById('returns-search-input')?.value || '').toLowerCase().trim();
 
       let filtered = this.items.filter((item) => {
-        // Filter by type / status tab
+
         if (this.currentFilter === 'pending_returns') {
           if (item.type !== 'return' || item.return_status !== 'pending') return false;
         } else if (this.currentFilter === 'approved_returns') {
@@ -174,7 +170,6 @@
           if (item.type !== 'cancellation' && item.order_status !== 'cancelled') return false;
         }
 
-        // Filter by search query
         if (q) {
           const num = (item.order_number || item.order_id || '').toLowerCase();
           const name = (item.customer_name || '').toLowerCase();
@@ -226,35 +221,35 @@
             ` : ''}
 
             <button type="button" onclick="AdminOrders.openOrderModal('${it.order_id}')"
-              class="p-1.5 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white transition cursor-pointer" title="View Full Order Details">
+              class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition cursor-pointer" title="View Full Order Details">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
 
             <button type="button" onclick="AdminOrders.openInvoiceModal('${it.order_id}')"
-              class="p-1.5 rounded-lg border border-indigo-500/30 hover:border-indigo-400 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 transition cursor-pointer" title="View &amp; Download Tax Invoice">
+              class="p-1.5 rounded-lg border border-primary/30 hover:border-primary bg-primary/10 hover:bg-primary/20 text-primary transition cursor-pointer" title="View &amp; Download Tax Invoice">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             </button>
           </div>
         `;
 
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
             <td class="py-3 px-4">
-              <span class="font-mono font-bold text-xs text-indigo-400">#${orderNum}</span>
-              <p class="text-[10px] text-slate-500 font-mono mt-0.5">${dateFormatted}</p>
+              <span class="font-mono font-bold text-xs text-primary">#${orderNum}</span>
+              <p class="text-[10px] text-slate-400 font-mono mt-0.5">${dateFormatted}</p>
             </td>
             <td class="py-3 px-4">
-              <p class="font-bold text-xs text-white">${it.customer_name || 'Customer'}</p>
+              <p class="font-bold text-xs text-slate-900">${it.customer_name || 'Customer'}</p>
               <p class="text-[11px] text-slate-400 font-mono">${it.customer_phone || '—'}</p>
             </td>
             <td class="py-3 px-4">${typeBadge}</td>
             <td class="py-3 px-4 max-w-xs">
-              <p class="text-xs font-semibold text-slate-200 truncate" title="${it.reason || ''}">${it.reason || 'General inquiry'}</p>
-              ${it.notes ? `<p class="text-[11px] text-slate-400 truncate max-w-[200px]" title="${it.notes}">"${it.notes}"</p>` : ''}
-              ${it.admin_notes ? `<p class="text-[10px] text-indigo-300 mt-0.5 truncate max-w-[200px]" title="${it.admin_notes}">Staff Note: ${it.admin_notes}</p>` : ''}
+              <p class="text-xs font-semibold text-slate-800 truncate" title="${it.reason || ''}">${it.reason || 'General inquiry'}</p>
+              ${it.notes ? `<p class="text-[11px] text-slate-500 truncate max-w-[200px]" title="${it.notes}">"${it.notes}"</p>` : ''}
+              ${it.admin_notes ? `<p class="text-[10px] text-primary mt-0.5 truncate max-w-[200px]" title="${it.admin_notes}">Staff Note: ${it.admin_notes}</p>` : ''}
             </td>
             <td class="py-3 px-4">
-              <span class="font-display font-black text-xs text-white">${Number(it.total || 0).toFixed(0)} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
+              <span class="font-display font-black text-xs text-slate-900">${Number(it.total || 0).toFixed(0)} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
               <p class="text-[10px] text-slate-400">${it.items_count || 1} item(s)</p>
             </td>
             <td class="py-3 px-4">${statusBadge}</td>

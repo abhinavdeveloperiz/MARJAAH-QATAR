@@ -9,6 +9,7 @@ import { SeoService } from '../seo/seo.service';
 export interface ProductFilterQuery {
   page?: number;
   limit?: number;
+  cursor?: string;
   category?: string;
   subcategory?: string;
   brand?: string;
@@ -24,10 +25,13 @@ export interface ProductFilterQuery {
   isLiked?: boolean | string;
   is_liked?: boolean | string;
   isNew?: boolean | string;
+  is_new?: boolean | string;
   isOnSale?: boolean | string;
   isOffer?: boolean | string;
   isBestSeller?: boolean | string;
-  sortBy?: string; // 'price-asc' | 'price-desc' | 'newest' | 'rating' | 'popular' | 'name'
+  is_best_seller?: boolean | string;
+  bestseller?: boolean | string;
+  sortBy?: string;
   sort?: string;
   status?: string;
   includeHidden?: boolean | string;
@@ -51,8 +55,37 @@ export class ProductsService implements OnModuleInit {
   private cacheExpiresAt = 0;
   private isRefreshing = false;
   private pendingFetchPromise: Promise<any[]> | null = null;
-  private readonly CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour memory TTL
+  private readonly CACHE_TTL_MS = 60 * 60 * 1000;
   private readonly DISK_CACHE_PATH = path.resolve(process.cwd(), '.products-cache.json');
+  private productSalesMap: Map<string, number> = new Map();
+  private productSalesExpiresAt = 0;
+
+  async getProductSalesMap(): Promise<Map<string, number>> {
+    if (this.productSalesMap.size > 0 && Date.now() < this.productSalesExpiresAt) {
+      return this.productSalesMap;
+    }
+    try {
+      const ordersSnap = await this.firestore.collection('orders').get();
+      const map = new Map<string, number>();
+      for (const doc of ordersSnap.docs) {
+        const order = doc.data();
+        if (order.status === 'cancelled' || order.status === 'canceled') continue;
+        const items = Array.isArray(order.items) ? order.items : [];
+        for (const it of items) {
+          const qty = Number(it.quantity) || 1;
+          const pid = it.id || it.product_id;
+          if (pid) map.set(String(pid), (map.get(String(pid)) || 0) + qty);
+          if (it.slug) map.set(String(it.slug), (map.get(String(it.slug)) || 0) + qty);
+        }
+      }
+      this.productSalesMap = map;
+      this.productSalesExpiresAt = Date.now() + 5 * 60 * 1000;
+      return map;
+    } catch (e: any) {
+      this.logger.warn(`Could not compute sales map: ${e.message}`);
+      return this.productSalesMap;
+    }
+  }
 
   async onModuleInit() {
     // 1. Immediately hydrate from local disk cache (< 3ms) so zero users experience cold start
@@ -258,20 +291,22 @@ export class ProductsService implements OnModuleInit {
       });
     }
 
-    // 5. Featured / Favorite / New / On Sale / Offer / Best Seller flags
     const isFeaturedFlag = query.isFeatured ?? query.is_featured ?? query.featured;
     if (isFeaturedFlag !== undefined && String(isFeaturedFlag).toLowerCase() === 'true') {
-      const featList = products.filter(p => Boolean(p.is_featured));
-      if (featList.length > 0) {
-        products = featList;
-      }
+      products = products.filter(p => Boolean(p.is_featured || p.featured));
     }
     const isFavoriteFlag = query.isFavorite ?? query.is_favorite ?? query.isLiked ?? query.is_liked;
     if (isFavoriteFlag !== undefined && String(isFavoriteFlag).toLowerCase() === 'true') {
       products = products.filter(p => Boolean(p.is_favorite || p.is_liked));
     }
-    if (query.isNew !== undefined && String(query.isNew).toLowerCase() === 'true') {
-      products = products.filter(p => Boolean(p.is_new));
+    const isNewFlag = query.isNew ?? query.is_new;
+    if (isNewFlag !== undefined && String(isNewFlag).toLowerCase() === 'true') {
+      const fortyFiveDaysAgo = Date.now() - 45 * 24 * 60 * 60 * 1000;
+      products = products.filter(p => {
+        if (Boolean(p.is_new)) return true;
+        const createdMs = new Date(p.created_at || (p.createdAt?._seconds ? p.createdAt._seconds * 1000 : 0)).getTime();
+        return createdMs >= fortyFiveDaysAgo;
+      });
     }
     if (query.isOnSale !== undefined && String(query.isOnSale).toLowerCase() === 'true') {
       products = products.filter(p => Boolean(p.is_on_sale) || Boolean(p.is_offer) || (p.original_price && Number(p.original_price) > Number(p.price)));
@@ -279,11 +314,15 @@ export class ProductsService implements OnModuleInit {
     if (query.isOffer !== undefined && String(query.isOffer).toLowerCase() === 'true') {
       products = products.filter(p => Boolean(p.is_offer) || Boolean(p.is_on_sale) || (p.original_price && Number(p.original_price) > Number(p.price)));
     }
-    if (query.isBestSeller !== undefined && String(query.isBestSeller).toLowerCase() === 'true') {
-      products = products.filter(p => Boolean(p.is_best_seller));
+    const isBestSellerFlag = query.isBestSeller ?? query.is_best_seller ?? query.bestseller;
+    if (isBestSellerFlag !== undefined && String(isBestSellerFlag).toLowerCase() === 'true') {
+      const salesMap = await this.getProductSalesMap();
+      products = products.filter(p => {
+        const orderSales = salesMap.get(String(p.id)) || salesMap.get(String(p.slug)) || 0;
+        return orderSales > 0 || Boolean(p.is_best_seller || p.isBestSeller);
+      });
     }
 
-    // 6. Price range
     if (query.minPrice !== undefined && !isNaN(Number(query.minPrice))) {
       const minP = Number(query.minPrice);
       products = products.filter(p => Number(p.price) >= minP);
@@ -293,13 +332,11 @@ export class ProductsService implements OnModuleInit {
       products = products.filter(p => Number(p.price) <= maxP);
     }
 
-    // 6b. Rating filter
     if (query.rating !== undefined && !isNaN(Number(query.rating))) {
       const minR = Number(query.rating);
       products = products.filter(p => Number(p.rating || 0) >= minR);
     }
 
-    // 6c. Dynamic Attribute Filters (e.g. RAM, Storage, Color, Processor, Specs)
     let queryAttrs = query.attributes;
     if (typeof queryAttrs === 'string') {
       try {
@@ -320,11 +357,9 @@ export class ProductsService implements OnModuleInit {
 
         if (acceptedVals.length > 0) {
           products = products.filter(p => {
-            // Check direct property
             const directVal = String(p[attrKey] || p[rawKey] || '').toLowerCase();
             if (acceptedVals.some(v => directVal.includes(v))) return true;
 
-            // Check specifications array
             if (Array.isArray(p.specifications)) {
               return p.specifications.some((spec: any) => {
                 const sName = String(spec?.name || spec?.key || '').toLowerCase();
@@ -333,7 +368,6 @@ export class ProductsService implements OnModuleInit {
               });
             }
 
-            // Check specifications object
             if (p.specifications && typeof p.specifications === 'object') {
               for (const [k, v] of Object.entries(p.specifications)) {
                 if (k.toLowerCase() === attrKey || k.toLowerCase().includes(attrKey)) {
@@ -349,7 +383,6 @@ export class ProductsService implements OnModuleInit {
       }
     }
 
-    // 7. Full-text search (name, name_ar, description, brand, sku, tags)
     if (query.search && typeof query.search === 'string' && query.search.trim()) {
       const terms = query.search.toLowerCase().trim().split(/\s+/);
       products = products.filter(p => {
@@ -367,43 +400,100 @@ export class ProductsService implements OnModuleInit {
       });
     }
 
-    // 8. Sorting
+    const salesMap = await this.getProductSalesMap();
     const sortBy = query.sortBy || query.sort || 'newest';
     products.sort((a, b) => {
+      let cmp = 0;
       switch (sortBy) {
         case 'price-asc':
         case 'price_asc':
-          return Number(a.price) - Number(b.price);
+          cmp = Number(a.price) - Number(b.price);
+          break;
         case 'price-desc':
         case 'price_desc':
-          return Number(b.price) - Number(a.price);
+          cmp = Number(b.price) - Number(a.price);
+          break;
         case 'featured':
-          return (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+          cmp = (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+          break;
         case 'rating':
-          return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+          cmp = (Number(b.rating) || 0) - (Number(a.rating) || 0);
+          break;
         case 'popular':
-          return (Number(b.review_count) || 0) - (Number(a.review_count) || 0);
+        case 'sales':
+        case 'bestseller': {
+          const salesB = salesMap.get(String(b.id)) || salesMap.get(String(b.slug)) || Number(b.sales_count || 0) || Number(b.review_count || 0);
+          const salesA = salesMap.get(String(a.id)) || salesMap.get(String(a.slug)) || Number(a.sales_count || 0) || Number(a.review_count || 0);
+          cmp = salesB - salesA;
+          break;
+        }
         case 'name':
-          return (a.name || '').localeCompare(b.name || '');
+          cmp = (a.name || '').localeCompare(b.name || '');
+          break;
         case 'newest':
-        default:
-          return new Date(b.created_at || b.createdAt?._seconds * 1000 || 0).getTime() - new Date(a.created_at || a.createdAt?._seconds * 1000 || 0).getTime();
+        default: {
+          const dateB = new Date(b.created_at || (b.createdAt?._seconds ? b.createdAt._seconds * 1000 : 0)).getTime();
+          const dateA = new Date(a.created_at || (a.createdAt?._seconds ? a.createdAt._seconds * 1000 : 0)).getTime();
+          cmp = dateB - dateA;
+          break;
+        }
       }
+      if (cmp !== 0) return cmp;
+      return String(a.id || '').localeCompare(String(b.id || ''));
     });
 
     const total = products.length;
     const totalPages = Math.ceil(total / limit) || 1;
-    const offset = (page - 1) * limit;
-    const paginatedItems = products.slice(offset, offset + limit);
+    let startIndex = (page - 1) * limit;
+
+    if (query.cursor && typeof query.cursor === 'string' && query.cursor.trim()) {
+      const rawCursor = query.cursor.trim();
+      let decodedOffset: number | null = null;
+      let decodedId: string | null = null;
+      try {
+        const decodedStr = Buffer.from(rawCursor, 'base64').toString('utf8');
+        const parsed = JSON.parse(decodedStr);
+        if (parsed) {
+          if (parsed.id) decodedId = String(parsed.id);
+          if (typeof parsed.offset === 'number') decodedOffset = parsed.offset;
+        }
+      } catch {
+        decodedId = rawCursor;
+      }
+      if (decodedId) {
+        const foundIdx = products.findIndex(p => String(p.id) === decodedId || String(p.slug) === decodedId);
+        if (foundIdx !== -1) {
+          startIndex = foundIdx + 1;
+        } else if (decodedOffset !== null && !isNaN(decodedOffset) && decodedOffset >= 0) {
+          startIndex = decodedOffset;
+        }
+      } else if (decodedOffset !== null && !isNaN(decodedOffset) && decodedOffset >= 0) {
+        startIndex = decodedOffset;
+      }
+    }
+
+    if (startIndex < 0) startIndex = 0;
+    const paginatedItems = products.slice(startIndex, startIndex + limit);
+    const nextOffset = startIndex + paginatedItems.length;
+    const hasMore = nextOffset < total;
+    const lastItem = paginatedItems.length > 0 ? paginatedItems[paginatedItems.length - 1] : null;
+    const nextCursor = hasMore && lastItem
+      ? Buffer.from(JSON.stringify({ id: String(lastItem.id), offset: nextOffset })).toString('base64')
+      : null;
 
     return {
       items: paginatedItems,
+      products: paginatedItems,
       total,
-      page,
+      page: Math.floor(startIndex / limit) + 1,
       limit,
       totalPages,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1,
+      hasNextPage: hasMore,
+      hasPrevPage: startIndex > 0,
+      next_cursor: nextCursor,
+      nextCursor: nextCursor,
+      has_more: hasMore,
+      hasMore: hasMore,
     };
   }
 

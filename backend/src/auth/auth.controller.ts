@@ -95,24 +95,40 @@ export class AuthController {
     }
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60000 } })
   @Post('heartbeat')
-  async heartbeat(@Request() req: any) {
-    const userId = String(req.user?.id || req.user?.sub || '').trim();
+  async heartbeat(
+    @Request() req: any,
+    @Body() body: any,
+    @Headers('authorization') authHeader: string,
+  ) {
+    let userId = '';
+    const rawToken = (authHeader ? authHeader.replace(/^Bearer\s+/i, '') : '') || body?.token;
+    if (rawToken) {
+      try {
+        const verified = await this.authService.verifyToken(rawToken);
+        if (verified?.user?.id) {
+          userId = String(verified.user.id);
+        }
+      } catch (e) {}
+    }
+    if (!userId && (body?.user_id || body?.userId || body?.id || body?.email)) {
+      userId = String(body.user_id || body.userId || body.id || body.email).trim();
+    }
     if (userId) {
       await this.authService.updatePresence(userId);
     }
     return { success: true, timestamp: new Date().toISOString() };
   }
 
-  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 120, ttl: 60000 } })
   @Post('presence')
-  async presence(@Request() req: any) {
-    const userId = String(req.user?.id || req.user?.sub || '').trim();
-    if (userId) {
-      await this.authService.updatePresence(userId);
-    }
-    return { success: true, timestamp: new Date().toISOString() };
+  async presence(
+    @Request() req: any,
+    @Body() body: any,
+    @Headers('authorization') authHeader: string,
+  ) {
+    return this.heartbeat(req, body, authHeader);
   }
 
   @UseGuards(JwtAuthGuard)

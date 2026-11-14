@@ -1,7 +1,4 @@
-/**
- * MARJAAH QATAR — Admin Approval Workflows Controller (Requirement 2.4 & 2.5)
- * Handles approval queue, change diffs, approval/rejection reasons, and independent module approval rules.
- */
+
 
 (function () {
   'use strict';
@@ -18,21 +15,33 @@
         container.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-xs text-slate-400">Loading approval submissions...</td></tr>`;
       }
 
-      try {
-        const [apprData, cfgData] = await Promise.all([
-          AdminApp.api(`/api/admin/approvals?status=${this.currentStatus === 'all' ? '' : this.currentStatus}`),
-          AdminApp.api('/api/admin/approvals/configs'),
-        ]);
+      const configsTbody = document.getElementById('approval-configs-tbody');
+      if (configsTbody && (!this.configs || this.configs.length === 0)) {
+        configsTbody.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-xs text-slate-400">Loading module configs...</td></tr>`;
+      }
 
+      const [apprRes, cfgRes] = await Promise.allSettled([
+        AdminApp.api(`/api/admin/approvals?status=${this.currentStatus === 'all' ? '' : this.currentStatus}`),
+        AdminApp.api('/api/admin/approvals/configs').catch(() => AdminApp.api('/api/admin/approvals/config')),
+      ]);
+
+      if (apprRes.status === 'fulfilled' && apprRes.value) {
+        const apprData = apprRes.value;
         this.approvals = apprData.items || apprData || [];
-        this.configs = cfgData.configs || cfgData.items || cfgData || [];
         this.renderTable();
+      } else {
+        console.warn('Approvals queue note:', apprRes.reason?.message);
+        this.approvals = [];
+        this.renderTable();
+      }
+
+      if (cfgRes.status === 'fulfilled' && cfgRes.value) {
+        const cfgData = cfgRes.value;
+        this.configs = cfgData.configs || cfgData.items || (Array.isArray(cfgData) ? cfgData : []);
         this.renderConfigsTable();
-      } catch (err) {
-        console.error('Failed to load approvals:', err);
-        if (container) {
-          container.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-xs text-rose-400">Failed to load approvals queue.</td></tr>`;
-        }
+      } else {
+        this.configs = [];
+        this.renderConfigsTable();
       }
     },
 
@@ -41,11 +50,11 @@
       document.querySelectorAll('.approval-tab-btn').forEach((btn) => {
         const s = btn.getAttribute('data-status');
         if (s === status) {
-          btn.classList.add('active', 'border-indigo-500', 'text-white', 'bg-indigo-600/10');
-          btn.classList.remove('border-transparent', 'text-slate-400');
+          btn.classList.add('active', 'border-primary', 'text-primary', 'bg-primary/10');
+          btn.classList.remove('border-transparent', 'text-slate-500');
         } else {
-          btn.classList.remove('active', 'border-indigo-500', 'text-white', 'bg-indigo-600/10');
-          btn.classList.add('border-transparent', 'text-slate-400');
+          btn.classList.remove('active', 'border-primary', 'text-primary', 'bg-primary/10');
+          btn.classList.add('border-transparent', 'text-slate-500');
         }
       });
       this.load();
@@ -62,25 +71,25 @@
 
       container.innerHTML = this.approvals.map((appr) => {
         const statusBadges = {
-          pending: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-          approved: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-          rejected: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+          pending: 'bg-amber-50 text-amber-700 border-amber-200',
+          approved: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+          rejected: 'bg-rose-50 text-rose-700 border-rose-200',
         };
         const statusBadge = statusBadges[appr.status] || statusBadges.pending;
         const submittedTime = appr.created_at ? new Date(appr.created_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) : '—';
         const itemTitle = appr.target_title || appr.target_id || 'Item Modification';
 
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/30 transition-colors">
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
             <td class="py-3.5 px-4">
               <div class="flex items-center gap-2">
-                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">${appr.module}</span>
-                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-white/5 text-slate-300 border border-white/10">${appr.action}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">${appr.module}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">${appr.action}</span>
               </div>
-              <p class="font-bold text-xs text-white mt-1.5 truncate max-w-xs">${itemTitle}</p>
+              <p class="font-bold text-xs text-slate-900 mt-1.5 truncate max-w-xs">${itemTitle}</p>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-300">
-              <span class="font-medium text-slate-200">@${appr.submitted_by_username || appr.submitted_by || 'Staff'}</span>
+            <td class="py-3.5 px-4 text-xs text-slate-600">
+              <span class="font-medium text-slate-800">@${appr.submitted_by_username || appr.submitted_by || 'Staff'}</span>
               <p class="text-[10px] text-slate-500 font-mono mt-0.5">${submittedTime}</p>
             </td>
             <td class="py-3.5 px-4">
@@ -88,29 +97,29 @@
                 ${(appr.status || 'pending').toUpperCase()}
               </span>
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-400">
+            <td class="py-3.5 px-4 text-xs text-slate-500">
               ${appr.reviewed_by ? `
-                <div class="text-xs text-slate-300">@${appr.reviewed_by}</div>
+                <div class="text-xs text-slate-700">@${appr.reviewed_by}</div>
                 <div class="text-[10px] text-slate-500 font-mono">${new Date(appr.reviewed_at).toLocaleDateString('en-GB')}</div>
               ` : '—'}
             </td>
-            <td class="py-3.5 px-4 text-xs text-slate-300">
+            <td class="py-3.5 px-4 text-xs text-slate-600">
               ${appr.rejection_reason ? `
-                <span class="text-rose-400 font-medium italic block max-w-xs truncate" title="${appr.rejection_reason}">
+                <span class="text-rose-600 font-medium italic block max-w-xs truncate" title="${appr.rejection_reason}">
                   "${appr.rejection_reason}"
                 </span>
-              ` : (appr.status === 'approved' ? '<span class="text-emerald-400 text-[11px]">Approved & Published</span>' : '<span class="text-slate-500">Awaiting Decision</span>')}
+              ` : (appr.status === 'approved' ? '<span class="text-emerald-600 text-[11px] font-semibold">Approved & Published</span>' : '<span class="text-slate-500">Awaiting Decision</span>')}
             </td>
             <td class="py-3.5 px-4 text-right">
               <div class="flex items-center justify-end gap-2">
-                <button type="button" onclick="AdminApprovals.openDiffModal('${appr.id}')" class="px-2.5 py-1.5 rounded-xl border border-slate-700/60 hover:bg-slate-700/40 text-xs font-semibold text-indigo-300 hover:text-white transition cursor-pointer">
+                <button type="button" onclick="AdminApprovals.openDiffModal('${appr.id}')" class="px-2.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-primary transition cursor-pointer">
                   Review Diff
                 </button>
                 ${appr.status === 'pending' ? `
                   <button type="button" onclick="AdminApprovals.approveSubmission('${appr.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
                     Approve
                   </button>
-                  <button type="button" onclick="AdminApprovals.promptRejectSubmission('${appr.id}')" class="px-2.5 py-1.5 rounded-xl bg-rose-600/80 hover:bg-rose-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
+                  <button type="button" onclick="AdminApprovals.promptRejectSubmission('${appr.id}')" class="px-2.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
                     Reject
                   </button>
                 ` : ''}
@@ -198,7 +207,6 @@
       }
     },
 
-    // ── Configurable Approval Workflows Per Module / Operation (Requirement 2.4) ──
     renderConfigsTable() {
       const tbody = document.getElementById('approval-configs-tbody');
       if (!tbody) return;
@@ -219,19 +227,19 @@
         const reqDelete = cfg.operations?.includes('delete') || false;
 
         return `
-          <tr class="border-b border-slate-800/60 hover:bg-slate-800/20 transition-colors">
-            <td class="py-3 px-4 font-bold text-xs text-white">${m.name}</td>
+          <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+            <td class="py-3 px-4 font-bold text-xs text-slate-900">${m.name}</td>
             <td class="py-3 px-3 text-center">
-              <input type="checkbox" data-cfg-mod="${m.key}" data-cfg-op="create" ${reqCreate ? 'checked' : ''} class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer accent-indigo-500" />
+              <input type="checkbox" data-cfg-mod="${m.key}" data-cfg-op="create" ${reqCreate ? 'checked' : ''} class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-0 cursor-pointer accent-primary" />
             </td>
             <td class="py-3 px-3 text-center">
-              <input type="checkbox" data-cfg-mod="${m.key}" data-cfg-op="edit" ${reqEdit ? 'checked' : ''} class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer accent-indigo-500" />
+              <input type="checkbox" data-cfg-mod="${m.key}" data-cfg-op="edit" ${reqEdit ? 'checked' : ''} class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-0 cursor-pointer accent-primary" />
             </td>
             <td class="py-3 px-3 text-center">
-              <input type="checkbox" data-cfg-mod="${m.key}" data-cfg-op="delete" ${reqDelete ? 'checked' : ''} class="w-4 h-4 rounded border-slate-700 text-indigo-600 focus:ring-0 cursor-pointer accent-indigo-500" />
+              <input type="checkbox" data-cfg-mod="${m.key}" data-cfg-op="delete" ${reqDelete ? 'checked' : ''} class="w-4 h-4 rounded border-slate-300 text-primary focus:ring-0 cursor-pointer accent-primary" />
             </td>
             <td class="py-3 px-4 text-right">
-              <button type="button" onclick="AdminApprovals.saveModuleApprovalConfig('${m.key}')" class="px-3 py-1 rounded-lg border border-indigo-500/30 bg-indigo-500/10 hover:bg-indigo-500/20 text-xs font-bold text-indigo-300 hover:text-white transition">
+              <button type="button" onclick="AdminApprovals.saveModuleApprovalConfig('${m.key}')" class="px-3 py-1 rounded-lg border border-primary/30 bg-primary/10 hover:bg-primary/20 text-xs font-bold text-primary transition cursor-pointer">
                 Save Rule
               </button>
             </td>

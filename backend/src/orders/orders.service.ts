@@ -219,6 +219,31 @@ export class OrdersService {
     let orders: any[] = [];
 
     if (isAdmin) {
+      if (!currentUser?.is_superuser && currentUser?.role !== 'admin' && currentUser?.username !== 'admin') {
+        const assignedRoleIds: string[] = Array.isArray(currentUser?.role_ids)
+          ? currentUser.role_ids
+          : (Array.isArray(currentUser?.roles) ? currentUser.roles : (currentUser?.role ? [currentUser.role] : []));
+
+        let hasOrderPerm = assignedRoleIds.includes('super_admin') || assignedRoleIds.includes('admin');
+        if (!hasOrderPerm) {
+          for (const rid of assignedRoleIds) {
+            const rDoc = await this.firestore.collection('admin_roles').doc(rid).get();
+            if (rDoc.exists) {
+              const perms = rDoc.data()?.permissions?.orders;
+              if (Array.isArray(perms) && (perms.includes('view') || perms.includes('manage') || perms.includes('*'))) {
+                hasOrderPerm = true;
+                break;
+              } else if (typeof perms === 'object' && perms !== null && (perms.view || perms.manage || perms['*'])) {
+                hasOrderPerm = true;
+                break;
+              }
+            }
+          }
+        }
+        if (!hasOrderPerm) {
+          throw new ForbiddenException('Access denied: You do not have permission to view the orders module.');
+        }
+      }
       orders = allOrders;
     } else if (currentUser) {
       const uId = String(currentUser.id || currentUser.sub || '').trim();
