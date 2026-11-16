@@ -45,6 +45,12 @@
         if (data.user) {
           localStorage.setItem('marjaah_admin_user', JSON.stringify(data.user));
         }
+        try {
+          localStorage.removeItem('marjaah_admin_dashboard_cache_v4');
+          localStorage.removeItem('marjaah_admin_dashboard_cache');
+          localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache');
+          localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache_v3');
+        } catch (_) {}
         if (window.api && typeof window.api.setToken === 'function') {
           window.api.setToken(data.token);
         }
@@ -71,6 +77,13 @@
       window.AdminApp.role = null;
       localStorage.removeItem('marjaah_admin_token');
       localStorage.removeItem('marjaah_admin_user');
+      localStorage.removeItem('marjaah_admin_role');
+      try {
+        localStorage.removeItem('marjaah_admin_dashboard_cache_v4');
+        localStorage.removeItem('marjaah_admin_dashboard_cache');
+        localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache');
+        localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache_v3');
+      } catch (_) {}
       if (window.AdminApp.refreshInterval) clearInterval(window.AdminApp.refreshInterval);
       if (notify) window.AdminApp.toast('Logged out successfully.', 'info');
       this.showLoginModal();
@@ -86,11 +99,25 @@
           this.handleLogin(u, p);
         });
       }
+
+      const toggleBtn = document.getElementById('admin-login-toggle-pw');
+      if (toggleBtn) {
+        toggleBtn.onclick = (e) => {
+          e.preventDefault();
+          if (typeof window.togglePasswordVisibility === 'function') {
+            window.togglePasswordVisibility('admin-login-password', toggleBtn);
+          }
+        };
+      }
     },
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.AdminAuth.bindEvents();
+    });
+  } else {
     window.AdminAuth.bindEvents();
-  });
+  }
 })();
 

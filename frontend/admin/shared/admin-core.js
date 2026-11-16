@@ -10,7 +10,13 @@
         return null;
       }
     })(),
-    role: null,
+    role: (() => {
+      try {
+        return JSON.parse(localStorage.getItem('marjaah_admin_role') || 'null');
+      } catch (e) {
+        return null;
+      }
+    })(),
     permissions: {},
     activeTab: 'dashboard',
     stats: {},
@@ -79,6 +85,7 @@
 
     async init() {
       this.bindGlobalEvents();
+      this.renderStaffProfile();
 
       if (!this.token) {
         if (window.AdminAuth) window.AdminAuth.showLoginModal();
@@ -112,9 +119,52 @@
       }
     },
 
+    getFirstPermittedTab() {
+      const candidates = [
+        { tab: 'dashboard', mod: 'dashboard' },
+        { tab: 'products', mod: 'products' },
+        { tab: 'orders', mod: 'orders' },
+        { tab: 'returns-cancellations', mod: 'orders' },
+        { tab: 'customers', mod: 'customers' },
+        { tab: 'approvals', mod: 'approvals' },
+        { tab: 'banners', mod: 'banners' },
+        { tab: 'promotions', mod: 'promotional_sections' },
+        { tab: 'locations', mod: 'store_locations' },
+        { tab: 'users', mod: 'admin_users' },
+        { tab: 'roles', mod: 'roles_permissions' },
+        { tab: 'settings', mod: 'settings' },
+        { tab: 'audit', mod: 'audit_logs' },
+      ];
+
+      for (const c of candidates) {
+        if (this.can(c.mod, 'view')) {
+          return c.tab;
+        }
+      }
+      return null;
+    },
+
     getInitialTab() {
       const hash = window.location.hash.replace('#', '').trim();
-      return hash || 'dashboard';
+      const permMap = {
+        'dashboard': 'dashboard',
+        'products': 'products',
+        'orders': 'orders',
+        'returns-cancellations': 'orders',
+        'customers': 'customers',
+        'approvals': 'approvals',
+        'locations': 'store_locations',
+        'banners': 'banners',
+        'promotions': 'promotional_sections',
+        'users': 'admin_users',
+        'roles': 'roles_permissions',
+        'audit': 'audit_logs',
+        'settings': 'settings',
+      };
+      if (hash && permMap[hash] && this.can(permMap[hash], 'view')) {
+        return hash;
+      }
+      return this.getFirstPermittedTab() || 'unauthorized';
     },
 
     async loadCurrentStaff() {
@@ -144,6 +194,9 @@
         name: 'Super Administrator',
         permissions: {},
       } : null);
+      if (this.role) {
+        localStorage.setItem('marjaah_admin_role', JSON.stringify(this.role));
+      }
 
       this.renderStaffProfile();
     },
@@ -168,25 +221,99 @@
 
       document.querySelectorAll('[data-admin-module]').forEach((item) => {
         const mod = item.getAttribute('data-admin-module');
-        if (!this.can(mod, 'view')) {
-          item.style.display = 'none';
+        const canView = this.can(mod, 'view');
+        item.classList.toggle('hidden', !canView);
+        if (!canView) {
+          item.style.setProperty('display', 'none', 'important');
         } else {
-          item.style.display = '';
+          item.style.removeProperty('display');
         }
       });
+
+      document.querySelectorAll('[data-admin-group]').forEach((group) => {
+        const items = group.querySelectorAll('[data-admin-module]');
+        const hasVisible = Array.from(items).some((item) => {
+          return !item.classList.contains('hidden') && item.style.display !== 'none';
+        });
+        group.classList.toggle('hidden', !hasVisible);
+        if (!hasVisible) {
+          group.style.setProperty('display', 'none', 'important');
+        } else {
+          group.style.removeProperty('display');
+        }
+      });
+
+      const btnNewOrder = document.getElementById('topbar-btn-new-order');
+      if (btnNewOrder) {
+        btnNewOrder.style.display = this.can('orders', 'create') ? '' : 'none';
+      }
+      const btnNewProduct = document.getElementById('topbar-btn-new-product');
+      if (btnNewProduct) {
+        btnNewProduct.style.display = this.can('products', 'create') ? '' : 'none';
+      }
+      const bell = document.getElementById('topbar-notification-bell');
+      if (bell) {
+        bell.style.display = this.can('approvals', 'view') ? '' : 'none';
+      }
+
+      if (!this.can('dashboard', 'view')) {
+        try {
+          localStorage.removeItem('marjaah_admin_dashboard_cache_v4');
+          localStorage.removeItem('marjaah_admin_dashboard_cache');
+          localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache');
+          localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache_v3');
+        } catch (_) {}
+      }
+    },
+
+    showNoPermissionsView() {
+      this.activeTab = 'unauthorized';
+      window.location.hash = 'unauthorized';
+      document.querySelectorAll('.sidebar-nav-item').forEach((item) => {
+        item.classList.remove('active');
+        item.classList.add('text-slate-600');
+      });
+      document.querySelectorAll('.admin-tab-pane').forEach((pane) => {
+        pane.classList.add('hidden');
+      });
+      const unauthPane = document.getElementById('pane-unauthorized');
+      if (unauthPane) {
+        unauthPane.classList.remove('hidden');
+      }
+      const bc = document.getElementById('admin-breadcrumb-current');
+      if (bc) bc.textContent = 'Access Restricted';
     },
 
     navigateTo(tabName) {
+      if (tabName === 'unauthorized') {
+        this.showNoPermissionsView();
+        return;
+      }
+
       const permMap = {
+        'dashboard': 'dashboard',
+        'products': 'products',
+        'orders': 'orders',
         'returns-cancellations': 'orders',
+        'customers': 'customers',
+        'approvals': 'approvals',
+        'locations': 'store_locations',
+        'banners': 'banners',
+        'promotions': 'promotional_sections',
         'users': 'admin_users',
         'roles': 'roles_permissions',
         'audit': 'audit_logs',
-        'locations': 'store_locations',
+        'settings': 'settings',
       };
       const permModule = permMap[tabName] || tabName;
-      if (!this.can(permModule, 'view') && tabName !== 'dashboard') {
+      if (!this.can(permModule, 'view')) {
         this.toast('You do not have permission to view this section.', 'error');
+        const fallback = this.getFirstPermittedTab();
+        if (fallback && fallback !== tabName) {
+          this.navigateTo(fallback);
+        } else if (!fallback) {
+          this.showNoPermissionsView();
+        }
         return;
       }
 
@@ -350,6 +477,13 @@
     },
 
     logout(notify = true) {
+      try {
+        localStorage.removeItem('marjaah_admin_dashboard_cache_v4');
+        localStorage.removeItem('marjaah_admin_dashboard_cache');
+        localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache');
+        localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache_v3');
+      } catch (_) {}
+
       if (window.AdminAuth) {
         window.AdminAuth.logout(notify);
       } else {
@@ -358,6 +492,7 @@
         this.role = null;
         localStorage.removeItem('marjaah_admin_token');
         localStorage.removeItem('marjaah_admin_user');
+        localStorage.removeItem('marjaah_admin_role');
         if (this.refreshInterval) clearInterval(this.refreshInterval);
       }
     },
@@ -426,6 +561,13 @@
     },
 
     bindGlobalEvents() {
+      window.addEventListener('hashchange', () => {
+        const tab = window.location.hash.replace('#', '').trim();
+        if (tab && tab !== this.activeTab) {
+          this.navigateTo(tab);
+        }
+      });
+
       document.querySelectorAll('.sidebar-nav-item').forEach((item) => {
         item.addEventListener('click', (e) => {
           e.preventDefault();
@@ -459,14 +601,10 @@
         const input = document.getElementById(inputId);
         if (!btn || !input) return;
 
-        btn.addEventListener('click', (e) => {
+        btn.onclick = (e) => {
           e.preventDefault();
-          const isPassword = input.type === 'password';
-          input.type = isPassword ? 'text' : 'password';
-          btn.innerHTML = isPassword
-            ? '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>'
-            : '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
-        });
+          window.togglePasswordVisibility(input, btn);
+        };
       };
 
       setupPasswordToggle('admin-login-toggle-pw', 'admin-login-password');
@@ -549,8 +687,32 @@
     }, 200);
   };
 
-  document.addEventListener('DOMContentLoaded', () => {
+  window.togglePasswordVisibility = window.togglePasswordVisibility || function (inputId, btn) {
+    const input = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
+    const toggleBtn = btn || (input ? input.parentElement?.querySelector('button') : null);
+    if (!input) return;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    if (toggleBtn) {
+      toggleBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+      toggleBtn.setAttribute('title', isPassword ? 'Hide password' : 'Show password');
+      toggleBtn.innerHTML = isPassword
+        ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9.88 9.88 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>'
+        : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>';
+    }
+    try {
+      input.focus();
+      const len = input.value.length;
+      input.setSelectionRange(len, len);
+    } catch (_) {}
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      window.AdminApp.init();
+    });
+  } else {
     window.AdminApp.init();
-  });
+  }
 })();
 

@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 8080;
+const BACKEND_PORT = Number(process.env.BACKEND_PORT) || 3005;
 const FRONTEND_DIR = path.resolve(__dirname, '../../frontend');
 
 const MIME_TYPES = {
@@ -27,7 +28,7 @@ const server = http.createServer((req, res) => {
   if (req.url.startsWith('/api/')) {
     const proxyReq = http.request({
       hostname: 'localhost',
-      port: 3001,
+      port: BACKEND_PORT,
       path: req.url,
       method: req.method,
       headers: req.headers,

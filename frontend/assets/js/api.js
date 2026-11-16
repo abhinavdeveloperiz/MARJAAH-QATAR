@@ -16,7 +16,7 @@
   }
 
 
-  const defaultBaseUrl = isLocal ? 'http://localhost:3001' : (window.API_BASE_URL || '');
+  const defaultBaseUrl = isLocal ? (window.location.port === '8080' ? '' : 'http://localhost:3005') : (window.API_BASE_URL || '');
 
   const API_CONFIG = {
     baseUrl: window.API_BASE_URL || localStorage.getItem('marjaah_api_url') || defaultBaseUrl,

@@ -44,6 +44,9 @@
     },
 
     getLocalCache() {
+      if (window.AdminApp && typeof window.AdminApp.can === 'function' && !window.AdminApp.can('dashboard', 'view')) {
+        return null;
+      }
       try {
         localStorage.removeItem('marjaah_admin_dashboard_cache');
         localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache');
@@ -68,6 +71,9 @@
     },
 
     async load() {
+      if (window.AdminApp && typeof window.AdminApp.can === 'function' && !window.AdminApp.can('dashboard', 'view')) {
+        return;
+      }
       try {
         localStorage.removeItem('marjaah_admin_dashboard_cache');
         localStorage.removeItem('marjaah_cache_v2_admin_dashboard_cache');
@@ -161,6 +167,9 @@
     },
 
     async fetchAndRevalidate() {
+      if (window.AdminApp && typeof window.AdminApp.can === 'function' && !window.AdminApp.can('dashboard', 'view')) {
+        return;
+      }
       if (this.isRevalidating) return;
       this.isRevalidating = true;
 
