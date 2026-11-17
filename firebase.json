@@ -42,6 +42,11 @@
         "type": 301
       },
       {
+        "source": "/search.html",
+        "destination": "/search/",
+        "type": 301
+      },
+      {
         "source": "/shop.html",
         "destination": "/shop/",
         "type": 301
@@ -289,6 +294,22 @@
         "destination": "/index.html"
       },
       {
+        "source": "/search",
+        "destination": "/search/index.html"
+      },
+      {
+        "source": "/search/**",
+        "destination": "/search/index.html"
+      },
+      {
+        "source": "/ar/search",
+        "destination": "/search/index.html"
+      },
+      {
+        "source": "/ar/search/**",
+        "destination": "/search/index.html"
+      },
+      {
         "source": "/ar/shop",
         "destination": "/shop/index.html"
       },
@@ -454,6 +475,22 @@
       },
       {
         "source": "/ar/category/**",
+        "destination": "/shop/index.html"
+      },
+      {
+        "source": "/subcategory",
+        "destination": "/shop/index.html"
+      },
+      {
+        "source": "/subcategory/**",
+        "destination": "/shop/index.html"
+      },
+      {
+        "source": "/ar/subcategory",
+        "destination": "/shop/index.html"
+      },
+      {
+        "source": "/ar/subcategory/**",
         "destination": "/shop/index.html"
       },
       {

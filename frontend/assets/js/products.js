@@ -396,6 +396,7 @@
     category: '',
     categoryName: '',
     subcategory: '',
+    subcategoryName: '',
     brand: '',
     attributes: {},
     minPrice: '',
@@ -420,6 +421,60 @@
     search: '',
     loading: false
   };
+
+  const subcategoryState = {
+    all: [],
+    filterQuery: '',
+    loading: false
+  };
+
+  const expandedCategories = new Set();
+
+  function getSubcategoryIconSvg(iconKey) {
+    const k = (iconKey || 'tag').toLowerCase().trim();
+    switch (k) {
+      case 'smartphone':
+      case 'mobile':
+      case 'phone':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><line x1="12" x2="12.01" y1="18" y2="18"/></svg>`;
+      case 'headphones':
+      case 'headset':
+      case 'audio':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></svg>`;
+      case 'watch':
+      case 'smartwatch':
+      case 'wearable':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><polyline points="12 9 12 12 13.5 13.5"/><path d="M16.51 17.35l-.85 3.22a2 2 0 0 1-1.93 1.43H10.27a2 2 0 0 1-1.93-1.43l-.85-3.22"/><path d="M7.49 6.65l.85-3.22A2 2 0 0 1 10.27 2h3.46a2 2 0 0 1 1.93 1.43l.85 3.22"/></svg>`;
+      case 'laptop':
+      case 'computer':
+      case 'pc':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="12" x="3" y="4" rx="2"/><line x1="2" x2="22" y1="20" y2="20"/></svg>`;
+      case 'tv':
+      case 'monitor':
+      case 'display':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>`;
+      case 'camera':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></svg>`;
+      case 'gamepad':
+      case 'gaming':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" x2="10" y1="12" y2="12"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="15" x2="15.01" y1="13" y2="13"/><line x1="18" x2="18.01" y1="11" y2="11"/><rect width="20" height="12" x="2" y="6" rx="6"/></svg>`;
+      case 'shirt':
+      case 'fashion':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/></svg>`;
+      case 'package':
+      case 'box':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg>`;
+      case 'sparkles':
+      case 'star':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>`;
+      case 'zap':
+      case 'bolt':
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`;
+      case 'tag':
+      default:
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2H2v10l9.29 9.29c.94.94 2.48.94 3.42 0l6.58-6.58c.94-.94.94-2.48 0-3.42L12 2Z"/><path d="M7 7h.01"/></svg>`;
+    }
+  }
 
   const categoryImageFallbacks = {
     'laptops-pcs': 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/categories/cat-laptops.jpg',
@@ -488,25 +543,275 @@
     `;
   }
 
+  function renderSubcategoryCard(sub, catObj, idx = 0) {
+    const catSlug = (catObj?.slug || catObj?.id || shopState.category || '').toLowerCase();
+    const subSlug = (sub.slug || sub.id || '').toLowerCase();
+    const name = (isRtl && sub.name_ar) ? sub.name_ar : (sub.name || subSlug);
+    const altName = (isRtl && sub.name) ? sub.name : (sub.name_ar || '');
+    const pCount = sub.product_count !== undefined ? Number(sub.product_count) : 0;
+    const color = sub.color || '#4063B2';
+    const iconSvg = getSubcategoryIconSvg(sub.icon);
+    const delay = (idx % 8) * 40;
+
+    const imgUrl = sub.image || sub.image_url || sub.thumbnail || catObj?.image || categoryImageFallbacks[subSlug] || categoryImageFallbacks[catSlug] || categoryImageFallbacks.default;
+    const subHref = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(catSlug)}/?subcategory=${encodeURIComponent(subSlug)}`;
+
+    return `
+      <a href="${subHref}" data-subcategory-card="${subSlug}" data-parent-cat="${catSlug}" class="group relative rounded-3xl overflow-hidden border flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-[#8D9CF5] cursor-pointer block text-inherit no-underline"
+           style="background:var(--bg-surface);border-color:var(--border-color);animation-delay:${delay}ms">
+        <div class="relative h-48 overflow-hidden" style="background:var(--bg-surface-2)">
+          <img src="${imgUrl}" alt="${name}" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+               loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/hero-mobile.jpg'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/40 to-transparent"></div>
+          
+          <!-- Top Badges: Icon/Color & Explore -->
+          <div class="absolute top-3.5 left-3.5 flex items-center gap-2">
+            <span class="w-7 h-7 rounded-xl flex items-center justify-center backdrop-blur-md bg-white/20 text-white shadow-sm border border-white/20" title="${name}">
+              ${iconSvg}
+            </span>
+            <span class="w-2.5 h-2.5 rounded-full ring-2 ring-white/30" style="background:${color}"></span>
+          </div>
+
+          <div class="absolute top-3.5 right-3.5">
+            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md bg-white/10 text-white/90 border border-white/15">
+              ${isRtl ? 'استكشف' : 'Explore'}
+            </span>
+          </div>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-display font-bold text-lg mb-1 group-hover:text-[#8D9CF5] transition-colors flex items-center gap-2" style="color:var(--text-primary)">
+              <span>${name}</span>
+            </h3>
+            ${altName ? `<p class="text-xs text-slate-400 mb-2">${altName}</p>` : ''}
+          </div>
+          <div class="pt-3 border-t mt-3 flex items-center justify-between text-xs font-bold text-[#8D9CF5]" style="border-color:var(--border-color)">
+            <span>${isRtl ? 'تصفح المنتجات' : 'Browse Products'} (${pCount})</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
+    `;
+  }
+
+  function renderAllProductsInCatCard(catObj) {
+    const catSlug = (catObj?.slug || catObj?.id || shopState.category || '').toLowerCase();
+    const catName = (isRtl && catObj?.name_ar) ? catObj.name_ar : (catObj?.name || catSlug);
+    const pCount = catObj?.product_count !== undefined ? Number(catObj.product_count) : 0;
+    const imgUrl = catObj?.image || categoryImageFallbacks[catSlug] || categoryImageFallbacks.default;
+    const catHref = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(catSlug)}/?view=products`;
+
+    return `
+      <a href="${catHref}" data-view-all-category-products="${catSlug}" class="group relative rounded-3xl overflow-hidden border flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-[#8D9CF5] cursor-pointer block text-inherit no-underline"
+           style="background:linear-gradient(135deg, rgba(64,99,178,0.18), var(--bg-surface));border-color:rgba(141,156,245,0.4)">
+        <div class="relative h-48 overflow-hidden" style="background:var(--bg-surface-2)">
+          <img src="${imgUrl}" alt="${catName}" class="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-108"
+               loading="lazy" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/hero-mobile.jpg'" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/60 to-transparent"></div>
+          
+          <div class="absolute top-3.5 left-3.5">
+            <span class="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#4063B2] text-white shadow-sm flex items-center gap-1.5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              <span>${isRtl ? 'جميع المنتجات' : 'All Products'}</span>
+            </span>
+          </div>
+
+          <div class="absolute top-3.5 right-3.5">
+            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-md bg-white/15 text-white border border-white/20">
+              ${isRtl ? 'تصفح الكل' : 'Browse All'}
+            </span>
+          </div>
+        </div>
+
+        <div class="p-5 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-display font-bold text-lg mb-1 text-[#8D9CF5] transition-colors" style="color:var(--text-primary)">
+              ${isRtl ? `جميع منتجات ${catName}` : `All ${catName} Products`}
+            </h3>
+            <p class="text-xs text-slate-400 mb-2">${isRtl ? 'عرض كافة منتجات هذه الفئة مباشرة' : `Browse all ${pCount} products in this category`}</p>
+          </div>
+          <div class="pt-3 border-t mt-3 flex items-center justify-between text-xs font-bold text-[#8D9CF5]" style="border-color:var(--border-color)">
+            <span>${isRtl ? 'عرض كل المنتجات' : 'View All Products'} (${pCount})</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform group-hover:translate-x-1.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </div>
+        </div>
+      </a>
+    `;
+  }
+
+  async function renderShopSubcategories() {
+    const container = document.getElementById('shop-subcategories-container');
+    if (!container) return;
+
+    const catSlug = (shopState.category || '').toLowerCase();
+    if (!catSlug) {
+      returnToShopCategories();
+      return;
+    }
+
+    container.innerHTML = `
+      <div class="col-span-full py-16 flex flex-col items-center justify-center text-center">
+        <div class="w-10 h-10 border-3 border-[#4063B2] border-t-transparent rounded-full animate-spin mb-3"></div>
+        <p class="text-xs text-slate-400 font-medium">${isRtl ? 'جاري تحميل الفئات الفرعية...' : 'Loading subcategories...'}</p>
+      </div>
+    `;
+
+    // Ensure categories are loaded
+    let catObj = (categoryState.all || []).find(c => (c.slug || c.id || '').toLowerCase() === catSlug);
+    let subs = catObj?.subcategories || [];
+
+    if (!subs || subs.length === 0) {
+      try {
+        const res = await fetch(`/api/subcategories?categorySlug=${encodeURIComponent(catSlug)}`);
+        if (res.ok) {
+          const sData = await res.json();
+          subs = Array.isArray(sData) ? sData : (sData.subcategories || []);
+          if (catObj) catObj.subcategories = subs;
+        }
+      } catch (err) {
+        console.warn('Error loading subcategories:', err);
+      }
+    }
+
+    if (!catObj && categoryState.all && categoryState.all.length > 0) {
+      catObj = categoryState.all.find(c => (c.slug || c.id || '').toLowerCase() === catSlug);
+    }
+
+    const catName = (isRtl && catObj?.name_ar) ? catObj.name_ar : (catObj?.name || catSlug.replace(/-/g, ' '));
+    shopState.categoryName = catName;
+
+    // Filter by categoryState.search if user searched in subcategories page
+    const filterQuery = (categoryState.search || '').trim().toLowerCase();
+    let displaySubs = subs;
+    if (filterQuery) {
+      displaySubs = subs.filter(s => {
+        const n = (s.name || '').toLowerCase();
+        const na = (s.name_ar || '').toLowerCase();
+        return n.includes(filterQuery) || na.includes(filterQuery);
+      });
+    }
+
+    // Sort subcategories by order or name
+    displaySubs.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+    // Update Counter text
+    const counterEl = document.getElementById('shop-items-counter');
+    if (counterEl) {
+      counterEl.innerHTML = `<span>${isRtl ? 'عرض' : 'Showing'} <strong style="color:var(--text-primary)">${displaySubs.length}</strong> ${isRtl ? 'فئة فرعية في' : 'subcategories in'} <strong class="text-[#8D9CF5]">${catName}</strong></span>`;
+    }
+
+    // Build Cards HTML
+    let html = '';
+    // Add "All Products in Category" card first if not searching
+    if (!filterQuery) {
+      html += renderAllProductsInCatCard(catObj);
+    }
+
+    if (displaySubs.length > 0) {
+      html += displaySubs.map((sub, idx) => renderSubcategoryCard(sub, catObj, idx)).join('');
+    } else if (subs.length === 0) {
+      // No subcategories in this category
+      html += `
+        <div class="col-span-full py-12 text-center rounded-3xl border p-8" style="background:var(--bg-surface);border-color:var(--border-color)">
+          <div class="w-14 h-14 rounded-2xl bg-[#4063B2]/10 text-[#8D9CF5] flex items-center justify-center mx-auto mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          </div>
+          <h3 class="text-base font-bold mb-1" style="color:var(--text-primary)">${isRtl ? 'لا توجد فئات فرعية لهذه الفئة حالياً' : 'No subcategories in this category yet'}</h3>
+          <p class="text-xs text-slate-400 mb-5">${isRtl ? 'يمكنك تصفح جميع منتجات هذه الفئة مباشرة' : `Browse all ${catObj?.product_count || 0} products in ${catName} directly.`}</p>
+          <button type="button" onclick="selectShopCategory('${catSlug}', true)" class="px-5 py-2.5 rounded-xl bg-[#4063B2] text-white text-xs font-bold hover:bg-[#345296] transition cursor-pointer">
+            ${isRtl ? `تصفح كل منتجات ${catName}` : `Browse All ${catName} Products`}
+          </button>
+        </div>
+      `;
+    } else {
+      // Search had no matches
+      html += `
+        <div class="col-span-full py-12 text-center">
+          <p class="text-xs text-slate-400 font-medium">${isRtl ? 'لم يتم العثور على فئات فرعية مطابقة للبحث.' : 'No subcategories found matching your search.'}</p>
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+
+    // Attach click listeners to Subcategory cards
+    container.querySelectorAll('[data-subcategory-card]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.metaKey && !e.ctrlKey && !e.shiftKey) {
+          e.preventDefault();
+        }
+        const targetSub = card.getAttribute('data-subcategory-card');
+        const parentCat = card.getAttribute('data-parent-cat') || catSlug;
+        selectShopSubcategory(parentCat, targetSub);
+      });
+    });
+
+    // Attach click listener to "View All Category Products" card
+    container.querySelectorAll('[data-view-all-category-products]').forEach(card => {
+      card.addEventListener('click', (e) => {
+        if (!e.metaKey && !e.ctrlKey && !e.shiftKey) {
+          e.preventDefault();
+        }
+        const parentCat = card.getAttribute('data-view-all-category-products') || catSlug;
+        selectShopCategory(parentCat, true);
+      });
+    });
+
+    // Clear category pagination since subcategories are displayed on a single page
+    const paginationContainer = document.getElementById('shop-pagination-container');
+    if (paginationContainer) paginationContainer.innerHTML = '';
+  }
+  global.renderShopSubcategories = renderShopSubcategories;
+  window.renderShopSubcategories = renderShopSubcategories;
+
   function updateShopViewMode() {
-    const isCategories = shopState.viewMode === 'categories' && !shopState.category && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer && !shopState.search;
+    try {
+      document.documentElement.classList.remove('init-categories-view', 'init-subcategories-view', 'init-products-view');
+    } catch (_) {}
+    const isCategories = shopState.viewMode === 'categories';
+    const isSubcategories = shopState.viewMode === 'subcategories';
 
     const categoriesContainer = document.getElementById('shop-categories-container');
+    const subcategoriesContainer = document.getElementById('shop-subcategories-container');
     const productsContainer = document.getElementById('shop-products-container');
+    const sidebar = document.getElementById('shop-category-sidebar');
     const filterControlsBar = document.getElementById('shop-filter-controls-bar');
     const backBtn = document.getElementById('shop-back-to-categories-btn');
+    const backBtnText = document.getElementById('shop-back-to-categories-text');
     const pageTitle = document.getElementById('shop-page-title');
     const breadcrumbSep = document.getElementById('shop-breadcrumb-sep');
     const breadcrumbCurrent = document.getElementById('shop-breadcrumb-current');
     const activeFiltersBar = document.getElementById('shop-active-filters-bar');
     const searchInput = document.getElementById('shop-search-input');
+    const pillsContainer = document.getElementById('shop-category-pills');
+    const mobileCatIndicator = document.getElementById('shop-mobile-cat-indicator');
 
     if (isCategories) {
-      if (categoriesContainer) categoriesContainer.classList.remove('hidden');
-      if (productsContainer) productsContainer.classList.add('hidden');
+      if (categoriesContainer) {
+        categoriesContainer.classList.remove('hidden');
+        categoriesContainer.style.display = 'grid';
+      }
+      if (subcategoriesContainer) {
+        subcategoriesContainer.classList.add('hidden');
+        subcategoriesContainer.style.display = 'none';
+      }
+      if (productsContainer) {
+        productsContainer.classList.add('hidden');
+        productsContainer.style.display = 'none';
+      }
+      if (sidebar) {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('lg:block');
+        sidebar.style.display = 'none';
+      }
       if (filterControlsBar) filterControlsBar.classList.add('hidden');
       if (backBtn) backBtn.classList.add('hidden');
       if (activeFiltersBar) activeFiltersBar.classList.add('hidden');
+      if (pillsContainer) {
+        pillsContainer.classList.remove('hidden');
+        pillsContainer.classList.add('flex');
+      }
 
       if (breadcrumbSep) breadcrumbSep.classList.add('hidden');
       if (breadcrumbCurrent) {
@@ -521,20 +826,104 @@
         searchInput.placeholder = isRtl ? 'البحث في الفئات...' : 'Search categories...';
         searchInput.value = categoryState.search || '';
       }
-    } else {
-      if (categoriesContainer) categoriesContainer.classList.add('hidden');
-      if (productsContainer) productsContainer.classList.remove('hidden');
-      if (filterControlsBar) filterControlsBar.classList.remove('hidden');
-      if (backBtn) backBtn.classList.remove('hidden');
+      if (mobileCatIndicator) {
+        mobileCatIndicator.textContent = isRtl ? 'جميع الفئات' : 'All Categories';
+      }
+    } else if (isSubcategories) {
+      if (categoriesContainer) {
+        categoriesContainer.classList.add('hidden');
+        categoriesContainer.style.display = 'none';
+      }
+      if (subcategoriesContainer) {
+        subcategoriesContainer.classList.remove('hidden');
+        subcategoriesContainer.style.display = 'grid';
+      }
+      if (productsContainer) {
+        productsContainer.classList.add('hidden');
+        productsContainer.style.display = 'none';
+      }
+      if (sidebar) {
+        sidebar.classList.add('hidden');
+        sidebar.classList.remove('lg:block');
+        sidebar.style.display = 'none';
+      }
+      if (filterControlsBar) filterControlsBar.classList.add('hidden');
+      if (backBtn) {
+        backBtn.classList.remove('hidden');
+        if (backBtnText) backBtnText.textContent = isRtl ? 'جميع الفئات' : 'All Categories';
+      }
+      if (activeFiltersBar) activeFiltersBar.classList.add('hidden');
+      if (pillsContainer) {
+        pillsContainer.classList.add('hidden');
+        pillsContainer.classList.remove('flex', 'md:flex');
+      }
 
       if (breadcrumbSep) breadcrumbSep.classList.remove('hidden');
       if (breadcrumbCurrent) {
         breadcrumbCurrent.classList.remove('hidden');
-        breadcrumbCurrent.textContent = shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : (isRtl ? 'جميع المنتجات' : 'All Products'));
+        breadcrumbCurrent.innerHTML = `<span class="text-[#8D9CF5] font-bold">${shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : '')}</span>`;
       }
 
       if (pageTitle) {
-        if (shopState.categoryName) {
+        pageTitle.textContent = shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : (isRtl ? 'الفئات الفرعية' : 'Subcategories'));
+      }
+      if (searchInput) {
+        searchInput.placeholder = isRtl ? `البحث في الفئات الفرعية...` : `Search subcategories...`;
+        searchInput.value = categoryState.search || '';
+      }
+      if (mobileCatIndicator) {
+        mobileCatIndicator.textContent = shopState.categoryName || (isRtl ? 'الفئات الفرعية' : 'Subcategories');
+      }
+    } else {
+      // Products view: ALWAYS show products and the left-side subcategory navigation sidebar!
+      if (categoriesContainer) {
+        categoriesContainer.classList.add('hidden');
+        categoriesContainer.style.display = 'none';
+      }
+      if (subcategoriesContainer) {
+        subcategoriesContainer.classList.add('hidden');
+        subcategoriesContainer.style.display = 'none';
+      }
+      if (productsContainer) {
+        productsContainer.classList.remove('hidden');
+        productsContainer.style.display = 'grid';
+      }
+      if (sidebar) {
+        sidebar.classList.remove('hidden');
+        sidebar.classList.add('lg:block');
+        sidebar.style.display = '';
+      }
+      if (filterControlsBar) filterControlsBar.classList.remove('hidden');
+      if (backBtn) {
+        backBtn.classList.remove('hidden');
+        if (backBtnText) {
+          if (shopState.subcategory) {
+            backBtnText.textContent = isRtl ? `فئات ${shopState.categoryName || ''}` : `All ${shopState.categoryName || ''} Subcategories`;
+          } else {
+            backBtnText.textContent = isRtl ? 'جميع الفئات' : 'All Categories';
+          }
+        }
+      }
+      if (pillsContainer) {
+        pillsContainer.classList.add('hidden', 'md:flex');
+        pillsContainer.classList.remove('flex');
+      }
+
+      if (breadcrumbSep) breadcrumbSep.classList.remove('hidden');
+      if (breadcrumbCurrent) {
+        breadcrumbCurrent.classList.remove('hidden');
+        if (shopState.subcategoryName) {
+          const catLabel = shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : '');
+          breadcrumbCurrent.innerHTML = `${catLabel ? `<a href="javascript:void(0)" onclick="if(window.selectShopCategory)window.selectShopCategory('${shopState.category}')" class="hover:underline">${catLabel}</a> <span class="mx-1 text-slate-400">/</span> ` : ''}<span class="text-[#8D9CF5] font-bold">${shopState.subcategoryName}</span>`;
+        } else {
+          breadcrumbCurrent.textContent = shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : (isRtl ? 'جميع المنتجات' : 'All Products'));
+        }
+      }
+
+      if (pageTitle) {
+        if (shopState.subcategoryName) {
+          pageTitle.textContent = shopState.subcategoryName;
+        } else if (shopState.categoryName) {
           pageTitle.textContent = shopState.categoryName;
         } else if (shopState.category) {
           pageTitle.textContent = shopState.category.replace(/-/g, ' ');
@@ -547,6 +936,15 @@
       if (searchInput) {
         searchInput.placeholder = isRtl ? 'البحث عن منتجات...' : 'Search products in category...';
         searchInput.value = shopState.search || '';
+      }
+      if (mobileCatIndicator) {
+        if (shopState.subcategoryName) {
+          mobileCatIndicator.textContent = `${shopState.categoryName || 'Category'} > ${shopState.subcategoryName}`;
+        } else if (shopState.categoryName) {
+          mobileCatIndicator.textContent = shopState.categoryName;
+        } else {
+          mobileCatIndicator.textContent = isRtl ? 'جميع المنتجات' : 'All Products';
+        }
       }
     }
   }
@@ -635,9 +1033,9 @@
       try {
         let data;
         if (global.api && typeof global.api.getCategories === 'function') {
-          data = await global.api.getCategories();
+          data = await global.api.getCategories(true);
         } else {
-          const res = await fetch('/api/categories');
+          const res = await fetch('/api/categories?includeSubcategories=true');
           data = await res.json();
         }
         if (Array.isArray(data)) {
@@ -647,6 +1045,7 @@
         } else if (data && Array.isArray(data.items)) {
           categoryState.all = data.items;
         }
+        renderLeftCategorySidebar();
       } catch (err) {
         console.error('Failed to fetch categories:', err);
       }
@@ -709,13 +1108,14 @@
     renderCategoryPagination();
   }
 
-  function selectShopCategory(slug) {
-    shopState.viewMode = 'products';
+  function selectShopCategory(slug, directToProducts = false) {
     shopState.category = (slug || '').trim().toLowerCase();
     shopState.subcategory = '';
+    shopState.subcategoryName = '';
     shopState.brand = '';
     shopState.attributes = {};
     shopState.page = 1;
+    categoryState.search = '';
 
     const found = (categoryState.all || []).find(c => (c.slug || c.id || '').toLowerCase() === shopState.category);
     if (found) {
@@ -724,21 +1124,80 @@
       shopState.categoryName = shopState.category.replace(/-/g, ' ');
     }
 
+    if (shopState.category) expandedCategories.add(shopState.category);
+
+    if (directToProducts) {
+      shopState.viewMode = 'products';
+      syncShopUrlParams();
+      updateShopViewMode();
+      syncShopInputs();
+      renderActiveFilterChips();
+      renderLeftCategorySidebar();
+      loadShopBrands();
+      loadShopSubcategories();
+      renderShop();
+    } else {
+      shopState.viewMode = 'subcategories';
+      syncShopUrlParams();
+      updateShopViewMode();
+      syncShopInputs();
+      renderActiveFilterChips();
+      renderShopSubcategories();
+      loadShopSubcategories();
+      renderLeftCategorySidebar();
+    }
+    loadShopCategories();
+
+    const target = document.getElementById('shop-page-title');
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  global.selectShopCategory = selectShopCategory;
+  window.selectShopCategory = selectShopCategory;
+
+  function selectShopSubcategory(catSlug, subSlug) {
+    shopState.viewMode = 'products';
+    shopState.category = (catSlug || '').trim().toLowerCase();
+    shopState.subcategory = (subSlug || '').trim().toLowerCase();
+    shopState.page = 1;
+
+    if (shopState.category) expandedCategories.add(shopState.category);
+
+    const foundCat = (categoryState.all || []).find(c => (c.slug || c.id || '').toLowerCase() === shopState.category);
+    if (foundCat) {
+      shopState.categoryName = (isRtl && foundCat.name_ar) ? foundCat.name_ar : (foundCat.name || shopState.category);
+      const foundSub = (foundCat.subcategories || []).find(s => (s.slug || s.id || '').toLowerCase() === shopState.subcategory);
+      if (foundSub) {
+        shopState.subcategoryName = (isRtl && foundSub.name_ar) ? foundSub.name_ar : (foundSub.name || shopState.subcategory);
+      } else {
+        shopState.subcategoryName = shopState.subcategory.replace(/-/g, ' ');
+      }
+    } else {
+      shopState.categoryName = shopState.category.replace(/-/g, ' ');
+      shopState.subcategoryName = shopState.subcategory.replace(/-/g, ' ');
+    }
+
     syncShopUrlParams();
     updateShopViewMode();
+    syncShopInputs();
+    renderActiveFilterChips();
+    renderLeftCategorySidebar();
     loadShopBrands();
+    loadShopSubcategories();
     renderShop();
     loadShopCategories();
 
     const target = document.getElementById('shop-page-title');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+  global.selectShopSubcategory = selectShopSubcategory;
+  window.selectShopSubcategory = selectShopSubcategory;
 
   function returnToShopCategories() {
     shopState.viewMode = 'categories';
     shopState.category = '';
     shopState.categoryName = '';
     shopState.subcategory = '';
+    shopState.subcategoryName = '';
     shopState.brand = '';
     shopState.attributes = {};
     shopState.search = '';
@@ -748,25 +1207,31 @@
 
     syncShopUrlParams();
     updateShopViewMode();
+    syncShopInputs();
+    renderActiveFilterChips();
+    renderLeftCategorySidebar();
     loadShopBrands();
+    loadShopSubcategories();
     renderShopCategories();
     loadShopCategories();
 
     const target = document.getElementById('shop-page-title');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
+  global.returnToShopCategories = returnToShopCategories;
+  window.returnToShopCategories = returnToShopCategories;
 
   function syncShopUrlParams() {
     try {
       const isArabic = window.location.pathname.startsWith('/ar');
       let targetPath = `${isArabic ? '/ar' : ''}/shop/`;
-      if (shopState.viewMode === 'products' && shopState.category && !shopState.search && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer) {
+      if ((shopState.viewMode === 'subcategories' || shopState.viewMode === 'products') && shopState.category) {
         targetPath = `${isArabic ? '/ar' : ''}/category/${encodeURIComponent(shopState.category)}/`;
       }
       const url = new URL(targetPath, window.location.origin);
       if (shopState.viewMode === 'products') {
+        if (shopState.subcategory) url.searchParams.set('subcategory', shopState.subcategory);
         if (shopState.search) url.searchParams.set('search', shopState.search);
-        if (shopState.category) url.searchParams.set('category', shopState.category);
         if (shopState.brand) url.searchParams.set('brand', shopState.brand);
         if (shopState.minPrice) url.searchParams.set('minPrice', shopState.minPrice);
         if (shopState.maxPrice) url.searchParams.set('maxPrice', shopState.maxPrice);
@@ -774,15 +1239,354 @@
         if (shopState.isOffer) url.searchParams.set('isOffer', 'true');
         if (shopState.sort && shopState.sort !== 'featured') url.searchParams.set('sort', shopState.sort);
         if (shopState.page > 1) url.searchParams.set('page', shopState.page);
-        if (shopState.limit && shopState.limit !== 12) url.searchParams.set('per_page', shopState.limit);
+        if (!shopState.subcategory && !shopState.search && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer) {
+          url.searchParams.set('view', 'products');
+        }
+        url.searchParams.delete('per_page');
+      } else if (shopState.viewMode === 'subcategories') {
+        if (categoryState.search) url.searchParams.set('search', categoryState.search);
       } else {
         if (categoryState.search) url.searchParams.set('search', categoryState.search);
         if (categoryState.page > 1) url.searchParams.set('cat_page', categoryState.page);
       }
 
-      window.history.pushState({ viewMode: shopState.viewMode, category: shopState.category }, '', url);
+      window.history.pushState({ viewMode: shopState.viewMode, category: shopState.category, subcategory: shopState.subcategory }, '', url);
     } catch (e) { }
   }
+
+  function renderLeftCategorySidebar() {
+    const sidebarList = document.getElementById('shop-sidebar-category-list');
+    const drawerList = document.getElementById('shop-drawer-category-list');
+    const totalCountEl = document.getElementById('sidebar-total-products-count');
+    const allCatBtn = document.getElementById('sidebar-all-categories-btn');
+
+    if (!sidebarList && !drawerList) return;
+
+    const categories = (categoryState.all || []).slice();
+    categories.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+    const totalCatalogProducts = categories.reduce((sum, c) => sum + (Number(c.product_count) || 0), 0);
+    if (totalCountEl) totalCountEl.textContent = (totalCatalogProducts || 1462).toLocaleString();
+
+    const activeCatSlug = (shopState.category || '').toLowerCase();
+    const activeSubSlug = (shopState.subcategory || '').toLowerCase();
+    const isAllActive = shopState.viewMode === 'categories' || (!activeCatSlug && !activeSubSlug);
+
+    if (allCatBtn) {
+      if (isAllActive) {
+        allCatBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer bg-[#4063B2] text-white shadow-sm';
+      } else {
+        allCatBtn.className = 'w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300';
+      }
+    }
+
+    if (activeCatSlug) {
+      expandedCategories.add(activeCatSlug);
+    }
+
+    const filterQ = (subcategoryState.filterQuery || '').toLowerCase().trim();
+
+    let filteredCats = categories;
+    if (filterQ) {
+      filteredCats = categories.filter(c => {
+        const matchCat = (c.name || '').toLowerCase().includes(filterQ) || (c.name_ar || '').toLowerCase().includes(filterQ);
+        const matchSub = (c.subcategories || []).some(s => (s.name || '').toLowerCase().includes(filterQ) || (s.name_ar || '').toLowerCase().includes(filterQ));
+        return matchCat || matchSub;
+      });
+    }
+
+    const generateListHtml = (isDrawer = false) => {
+      if (filteredCats.length === 0) {
+        return `<div class="p-4 text-center text-xs text-slate-400 font-medium">${isRtl ? 'لا توجد فئات مطابقة' : 'No categories match your search.'}</div>`;
+      }
+
+      return filteredCats.map(cat => {
+        const catSlug = (cat.slug || cat.id || '').toLowerCase();
+        const catName = (isRtl && cat.name_ar) ? cat.name_ar : (cat.name || catSlug);
+        const isCatActive = activeCatSlug === catSlug;
+        const isExpanded = isCatActive || expandedCategories.has(catSlug) || Boolean(filterQ);
+        const catCount = Number(cat.product_count) || 0;
+        const subs = (cat.subcategories || []).slice();
+        subs.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+
+        let subsHtml = '';
+        if (subs.length > 0) {
+          subsHtml = `
+            <div class="mt-1 pl-2.5 pr-1 py-1 space-y-1 border-l-2 ml-3 border-slate-200 dark:border-slate-800 ${isExpanded ? '' : 'hidden'}" data-accordion-content="${catSlug}">
+              <!-- "All in Category" Option -->
+              <button type="button" data-nav-category="${catSlug}" class="w-full text-left flex items-center justify-between py-1.5 px-2 rounded-lg text-xs transition-all cursor-pointer ${isCatActive && !activeSubSlug ? 'bg-[#4063B2]/15 text-[#4063B2] dark:text-[#8D9CF5] font-black' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/40 font-semibold'}">
+                <span class="truncate">${isRtl ? `جميع ${catName}` : `All ${catName}`}</span>
+                <span class="text-[10px] font-mono opacity-60">(${catCount})</span>
+              </button>
+
+              ${subs.map(sub => {
+                const subSlug = (sub.slug || sub.id || '').toLowerCase();
+                const subName = (isRtl && sub.name_ar) ? sub.name_ar : (sub.name || subSlug);
+                const isSubActive = isCatActive && activeSubSlug === subSlug;
+                const subCount = Number(sub.product_count) || 0;
+                const color = sub.color || '#4063B2';
+                const iconSvg = getSubcategoryIconSvg(sub.icon);
+                const img = sub.image || '/assets/images/products/placeholder.svg';
+
+                return `
+                  <button type="button" data-nav-subcategory="${subSlug}" data-parent-cat="${catSlug}" class="w-full text-left flex items-center justify-between py-1.5 px-2 rounded-xl text-xs transition-all cursor-pointer group ${isSubActive ? 'bg-[#4063B2] text-white font-bold shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/60'}">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <!-- Color dot + Thumbnail -->
+                      <div class="relative w-6 h-6 rounded-lg overflow-hidden border border-slate-700/30 flex-shrink-0 bg-slate-800/50 flex items-center justify-center">
+                        <img src="${img}" class="w-full h-full object-cover" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                        <span class="absolute bottom-0 right-0 w-2 h-2 rounded-full border border-white" style="background:${color}"></span>
+                      </div>
+                      <!-- Icon + Name -->
+                      <div class="flex items-center gap-1.5 min-w-0">
+                        <span class="text-slate-400 shrink-0 ${isSubActive ? '!text-white' : ''}">${iconSvg}</span>
+                        <span class="truncate">${subName}</span>
+                      </div>
+                    </div>
+                    <span class="text-[10px] font-mono ml-1 flex-shrink-0 ${isSubActive ? 'text-white/90' : 'text-slate-400'}">(${subCount})</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+
+        return `
+          <div class="category-accordion-group rounded-2xl transition-all" data-cat-group="${catSlug}">
+            <!-- Parent Category Header Button -->
+            <div class="flex items-center justify-between p-1 rounded-xl transition-all ${isCatActive ? 'bg-[#4063B2]/10 text-[#4063B2] dark:text-[#8D9CF5]' : 'hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-800 dark:text-slate-200'}">
+              <button type="button" data-nav-category="${catSlug}" class="flex-1 text-left flex items-center gap-2.5 py-1 px-2 rounded-lg cursor-pointer min-w-0">
+                <span class="w-2 h-2 rounded-full flex-shrink-0 ${isCatActive ? 'bg-[#4063B2] animate-pulse' : 'bg-slate-400/40'}"></span>
+                <span class="text-xs font-bold truncate">${catName}</span>
+                <span class="text-[10px] font-mono text-slate-400 shrink-0">(${catCount})</span>
+              </button>
+              ${subs.length > 0 ? `
+                <button type="button" data-toggle-accordion="${catSlug}" aria-label="Toggle subcategories" class="p-1.5 rounded-lg hover:bg-slate-500/10 text-slate-400 hover:text-slate-200 transition cursor-pointer">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}"><path d="m9 18 6-6-6-6"/></svg>
+                </button>
+              ` : ''}
+            </div>
+            ${subsHtml}
+          </div>
+        `;
+      }).join('');
+    };
+
+    if (sidebarList) {
+      sidebarList.innerHTML = generateListHtml(false);
+      bindSidebarListeners(sidebarList, false);
+    }
+    if (drawerList) {
+      drawerList.innerHTML = generateListHtml(true);
+      bindSidebarListeners(drawerList, true);
+    }
+  }
+  global.renderLeftCategorySidebar = renderLeftCategorySidebar;
+  window.renderLeftCategorySidebar = renderLeftCategorySidebar;
+
+  function bindSidebarListeners(container, isDrawer = false) {
+    container.querySelectorAll('[data-toggle-accordion]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const slug = btn.getAttribute('data-toggle-accordion');
+        if (expandedCategories.has(slug)) {
+          expandedCategories.delete(slug);
+        } else {
+          expandedCategories.add(slug);
+        }
+        renderLeftCategorySidebar();
+      });
+    });
+
+    container.querySelectorAll('[data-nav-category]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const slug = btn.getAttribute('data-nav-category');
+        selectShopCategory(slug);
+        if (isDrawer && window.closeShopCategoryDrawer) window.closeShopCategoryDrawer();
+      });
+    });
+
+    container.querySelectorAll('[data-nav-subcategory]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const subSlug = btn.getAttribute('data-nav-subcategory');
+        const parentSlug = btn.getAttribute('data-parent-cat');
+        selectShopSubcategory(parentSlug, subSlug);
+        if (isDrawer && window.closeShopCategoryDrawer) window.closeShopCategoryDrawer();
+      });
+    });
+  }
+
+  async function loadShopSubcategories(categorySlug = null) {
+    const filterSubSec = document.getElementById('filter-subcategories-section');
+    const filterSubList = document.getElementById('filter-subcategory-list');
+    const filterSubName = document.getElementById('filter-subcategories-selected-name');
+    if (!filterSubSec || !filterSubList) return;
+
+    const catSlug = (categorySlug || shopState.category || '').toLowerCase();
+    if (!catSlug) {
+      filterSubSec.classList.add('hidden');
+      filterSubList.innerHTML = '';
+      if (filterSubName) filterSubName.textContent = '';
+      return;
+    }
+
+    filterSubSec.classList.remove('hidden');
+
+    let catObj = (categoryState.all || []).find(c => (c.slug || c.id || '').toLowerCase() === catSlug);
+    let subs = catObj?.subcategories || [];
+
+    if (!subs || subs.length === 0) {
+      try {
+        const res = await fetch(`/api/subcategories?categorySlug=${encodeURIComponent(catSlug)}`);
+        if (res.ok) {
+          const sData = await res.json();
+          subs = Array.isArray(sData) ? sData : (sData.subcategories || []);
+          if (catObj) catObj.subcategories = subs;
+        }
+      } catch (err) {}
+    }
+
+    if (filterSubName) {
+      filterSubName.textContent = shopState.subcategoryName ? `(${shopState.subcategoryName})` : '';
+    }
+
+    if (subs.length === 0) {
+      filterSubList.innerHTML = `<p class="text-[11px] text-slate-400 py-1 italic">${isRtl ? 'لا توجد فئات فرعية لهذه الفئة' : 'No subcategories available'}</p>`;
+      return;
+    }
+
+    const curSub = (shopState.subcategory || '').toLowerCase();
+    const allCatCount = Number(catObj?.product_count) || subs.reduce((sum, s) => sum + (Number(s.product_count) || 0), 0);
+
+    let html = `
+      <label class="flex items-center justify-between text-xs py-1.5 px-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer transition-colors ${!curSub ? 'bg-[#4063B2]/10 font-bold text-[#4063B2] dark:text-[#8D9CF5]' : ''}">
+        <div class="flex items-center gap-2 min-w-0">
+          <input type="radio" name="filter-subcat-radio" data-filter-sub="" ${!curSub ? 'checked' : ''} class="w-3.5 h-3.5 text-[#4063B2] focus:ring-0 cursor-pointer" />
+          <span class="w-2 h-2 rounded-full shrink-0 bg-slate-400"></span>
+          <span class="truncate font-medium">${isRtl ? 'جميع الفئات الفرعية' : 'All Subcategories'}</span>
+        </div>
+        <span class="text-[10px] font-mono text-slate-400 shrink-0">(${allCatCount})</span>
+      </label>
+    `;
+
+    html += subs.map(sub => {
+      const subSlug = (sub.slug || sub.id || '').toLowerCase();
+      const subName = (isRtl && sub.name_ar) ? sub.name_ar : (sub.name || subSlug);
+      const isChecked = curSub === subSlug;
+      const count = Number(sub.product_count) || 0;
+      const color = sub.color || '#4063B2';
+
+      return `
+        <label class="flex items-center justify-between text-xs py-1.5 px-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/60 cursor-pointer transition-colors ${isChecked ? 'bg-[#4063B2]/10 font-bold text-[#4063B2] dark:text-[#8D9CF5]' : ''}">
+          <div class="flex items-center gap-2 min-w-0">
+            <input type="radio" name="filter-subcat-radio" data-filter-sub="${subSlug}" ${isChecked ? 'checked' : ''} class="w-3.5 h-3.5 text-[#4063B2] focus:ring-0 cursor-pointer" />
+            <span class="w-2 h-2 rounded-full shrink-0" style="background:${color}"></span>
+            <span class="truncate font-medium">${subName}</span>
+          </div>
+          <span class="text-[10px] font-mono text-slate-400 shrink-0">(${count})</span>
+        </label>
+      `;
+    }).join('');
+
+    filterSubList.innerHTML = html;
+
+    filterSubList.querySelectorAll('input[data-filter-sub]').forEach(input => {
+      input.addEventListener('change', () => {
+        const targetSub = input.getAttribute('data-filter-sub');
+        if (!targetSub) {
+          shopState.subcategory = '';
+          shopState.subcategoryName = '';
+          selectShopCategory(catSlug, true);
+        } else {
+          selectShopSubcategory(catSlug, targetSub);
+        }
+      });
+    });
+  }
+  global.loadShopSubcategories = loadShopSubcategories;
+  window.loadShopSubcategories = loadShopSubcategories;
+
+  function updateSearchMatchBanner() {
+    const banner = document.getElementById('shop-search-match-banner');
+    const bannerText = document.getElementById('shop-search-match-text');
+    const bannerAction = document.getElementById('shop-search-match-action');
+    if (!banner || !bannerText || !bannerAction) return;
+
+    const q = (shopState.search || '').toLowerCase().trim();
+    if (!q || q.length < 2) {
+      banner.classList.add('hidden');
+      return;
+    }
+
+    let matchSub = null;
+    let matchCat = null;
+
+    for (const cat of (categoryState.all || [])) {
+      for (const s of (cat.subcategories || [])) {
+        if ((s.name || '').toLowerCase().includes(q) || (s.name_ar || '').toLowerCase().includes(q) || (s.slug || '').toLowerCase().includes(q)) {
+          matchSub = { ...s, parentCat: cat };
+          break;
+        }
+      }
+      if (matchSub) break;
+      if ((cat.name || '').toLowerCase().includes(q) || (cat.name_ar || '').toLowerCase().includes(q) || (cat.slug || '').toLowerCase().includes(q)) {
+        matchCat = cat;
+      }
+    }
+
+    if (matchSub) {
+      banner.classList.remove('hidden');
+      const catName = matchSub.parentCat.name || '';
+      bannerText.innerHTML = `Found matching subcategory: <strong>${matchSub.name}</strong> in ${catName} <span class="text-[10px] text-slate-400 font-mono">(${matchSub.product_count || 0} items)</span>`;
+      bannerAction.textContent = `Explore ${matchSub.name}`;
+      bannerAction.onclick = () => {
+        selectShopSubcategory(matchSub.parentCat.slug, matchSub.slug);
+      };
+    } else if (matchCat) {
+      banner.classList.remove('hidden');
+      bannerText.innerHTML = `Found matching category: <strong>${matchCat.name}</strong> <span class="text-[10px] text-slate-400 font-mono">(${matchCat.product_count || 0} items)</span>`;
+      bannerAction.textContent = `Explore ${matchCat.name}`;
+      bannerAction.onclick = () => {
+        selectShopCategory(matchCat.slug);
+      };
+    } else {
+      banner.classList.add('hidden');
+    }
+  }
+
+  window.openShopCategoryDrawer = function() {
+    const drawer = document.getElementById('shop-category-drawer');
+    if (!drawer) return;
+    drawer.classList.remove('hidden', 'pointer-events-none');
+    drawer.classList.remove('opacity-0');
+    drawer.classList.add('opacity-100');
+    const panel = drawer.querySelector('.max-w-\\[92vw\\]') || drawer.querySelector('[style*="translate-x"]');
+    if (panel) {
+      panel.classList.remove('-translate-x-full');
+      panel.classList.add('translate-x-0');
+    }
+    document.body.classList.add('overflow-hidden');
+  };
+
+  window.closeShopCategoryDrawer = function() {
+    const drawer = document.getElementById('shop-category-drawer');
+    if (!drawer) return;
+    drawer.classList.remove('opacity-100');
+    drawer.classList.add('opacity-0');
+    const panel = drawer.querySelector('.max-w-\\[92vw\\]') || drawer.querySelector('[style*="translate-x"]');
+    if (panel) {
+      panel.classList.remove('translate-x-0');
+      panel.classList.add('-translate-x-full');
+    }
+    setTimeout(() => {
+      drawer.classList.add('hidden', 'pointer-events-none');
+      document.body.classList.remove('overflow-hidden');
+    }, 300);
+  };
+
+  window.onSidebarSearchInput = function(val, target = 'sidebar') {
+    subcategoryState.filterQuery = (val || '').toLowerCase().trim();
+    renderLeftCategorySidebar();
+  };
 
   function syncShopInputs() {
     // In Stock checkboxes
@@ -848,10 +1652,23 @@
     if (shopState.category) {
       activeCount++;
       const catLabel = (shopState.categoryName || shopState.category).replace(/-/g, ' ');
+      // In responsive / mobile design (< lg), if a subcategory is also selected, hide the parent category chip
+      const catChipClass = shopState.subcategory ? 'hidden lg:inline-flex' : 'inline-flex';
       chips.push(`
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-[#4063B2]/15 text-[#4063B2] dark:text-[#8D9CF5] border border-[#4063B2]/30">
+        <span class="${catChipClass} items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-[#4063B2]/15 text-[#4063B2] dark:text-[#8D9CF5] border border-[#4063B2]/30 flex-shrink-0 whitespace-nowrap">
           <span>${isRtl ? 'الفئة:' : 'Category:'} <strong>${catLabel}</strong></span>
           <button type="button" data-clear="category" aria-label="Remove category filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
+        </span>
+      `);
+    }
+
+    if (shopState.subcategory) {
+      activeCount++;
+      const subLabel = (shopState.subcategoryName || shopState.subcategory).replace(/-/g, ' ');
+      chips.push(`
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-[#8D9CF5]/20 text-[#4063B2] dark:text-[#8D9CF5] border border-[#8D9CF5]/40 shadow-xs flex-shrink-0 whitespace-nowrap">
+          <span>${isRtl ? 'الفئة الفرعية:' : 'Subcategory:'} <strong>${subLabel}</strong></span>
+          <button type="button" data-clear="subcategory" aria-label="Remove subcategory filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
         </span>
       `);
     }
@@ -859,7 +1676,7 @@
     selectedBrands.forEach(b => {
       activeCount++;
       chips.push(`
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-slate-200/60 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-slate-200/60 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-700 flex-shrink-0 whitespace-nowrap">
           <span>${b}</span>
           <button type="button" data-clear-brand="${b}" aria-label="Remove brand filter ${b}" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
         </span>
@@ -871,7 +1688,7 @@
       const minText = shopState.minPrice ? formatPrice(shopState.minPrice) : '0';
       const maxText = shopState.maxPrice ? formatPrice(shopState.maxPrice) : '+∞';
       chips.push(`
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 flex-shrink-0 whitespace-nowrap">
           <span>${minText} – ${maxText}</span>
           <button type="button" data-clear="price" aria-label="Remove price filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
         </span>
@@ -881,7 +1698,7 @@
     if (shopState.inStock) {
       activeCount++;
       chips.push(`
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 flex-shrink-0 whitespace-nowrap">
           <span>${isRtl ? 'متوفر فقط' : 'In Stock Only'}</span>
           <button type="button" data-clear="inStock" aria-label="Remove in-stock filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
         </span>
@@ -891,7 +1708,7 @@
     if (shopState.isOffer) {
       activeCount++;
       chips.push(`
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 flex-shrink-0 whitespace-nowrap">
           <span>${isRtl ? 'عروض فقط' : 'Offers Only'}</span>
           <button type="button" data-clear="isOffer" aria-label="Remove offers filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
         </span>
@@ -901,7 +1718,7 @@
     if (shopState.search) {
       activeCount++;
       chips.push(`
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30">
+        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 flex-shrink-0 whitespace-nowrap">
           <span>"${shopState.search}"</span>
           <button type="button" data-clear="search" aria-label="Remove search term" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
         </span>
@@ -916,7 +1733,7 @@
           activeCount++;
           const labelKey = attrKey.replace(/_/g, ' ').toUpperCase();
           chips.push(`
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 border border-cyan-500/30 flex-shrink-0 whitespace-nowrap">
               <span>${labelKey}: <strong>${v}</strong></span>
               <button type="button" data-clear-attr="${attrKey}" data-clear-val="${v}" aria-label="Remove ${labelKey} filter" class="hover:opacity-75 cursor-pointer ml-1 text-sm font-black">&times;</button>
             </span>
@@ -941,11 +1758,11 @@
 
     if (activeCount > 0) {
       bar.innerHTML = `
-        <div class="flex flex-wrap items-center gap-2 flex-1">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-400 mr-1">${isRtl ? 'الفلاتر النشطة:' : 'Active Filters:'}</span>
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 flex-1 select-none">
+          <span class="hidden sm:inline-block text-[11px] font-bold uppercase tracking-wider text-slate-400 mr-0.5 flex-shrink-0">${isRtl ? 'الفلاتر النشطة:' : 'Active:'}</span>
           ${chips.join('')}
         </div>
-        <button id="shop-clear-all-filters" type="button" class="text-xs font-bold text-rose-500 hover:underline cursor-pointer flex-shrink-0">
+        <button id="shop-clear-all-filters" type="button" class="text-xs font-bold text-rose-500 hover:underline cursor-pointer flex-shrink-0 ml-2 whitespace-nowrap">
           ${isRtl ? 'مسح الكل' : 'Clear All'}
         </button>
       `;
@@ -957,6 +1774,17 @@
           const key = btn.getAttribute('data-clear');
           if (key === 'category') {
             returnToShopCategories();
+            return;
+          }
+          if (key === 'subcategory') {
+            shopState.subcategory = '';
+            shopState.subcategoryName = '';
+            shopState.page = 1;
+            if (shopState.category) {
+              selectShopCategory(shopState.category);
+            } else {
+              returnToShopCategories();
+            }
             return;
           }
           if (key === 'price') { shopState.minPrice = ''; shopState.maxPrice = ''; }
@@ -1033,13 +1861,14 @@
       if (categoryState.all && categoryState.all.length > 0) {
         categories = categoryState.all;
       } else if (global.api && typeof global.api.getCategories === 'function') {
-        categories = await global.api.getCategories();
+        categories = await global.api.getCategories(true);
       } else {
-        const res = await fetch('/api/categories');
+        const res = await fetch('/api/categories?includeSubcategories=true');
         categories = await res.json();
       }
       if (!Array.isArray(categories)) return;
       categoryState.all = categories;
+      renderLeftCategorySidebar();
 
       const activeCat = (shopState.category || '').toLowerCase();
       
@@ -1080,6 +1909,13 @@
         });
 
         pillsContainer.innerHTML = html;
+        if (shopState.viewMode === 'products') {
+          pillsContainer.classList.add('hidden', 'md:flex');
+          pillsContainer.classList.remove('flex');
+        } else {
+          pillsContainer.classList.remove('hidden');
+          pillsContainer.classList.add('flex');
+        }
 
         pillsContainer.querySelectorAll('[data-category-slug]').forEach(btn => {
           btn.addEventListener('click', (e) => {
@@ -1428,6 +2264,13 @@
       }
       return renderShopCategories();
     }
+    if (shopState.viewMode === 'subcategories') {
+      if (shopInfiniteScroller) {
+        shopInfiniteScroller.destroy();
+        shopInfiniteScroller = null;
+      }
+      return renderShopSubcategories();
+    }
 
     updateShopViewMode();
 
@@ -1455,6 +2298,8 @@
       shopInfiniteScroller.destroy();
       shopInfiniteScroller = null;
     }
+
+    updateSearchMatchBanner();
 
     container.style.opacity = '1';
     container.innerHTML = `
@@ -1537,68 +2382,85 @@
     const categoriesContainer = document.getElementById('shop-categories-container');
     if (!productsContainer && !categoriesContainer) return;
 
-    // Read initial URL params or clean path /category/:slug/ or /ar/category/:slug/
+    // Read initial URL params or clean path /category/:slug/ or /subcategory/:slug/
     const catMatch = window.location.pathname.match(/(?:\/ar)?\/category\/([^/?#]+)/i);
-    if (catMatch && catMatch[1]) {
-      shopState.category = decodeURIComponent(catMatch[1]).trim().toLowerCase();
-      shopState.viewMode = 'products';
-    }
+    const subMatch = window.location.pathname.match(/(?:\/ar)?\/subcategory\/([^/?#]+)/i);
     const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.has('category')) {
-      shopState.category = searchParams.get('category').trim().toLowerCase();
-      shopState.viewMode = 'products';
-      if (window.history && window.history.replaceState && !searchParams.has('search') && !searchParams.has('brand') && !searchParams.has('minPrice')) {
-        const isArabic = window.location.pathname.startsWith('/ar');
-        const cleanCatPath = `${isArabic ? '/ar' : ''}/category/${encodeURIComponent(shopState.category)}/`;
-        window.history.replaceState(null, '', cleanCatPath);
-      }
+    if (searchParams.has('per_page')) {
+      searchParams.delete('per_page');
+      try {
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete('per_page');
+        window.history.replaceState({}, '', cleanUrl.toString());
+      } catch (_) {}
+    }
+
+    let initialCategory = '';
+    if (catMatch && catMatch[1]) {
+      initialCategory = decodeURIComponent(catMatch[1]).trim().toLowerCase();
+    } else if (searchParams.has('category')) {
+      initialCategory = searchParams.get('category').trim().toLowerCase();
+    }
+
+    if (subMatch && subMatch[1]) {
+      shopState.subcategory = decodeURIComponent(subMatch[1]).trim().toLowerCase();
+    } else if (searchParams.has('subcategory')) {
+      shopState.subcategory = searchParams.get('subcategory').trim().toLowerCase();
     }
     if (searchParams.has('brand')) {
       shopState.brand = searchParams.get('brand').trim();
-      shopState.viewMode = 'products';
     }
     if (searchParams.has('minPrice')) {
       shopState.minPrice = searchParams.get('minPrice').trim();
-      shopState.viewMode = 'products';
     }
     if (searchParams.has('maxPrice')) {
       shopState.maxPrice = searchParams.get('maxPrice').trim();
-      shopState.viewMode = 'products';
     }
     if (searchParams.has('inStock')) {
       shopState.inStock = searchParams.get('inStock') === 'true';
-      shopState.viewMode = 'products';
     }
     if (searchParams.has('isOffer')) {
       shopState.isOffer = searchParams.get('isOffer') === 'true';
-      shopState.viewMode = 'products';
     }
     if (searchParams.has('search')) {
       const sVal = searchParams.get('search').trim();
-      if (shopState.viewMode === 'products' || shopState.category || shopState.brand) {
-        shopState.search = sVal;
-        shopState.viewMode = 'products';
-      } else {
-        shopState.search = sVal;
-        categoryState.search = sVal;
-      }
+      shopState.search = sVal;
+      categoryState.search = sVal;
     }
     if (searchParams.has('sort')) shopState.sort = searchParams.get('sort');
     if (searchParams.has('page')) shopState.page = parseInt(searchParams.get('page'), 10) || 1;
     if (searchParams.has('cat_page')) categoryState.page = parseInt(searchParams.get('cat_page'), 10) || 1;
-    if (searchParams.has('per_page')) shopState.limit = parseInt(searchParams.get('per_page'), 10) || 12;
 
-    // Default to categories view when visiting /shop/ without category/brand/filters
-    if (!shopState.category && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer && !shopState.search) {
-      shopState.viewMode = 'categories';
+    if (initialCategory) {
+      shopState.category = initialCategory;
+      if (shopState.subcategory || shopState.brand || shopState.minPrice || shopState.maxPrice || shopState.inStock || shopState.isOffer || (searchParams.has('search') && shopState.search) || searchParams.get('view') === 'products') {
+        shopState.viewMode = 'products';
+      } else {
+        shopState.viewMode = 'subcategories';
+      }
+    } else if (shopState.subcategory) {
+      shopState.viewMode = 'products';
+    } else {
+      if (shopState.brand || shopState.minPrice || shopState.maxPrice || shopState.inStock || shopState.isOffer || shopState.search) {
+        shopState.viewMode = 'products';
+      } else {
+        shopState.viewMode = 'categories';
+      }
     }
 
-    // Bind Back to Categories button
+    // Call updateShopViewMode synchronously right away to guarantee zero layout flash
+    updateShopViewMode();
+
+    // Bind Back to Categories / Subcategories button
     const backToCatBtn = document.getElementById('shop-back-to-categories-btn');
     if (backToCatBtn) {
       backToCatBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        returnToShopCategories();
+        if (shopState.viewMode === 'products' && shopState.category && shopState.subcategory) {
+          selectShopCategory(shopState.category);
+        } else {
+          returnToShopCategories();
+        }
       });
     }
 
@@ -1617,7 +2479,7 @@
     if (searchInput) {
       if (shopState.viewMode === 'products' && shopState.search) {
         searchInput.value = shopState.search;
-      } else if (shopState.viewMode === 'categories' && categoryState.search) {
+      } else if (categoryState.search) {
         searchInput.value = categoryState.search;
       }
 
@@ -1630,6 +2492,9 @@
             categoryState.search = val;
             categoryState.page = 1;
             renderShopCategories();
+          } else if (shopState.viewMode === 'subcategories') {
+            categoryState.search = val;
+            renderShopSubcategories();
           } else {
             shopState.search = val;
             shopState.page = 1;
@@ -1647,6 +2512,9 @@
           categoryState.search = val;
           categoryState.page = 1;
           renderShopCategories();
+        } else if (shopState.viewMode === 'subcategories') {
+          categoryState.search = val;
+          renderShopSubcategories();
         } else {
           shopState.search = val;
           shopState.page = 1;
@@ -1665,29 +2533,6 @@
         shopState.page = 1;
         syncShopUrlParams();
         renderShop();
-      });
-    }
-
-    // Items per page buttons
-    const perPageContainer = document.getElementById('shop-per-page-container');
-    if (perPageContainer) {
-      perPageContainer.querySelectorAll('[data-per-page]').forEach(btn => {
-        const limitVal = parseInt(btn.getAttribute('data-per-page'), 10);
-        if (limitVal === shopState.limit) {
-          btn.className = 'px-2.5 py-1 rounded-lg transition-all bg-white dark:bg-slate-700 shadow-xs font-bold text-slate-900 dark:text-white cursor-pointer';
-        } else {
-          btn.className = 'px-2.5 py-1 rounded-lg transition-all text-slate-500 hover:text-slate-800 dark:text-slate-400 cursor-pointer';
-        }
-        btn.addEventListener('click', () => {
-          shopState.limit = limitVal;
-          shopState.page = 1;
-          perPageContainer.querySelectorAll('[data-per-page]').forEach(b => {
-            b.className = 'px-2.5 py-1 rounded-lg transition-all text-slate-500 hover:text-slate-800 dark:text-slate-400 cursor-pointer';
-          });
-          btn.className = 'px-2.5 py-1 rounded-lg transition-all bg-white dark:bg-slate-700 shadow-xs font-bold text-slate-900 dark:text-white cursor-pointer';
-          syncShopUrlParams();
-          renderShop();
-        });
       });
     }
 
@@ -1761,6 +2606,7 @@
       const urlCategory = cMatch && cMatch[1] ? decodeURIComponent(cMatch[1]).trim().toLowerCase() : (p.get('category')?.trim().toLowerCase() || '');
 
       shopState.category = urlCategory;
+      shopState.subcategory = p.get('subcategory')?.trim().toLowerCase() || '';
       shopState.brand = p.get('brand')?.trim() || '';
       shopState.minPrice = p.get('minPrice')?.trim() || '';
       shopState.maxPrice = p.get('maxPrice')?.trim() || '';
@@ -1769,16 +2615,21 @@
       shopState.search = p.get('search')?.trim() || '';
       shopState.sort = p.get('sort')?.trim() || 'featured';
       shopState.page = parseInt(p.get('page'), 10) || 1;
-      shopState.limit = parseInt(p.get('per_page'), 10) || 12;
 
       categoryState.page = parseInt(p.get('cat_page'), 10) || 1;
 
-      if (!shopState.category && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer && !shopState.search) {
+      if (!shopState.category && !shopState.subcategory && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer && !shopState.search) {
         shopState.viewMode = 'categories';
         categoryState.search = '';
         if (searchInput) searchInput.value = '';
         updateShopViewMode();
         renderShopCategories();
+      } else if (shopState.category && !shopState.subcategory && !shopState.brand && !shopState.minPrice && !shopState.maxPrice && !shopState.inStock && !shopState.isOffer && !shopState.search && p.get('view') !== 'products') {
+        shopState.viewMode = 'subcategories';
+        categoryState.search = '';
+        if (searchInput) searchInput.value = '';
+        updateShopViewMode();
+        renderShopSubcategories();
       } else {
         shopState.viewMode = 'products';
         if (searchInput) searchInput.value = shopState.search;
@@ -1787,15 +2638,22 @@
         renderShop();
       }
       syncShopInputs();
+      renderActiveFilterChips();
       loadShopCategories();
+      loadShopSubcategories();
+      renderLeftCategorySidebar();
     });
 
     loadShopCategories();
     loadShopBrands();
+    loadShopSubcategories();
+    renderLeftCategorySidebar();
 
     updateShopViewMode();
     if (shopState.viewMode === 'categories') {
       renderShopCategories();
+    } else if (shopState.viewMode === 'subcategories') {
+      renderShopSubcategories();
     } else {
       renderShop();
     }

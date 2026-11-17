@@ -3,9 +3,10 @@ import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
 import { UploadModule } from '../upload/upload.module';
 import { SeoModule } from '../seo/seo.module';
+import { SubcategoriesModule } from '../subcategories/subcategories.module';
 
 @Module({
-  imports: [UploadModule, forwardRef(() => SeoModule)],
+  imports: [UploadModule, forwardRef(() => SeoModule), forwardRef(() => SubcategoriesModule)],
   providers: [CategoriesService],
   controllers: [CategoriesController],
   exports: [CategoriesService],

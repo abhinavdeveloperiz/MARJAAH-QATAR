@@ -58,29 +58,19 @@
   updateNavbar();
   window.addEventListener('scroll', updateNavbar, { passive: true });
 
-  // Search overlay & instant debounced preview
+  // Search button: Navigate to dedicated search page with automatic autofocus & recent searches
   const searchBtn = document.getElementById('search-btn');
+  const allSearchBtns = document.querySelectorAll('#search-btn, [data-open-search], .btn-open-search');
   const searchOverlay = document.getElementById('search-overlay');
   const searchClose = document.getElementById('search-close');
   const searchInput = document.getElementById('search-input');
 
-  let liveResultsContainer = document.getElementById('search-live-results');
-  if (!liveResultsContainer && searchOverlay) {
-    const formEl = searchOverlay.querySelector('form');
-    if (formEl) {
-      liveResultsContainer = document.createElement('div');
-      liveResultsContainer.id = 'search-live-results';
-      liveResultsContainer.className = 'hidden mt-4 max-h-72 overflow-y-auto space-y-2 pr-1';
-      formEl.parentNode.insertBefore(liveResultsContainer, formEl.nextSibling);
-    }
-  }
-
-  let searchDebounceTimer = null;
-  let searchAbortController = null;
-
-  if (searchBtn) searchBtn.addEventListener('click', function() {
-    searchOverlay.classList.remove('hidden');
-    setTimeout(() => searchInput?.focus(), 50);
+  allSearchBtns.forEach(btn => {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const isAr = window.location.pathname.startsWith('/ar') || document.documentElement.getAttribute('dir') === 'rtl';
+      window.location.href = `${isAr ? '/ar' : ''}/search/`;
+    });
   });
   if (searchClose) searchClose.addEventListener('click', function() {
     searchOverlay.classList.add('hidden');
@@ -105,7 +95,7 @@
       e.preventDefault();
       const q = searchInput ? searchInput.value.trim() : '';
       if (q) {
-        window.location.href = `${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}`;
+        window.location.href = `${isArPage ? '/ar' : ''}/search/?q=${encodeURIComponent(q)}`;
       }
     });
   }
@@ -116,7 +106,7 @@
         e.preventDefault();
         const q = searchInput.value.trim();
         if (q) {
-          window.location.href = `${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}`;
+          window.location.href = `${isArPage ? '/ar' : ''}/search/?q=${encodeURIComponent(q)}`;
         }
       } else if (e.key === 'Escape') {
         if (searchOverlay) searchOverlay.classList.add('hidden');
@@ -150,52 +140,135 @@
         }
 
         try {
-          const res = await fetch(`/api/products?search=${encodeURIComponent(q)}&limit=5`, {
+          const res = await fetch(`/api/products/search?q=${encodeURIComponent(q)}&limit=6`, {
             signal: searchAbortController.signal,
           });
           if (!res.ok) throw new Error('Search failed');
           const data = await res.json();
-          const items = data.products || data.items || data.data || [];
+          const categories = data.categories || [];
+          const subcategories = data.subcategories || [];
+          const products = data.products || [];
+          const totalMatches = categories.length + subcategories.length + products.length;
 
           if (!liveResultsContainer) return;
 
-          if (items.length === 0) {
+          if (totalMatches === 0) {
             liveResultsContainer.innerHTML = `
               <div class="p-4 rounded-2xl border border-dashed border-slate-700/80 text-center text-xs text-slate-400">
-                ${isArPage ? `لم يتم العثور على نتائج تطابق "${q}"` : `No products matching "${q}"`}
+                ${isArPage ? `لم يتم العثور على نتائج تطابق "${q}"` : `No matching categories, subcategories, or products for "${q}"`}
               </div>
             `;
             return;
           }
 
-          liveResultsContainer.innerHTML = `
-            <div class="space-y-1.5">
-              ${items.map(p => {
-                const prodUrl = `${isArPage ? '/ar' : ''}/product/?slug=${encodeURIComponent(p.slug || p.id)}`;
-                const price = Number(p.price || 0).toLocaleString();
-                const img = p.image || '/assets/images/products/placeholder.svg';
-                return `
-                  <a href="${prodUrl}" class="flex items-center justify-between p-2.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 transition group">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <img src="${img}" class="w-10 h-10 object-cover rounded-xl border border-slate-700/60 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
-                      <div class="min-w-0">
-                        <div class="text-xs font-bold text-white group-hover:text-indigo-400 transition truncate">${p.name || ''}</div>
-                        <div class="text-[10px] text-slate-400 truncate">${p.brand || p.category || 'Catalog item'}</div>
-                      </div>
-                    </div>
-                    <div class="text-right flex-shrink-0 pl-3">
-                      <div class="text-xs font-black text-indigo-400 font-mono">${price} <span class="text-[9px] text-slate-400">QAR</span></div>
-                    </div>
-                  </a>
-                `;
-              }).join('')}
-              <div class="pt-2 text-center">
-                <a href="${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition py-1">
-                  <span>${isArPage ? 'عرض جميع النتائج المطابقة في الكتالوج' : 'View all matching items in Catalog'} &rarr;</span>
-                </a>
+          let html = '<div class="space-y-3 max-h-[70vh] overflow-y-auto pr-1">';
+
+          // 1. Matching Categories Section
+          if (categories.length > 0) {
+            html += `
+              <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1.5 flex items-center justify-between">
+                  <span>${isArPage ? 'الفئات الرئيسية' : 'Categories'}</span>
+                  <span class="text-indigo-400">${categories.length}</span>
+                </div>
+                <div class="space-y-1">
+                  ${categories.map(c => {
+                    const catUrl = `${isArPage ? '/ar' : ''}/shop/?category=${encodeURIComponent(c.slug || c.id)}`;
+                    const img = c.image || '/assets/images/products/placeholder.svg';
+                    return `
+                      <a href="${catUrl}" class="flex items-center justify-between p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <img src="${img}" class="w-8 h-8 object-cover rounded-lg border border-indigo-400/30 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                          <div class="min-w-0">
+                            <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition truncate">${c.name || ''}</div>
+                            <div class="text-[10px] text-slate-400 font-medium">${c.product_count || 0} products</div>
+                          </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Category</span>
+                      </a>
+                    `;
+                  }).join('')}
+                </div>
               </div>
+            `;
+          }
+
+          // 2. Matching Subcategories Section
+          if (subcategories.length > 0) {
+            html += `
+              <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1.5 flex items-center justify-between">
+                  <span>${isArPage ? 'الفئات الفرعية' : 'Subcategories'}</span>
+                  <span class="text-indigo-400">${subcategories.length}</span>
+                </div>
+                <div class="space-y-1">
+                  ${subcategories.map(s => {
+                    const subUrl = `${isArPage ? '/ar' : ''}/shop/?category=${encodeURIComponent(s.category_slug || '')}&subcategory=${encodeURIComponent(s.slug || s.id)}`;
+                    const colorDot = s.color || '#4063B2';
+                    const img = s.image || '/assets/images/products/placeholder.svg';
+                    return `
+                      <a href="${subUrl}" class="flex items-center justify-between p-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <div class="relative w-8 h-8 rounded-lg overflow-hidden border border-purple-400/30 flex-shrink-0">
+                            <img src="${img}" class="w-full h-full object-cover" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                            <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full border border-white" style="background:${colorDot}"></span>
+                          </div>
+                          <div class="min-w-0">
+                            <div class="text-xs font-bold text-white group-hover:text-purple-300 transition truncate">${s.name || ''}</div>
+                            <div class="text-[10px] text-slate-400 truncate">in ${s.category_name || 'Category'} &bull; ${s.product_count || 0} items</div>
+                          </div>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-purple-500/20 text-purple-300 border border-purple-500/30">Subcategory</span>
+                      </a>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }
+
+          // 3. Matching Products Section
+          if (products.length > 0) {
+            html += `
+              <div>
+                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-1 mb-1.5 flex items-center justify-between">
+                  <span>${isArPage ? 'المنتجات' : 'Products'}</span>
+                  <span class="text-indigo-400">${data.totalProducts || products.length}</span>
+                </div>
+                <div class="space-y-1">
+                  ${products.map(p => {
+                    const prodUrl = `${isArPage ? '/ar' : ''}/product/?slug=${encodeURIComponent(p.slug || p.id)}`;
+                    const price = Number(p.price || 0).toLocaleString();
+                    const img = p.image || '/assets/images/products/placeholder.svg';
+                    return `
+                      <a href="${prodUrl}" class="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 transition group">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <img src="${img}" class="w-9 h-9 object-cover rounded-xl border border-slate-700/60 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                          <div class="min-w-0">
+                            <div class="text-xs font-bold text-white group-hover:text-indigo-400 transition truncate">${p.name || ''}</div>
+                            <div class="text-[10px] text-slate-400 truncate">${p.brand || p.subcategory_name || p.category_name || 'Item'}</div>
+                          </div>
+                        </div>
+                        <div class="text-right flex-shrink-0 pl-2">
+                          <div class="text-xs font-black text-indigo-400 font-mono">${price} <span class="text-[9px] text-slate-400">QAR</span></div>
+                        </div>
+                      </a>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `;
+          }
+
+          html += `
+            <div class="pt-2 text-center border-t border-slate-700/60 mt-2">
+              <a href="${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition py-1">
+                <span>${isArPage ? 'عرض جميع النتائج في الكتالوج' : `View all results for "${q}" in Shop`} &rarr;</span>
+              </a>
             </div>
-          `;
+          </div>`;
+
+          liveResultsContainer.innerHTML = html;
         } catch (err) {
           if (err.name === 'AbortError') return;
           console.warn('Live search error:', err);

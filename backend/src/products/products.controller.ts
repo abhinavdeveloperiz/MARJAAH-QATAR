@@ -20,6 +20,17 @@ import { RequirePermission } from '../admin/rbac/require-permission.decorator';
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  @Get('search')
+  async searchCatalog(
+    @Query('q') q?: string,
+    @Query('search') search?: string,
+    @Query('limit') limit?: string,
+  ) {
+    const query = q || search || '';
+    const numLimit = Math.max(1, Math.min(100, Number(limit) || 12));
+    return this.productsService.searchCatalog(query, numLimit);
+  }
+
   @Get('filters')
   async getCategoryFilters(@Query() query: { category?: string; subcategory?: string; search?: string }) {
     return this.productsService.getCategoryFilters(query);

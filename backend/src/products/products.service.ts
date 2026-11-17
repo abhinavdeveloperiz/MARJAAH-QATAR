@@ -384,20 +384,42 @@ export class ProductsService implements OnModuleInit {
     }
 
     if (query.search && typeof query.search === 'string' && query.search.trim()) {
-      const terms = query.search.toLowerCase().trim().split(/\s+/);
-      products = products.filter(p => {
-        const target = [
-          p.name || '',
-          p.name_ar || '',
-          p.short_description || '',
-          p.description || '',
-          p.brand || '',
-          p.sku || '',
-          ...(Array.isArray(p.tags) ? p.tags : []),
-        ].join(' ').toLowerCase();
+      const parsed = this.parseNaturalQuery(query.search);
+      if (query.minPrice === undefined && parsed.minPrice !== null) {
+        products = products.filter(p => Number(p.price) >= parsed.minPrice!);
+      }
+      if (query.maxPrice === undefined && parsed.maxPrice !== null) {
+        products = products.filter(p => Number(p.price) <= parsed.maxPrice!);
+      }
+      if (parsed.termVariants.length > 0) {
+        products = products.filter(p => {
+          const specText = Array.isArray(p.specifications)
+            ? p.specifications.map((s: any) => `${s.name || s.key || ''} ${s.value || s.val || ''}`).join(' ')
+            : (p.specifications && typeof p.specifications === 'object' ? Object.values(p.specifications).join(' ') : '');
 
-        return terms.every(t => target.includes(t));
-      });
+          const target = [
+            p.name || '',
+            p.name_ar || '',
+            p.short_description || '',
+            p.short_description_ar || '',
+            p.description || '',
+            p.description_ar || '',
+            p.brand || '',
+            p.brand_name || '',
+            p.sku || '',
+            p.category || '',
+            p.category_name || '',
+            p.category_slug || '',
+            p.subcategory || '',
+            p.subcategory_name || '',
+            p.subcategory_slug || '',
+            specText,
+            ...(Array.isArray(p.tags) ? p.tags : []),
+          ].join(' ').toLowerCase();
+
+          return parsed.termVariants.every(variants => variants.some(v => target.includes(v)));
+        });
+      }
     }
 
     const salesMap = await this.getProductSalesMap();
@@ -584,16 +606,26 @@ export class ProductsService implements OnModuleInit {
     }
 
     if (query.search && typeof query.search === 'string' && query.search.trim()) {
-      const terms = query.search.toLowerCase().trim().split(/\s+/);
-      products = products.filter(p => {
-        const target = [
-          p.name || '',
-          p.brand || '',
-          p.description || '',
-          ...(Array.isArray(p.tags) ? p.tags : []),
-        ].join(' ').toLowerCase();
-        return terms.every(t => target.includes(t));
-      });
+      const parsed = this.parseNaturalQuery(query.search);
+      if (parsed.minPrice !== null) {
+        products = products.filter(p => Number(p.price) >= parsed.minPrice!);
+      }
+      if (parsed.maxPrice !== null) {
+        products = products.filter(p => Number(p.price) <= parsed.maxPrice!);
+      }
+      if (parsed.termVariants.length > 0) {
+        products = products.filter(p => {
+          const target = [
+            p.name || '',
+            p.brand || '',
+            p.description || '',
+            p.category_name || '',
+            p.subcategory_name || '',
+            ...(Array.isArray(p.tags) ? p.tags : []),
+          ].join(' ').toLowerCase();
+          return parsed.termVariants.every(variants => variants.some(v => target.includes(v)));
+        });
+      }
     }
 
     // 1. Brands with exact live product counts in this category
@@ -608,6 +640,22 @@ export class ProductsService implements OnModuleInit {
       }
     }
     const brands = Array.from(brandMap.values()).sort((a, b) => b.count - a.count);
+
+    // 1b. Subcategories with exact live product counts in this category
+    const subMap = new Map<string, { id?: string; name: string; slug: string; count: number }>();
+    for (const p of products) {
+      const s = (p.subcategory || p.subcategory_name || '').trim();
+      const sSlug = p.subcategory_slug || (s ? s.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
+      const sId = p.subcategory_id;
+      if (s) {
+        const key = sSlug || s.toLowerCase();
+        const existing = subMap.get(key) || { id: sId, name: s, slug: sSlug, count: 0 };
+        existing.count += 1;
+        if (!existing.id && sId) existing.id = sId;
+        subMap.set(key, existing);
+      }
+    }
+    const subcategories = Array.from(subMap.values()).sort((a, b) => b.count - a.count);
 
     // 2. Exact Price Range in this category
     let minPrice = 0;
@@ -686,6 +734,7 @@ export class ProductsService implements OnModuleInit {
       category: query.category || null,
       subcategory: query.subcategory || null,
       total_products: products.length,
+      subcategories,
       brands,
       price_range: {
         min: minPrice,
@@ -700,6 +749,308 @@ export class ProductsService implements OnModuleInit {
         rated_4_plus: rated4Plus,
         rated_3_plus: rated3Plus,
       },
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // NATURAL LANGUAGE SEARCH PARSER & INTENT RECOGNITION
+  // ═══════════════════════════════════════════════════════════════════════════
+  private parseNaturalQuery(raw: string): {
+    raw: string;
+    cleanText: string;
+    terms: string[];
+    termVariants: string[][];
+    minPrice: number | null;
+    maxPrice: number | null;
+  } {
+    if (!raw) {
+      return { raw: '', cleanText: '', terms: [], termVariants: [], minPrice: null, maxPrice: null };
+    }
+    let str = raw.trim().toLowerCase();
+    let minPrice: number | null = null;
+    let maxPrice: number | null = null;
+
+    // 1. Between X and Y [currency]
+    const betweenMatch = str.match(
+      /between\s+(\d+(?:\.\d+)?)\s*(?:and|-|to)\s*(\d+(?:\.\d+)?)(?:\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$))?/i,
+    );
+    if (betweenMatch) {
+      const p1 = parseFloat(betweenMatch[1]);
+      const p2 = parseFloat(betweenMatch[2]);
+      minPrice = Math.min(p1, p2);
+      maxPrice = Math.max(p1, p2);
+      str = str.replace(betweenMatch[0], ' ');
+    }
+
+    // 2. Under / Below / Less than / Max / <= / Up to X [currency]
+    const underMatch =
+      str.match(
+        /(?:under|below|less\s+than|max|up\s+to|within|<=\s*|<\s*)\s*(\d+(?:\.\d+)?)(?:\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$))?/i,
+      ) ||
+      str.match(
+        /(\d+(?:\.\d+)?)\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$)?\s*(?:and\s+below|or\s+less|max)/i,
+      );
+    if (underMatch) {
+      maxPrice = parseFloat(underMatch[1]);
+      str = str.replace(underMatch[0], ' ');
+    }
+
+    // 3. Above / Over / More than / Min / >= / From X [currency]
+    const aboveMatch =
+      str.match(
+        /(?:above|over|more\s+than|min|starting\s+from|from|>=\s*|>\s*)\s*(\d+(?:\.\d+)?)(?:\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$))?/i,
+      ) ||
+      str.match(
+        /(\d+(?:\.\d+)?)\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$)?\s*(?:and\s+above|or\s+more|min)/i,
+      );
+    if (aboveMatch) {
+      minPrice = parseFloat(aboveMatch[1]);
+      str = str.replace(aboveMatch[0], ' ');
+    }
+
+    // Clean currency symbols and orphan words
+    str = str.replace(/\b(qar|qr|riyal|riyals|dhs|aed|usd)\b/gi, ' ');
+    str = str.replace(/[^\w\s\u0600-\u06FF]/g, ' ');
+    const stopWords = new Set([
+      'in', 'for', 'with', 'of', 'the', 'a', 'an', 'at', 'by',
+      'under', 'below', 'above', 'over', 'between', 'and', 'or', 'to',
+    ]);
+    const terms = str
+      .split(/\s+/)
+      .map(t => t.trim())
+      .filter(t => t.length > 0 && !stopWords.has(t));
+
+    const synonymGroups = [
+      ['magsafe', 'mag safe', 'magnetic', 'magnet'],
+      ['case', 'cases', 'cover', 'covers', 'pouch', 'pouches', 'shell', 'bumper'],
+      ['mobile', 'mobiles', 'phone', 'phones', 'cellphone', 'cellphones', 'smartphone', 'smartphones', 'iphone', 'samsung'],
+      ['watch', 'watches', 'smartwatch', 'smartwatches'],
+      ['laptop', 'laptops', 'notebook', 'notebooks', 'computer', 'computers', 'pc'],
+      ['earbud', 'earbuds', 'earphone', 'earphones', 'headphone', 'headphones', 'headset', 'headsets', 'audio', 'airpods'],
+      ['charger', 'chargers', 'charging', 'adapter', 'adapters', 'gan'],
+      ['cable', 'cables', 'cord', 'cords', 'wire', 'wires'],
+      ['powerbank', 'powerbanks', 'power bank', 'power banks', 'portable charger'],
+      ['speaker', 'speakers'],
+      ['screen', 'protector', 'protectors', 'tempered', 'protection'],
+      ['camera', 'cameras', 'lens', 'lenses'],
+      ['car', 'holder', 'mount', 'stand'],
+    ];
+
+    // Build compound words (e.g. ['mag', 'safe'] -> 'magsafe')
+    const compoundTokens: string[] = [];
+    for (let i = 0; i < terms.length - 1; i++) {
+      compoundTokens.push(terms[i] + terms[i + 1]);
+      compoundTokens.push(terms[i] + '-' + terms[i + 1]);
+    }
+
+    const termVariants = terms.map((term, idx) => {
+      const variants = new Set<string>([term]);
+      let stem = term;
+      if (term.endsWith('ies') && term.length > 4) stem = term.slice(0, -3) + 'y';
+      else if (term.endsWith('es') && term.length > 4) stem = term.slice(0, -2);
+      else if (term.endsWith('s') && term.length > 3) stem = term.slice(0, -1);
+      variants.add(stem);
+
+      // If this term is part of a compound word, add compound variants
+      if (idx < terms.length - 1) {
+        variants.add(term + terms[idx + 1]);
+        variants.add(term + '-' + terms[idx + 1]);
+      }
+      if (idx > 0) {
+        variants.add(terms[idx - 1] + term);
+        variants.add(terms[idx - 1] + '-' + term);
+      }
+
+      for (const group of synonymGroups) {
+        if (group.includes(term) || group.includes(stem)) {
+          group.forEach(w => variants.add(w));
+        }
+      }
+      return Array.from(variants);
+    });
+
+    return {
+      raw,
+      cleanText: terms.join(' '),
+      terms,
+      termVariants,
+      minPrice,
+      maxPrice,
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // UNIFIED CATALOG SEARCH (Products, Categories & Subcategories)
+  // ═══════════════════════════════════════════════════════════════════════════
+  async searchCatalog(q: string, limit = 8) {
+    if (!q || !q.trim()) {
+      return {
+        query: '',
+        parsedIntent: null,
+        categories: [],
+        subcategories: [],
+        products: [],
+        totalProducts: 0,
+      };
+    }
+
+    const rawQuery = q.trim();
+    const parsed = this.parseNaturalQuery(rawQuery);
+    const queryLower = parsed.cleanText.toLowerCase() || rawQuery.toLowerCase();
+    const terms = parsed.terms.length > 0 ? parsed.terms : queryLower.split(/\s+/).filter(Boolean);
+    const termVariants = parsed.termVariants;
+
+    // 1. Search Categories
+    let allCategories: any[] = [];
+    try {
+      const catPath = path.resolve(process.cwd(), '.categories-cache.json');
+      if (fs.existsSync(catPath)) {
+        allCategories = JSON.parse(fs.readFileSync(catPath, 'utf-8'));
+      }
+    } catch (_) {}
+    if (allCategories.length === 0) {
+      const snap = await this.firestore.collection('categories').get();
+      allCategories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    const matchedCategories = allCategories
+      .filter(c => {
+        const target = [c.name || '', c.name_ar || '', c.slug || ''].join(' ').toLowerCase();
+        if (termVariants.length > 0) {
+          return termVariants.some(variants => variants.some(v => target.includes(v)));
+        }
+        return terms.some(t => target.includes(t)) || target.includes(queryLower);
+      })
+      .slice(0, 6);
+
+    // 2. Search Subcategories
+    let allSubcategories: any[] = [];
+    try {
+      const subPath = path.resolve(process.cwd(), '.subcategories-cache.json');
+      if (fs.existsSync(subPath)) {
+        allSubcategories = JSON.parse(fs.readFileSync(subPath, 'utf-8'));
+      }
+    } catch (_) {}
+    if (allSubcategories.length === 0) {
+      const snap = await this.firestore.collection('subcategories').get();
+      allSubcategories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    const matchedSubcategories = allSubcategories
+      .filter(s => {
+        if (s.is_active === false) return false;
+        const target = [
+          s.name || '',
+          s.name_ar || '',
+          s.slug || '',
+          s.category_name || '',
+          s.category_slug || '',
+        ].join(' ').toLowerCase();
+        if (termVariants.length > 0) {
+          return termVariants.some(variants => variants.some(v => target.includes(v)));
+        }
+        return terms.some(t => target.includes(t)) || target.includes(queryLower);
+      })
+      .slice(0, 10);
+
+    // 3. Search Products across full dataset
+    const allProducts = await this.getAllProducts();
+    const activeProducts = allProducts.filter(
+      p => p.status !== 'hidden' && p.status !== 'pending_approval' && p.status !== 'rejected' && p.is_active !== false,
+    );
+
+    const safeStr = (val: any): string => {
+      if (val === null || val === undefined) return '';
+      if (typeof val === 'string') return val.toLowerCase();
+      if (Array.isArray(val)) return val.map(safeStr).join(' ');
+      if (typeof val === 'object') return Object.values(val).map(safeStr).join(' ');
+      return String(val).toLowerCase();
+    };
+
+    const scoredProducts: { product: any; score: number }[] = [];
+
+    for (const p of activeProducts) {
+      const price = Number(p.price) || 0;
+      if (parsed.minPrice !== null && price < parsed.minPrice) continue;
+      if (parsed.maxPrice !== null && price > parsed.maxPrice) continue;
+
+      const name = safeStr(p.name);
+      const nameAr = safeStr(p.name_ar);
+      const sku = safeStr(p.sku);
+      const brand = safeStr(p.brand || p.brand_name || p.brand_slug);
+      const cat = safeStr(p.category_name || p.category || p.category_slug);
+      const sub = safeStr(p.subcategory_name || p.subcategory || p.subcategory_slug);
+      const compat = safeStr(p.compatibility);
+      const colour = safeStr(p.colour || p.color);
+      const shortDesc = safeStr(p.short_description || p.short_description_ar);
+      const desc = safeStr(p.description || p.description_ar);
+      const specText = safeStr(p.specifications);
+      const tags = safeStr(p.tags);
+
+      const target = [name, nameAr, sku, brand, cat, sub, compat, colour, specText, shortDesc, desc, tags].join(' ');
+      const targetSpaceless = target.replace(/[\s\-_/.,()+]+/g, '');
+
+      let matchesAll = true;
+      let score = 0;
+
+      // Exact phrase bonus
+      if (queryLower && name.includes(queryLower)) {
+        score += 120;
+      } else if (queryLower && (compat.includes(queryLower) || sub.includes(queryLower))) {
+        score += 60;
+      } else if (queryLower && target.includes(queryLower)) {
+        score += 40;
+      }
+
+      if (termVariants.length > 0) {
+        for (const variants of termVariants) {
+          let variantMatched = false;
+          for (const v of variants) {
+            const vSpaceless = v.replace(/[\s\-_/.,()+]+/g, '');
+            if (target.includes(v) || (vSpaceless.length > 2 && targetSpaceless.includes(vSpaceless))) {
+              variantMatched = true;
+              if (name.includes(v)) score += 25;
+              if (compat.includes(v)) score += 20;
+              if (sub.includes(v)) score += 20;
+              if (brand.includes(v)) score += 15;
+              if (cat.includes(v)) score += 10;
+              if (specText.includes(v)) score += 10;
+              if (desc.includes(v)) score += 5;
+              break;
+            }
+          }
+          if (!variantMatched) {
+            matchesAll = false;
+            break;
+          }
+        }
+      } else if (terms.length > 0) {
+        matchesAll = terms.every(t => target.includes(t) || targetSpaceless.includes(t.replace(/[\s\-_/]+/g, '')));
+      }
+
+      if (matchesAll) {
+        if (p.is_featured) score += 5;
+        if (Number(p.rating) >= 4.5) score += 5;
+        scoredProducts.push({ product: p, score });
+      }
+    }
+
+    // Sort by relevance score descending
+    scoredProducts.sort((a, b) => b.score - a.score);
+    const matchingProducts = scoredProducts.map(sp => sp.product);
+
+    return {
+      query: rawQuery,
+      parsedIntent: {
+        cleanText: parsed.cleanText,
+        minPrice: parsed.minPrice,
+        maxPrice: parsed.maxPrice,
+        terms: parsed.terms,
+      },
+      categories: matchedCategories,
+      subcategories: matchedSubcategories,
+      products: matchingProducts.slice(0, limit),
+      totalProducts: matchingProducts.length,
     };
   }
 
@@ -834,6 +1185,124 @@ export class ProductsService implements OnModuleInit {
     return { success: true, count: ids.length, status: validStatus };
   }
 
+  private async resolveCategoryAndSubcategory(data: any): Promise<{
+    category_id?: string;
+    category_slug?: string;
+    category_name?: string;
+    category?: string;
+    subcategory_id?: string;
+    subcategory_slug?: string;
+    subcategory_name?: string;
+    subcategory?: string;
+  }> {
+    const result: any = {};
+
+    // 1. Resolve Category
+    const catSearch = data.category_id || data.category_slug || data.category;
+    let resolvedCat: any = null;
+    if (catSearch) {
+      try {
+        const catPath = path.resolve(process.cwd(), '.categories-cache.json');
+        if (fs.existsSync(catPath)) {
+          const cats = JSON.parse(fs.readFileSync(catPath, 'utf-8'));
+          resolvedCat = cats.find((c: any) =>
+            c.id === catSearch ||
+            c.slug === catSearch ||
+            c.slug === String(catSearch).toLowerCase().replace(/[^a-z0-9]+/g, '-') ||
+            (c.name || '').toLowerCase() === String(catSearch).toLowerCase()
+          );
+        }
+      } catch (_) {}
+
+      if (!resolvedCat && data.category_id) {
+        const doc = await this.firestore.doc('categories', data.category_id).get();
+        if (doc.exists) resolvedCat = { id: doc.id, ...doc.data() };
+      }
+      if (!resolvedCat && catSearch) {
+        const snap = await this.firestore.collection('categories')
+          .where('slug', '==', String(catSearch).toLowerCase().replace(/[^a-z0-9]+/g, '-'))
+          .limit(1)
+          .get();
+        if (!snap.empty) {
+          const d = snap.docs[0];
+          resolvedCat = { id: d.id, ...d.data() };
+        }
+      }
+    }
+
+    if (resolvedCat) {
+      result.category_id = resolvedCat.id;
+      result.category_slug = resolvedCat.slug;
+      result.category_name = resolvedCat.name;
+      result.category = resolvedCat.name;
+    } else if (data.category) {
+      result.category = data.category;
+      result.category_slug = data.category_slug || String(data.category).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    }
+
+    // 2. Resolve Subcategory
+    const subSearch = data.subcategory_id || data.subcategory_slug || data.subcategory;
+    let resolvedSub: any = null;
+    if (subSearch) {
+      try {
+        const subPath = path.resolve(process.cwd(), '.subcategories-cache.json');
+        if (fs.existsSync(subPath)) {
+          const subs = JSON.parse(fs.readFileSync(subPath, 'utf-8'));
+          resolvedSub = subs.find((s: any) =>
+            s.id === subSearch ||
+            s.slug === subSearch ||
+            s.slug === String(subSearch).toLowerCase().replace(/[^a-z0-9]+/g, '-') ||
+            (s.name || '').toLowerCase() === String(subSearch).toLowerCase()
+          );
+        }
+      } catch (_) {}
+
+      if (!resolvedSub && data.subcategory_id) {
+        const doc = await this.firestore.doc('subcategories', data.subcategory_id).get();
+        if (doc.exists) resolvedSub = { id: doc.id, ...doc.data() };
+      }
+      if (!resolvedSub && subSearch) {
+        const snap = await this.firestore.collection('subcategories')
+          .where('slug', '==', String(subSearch).toLowerCase().replace(/[^a-z0-9]+/g, '-'))
+          .limit(1)
+          .get();
+        if (!snap.empty) {
+          const d = snap.docs[0];
+          resolvedSub = { id: d.id, ...d.data() };
+        }
+      }
+    }
+
+    if (resolvedSub) {
+      // Validate relationship: subcategory must belong to the selected category
+      if (result.category_id || result.category_slug) {
+        const matchCat =
+          (result.category_id && (resolvedSub.category_id === result.category_id || resolvedSub.category_slug === result.category_id)) ||
+          (result.category_slug && (resolvedSub.category_slug === result.category_slug || resolvedSub.category_id === result.category_slug));
+        if (!matchCat) {
+          throw new BadRequestException(
+            `Subcategory "${resolvedSub.name}" does not belong to category "${result.category_name || result.category}". Expected parent: "${resolvedSub.category_name || resolvedSub.category_slug}"`
+          );
+        }
+      } else {
+        result.category_id = resolvedSub.category_id;
+        result.category_slug = resolvedSub.category_slug;
+        result.category_name = resolvedSub.category_name;
+        result.category = resolvedSub.category_name;
+      }
+
+      result.subcategory_id = resolvedSub.id;
+      result.subcategory_slug = resolvedSub.slug;
+      result.subcategory_name = resolvedSub.name;
+      result.subcategory = resolvedSub.name;
+    } else if (data.subcategory) {
+      result.subcategory = data.subcategory;
+      result.subcategory_slug = data.subcategory_slug || String(data.subcategory).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    }
+
+    return result;
+  }
+
   async create(data: any, adminUser?: any) {
     if (!data.name || !data.price) {
       throw new BadRequestException('Product name and price are required');
@@ -877,8 +1346,11 @@ export class ProductsService implements OnModuleInit {
       primaryImage = images[0];
     }
 
+    const catSub = await this.resolveCategoryAndSubcategory(data);
+
     const product = {
       ...data,
+      ...catSub,
       slug,
       sku: data.sku ? String(data.sku).trim() : undefined,
       image: primaryImage,
@@ -963,6 +1435,27 @@ export class ProductsService implements OnModuleInit {
       ...data,
       updated_at: new Date().toISOString(),
     };
+
+    if (
+      data.category !== undefined ||
+      data.category_id !== undefined ||
+      data.category_slug !== undefined ||
+      data.subcategory !== undefined ||
+      data.subcategory_id !== undefined ||
+      data.subcategory_slug !== undefined
+    ) {
+      const existingData = doc.data() as any;
+      const mergedForCatSub = {
+        category_id: data.category_id !== undefined ? data.category_id : existingData.category_id,
+        category_slug: data.category_slug !== undefined ? data.category_slug : existingData.category_slug,
+        category: data.category !== undefined ? data.category : existingData.category,
+        subcategory_id: data.subcategory_id !== undefined ? data.subcategory_id : existingData.subcategory_id,
+        subcategory_slug: data.subcategory_slug !== undefined ? data.subcategory_slug : existingData.subcategory_slug,
+        subcategory: data.subcategory !== undefined ? data.subcategory : existingData.subcategory,
+      };
+      const catSub = await this.resolveCategoryAndSubcategory(mergedForCatSub);
+      Object.assign(updateData, catSub);
+    }
 
     if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
       const uploadRes = await this.uploadService.uploadBase64(data.image, `prod_${id}.jpg`, 'products');

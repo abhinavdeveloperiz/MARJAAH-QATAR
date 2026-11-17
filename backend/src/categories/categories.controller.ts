@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -8,8 +8,9 @@ export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
   @Get()
-  async findAll() {
-    return this.categoriesService.findAll();
+  async findAll(@Query('includeSubcategories') includeSubcategories?: string) {
+    const withSubs = String(includeSubcategories).toLowerCase() === 'true';
+    return this.categoriesService.findAll(withSubs);
   }
 
   @Get(':slugOrId')

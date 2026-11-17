@@ -285,6 +285,63 @@
       }
     })();
   </script>
+
+  <!-- ZERO-FLASH STOREFRONT NAVIGATION GUARD -->
+  <script>
+    (function() {
+      try {
+        var p = window.location.pathname;
+        var s = window.location.search;
+        var isSub = p.indexOf('/subcategory/') !== -1 || s.indexOf('subcategory=') !== -1;
+        var isCat = p.indexOf('/category/') !== -1 || s.indexOf('category=') !== -1;
+        var isSearch = s.indexOf('search=') !== -1 || s.indexOf('q=') !== -1 || s.indexOf('view=products') !== -1;
+        // If on /shop/ or shop root with no category/subcategory/search, guarantee initial view is strictly categories
+        if (!isSub && !isCat && !isSearch) {
+          document.documentElement.classList.add('init-categories-view');
+        } else if (isCat && !isSub && !isSearch) {
+          document.documentElement.classList.add('init-subcategories-view');
+        } else {
+          document.documentElement.classList.add('init-products-view');
+        }
+      } catch(_) {}
+    })();
+  </script>
+  <style>
+    /* Prevent any fraction-of-a-second DOM flash before products.js executes */
+    html.init-categories-view #shop-products-container,
+    html.init-categories-view #shop-subcategories-container,
+    html.init-categories-view #shop-category-sidebar,
+    html.init-categories-view #shop-filter-controls-bar,
+    html.init-categories-view #shop-active-filters-bar {
+      display: none !important;
+    }
+    html.init-categories-view #shop-categories-container {
+      display: grid !important;
+    }
+
+    html.init-subcategories-view #shop-products-container,
+    html.init-subcategories-view #shop-categories-container,
+    html.init-subcategories-view #shop-category-sidebar,
+    html.init-subcategories-view #shop-filter-controls-bar,
+    html.init-subcategories-view #shop-active-filters-bar {
+      display: none !important;
+    }
+    html.init-subcategories-view #shop-subcategories-container {
+      display: grid !important;
+    }
+
+    /* Mobile responsive compaction: keep active filters bar tight & single-line horizontal scroll */
+    @media (max-width: 1023px) {
+      #shop-active-filters-bar {
+        padding: 0.35rem 0.65rem !important;
+        margin-bottom: 0.65rem !important;
+      }
+      .shop-header-compact {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+      }
+    }
+  </style>
   
   <script src="/assets/js/api.js?v=2.6.0"></script>
 </head>
@@ -625,10 +682,10 @@
     
 <div class="pt-[72px] min-h-screen pb-16">
   <!-- ─── SHOP HEADER & BREADCRUMBS ────────────────────────────────────── -->
-  <div class="py-8 sm:py-10 border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
+  <div class="py-3.5 sm:py-6 lg:py-8 border-b" style="background:var(--bg-surface);border-color:var(--border-color)">
     <div class="container-custom">
       <!-- Breadcrumb -->
-      <nav id="shop-breadcrumb" class="flex items-center gap-2 text-xs mb-4" style="color:var(--text-tertiary)">
+      <nav id="shop-breadcrumb" class="flex items-center gap-1.5 sm:gap-2 text-xs mb-2 sm:mb-4" style="color:var(--text-tertiary)">
         <a href="/" class="hover:text-primary transition-colors flex items-center gap-1">
           <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -646,45 +703,37 @@
       </nav>
 
       <!-- Title & Counters -->
-      <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="flex flex-wrap items-end justify-between gap-3 sm:gap-4">
         <div>
-          <div class="flex items-center gap-3">
-            <h1 id="shop-page-title" class="text-2xl sm:text-3xl lg:text-4xl font-display font-black tracking-tight"
+          <div class="flex items-center gap-2.5 sm:gap-3">
+            <h1 id="shop-page-title" class="text-xl sm:text-3xl lg:text-4xl font-display font-black tracking-tight"
               style="color:var(--text-primary)">
               Shop by Category
             </h1>
-            <button id="shop-back-to-categories-btn" type="button" class="hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10 text-[#8D9CF5] cursor-pointer" style="border-color:var(--border-color);background:var(--bg-surface-2)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            <button id="shop-back-to-categories-btn" type="button" class="hidden inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-xl border text-xs font-bold transition-all hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10 text-[#8D9CF5] cursor-pointer" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
               <span id="shop-back-to-categories-text">All Categories</span>
             </button>
           </div>
-          <p id="shop-items-counter" class="text-sm mt-1.5 flex items-center gap-2 font-medium" style="color:var(--text-secondary)">
+          <p id="shop-items-counter" class="text-xs sm:text-sm mt-1 flex items-center gap-2 font-medium" style="color:var(--text-secondary)">
             <span>Explore categories with 20 items per page</span>
           </p>
         </div>
 
         <!-- Filter Controls: Sort & Items Per Page -->
         <div id="shop-filter-controls-bar" class="hidden flex flex-wrap items-center justify-between sm:justify-end gap-2 sm:gap-3 w-full sm:w-auto">
+          <!-- Mobile Subcategories Drawer Trigger (Left-side navigation drawer on mobile/tablet) -->
+          <button id="shop-subcategories-open-btn" type="button" onclick="if(window.openShopCategoryDrawer)window.openShopCategoryDrawer()" class="lg:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#8D9CF5]"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span>Subcategories</span>
+          </button>
+
           <!-- Right-Side Filter Sidebar Trigger Button (Desktop + Tablet + Mobile) -->
           <button id="shop-filter-open-btn" type="button" onclick="if(window.openShopFilterDrawer)window.openShopFilterDrawer()" class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
             <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
             <span>Filters</span>
             <span id="shop-filter-active-count" class="hidden min-w-[20px] h-5 px-1.5 rounded-full bg-[#4063B2] text-white text-[10px] font-black items-center justify-center">0</span>
           </button>
-
-          <!-- Items Per Page Toggle -->
-          <div id="shop-per-page-container" class="flex items-center rounded-xl p-1 border text-xs font-semibold"
-            style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <span class="px-2 hidden sm:inline" style="color:var(--text-tertiary)">View:</span>
-            <button type="button" data-per-page="12"
-              class="px-2.5 py-1 rounded-lg transition-all bg-white dark:bg-slate-700 shadow-xs font-bold text-slate-900 dark:text-white cursor-pointer">
-              12
-            </button>
-            <button type="button" data-per-page="24"
-              class="px-2.5 py-1 rounded-lg transition-all text-slate-500 hover:text-slate-800 dark:text-slate-400 cursor-pointer">
-              24
-            </button>
-          </div>
 
           <!-- Sort Selector -->
           <form id="shop-sort-form" onsubmit="event.preventDefault()" class="flex items-center gap-2">
@@ -702,7 +751,7 @@
       </div>
 
       <!-- Search & Category Navigation -->
-      <div class="mt-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="mt-3 sm:mt-6 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <!-- Search bar -->
         <form id="shop-search-form" onsubmit="event.preventDefault()" class="w-full md:max-w-md">
           <div class="relative">
@@ -715,13 +764,13 @@
             </svg>
             <input type="text" id="shop-search-input" name="search" value=""
               placeholder="Search categories or products..."
-              class="w-full pl-10 pr-4 py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none transition-all shadow-xs"
+              class="w-full pl-10 pr-4 py-2 sm:py-2.5 rounded-xl border text-xs sm:text-sm focus:outline-none transition-all shadow-xs"
               style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
           </div>
         </form>
 
-        <!-- Category Pills -->
-        <div id="shop-category-pills" class="flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center touch-pan-x">
+        <!-- Category Pills (Hidden on mobile when in products view) -->
+        <div id="shop-category-pills" class="hidden md:flex gap-2 overflow-x-auto pb-1 no-scrollbar items-center touch-pan-x">
           <a href="javascript:void(0)" data-category-slug=""
             class="flex-shrink-0 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs bg-[#4063B2] text-white shadow-[0_4px_12px_rgba(64,99,178,0.25)]">
             All Categories
@@ -731,19 +780,78 @@
     </div>
   </div>
 
-  <!-- ─── PRODUCTS CATALOG LAYOUT (Full-Width, Symmetric, No Blank Gaps) ── -->
-  <div class="container-custom py-6 sm:py-8 lg:py-10">
-    <!-- Active Filters Bar (Chips) -->
-    <div id="shop-active-filters-bar" class="hidden mb-6 flex-wrap items-center gap-2 p-3 rounded-2xl border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Filters:</span>
-      <div id="shop-active-chips" class="flex flex-wrap items-center gap-2"></div>
-      <button id="shop-clear-all-filters" onclick="if(window.clearAllShopFilters)window.clearAllShopFilters()" type="button" class="text-xs font-bold text-rose-500 hover:underline ml-2 cursor-pointer">Clear All</button>
-    </div>
+  <!-- ─── PRODUCTS CATALOG LAYOUT (With Dedicated Left-Side Subcategory Navigation) ── -->
+  <div class="container-custom py-3 sm:py-6 lg:py-8">
+    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start w-full">
+      
+      <!-- ─── 1. DEDICATED LEFT-SIDE CATEGORY & SUBCATEGORY NAVIGATION ─── -->
+      <aside id="shop-category-sidebar" class="w-full lg:w-72 xl:w-80 shrink-0 hidden sticky top-24 self-start rounded-3xl border overflow-hidden shadow-sm transition-all" style="background:var(--bg-surface);border-color:var(--border-color);display:none;">
+        <!-- Sidebar Header -->
+        <div class="p-4 border-b flex items-center justify-between" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-[#4063B2]"></span>
+            <h3 class="text-xs font-bold uppercase tracking-wider" style="color:var(--text-primary)">Catalog Hierarchy</h3>
+          </div>
+          <button type="button" onclick="if(window.returnToShopCategories)window.returnToShopCategories()" class="text-[11px] font-bold text-[#8D9CF5] hover:underline cursor-pointer">
+            Reset
+          </button>
+        </div>
 
-    <!-- Full-Width Catalog Grid Container -->
-    <div class="w-full flex flex-col">
-      <!-- 1. Categories Grid (Shown when browsing categories, 20 per page) -->
-      <div id="shop-categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6 w-full min-h-[420px]">
+        <!-- Sidebar Filter / Search input -->
+        <div class="p-3 border-b" style="border-color:var(--border-color)">
+          <div class="relative">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="shop-sidebar-search-input" placeholder="Quick filter categories..." class="w-full pl-8 pr-3 py-1.5 rounded-xl border text-[11px] focus:outline-none transition-all" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" oninput="if(window.onSidebarSearchInput)window.onSidebarSearchInput(this.value)" />
+          </div>
+        </div>
+
+        <!-- "All Categories" Root Option -->
+        <div class="p-2 border-b" style="border-color:var(--border-color)">
+          <button type="button" id="sidebar-all-categories-btn" onclick="if(window.returnToShopCategories)window.returnToShopCategories()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer bg-[#4063B2]/10 text-[#4063B2] dark:text-[#8D9CF5] hover:bg-[#4063B2]/15">
+            <div class="flex items-center gap-2.5">
+              <span class="w-6 h-6 rounded-lg bg-[#4063B2]/20 text-[#4063B2] flex items-center justify-center text-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+              </span>
+              <span>All Categories</span>
+            </div>
+            <span id="sidebar-total-products-count" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400">1,462</span>
+          </button>
+        </div>
+
+        <!-- Accordion Category & Subcategory List -->
+        <div id="shop-sidebar-category-list" class="max-h-[calc(100vh-250px)] overflow-y-auto p-2 space-y-1.5 pr-1">
+          <div class="p-4 text-center text-xs text-slate-400">Loading catalog navigation...</div>
+        </div>
+      </aside>
+
+      <!-- ─── 2. MAIN CATALOG COLUMN ─── -->
+      <div class="flex-1 w-full min-w-0 flex flex-col">
+        <!-- Active Filters Bar (Chips - Compact, horizontally scrollable single row) -->
+        <div id="shop-active-filters-bar" class="hidden mb-3 sm:mb-4 items-center justify-between gap-2 px-3 py-1.5 rounded-xl border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+          <div id="shop-active-chips" class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 flex-1 select-none"></div>
+          <button id="shop-clear-all-filters" onclick="if(window.clearAllShopFilters)window.clearAllShopFilters()" type="button" class="text-xs font-bold text-rose-500 hover:underline ml-2 cursor-pointer shrink-0 whitespace-nowrap">Clear All</button>
+        </div>
+
+        <!-- Category/Subcategory Match Banner (Search Enhancement) -->
+        <div id="shop-search-match-banner" class="hidden mb-4 p-3.5 rounded-2xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3" style="background:rgba(64,99,178,0.10);border-color:rgba(64,99,178,0.25)">
+          <div class="flex items-center gap-3 min-w-0">
+            <div id="shop-search-match-icon" class="w-8 h-8 rounded-xl bg-[#4063B2]/20 flex items-center justify-center text-[#8D9CF5] shrink-0">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div class="min-w-0">
+              <div class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Suggested Match</div>
+              <div id="shop-search-match-text" class="text-xs font-bold truncate" style="color:var(--text-primary)">Category match found</div>
+            </div>
+          </div>
+          <button type="button" id="shop-search-match-action" class="px-3.5 py-1.5 rounded-xl bg-[#4063B2] text-white text-xs font-bold hover:bg-[#345296] transition cursor-pointer shrink-0">
+            View Matching Products
+          </button>
+        </div>
+
+        <!-- Full-Width Catalog Grid Container -->
+        <div class="w-full flex flex-col">
+          <!-- 1. Categories Grid (Shown when browsing categories, 20 per page) -->
+          <div id="shop-categories-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 w-full min-h-[420px]">
         <a href="/category/mobile-accessories/" data-category-card="mobile-accessories" class="group relative rounded-3xl overflow-hidden border flex flex-col transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-[#8D9CF5] cursor-pointer block text-inherit no-underline"
          style="background:var(--bg-surface);border-color:var(--border-color);animation-delay:0ms">
       <div class="relative h-48 overflow-hidden" style="background:var(--bg-surface-2)">
@@ -1045,8 +1153,13 @@
     </a>
       </div>
 
+      <!-- 1b. Subcategories Grid (Shown when a category is selected to browse subcategories) -->
+      <div id="shop-subcategories-container" class="hidden grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 sm:gap-5 w-full min-h-[420px]" style="display:none;">
+        <!-- Populated dynamically by renderShopSubcategories() -->
+      </div>
+
       <!-- 2. Products Grid (Shown when category is selected or search active) -->
-      <div id="shop-products-container" class="hidden grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-5 gap-3.5 sm:gap-4 lg:gap-5 xl:gap-6 w-full min-h-[420px]">
+      <div id="shop-products-container" class="hidden grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-5 w-full min-h-[420px]" style="display:none;">
         <!-- Initial Catalog Products for Crawlers & Fast First Paint -->
         <div data-animate class="card anim-visible group relative rounded-xl sm:rounded-2xl overflow-hidden flex flex-col h-full transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-slate-300"
          style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:0ms">
@@ -1318,6 +1431,60 @@
       <div id="shop-pagination-container" class="mt-12 pb-8 flex items-center justify-center gap-2 flex-wrap"></div>
     </div>
   </div>
+</div>
+</div>
+
+<!-- ═══ MOBILE / TABLET CATEGORY & SUBCATEGORY DRAWER ═════════════════════════ -->
+<div id="shop-category-drawer" class="fixed inset-0 z-[125] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+  <!-- Backdrop -->
+  <div class="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity" onclick="if(window.closeShopCategoryDrawer)window.closeShopCategoryDrawer()"></div>
+  <!-- Drawer Panel (Slides in from Left) -->
+  <div class="absolute inset-y-0 left-0 w-full max-w-[92vw] sm:max-w-md flex flex-col shadow-2xl overflow-hidden -translate-x-full transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]"
+       style="background:var(--bg-surface);border-right:1px solid var(--border-color)">
+    
+    <!-- Drawer Header -->
+    <div class="flex items-center justify-between px-5 py-4 border-b flex-shrink-0" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-[#4063B2]/10 text-[#8D9CF5]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+        </div>
+        <div>
+          <h3 class="font-display font-bold text-base" style="color:var(--text-primary)">Categories &amp; Subcategories</h3>
+          <p class="text-[11px] text-slate-400 font-medium">Browse store catalog hierarchy</p>
+        </div>
+      </div>
+      <button type="button" onclick="if(window.closeShopCategoryDrawer)window.closeShopCategoryDrawer()" class="w-8 h-8 rounded-xl border flex items-center justify-center cursor-pointer hover:bg-slate-500/10 transition-colors" style="border-color:var(--border-color);color:var(--text-secondary)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Mobile Drawer Search -->
+    <div class="p-3 border-b" style="border-color:var(--border-color)">
+      <div class="relative">
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="shop-drawer-search-input" placeholder="Search categories &amp; subcategories..." class="w-full pl-8 pr-3 py-2 rounded-xl border text-xs focus:outline-none transition-all" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" oninput="if(window.onSidebarSearchInput)window.onSidebarSearchInput(this.value, 'drawer')" />
+      </div>
+    </div>
+
+    <!-- "All Categories" Button in Mobile Drawer -->
+    <div class="p-2 border-b" style="border-color:var(--border-color)">
+      <button type="button" onclick="if(window.returnToShopCategories)window.returnToShopCategories();if(window.closeShopCategoryDrawer)window.closeShopCategoryDrawer()" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer bg-[#4063B2]/10 text-[#4063B2] dark:text-[#8D9CF5]">
+        <div class="flex items-center gap-2.5">
+          <span class="w-6 h-6 rounded-lg bg-[#4063B2]/20 text-[#4063B2] flex items-center justify-center text-xs">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+          </span>
+          <span>All Categories</span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-slate-500/10 text-slate-400">View All</span>
+      </button>
+    </div>
+
+    <!-- Accordion Category & Subcategory List (Drawer) -->
+    <div id="shop-drawer-category-list" class="flex-1 overflow-y-auto p-3 space-y-2">
+      <!-- Populated dynamically by products.js -->
+    </div>
+  </div>
+</div>
 
 <!-- ═══ RIGHT-SIDE FILTER SIDEBAR DRAWER (Desktop + Mobile) ═════════════════════ -->
 <div id="shop-filter-drawer" class="fixed inset-0 z-[125] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
@@ -1359,6 +1526,17 @@
           <input type="checkbox" id="filter-offers-only" class="w-4 h-4 rounded border-slate-600 text-[#4063B2] focus:ring-0 cursor-pointer" />
           <span style="color:var(--text-primary)">On Sale &amp; Special Offers</span>
         </label>
+      </div>
+
+      <!-- 1b. Subcategories (Dynamic based on selected category) -->
+      <div id="filter-subcategories-section" class="space-y-3 pb-5 border-b hidden" style="border-color:var(--border-color)">
+        <div class="flex items-center justify-between">
+          <h4 class="text-xs font-bold tracking-wider uppercase text-slate-400">Subcategories</h4>
+          <span id="filter-subcategories-selected-name" class="text-[10px] text-[#8D9CF5] font-bold"></span>
+        </div>
+        <div id="filter-subcategory-list" class="space-y-1.5 max-h-56 overflow-y-auto pr-1">
+          <!-- Dynamically populated based on active category -->
+        </div>
       </div>
 
       <!-- 2. Price Range (QAR) -->

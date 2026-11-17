@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Search Catalog | M.SHOP Qatar</title>
+  <meta name="description" content="Search authentic smartphones, mobile accessories, power banks, chargers, audio gear, and laptops at M.SHOP Qatar." />
+  <link rel="canonical" href="https://www.marjaah.shop/search/" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/branding/favicon.png?v=5" />
+  <link rel="icon" type="image/svg+xml" href="/assets/images/branding/favicon.svg?v=5" />
+  <link rel="shortcut icon" href="/assets/images/branding/favicon.ico?v=5" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/images/branding/apple-touch-icon.png?v=4" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Phosphor Icons -->
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            base: 'var(--bg-base)',
+            surface: { DEFAULT: 'var(--bg-surface)', 2: 'var(--bg-surface-2)', 3: 'var(--bg-surface-3)' },
+            'text-primary': 'var(--text-primary)',
+            'text-secondary': 'var(--text-secondary)',
+            'text-tertiary': 'var(--text-tertiary)',
+            'border-default': 'var(--border-color)',
+            navy: { DEFAULT: '#070B14', 50: '#1A2540', 100: '#151F36', 200: '#10182C', 300: '#0C1222', 400: '#090E1B', 500: '#070B14' },
+            primary: { DEFAULT: '#4063B2', 50: '#EEF2FF', 100: '#E0E7FF', 200: '#C7D2FE', 300: '#A5B4FC', 400: '#8D9CF5', 500: '#4063B2', 600: '#36529A', 700: '#2C427F', 800: '#223363', 900: '#182447' },
+            accent: { DEFAULT: '#8D9CF5', light: '#A8B4F8', dark: '#6F80EB', 500: '#8D9CF5', 400: '#A8B4F8' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'Cairo', 'system-ui', 'sans-serif'],
+            display: ['Outfit', 'Space Grotesk', 'Cairo', 'sans-serif'],
+            arabic: ['Cairo', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Global styles -->
+  <link rel="stylesheet" href="/assets/css/globals.css" />
+
+  <style>
+    /* Custom scrollbar hiding for horizontal scroll rows */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* Shimmer effect for skeletons */
+    @keyframes shimmer {
+      100% { transform: translateX(100%); }
+    }
+    .shimmer-mask {
+      position: relative;
+      overflow: hidden;
+    }
+    .shimmer-mask::after {
+      position: absolute;
+      top: 0; right: 0; bottom: 0; left: 0;
+      transform: translateX(-100%);
+      background-image: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0,
+        rgba(255, 255, 255, 0.06) 20%,
+        rgba(255, 255, 255, 0.12) 60%,
+        rgba(255, 255, 255, 0)
+      );
+      animation: shimmer 1.5s infinite;
+      content: '';
+    }
+
+    /* Wishlist active animation */
+    .wishlist-active svg {
+      fill: #EF4444 !important;
+      stroke: #EF4444 !important;
+      color: #EF4444 !important;
+    }
+  </style>
+</head>
+
+<body style="background-color:var(--bg-base);color:var(--text-primary);margin:0;padding:0;" class="font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- TOP APP / SEARCH BAR (Sticky Header) -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl border-b transition-colors"
+          style="background-color:rgba(7, 11, 20, 0.88); border-color:var(--border-color);">
+    <div class="max-w-6xl mx-auto px-3 sm:px-6 py-2.5 sm:py-3.5">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Back Button -->
+        <button id="search-back-btn" aria-label="Go back"
+                class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-primary)">
+          <i class="ph-bold ph-arrow-left text-lg rtl:rotate-180" id="back-icon"></i>
+        </button>
+
+        <!-- Main Search Input Box -->
+        <div class="relative flex-1 group">
+          <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none text-slate-400 group-focus-within:text-indigo-400 transition-colors">
+            <i class="ph-bold ph-magnifying-glass text-lg"></i>
+          </div>
+
+          <input type="search"
+                 id="page-search-input"
+                 autofocus
+                 autocomplete="off"
+                 autocorrect="off"
+                 spellcheck="false"
+                 placeholder="Search products, brands, 'mobiles under 500'..."
+                 class="w-full h-11 sm:h-12 ps-10 pe-16 text-sm sm:text-base rounded-xl font-medium outline-none transition-all duration-200"
+                 style="background:var(--bg-surface);border:1.5px solid var(--border-color);color:var(--text-primary);" />
+
+          <!-- Right Action Container (Spinner + Clear Button) -->
+          <div class="absolute inset-y-0 end-0 flex items-center pe-2.5 gap-1">
+            <!-- Loading Spinner -->
+            <div id="search-spinner" class="hidden items-center justify-center pe-1">
+              <span class="w-4 h-4 border-2 border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+            </div>
+
+            <!-- Clear Button -->
+            <button id="search-clear-btn" type="button" aria-label="Clear search"
+                    class="hidden w-7 h-7 rounded-lg items-center justify-center text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer">
+              <i class="ph-bold ph-x text-sm"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Home / Storefront Link -->
+        <a href="/shop/" aria-label="Shop catalog"
+           class="w-10 h-10 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-all hover:scale-105 active:scale-95 text-slate-300 hover:text-white"
+           style="background:var(--bg-surface);border:1px solid var(--border-color);">
+          <i class="ph-bold ph-storefront text-lg"></i>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN SEARCH CONTENT AREA -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6 space-y-6">
+
+    <!-- RECENT SEARCHES BAR (Horizontally scrollable to right side, LocalStorage ONLY) -->
+    <section id="recent-searches-section" class="space-y-2">
+      <div class="flex items-center justify-between px-1">
+        <div class="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400">
+          <i class="ph-bold ph-clock-counter-clockwise text-indigo-400"></i>
+          <span id="recent-title">Recently Searched</span>
+        </div>
+        <button id="clear-recent-btn" type="button"
+                class="text-xs font-semibold text-slate-400 hover:text-red-400 transition-colors cursor-pointer px-1 py-0.5">
+          <span id="clear-recent-text">Clear All</span>
+        </button>
+      </div>
+
+      <!-- Horizontal Scrollable Container (Scrollable to the right side) -->
+      <div id="recent-chips-container"
+           class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-0.5 select-none scroll-smooth">
+        <!-- Injected via JavaScript from localStorage -->
+      </div>
+    </section>
+
+    <!-- TRENDING & POPULAR SUGGESTIONS BAR (Horizontally scrollable) -->
+    <section id="suggestions-section" class="space-y-2">
+      <div class="flex items-center gap-1.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 px-1">
+        <i class="ph-bold ph-trend-up text-amber-400"></i>
+        <span id="trending-title">Popular Searches</span>
+      </div>
+
+      <!-- Horizontal Scrollable Suggestions -->
+      <div id="trending-chips-container"
+           class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 px-0.5 select-none scroll-smooth">
+        <!-- Quick pills -->
+        <button type="button" data-search-pill="mobiles under 500"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:rgba(99, 102, 241, 0.12);border:1px solid rgba(99, 102, 241, 0.28);color:#A5B4FC;">
+          <span>🔥 Mobiles under 500</span>
+        </button>
+
+        <button type="button" data-search-pill="Smartphones"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>📱 Smartphones</span>
+        </button>
+
+        <button type="button" data-search-pill="Smart Watches"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>⌚ Smart Watches</span>
+        </button>
+
+        <button type="button" data-search-pill="Power Banks"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>🔋 Power Banks</span>
+        </button>
+
+        <button type="button" data-search-pill="Wireless Earbuds"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>🎧 Wireless Earbuds</span>
+        </button>
+
+        <button type="button" data-search-pill="chargers below 100"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:rgba(16, 185, 129, 0.12);border:1px solid rgba(16, 185, 129, 0.28);color:#6EE7B7;">
+          <span>⚡ Chargers below 100</span>
+        </button>
+
+        <button type="button" data-search-pill="Car Accessories"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>🚗 Car Accessories</span>
+        </button>
+
+        <button type="button" data-search-pill="Laptops"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>💻 Laptops</span>
+        </button>
+
+        <button type="button" data-search-pill="under 50 QAR"
+                class="suggest-pill flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap transition-all duration-200 cursor-pointer flex-shrink-0"
+                style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+          <span>💰 Under 50 QAR</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- DETECTED NATURAL INTENT BADGE (e.g. Price bounds or Category filters) -->
+    <div id="detected-intent-container" class="hidden flex-wrap items-center gap-2 pt-1">
+      <!-- Injected intent badges -->
+    </div>
+
+    <!-- LIVE RESULTS WRAPPER -->
+    <div id="search-results-wrapper" class="space-y-6">
+
+      <!-- MATCHING CATEGORIES SECTION -->
+      <section id="results-categories-section" class="hidden space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="ph-bold ph-squares-four text-indigo-400"></i>
+            <span id="cat-section-title">Matching Categories</span>
+          </h2>
+          <span id="cat-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">0</span>
+        </div>
+        <div id="results-categories-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-3">
+          <!-- Injected Category Cards -->
+        </div>
+      </section>
+
+      <!-- MATCHING SUBCATEGORIES SECTION -->
+      <section id="results-subcategories-section" class="hidden space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+            <i class="ph-bold ph-tree-structure text-indigo-400"></i>
+            <span id="subcat-section-title">Matching Subcategories</span>
+          </h2>
+          <span id="subcat-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">0</span>
+        </div>
+        <div id="results-subcategories-grid" class="flex flex-wrap gap-2">
+          <!-- Injected Subcategory Chips -->
+        </div>
+      </section>
+
+      <!-- MATCHING PRODUCTS SECTION -->
+      <section id="results-products-section" class="hidden space-y-3">
+        <div class="flex items-center justify-between px-1">
+          <div class="flex items-center gap-2">
+            <h2 class="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <i class="ph-bold ph-package text-indigo-400"></i>
+              <span id="prod-section-title">Products</span>
+            </h2>
+            <span id="prod-count-badge" class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold">0</span>
+          </div>
+
+          <!-- View all in Shop link -->
+          <a id="view-all-shop-link" href="/shop/" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 flex items-center gap-1 transition">
+            <span id="view-all-text">Open Full Shop</span>
+            <i class="ph-bold ph-arrow-right text-xs rtl:rotate-180"></i>
+          </a>
+        </div>
+
+        <!-- Products Grid (2 cols mobile, 3 cols tablet, 4-5 cols desktop) -->
+        <div id="results-products-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+          <!-- Injected Product Cards -->
+        </div>
+      </section>
+
+      <!-- EMPTY STATE (No matching items) -->
+      <div id="search-empty-state" class="hidden text-center py-12 px-4 rounded-2xl border"
+           style="background:var(--bg-surface);border-color:var(--border-color);">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+          <i class="ph-bold ph-magnifying-glass text-2xl"></i>
+        </div>
+        <h3 id="empty-title" class="text-base sm:text-lg font-bold mb-1.5" style="color:var(--text-primary)">No matching products found</h3>
+        <p id="empty-desc" class="text-xs sm:text-sm max-w-md mx-auto mb-5" style="color:var(--text-secondary)">
+          We couldn't find anything matching your search. Try checking your spelling or explore these popular recommendations:
+        </p>
+        <div class="flex flex-wrap justify-center gap-2 max-w-lg mx-auto">
+          <button type="button" data-search-pill="mobiles under 500" class="suggest-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 transition cursor-pointer">
+            Mobiles under 500
+          </button>
+          <button type="button" data-search-pill="Power Banks" class="suggest-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+            Power Banks
+          </button>
+          <button type="button" data-search-pill="Smartphones" class="suggest-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+            Smartphones
+          </button>
+          <button type="button" data-search-pill="Audio" class="suggest-pill px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition cursor-pointer">
+            Wireless Earbuds
+          </button>
+        </div>
+      </div>
+
+      <!-- SKELETON LOADING STATE -->
+      <div id="search-skeleton-state" class="hidden space-y-4">
+        <div class="h-4 w-32 rounded bg-slate-800 shimmer-mask"></div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          <div class="h-64 rounded-2xl bg-slate-800/60 shimmer-mask border border-slate-700/50"></div>
+          <div class="h-64 rounded-2xl bg-slate-800/60 shimmer-mask border border-slate-700/50"></div>
+          <div class="h-64 rounded-2xl bg-slate-800/60 shimmer-mask border border-slate-700/50"></div>
+          <div class="h-64 rounded-2xl bg-slate-800/60 shimmer-mask border border-slate-700/50"></div>
+          <div class="h-64 rounded-2xl bg-slate-800/60 shimmer-mask border border-slate-700/50 hidden lg:block"></div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- TOAST CONTAINER -->
+  <div id="toast-container" style="position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;display:flex;flex-direction:column;gap:0.5rem;pointer-events:none;"></div>
+
+  <!-- SCRIPT LIBRARIES -->
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/toast.js"></script>
+  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/wishlist.js?v=2.4"></script>
+
+  <!-- SEARCH CONTROLLER SCRIPT -->
+  <script>
+    (function () {
+      'use strict';
+
+      // 1. Language & Direction Setup
+      const isArabic = window.location.pathname.startsWith('/ar') ||
+                       document.documentElement.getAttribute('dir') === 'rtl' ||
+                       document.documentElement.lang === 'ar';
+      const LOCALE = isArabic ? 'ar' : 'en';
+
+      if (isArabic) {
+        document.documentElement.setAttribute('dir', 'rtl');
+        document.documentElement.lang = 'ar';
+        document.title = 'البحث في الكتالوج | متجر مرجاح قطر';
+
+        // Localized UI strings
+        const pInput = document.getElementById('page-search-input');
+        if (pInput) pInput.placeholder = "ابحث عن المنتجات، الماركات، 'جوالات أقل من 500'...";
+        const rTitle = document.getElementById('recent-title');
+        if (rTitle) rTitle.textContent = 'عمليات البحث الأخيرة';
+        const cRecent = document.getElementById('clear-recent-text');
+        if (cRecent) cRecent.textContent = 'مسح الكل';
+        const tTitle = document.getElementById('trending-title');
+        if (tTitle) tTitle.textContent = 'عمليات البحث الشائعة';
+        const cSecTitle = document.getElementById('cat-section-title');
+        if (cSecTitle) cSecTitle.textContent = 'الفئات المطابقة';
+        const sSecTitle = document.getElementById('subcat-section-title');
+        if (sSecTitle) sSecTitle.textContent = 'الفئات الفرعية المطابقة';
+        const pSecTitle = document.getElementById('prod-section-title');
+        if (pSecTitle) pSecTitle.textContent = 'المنتجات المطابقة';
+        const vAllText = document.getElementById('view-all-text');
+        if (vAllText) vAllText.textContent = 'فتح المتجر الكامل';
+        const eTitle = document.getElementById('empty-title');
+        if (eTitle) eTitle.textContent = 'لم يتم العثور على منتجات مطابقة';
+        const eDesc = document.getElementById('empty-desc');
+        if (eDesc) eDesc.textContent = 'لم نتمكن من العثور على أي منتج يطابق بحثك. جرّب استخدام كلمات أخرى أو استكشف الاقتراحات الشائعة أدناه:';
+      }
+
+      // 2. DOM Elements
+      const searchInput = document.getElementById('page-search-input');
+      const searchClearBtn = document.getElementById('search-clear-btn');
+      const searchSpinner = document.getElementById('search-spinner');
+      const searchBackBtn = document.getElementById('search-back-btn');
+
+      const recentSection = document.getElementById('recent-searches-section');
+      const recentChipsContainer = document.getElementById('recent-chips-container');
+      const clearRecentBtn = document.getElementById('clear-recent-btn');
+      const suggestionsSection = document.getElementById('suggestions-section');
+      const detectedIntentContainer = document.getElementById('detected-intent-container');
+
+      const categoriesSection = document.getElementById('results-categories-section');
+      const categoriesGrid = document.getElementById('results-categories-grid');
+      const catCountBadge = document.getElementById('cat-count-badge');
+
+      const subcategoriesSection = document.getElementById('results-subcategories-section');
+      const subcategoriesGrid = document.getElementById('results-subcategories-grid');
+      const subcatCountBadge = document.getElementById('subcat-count-badge');
+
+      const productsSection = document.getElementById('results-products-section');
+      const productsGrid = document.getElementById('results-products-grid');
+      const prodCountBadge = document.getElementById('prod-count-badge');
+      const viewAllShopLink = document.getElementById('view-all-shop-link');
+
+      const emptyState = document.getElementById('search-empty-state');
+      const skeletonState = document.getElementById('search-skeleton-state');
+
+      // 3. LocalStorage Recent Searches Management (LOCAL ONLY - NO DB CALLS)
+      const RECENT_SEARCHES_KEY = 'marjaah_recent_searches';
+      const MAX_RECENT_ITEMS = 15;
+
+      function getRecentSearches() {
+        try {
+          const raw = localStorage.getItem(RECENT_SEARCHES_KEY);
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          console.warn('Error reading recent searches from localStorage:', e);
+          return [];
+        }
+      }
+
+      function saveRecentSearch(query) {
+        if (!query || typeof query !== 'string') return;
+        const clean = query.trim();
+        if (clean.length < 2) return;
+
+        let list = getRecentSearches();
+        // Deduplicate (case-insensitive)
+        list = list.filter(item => item.toLowerCase() !== clean.toLowerCase());
+        // Put newest at the front
+        list.unshift(clean);
+        // Cap max items
+        if (list.length > MAX_RECENT_ITEMS) {
+          list = list.slice(0, MAX_RECENT_ITEMS);
+        }
+
+        try {
+          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(list));
+        } catch (e) {
+          console.warn('Error saving recent searches to localStorage:', e);
+        }
+        renderRecentSearches();
+      }
+
+      function removeRecentSearch(queryToRemove) {
+        let list = getRecentSearches();
+        list = list.filter(item => item.toLowerCase() !== queryToRemove.toLowerCase());
+        try {
+          localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(list));
+        } catch (e) {}
+        renderRecentSearches();
+      }
+
+      function clearAllRecentSearches() {
+        try {
+          localStorage.removeItem(RECENT_SEARCHES_KEY);
+        } catch (e) {}
+        renderRecentSearches();
+      }
+
+      function renderRecentSearches() {
+        const list = getRecentSearches();
+        if (!recentChipsContainer || !recentSection) return;
+
+        if (list.length === 0) {
+          recentSection.classList.add('hidden');
+          return;
+        }
+
+        recentSection.classList.remove('hidden');
+        recentChipsContainer.innerHTML = list.map(item => `
+          <div class="recent-chip inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all duration-200 cursor-pointer flex-shrink-0 group"
+               style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-primary);"
+               data-query="${escapeHtml(item)}">
+            <i class="ph-bold ph-clock-counter-clockwise text-xs text-slate-400 group-hover:text-indigo-400 transition-colors"></i>
+            <span class="query-text font-medium">${escapeHtml(item)}</span>
+            <button type="button" aria-label="Remove search item" class="remove-chip-btn ps-1 text-slate-400 hover:text-red-400 transition-colors cursor-pointer" data-remove="${escapeHtml(item)}">
+              <i class="ph-bold ph-x text-xs"></i>
+            </button>
+          </div>
+        `).join('');
+
+        // Wire click handlers on chips
+        recentChipsContainer.querySelectorAll('.recent-chip').forEach(chip => {
+          chip.addEventListener('click', function(e) {
+            if (e.target.closest('.remove-chip-btn')) return;
+            const q = this.dataset.query;
+            if (q) {
+              setSearchQuery(q, true);
+            }
+          });
+        });
+
+        // Wire remove buttons
+        recentChipsContainer.querySelectorAll('.remove-chip-btn').forEach(btn => {
+          btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const q = this.dataset.remove;
+            if (q) removeRecentSearch(q);
+          });
+        });
+      }
+
+      // Enable horizontal mouse wheel scroll on chips container for desktop users
+      function enableWheelHorizontalScroll(el) {
+        if (!el) return;
+        el.addEventListener('wheel', function(e) {
+          if (e.deltaY !== 0) {
+            e.preventDefault();
+            el.scrollLeft += e.deltaY;
+          }
+        }, { passive: false });
+      }
+
+      enableWheelHorizontalScroll(recentChipsContainer);
+      enableWheelHorizontalScroll(document.getElementById('trending-chips-container'));
+
+      if (clearRecentBtn) {
+        clearRecentBtn.addEventListener('click', clearAllRecentSearches);
+      }
+
+      // Wire trending pills
+      document.querySelectorAll('.suggest-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+          const q = this.dataset.searchPill;
+          if (q) {
+            setSearchQuery(q, true);
+          }
+        });
+      });
+
+      // 4. Automatic Focus & Keyboard Activation
+      function ensureFocus() {
+        if (!searchInput) return;
+        try {
+          searchInput.focus();
+          const len = searchInput.value.length;
+          searchInput.setSelectionRange(len, len);
+        } catch (_) {}
+      }
+
+      // Run on page ready and slightly delayed for mobile OS virtual keyboards
+      ensureFocus();
+      requestAnimationFrame(ensureFocus);
+      setTimeout(ensureFocus, 100);
+      setTimeout(ensureFocus, 300);
+
+      // 5. Back Button Navigation
+      if (searchBackBtn) {
+        searchBackBtn.addEventListener('click', function() {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            window.location.href = `${isArabic ? '/ar' : ''}/shop/`;
+          }
+        });
+      }
+
+      // 6. Clear Button
+      if (searchClearBtn) {
+        searchClearBtn.addEventListener('click', function() {
+          searchInput.value = '';
+          searchClearBtn.classList.add('hidden');
+          searchSpinner.classList.add('hidden');
+          resetSearchResults();
+          updateUrlQuery('');
+          ensureFocus();
+        });
+      }
+
+      // 7. Debounced Search Execution
+      let debounceTimer = null;
+      let abortController = null;
+
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          const q = (e.target.value || '').trim();
+          if (q.length > 0) {
+            searchClearBtn.classList.remove('hidden');
+          } else {
+            searchClearBtn.classList.add('hidden');
+          }
+
+          clearTimeout(debounceTimer);
+          if (q.length === 0) {
+            resetSearchResults();
+            updateUrlQuery('');
+            return;
+          }
+
+          debounceTimer = setTimeout(() => {
+            executeSearch(q, false);
+          }, 250);
+        });
+
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const q = searchInput.value.trim();
+            if (q) {
+              saveRecentSearch(q);
+              executeSearch(q, true);
+            }
+          } else if (e.key === 'Escape') {
+            searchInput.value = '';
+            searchClearBtn.classList.add('hidden');
+            resetSearchResults();
+          }
+        });
+      }
+
+      function setSearchQuery(query, runImmediate) {
+        if (!searchInput) return;
+        searchInput.value = query;
+        searchClearBtn.classList.remove('hidden');
+        if (runImmediate) {
+          saveRecentSearch(query);
+          executeSearch(query, true);
+        }
+        ensureFocus();
+      }
+
+      function updateUrlQuery(query) {
+        try {
+          const url = new URL(window.location.href);
+          if (query) {
+            url.searchParams.set('q', query);
+          } else {
+            url.searchParams.delete('q');
+            url.searchParams.delete('search');
+          }
+          window.history.replaceState({}, '', url.toString());
+        } catch (_) {}
+      }
+
+      function resetSearchResults() {
+        if (categoriesSection) categoriesSection.classList.add('hidden');
+        if (subcategoriesSection) subcategoriesSection.classList.add('hidden');
+        if (productsSection) productsSection.classList.add('hidden');
+        if (emptyState) emptyState.classList.add('hidden');
+        if (skeletonState) skeletonState.classList.add('hidden');
+        if (detectedIntentContainer) {
+          detectedIntentContainer.classList.add('hidden');
+          detectedIntentContainer.innerHTML = '';
+        }
+        // Show recent & trending
+        renderRecentSearches();
+        if (suggestionsSection) suggestionsSection.classList.remove('hidden');
+      }
+
+      async function executeSearch(query, isFinalSubmission) {
+        if (!query || !query.trim()) return;
+        const cleanQuery = query.trim();
+
+        if (isFinalSubmission) {
+          saveRecentSearch(cleanQuery);
+        }
+        updateUrlQuery(cleanQuery);
+
+        if (abortController) abortController.abort();
+        abortController = new AbortController();
+
+        // Show spinner & skeletons
+        if (searchSpinner) searchSpinner.classList.remove('hidden');
+        if (skeletonState) skeletonState.classList.remove('hidden');
+        if (emptyState) emptyState.classList.add('hidden');
+
+        // Update view all link
+        if (viewAllShopLink) {
+          viewAllShopLink.href = `${isArabic ? '/ar' : ''}/shop/?search=${encodeURIComponent(cleanQuery)}`;
+        }
+
+        try {
+          let res = null;
+          try {
+            res = await fetch(`/api/products/search?q=${encodeURIComponent(cleanQuery)}&limit=40`, {
+              signal: abortController.signal,
+            });
+          } catch (e) {
+            if (e.name === 'AbortError') return;
+          }
+
+          // Resilient fallback: if dev proxy returned 502 or failed on localhost, retry direct on port 3001
+          if (!res || !res.ok) {
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            if (isLocal) {
+              try {
+                res = await fetch(`http://localhost:3001/api/products/search?q=${encodeURIComponent(cleanQuery)}&limit=40`, {
+                  signal: abortController.signal,
+                });
+              } catch (e2) {
+                if (e2.name === 'AbortError') return;
+              }
+            }
+          }
+
+          if (!res || !res.ok) throw new Error('Search network error');
+          const data = await res.json();
+
+          renderSearchResults(data, cleanQuery);
+        } catch (err) {
+          if (err.name === 'AbortError') return;
+          console.error('Catalog search failed:', err);
+          if (skeletonState) skeletonState.classList.add('hidden');
+          if (emptyState) {
+            emptyState.classList.remove('hidden');
+            const d = document.getElementById('empty-desc');
+            if (d) d.textContent = isArabic ? 'لم نتمكن من العثور على أي منتج يطابق بحثك.' : 'No products matched your search. Try checking your spelling or explore the suggestions below.';
+          }
+        } finally {
+          if (searchSpinner) searchSpinner.classList.add('hidden');
+          if (skeletonState) skeletonState.classList.add('hidden');
+        }
+      }
+
+      function renderSearchResults(data, rawQuery) {
+        const { categories = [], subcategories = [], products = [], totalProducts = 0, parsedIntent } = data;
+
+        // Render Intent Badges if natural bounds detected
+        if (detectedIntentContainer) {
+          detectedIntentContainer.innerHTML = '';
+          let hasIntent = false;
+
+          if (parsedIntent && parsedIntent.maxPrice !== null) {
+            hasIntent = true;
+            const badge = document.createElement('div');
+            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
+            badge.innerHTML = `
+              <i class="ph-bold ph-tag"></i>
+              <span>${isArabic ? 'الحد الأقصى للسعر:' : 'Price:'} ≤ ${parsedIntent.maxPrice} ${isArabic ? 'ر.ق' : 'QAR'}</span>
+            `;
+            detectedIntentContainer.appendChild(badge);
+          }
+
+          if (parsedIntent && parsedIntent.minPrice !== null) {
+            hasIntent = true;
+            const badge = document.createElement('div');
+            badge.className = 'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30';
+            badge.innerHTML = `
+              <i class="ph-bold ph-tag"></i>
+              <span>${isArabic ? 'الحد الأدنى للسعر:' : 'Price:'} ≥ ${parsedIntent.minPrice} ${isArabic ? 'ر.ق' : 'QAR'}</span>
+            `;
+            detectedIntentContainer.appendChild(badge);
+          }
+
+          if (hasIntent) {
+            detectedIntentContainer.classList.remove('hidden');
+          } else {
+            detectedIntentContainer.classList.add('hidden');
+          }
+        }
+
+        let totalMatched = categories.length + subcategories.length + products.length;
+
+        // 1. Render Categories
+        if (categories.length > 0) {
+          categoriesSection.classList.remove('hidden');
+          if (catCountBadge) catCountBadge.textContent = categories.length;
+          categoriesGrid.innerHTML = categories.map(cat => {
+            const catName = isArabic && cat.name_ar ? cat.name_ar : (cat.name || 'Category');
+            const catSlug = cat.slug || cat.id;
+            const catImg = cat.image || '/assets/images/categories/placeholder.png';
+            const catUrl = `${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(catSlug)}`;
+            return `
+              <a href="${catUrl}" class="group block p-2.5 sm:p-3 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:border-indigo-500/50"
+                 style="background:var(--bg-surface);border-color:var(--border-color);">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-800 border border-slate-700/60 p-1 flex items-center justify-center">
+                    <img src="${catImg}" alt="${escapeHtml(catName)}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                         onerror="this.src='/assets/images/branding/favicon.png'" />
+                  </div>
+                  <div class="min-w-0 flex-1">
+                    <div class="text-xs uppercase tracking-wider text-indigo-400 font-bold mb-0.5">${isArabic ? 'فئة' : 'Category'}</div>
+                    <div class="text-xs sm:text-sm font-bold text-slate-100 group-hover:text-indigo-400 transition-colors truncate">${escapeHtml(catName)}</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">${isArabic ? 'عرض كل المنتجات' : 'View products'} →</div>
+                  </div>
+                </div>
+              </a>
+            `;
+          }).join('');
+        } else {
+          categoriesSection.classList.add('hidden');
+        }
+
+        // 2. Render Subcategories
+        if (subcategories.length > 0) {
+          subcategoriesSection.classList.remove('hidden');
+          if (subcatCountBadge) subcatCountBadge.textContent = subcategories.length;
+          subcategoriesGrid.innerHTML = subcategories.map(sub => {
+            const subName = isArabic && sub.name_ar ? sub.name_ar : (sub.name || 'Subcategory');
+            const parentCatSlug = sub.category_slug || (sub.category_name ? sub.category_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
+            const subSlug = sub.slug || (sub.name ? sub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
+            const color = sub.color || '#6366F1';
+            const icon = sub.icon || 'ph-tag';
+            const subUrl = `${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(parentCatSlug)}&subcategory=${encodeURIComponent(subSlug)}`;
+            return `
+              <a href="${subUrl}" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs sm:text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-indigo-400 group"
+                 style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary);">
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color:${color};box-shadow:0 0 8px ${color}88;"></span>
+                <i class="ph-bold ${icon} text-slate-400 group-hover:text-indigo-400 transition-colors"></i>
+                <span class="truncate">${escapeHtml(subName)}</span>
+                <span class="text-[10px] text-slate-400 group-hover:text-slate-300 font-normal">(${escapeHtml(sub.category_name || '')})</span>
+              </a>
+            `;
+          }).join('');
+        } else {
+          subcategoriesSection.classList.add('hidden');
+        }
+
+        // 3. Render Products
+        if (products.length > 0) {
+          productsSection.classList.remove('hidden');
+          if (prodCountBadge) prodCountBadge.textContent = totalProducts || products.length;
+          productsGrid.innerHTML = products.map(p => renderProductCard(p)).join('');
+
+          // Sync wishlist icons
+          if (window.Wishlist && typeof window.Wishlist.syncButtons === 'function') {
+            window.Wishlist.syncButtons();
+          } else if (typeof syncWishlistButtons === 'function') {
+            syncWishlistButtons();
+          }
+        } else {
+          productsSection.classList.add('hidden');
+        }
+
+        // 4. Handle Empty State
+        if (totalMatched === 0) {
+          emptyState.classList.remove('hidden');
+        } else {
+          emptyState.classList.add('hidden');
+        }
+      }
+
+      function renderProductCard(p) {
+        const title = isArabic && p.name_ar ? p.name_ar : (p.name || 'Product');
+        const slug = p.slug || p.id;
+        const brand = p.brand || p.brand_name || '';
+        const price = Number(p.price) || 0;
+        const originalPrice = Number(p.compare_at_price || p.original_price || p.regular_price || 0);
+        const hasDiscount = originalPrice > price;
+        const discountPercent = hasDiscount ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
+        const image = (Array.isArray(p.images) && p.images[0]) || p.image || '/assets/images/branding/favicon.png';
+        const rating = Number(p.rating) || 4.8;
+        const reviewCount = Number(p.review_count || p.reviews_count || 12);
+        const inStock = p.in_stock !== false && p.stock_status !== 'out_of_stock' && (p.inventory_quantity === undefined || p.inventory_quantity > 0);
+        const productUrl = `${isArabic ? '/ar' : ''}/product/?slug=${encodeURIComponent(slug)}`;
+
+        return `
+          <div class="product-card group relative flex flex-col rounded-2xl border transition-all duration-300 hover:shadow-xl hover:border-indigo-500/40"
+               style="background:var(--bg-surface);border-color:var(--border-color);">
+
+            <!-- Image Container -->
+            <div class="relative aspect-square w-full rounded-t-2xl overflow-hidden bg-slate-900/40 p-3 flex items-center justify-center">
+              <a href="${productUrl}" class="w-full h-full flex items-center justify-center">
+                <img src="${image}" alt="${escapeHtml(title)}"
+                     loading="lazy"
+                     class="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500"
+                     onerror="this.src='/assets/images/branding/favicon.png'" />
+              </a>
+
+              <!-- Discount Pill -->
+              ${hasDiscount ? `
+                <div class="absolute top-2.5 start-2.5 px-2 py-0.5 rounded-lg text-[10px] sm:text-xs font-black bg-rose-500 text-white shadow-md">
+                  -${discountPercent}%
+                </div>
+              ` : ''}
+
+              <!-- Wishlist Heart Button -->
+              <button type="button" aria-label="Toggle wishlist"
+                      data-wishlist-toggle="${escapeHtml(slug)}"
+                      class="absolute top-2.5 end-2.5 w-8 h-8 rounded-full flex items-center justify-center bg-black/40 backdrop-blur-md text-white/80 hover:text-rose-500 hover:bg-black/60 transition-all cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-3 sm:p-4 flex flex-col flex-1 justify-between gap-2">
+              <div>
+                <!-- Brand & Stock Row -->
+                <div class="flex items-center justify-between text-[11px] mb-1">
+                  <span class="font-bold text-slate-400 uppercase tracking-wider truncate">${escapeHtml(brand)}</span>
+                  ${inStock
+                    ? `<span class="text-emerald-400 font-medium">${isArabic ? 'متوفر' : 'In Stock'}</span>`
+                    : `<span class="text-rose-400 font-medium">${isArabic ? 'غير متوفر' : 'Out of Stock'}</span>`
+                  }
+                </div>
+
+                <!-- Title -->
+                <a href="${productUrl}" class="block font-semibold text-xs sm:text-sm text-slate-100 hover:text-indigo-400 transition-colors line-clamp-2 leading-snug">
+                  ${escapeHtml(title)}
+                </a>
+              </div>
+
+              <!-- Price & Rating Row -->
+              <div class="pt-2 border-t border-slate-800/80">
+                <div class="flex items-baseline gap-1.5 mb-1.5">
+                  <span class="text-sm sm:text-base font-extrabold text-indigo-400">${price.toFixed(0)}</span>
+                  <span class="text-[11px] font-bold text-slate-400">${isArabic ? 'ر.ق' : 'QAR'}</span>
+                  ${hasDiscount ? `
+                    <span class="text-xs text-slate-500 line-through ms-1">${originalPrice.toFixed(0)}</span>
+                  ` : ''}
+                </div>
+
+                <!-- Quick Add To Cart Button -->
+                <button type="button"
+                        data-add-to-cart="${escapeHtml(slug)}"
+                        data-name="${escapeHtml(title)}"
+                        data-price="${price}"
+                        data-image="${escapeHtml(image)}"
+                        ${!inStock ? 'disabled' : ''}
+                        class="w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-200 cursor-pointer ${inStock ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 active:scale-95' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}">
+                  <i class="ph-bold ph-shopping-bag"></i>
+                  <span>${isArabic ? 'أضف للسلة' : 'Add to Cart'}</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      // 8. On Initial Page Load: Check URL Query params (?q=... or ?search=...)
+      window.addEventListener('DOMContentLoaded', function() {
+        renderRecentSearches();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialQuery = (urlParams.get('q') || urlParams.get('search') || '').trim();
+
+        if (initialQuery) {
+          setSearchQuery(initialQuery, true);
+        } else {
+          ensureFocus();
+        }
+      });
+
+    })();
+  </script>
+
+</body>
+</html>

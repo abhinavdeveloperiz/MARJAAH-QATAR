@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Patch,
+  Delete,
+  Param,
+  Query,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { SubcategoriesService } from './subcategories.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -8,8 +19,13 @@ export class SubcategoriesController {
   constructor(private readonly subcategoriesService: SubcategoriesService) {}
 
   @Get()
-  async findAll(@Query('categoryId') categoryId?: string, @Query('categorySlug') categorySlug?: string) {
-    return this.subcategoriesService.findAll(categoryId, categorySlug);
+  async findAll(
+    @Query('categoryId') categoryId?: string,
+    @Query('categorySlug') categorySlug?: string,
+    @Query('includeInactive') includeInactive?: string,
+  ) {
+    const isInactiveAllowed = String(includeInactive).toLowerCase() === 'true';
+    return this.subcategoriesService.findAll(categoryId, categorySlug, isInactiveAllowed);
   }
 
   @Get(':slugOrId')
@@ -30,8 +46,15 @@ export class SubcategoriesController {
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch(':id/status')
+  async updateStatus(@Param('id') id: string, @Body('is_active') isActive: boolean) {
+    return this.subcategoriesService.update(id, { is_active: Boolean(isActive) });
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.subcategoriesService.remove(id);
+  async remove(@Param('id') id: string, @Query('force') force?: string) {
+    const isForce = String(force).toLowerCase() === 'true';
+    return this.subcategoriesService.remove(id, isForce);
   }
 }

@@ -158,6 +158,32 @@
       this.set('catalog_categories', categories, 60 * 60 * 1000);
     },
 
+    getSubcategories() {
+      return this.get('catalog_subcategories') || [];
+    },
+
+    setSubcategories(subcategories) {
+      this.set('catalog_subcategories', subcategories, 60 * 60 * 1000);
+    },
+
+    updateSubcategory(sub) {
+      if (!sub || !sub.id) return;
+      const list = this.getSubcategories();
+      const idx = list.findIndex((s) => s.id === sub.id);
+      if (idx >= 0) {
+        list[idx] = { ...list[idx], ...sub };
+      } else {
+        list.push(sub);
+      }
+      this.setSubcategories(list);
+    },
+
+    removeSubcategory(subId) {
+      if (!subId) return;
+      const list = this.getSubcategories().filter((s) => s.id !== subId);
+      this.setSubcategories(list);
+    },
+
     getBrands() {
       return this.get('catalog_brands') || [];
     },

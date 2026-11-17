@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const PORT = 8080;
-const BACKEND_PORT = Number(process.env.BACKEND_PORT) || 3005;
+const BACKEND_PORT = Number(process.env.BACKEND_PORT) || 3001;
 const FRONTEND_DIR = path.resolve(__dirname, '../../frontend');
 
 const MIME_TYPES = {
@@ -63,7 +63,7 @@ const server = http.createServer((req, res) => {
   // Route clean product URLs: /product/:slug, /ar/product/:slug
   if (pathname.match(/^\/(?:ar\/)?product(?:\/.*)?$/)) {
     filePath = path.join(FRONTEND_DIR, 'product', 'index.html');
-  } else if (pathname.match(/^\/(?:ar\/)?category(?:\/.*)?$/)) {
+  } else if (pathname.match(/^\/(?:ar\/)?(?:category|subcategory)(?:\/.*)?$/)) {
     filePath = path.join(FRONTEND_DIR, 'shop', 'index.html');
   } else if (pathname === '/robot.txt') {
     filePath = path.join(FRONTEND_DIR, 'robots.txt');

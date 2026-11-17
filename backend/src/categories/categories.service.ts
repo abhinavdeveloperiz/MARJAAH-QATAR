@@ -4,6 +4,7 @@ import * as path from 'path';
 import { FirestoreService } from '../firebase/firestore.service';
 import { UploadService } from '../upload/upload.service';
 import { SeoService } from '../seo/seo.service';
+import { SubcategoriesService } from '../subcategories/subcategories.service';
 
 @Injectable()
 export class CategoriesService implements OnModuleInit {
@@ -13,6 +14,7 @@ export class CategoriesService implements OnModuleInit {
     private readonly firestore: FirestoreService,
     private readonly uploadService: UploadService,
     @Optional() @Inject(forwardRef(() => SeoService)) private readonly seoService?: SeoService,
+    @Optional() @Inject(forwardRef(() => SubcategoriesService)) private readonly subcategoriesService?: SubcategoriesService,
   ) {}
 
   private cachedCategories: any[] | null = null;
@@ -108,20 +110,43 @@ export class CategoriesService implements OnModuleInit {
     return categories;
   }
 
-  async findAll() {
+  async findAll(includeSubcategories = false) {
     const now = Date.now();
+    let categories: any[];
+
     // 1. Fresh in-memory cache: instant 0ms response
     if (this.cachedCategories && now < this.cacheExpiresAt) {
-      return this.cachedCategories;
-    }
-
-    // 2. Stale-While-Revalidate: return existing data in 0ms, refresh asynchronously in background
-    if (this.cachedCategories && this.cachedCategories.length > 0) {
+      categories = this.cachedCategories;
+    } else if (this.cachedCategories && this.cachedCategories.length > 0) {
+      // 2. Stale-While-Revalidate: return existing data in 0ms, refresh asynchronously in background
       this.refreshCacheInBackground().catch(() => {});
-      return this.cachedCategories;
+      categories = this.cachedCategories;
+    } else {
+      categories = await this.fetchFromFirestore();
     }
 
-    return this.fetchFromFirestore();
+    if (!includeSubcategories) {
+      return categories;
+    }
+
+    let allSubs: any[] = [];
+    if (this.subcategoriesService) {
+      allSubs = await this.subcategoriesService.findAll(undefined, undefined, false);
+    } else {
+      const subSnap = await this.firestore.collection('subcategories').get();
+      allSubs = subSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    return categories.map(cat => {
+      const catId = String(cat.id || '').toLowerCase();
+      const catSlug = String(cat.slug || '').toLowerCase();
+      const subcategories = allSubs.filter(s => {
+        const sCatId = String(s.category_id || '').toLowerCase();
+        const sCatSlug = String(s.category_slug || '').toLowerCase();
+        return (catId && sCatId === catId) || (catSlug && sCatSlug === catSlug);
+      });
+      return { ...cat, subcategories };
+    });
   }
 
   async findOne(slugOrId: string) {

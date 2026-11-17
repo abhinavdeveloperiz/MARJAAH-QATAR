@@ -16,7 +16,7 @@
   }
 
 
-  const defaultBaseUrl = isLocal ? (window.location.port === '8080' ? '' : 'http://localhost:3005') : (window.API_BASE_URL || '');
+  const defaultBaseUrl = isLocal ? (window.location.port === '8080' ? '' : 'http://localhost:3001') : (window.API_BASE_URL || '');
 
   const API_CONFIG = {
     baseUrl: window.API_BASE_URL || localStorage.getItem('marjaah_api_url') || defaultBaseUrl,
@@ -211,9 +211,17 @@
     }
 
     // ── Pre-wired helper methods ────────────────────────
-    getCategories() { return this.get('/api/categories'); }
+    getCategories(includeSubcategories = false) {
+      return this.get('/api/categories', includeSubcategories ? { includeSubcategories: 'true' } : {});
+    }
     getCategory(slug) { return this.get(`/api/categories/${slug}`); }
-    getSubcategories(catSlug) { return this.get('/api/subcategories', { categorySlug: catSlug }); }
+    getSubcategories(params) {
+      if (typeof params === 'string') return this.get('/api/subcategories', { categorySlug: params });
+      return this.get('/api/subcategories', params || {});
+    }
+    searchCatalog(q, limit = 8) {
+      return this.get('/api/products/search', { q, limit });
+    }
     getBrands() { return this.get('/api/brands'); }
     getBanners(type) { return this.get('/api/banners', { type }); }
     getProducts(params) { return this.get('/api/products', params); }
@@ -326,7 +334,8 @@
     deleteCategory(id) { return this.delete(`/api/categories/${id}`); }
     createSubcategory(data) { return this.post('/api/subcategories', data); }
     updateSubcategory(id, data) { return this.put(`/api/subcategories/${id}`, data); }
-    deleteSubcategory(id) { return this.delete(`/api/subcategories/${id}`); }
+    updateSubcategoryStatus(id, is_active) { return this.patch(`/api/subcategories/${id}/status`, { is_active }); }
+    deleteSubcategory(id, force = false) { return this.delete(`/api/subcategories/${id}${force ? '?force=true' : ''}`); }
     createBrand(data) { return this.post('/api/brands', data); }
     updateBrand(id, data) { return this.put(`/api/brands/${id}`, data); }
     deleteBrand(id) { return this.delete(`/api/brands/${id}`); }
