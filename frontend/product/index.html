@@ -101,7 +101,7 @@
   </script>
 
   <!-- Global CSS (design tokens + component classes) -->
-  <link rel="stylesheet" href="/assets/css/globals.css?v=3.0" />
+  <link rel="stylesheet" href="/assets/css/globals.css?v=3.1" />
 
   <!-- Inline anim & RTL font helpers -->
   <style>
@@ -442,10 +442,10 @@
         <div class="hidden lg:block relative">
           
           <div class="relative">
-            <button id="user-menu-btn" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-xl transition-all cursor-pointer">
-              <div class="w-7 h-7 rounded-lg flex items-center justify-center text-white font-display text-xs" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">
+            <button id="user-menu-btn" type="button" aria-label="User menu" class="nav-btn flex items-center gap-2 px-3 py-2 rounded-xl transition-all cursor-pointer">
+              <span class="w-7 h-7 rounded-lg inline-flex items-center justify-center text-white font-display text-xs" style="background:linear-gradient(135deg,#4063B2,#8D9CF5)">
                 
-              </div>
+              </span>
               <span class="user-name text-xs font-sans font-semibold max-w-[80px] truncate"></span>
             </button>
             <div id="user-dropdown" class="hidden absolute right-0 top-full mt-2 w-52 border rounded-2xl shadow-2xl overflow-hidden z-50 animate-fade-in-up" style="background:var(--bg-surface);border-color:var(--border-color)">
@@ -474,7 +474,7 @@
   <div class="w-full max-w-2xl border rounded-3xl p-5 sm:p-6 shadow-2xl animate-fade-in-up" style="background:var(--bg-surface);border-color:var(--color-accent);">
     <div class="flex items-center justify-between pb-4" style="border-bottom:1px solid var(--border-color)">
       <span class="text-xs font-sans font-bold tracking-widest uppercase" style="color:var(--color-accent)">Fast Catalog Search — Qatar</span>
-      <button id="search-close" class="p-1 cursor-pointer" style="color:var(--text-secondary)">
+      <button id="search-close" type="button" aria-label="Close search" class="p-1 cursor-pointer" style="color:var(--text-secondary)">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
       </button>
     </div>
@@ -689,7 +689,7 @@
   <main class="flex-1 min-h-screen">
     
     
-<div id="product-detail-view" class="pt-[72px]">
+<div id="product-detail-view" class="pt-[72px]" aria-busy="true">
   <!-- Breadcrumb -->
   <div class="py-4 border-b" style="border-color:var(--border-color);background:var(--bg-surface)">
     <div class="container-custom flex items-center gap-2 text-xs font-sans" style="color:var(--text-tertiary)">
@@ -697,11 +697,15 @@
       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="m9 18 6-6-6-6"/></svg>
       <a href="/shop/" class="hover:text-primary-500 transition-colors">Shop</a>
       
-      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="m9 18 6-6-6-6"/></svg>
-      <a id="product-category-link" href="/shop/" class="hover:text-primary-500 transition-colors">Shop</a>
+      <svg id="product-category-sep" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="m9 18 6-6-6-6"/></svg>
+      <a id="product-category-link" href="/shop/" class="hover:text-primary-500 transition-colors inline-flex items-center" aria-label="Loading category">
+        <span aria-hidden="true" class="skeleton-shimmer inline-block h-3 w-16 rounded-md"></span>
+      </a>
       
       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="m9 18 6-6-6-6"/></svg>
-      <span id="product-crumb-name" style="color:var(--text-primary)" class="truncate max-w-[200px]">ASUS ROG Strix G16 Gaming Laptop</span>
+      <span id="product-crumb-name" style="color:var(--text-primary)" class="truncate max-w-[200px] inline-flex items-center">
+        <span aria-hidden="true" class="skeleton-shimmer inline-block h-3 w-36 rounded-md"></span>
+      </span>
     </div>
   </div>
 
@@ -709,10 +713,9 @@
     <div class="grid lg:grid-cols-2 gap-12">
       <!-- Gallery -->
       <div class="space-y-4">
-        <div class="aspect-square rounded-3xl overflow-hidden relative group" style="background:var(--bg-surface-2)">
-          <img id="main-image" src="/assets/images/products/placeholder.svg" alt="Product Image"
-            class="w-full h-full object-cover transition-all duration-300"
-            onerror="this.src='/assets/images/products/placeholder.svg'" />
+        <div id="product-main-image-wrap" class="aspect-square rounded-3xl overflow-hidden relative group img-shimmer-wrap" style="background:var(--bg-surface-2)">
+          <img id="main-image" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt=""
+            class="w-full h-full object-cover transition-all duration-300" />
 
           <!-- Prev / Next Navigation Arrows for multi-image -->
           <button id="gallery-prev-btn" type="button" aria-label="Previous image"
@@ -737,38 +740,41 @@
       <!-- Info -->
       <div>
         <div class="mb-4 flex items-center gap-4">
-          <span id="product-brand" class="text-xs font-bold uppercase tracking-widest" style="color:var(--color-accent)">ASUS</span>
-          <span id="product-sku" class="text-xs font-mono" style="color:var(--text-tertiary)">SKU: ROG-G16-I9-4070</span>
+          <span id="product-brand" class="text-xs font-bold uppercase tracking-widest inline-flex items-center" style="color:var(--color-accent)">
+            <span aria-hidden="true" class="skeleton-shimmer inline-block h-3.5 w-16 rounded-md"></span>
+          </span>
+          <span id="product-sku" class="text-xs font-mono inline-flex items-center" style="color:var(--text-tertiary)">
+            <span aria-hidden="true" class="skeleton-shimmer inline-block h-3.5 w-28 rounded-md"></span>
+          </span>
         </div>
         <h1 id="product-title" class="text-2xl sm:text-3xl font-display font-black leading-tight mb-4" style="color:var(--text-primary)">
-          ASUS ROG Strix G16 Gaming Laptop
+          <span class="sr-only">Loading product details...</span>
+          <span aria-hidden="true" class="block space-y-2.5">
+            <span class="skeleton-shimmer block h-7 sm:h-8 w-11/12 rounded-lg"></span>
+            <span class="skeleton-shimmer block h-7 sm:h-8 w-3/5 rounded-lg"></span>
+          </span>
         </h1>
 
         <!-- Rating -->
-        <div id="product-rating-container" class="flex items-center gap-3 mb-5">
-          <div class="flex items-center gap-0.5">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          </div>
-          <span class="text-sm font-bold" style="color:var(--text-primary)">4.8</span>
-          <span class="text-xs" style="color:var(--text-tertiary)">(47 reviews)</span>
+        <div id="product-rating-container" class="flex items-center gap-3 mb-5" aria-hidden="true">
+          <span class="skeleton-shimmer inline-block h-4 w-24 rounded-md"></span>
+          <span class="skeleton-shimmer inline-block h-4 w-8 rounded-md"></span>
+          <span class="skeleton-shimmer inline-block h-3.5 w-20 rounded-md"></span>
         </div>
 
         <!-- Price -->
-        <div id="product-price-container" class="flex items-baseline gap-3 mb-6">
-          <span class="text-4xl font-display font-black" style="color:var(--text-primary)">
-            QAR 6499
-          </span>
-          <span class="text-lg line-through" style="color:var(--text-tertiary)">
-            QAR 7299
-          </span>
+        <div id="product-price-container" class="flex items-baseline gap-3 mb-6" aria-hidden="true">
+          <span class="skeleton-shimmer inline-block h-10 w-36 rounded-xl"></span>
+          <span class="skeleton-shimmer inline-block h-6 w-20 rounded-lg"></span>
         </div>
 
         <!-- Short description -->
-        <p id="product-short-description" class="text-sm leading-relaxed mb-4" style="color:var(--text-secondary)"></p>
+        <div id="product-short-description" class="text-sm leading-relaxed mb-4" style="color:var(--text-secondary)">
+          <div aria-hidden="true" class="space-y-2">
+            <span class="skeleton-shimmer block h-3.5 w-full rounded-md"></span>
+            <span class="skeleton-shimmer block h-3.5 w-4/5 rounded-md"></span>
+          </div>
+        </div>
 
         <!-- Compatibility Badges -->
         <div id="product-compatibility-container" class="hidden flex-wrap items-center gap-2 mb-4">
@@ -786,9 +792,8 @@
         </div>
 
         <!-- Stock status -->
-        <div id="product-stock-container" class="flex items-center gap-2 mb-6">
-          <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-          <span class="text-xs font-bold text-emerald-500">In Stock</span>
+        <div id="product-stock-container" class="flex items-center gap-2 mb-6" aria-hidden="true">
+          <span class="skeleton-shimmer inline-block h-4 w-28 rounded-full"></span>
         </div>
 
         <!-- Actions -->
@@ -797,7 +802,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" x2="21" y1="6" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
             <span>Add to Cart</span>
           </button>
-          <button id="product-wishlist-btn" aria-label="Add to Wishlist" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all cursor-pointer shrink-0" style="border-color:var(--border-color);background:var(--bg-surface-2)">
+          <button id="product-wishlist-btn" disabled aria-disabled="true" aria-label="Add to Wishlist" class="w-12 h-12 rounded-2xl border flex items-center justify-center transition-all opacity-60 cursor-not-allowed shrink-0" style="border-color:var(--border-color);background:var(--bg-surface-2);pointer-events:none">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
           </button>
         </div>
@@ -806,14 +811,14 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
           <div class="flex items-center gap-2.5 p-3 rounded-xl" style="background:var(--bg-surface-2)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            <span id="product-delivery-text" class="text-xs font-medium" style="color:var(--text-secondary)">
-              Fast Delivery Across Qatar
+            <span id="product-delivery-text" class="text-xs font-medium flex-1" style="color:var(--text-secondary)">
+              <span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-32 rounded-md"></span>
             </span>
           </div>
           <div class="flex items-center gap-2.5 p-3 rounded-xl" style="background:var(--bg-surface-2)">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            <span id="product-warranty-text" class="text-xs font-medium" style="color:var(--text-secondary)">
-              Brand Warranty
+            <span id="product-warranty-text" class="text-xs font-medium flex-1" style="color:var(--text-secondary)">
+              <span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-28 rounded-md"></span>
             </span>
           </div>
         </div>
@@ -824,7 +829,20 @@
             <h3 class="text-sm font-bold" style="color:var(--text-primary)">Specifications</h3>
           </div>
           <table id="product-specs-table" class="w-full text-xs min-w-[280px]">
-            <tbody id="product-specs-tbody"></tbody>
+            <tbody id="product-specs-tbody">
+              <tr style="border-bottom:1px solid var(--border-color)">
+                <td class="px-4 py-3 w-36 sm:w-44"><span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-24 rounded-md"></span></td>
+                <td class="px-4 py-3"><span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-40 rounded-md"></span></td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--border-color)">
+                <td class="px-4 py-3 w-36 sm:w-44"><span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-20 rounded-md"></span></td>
+                <td class="px-4 py-3"><span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-32 rounded-md"></span></td>
+              </tr>
+              <tr>
+                <td class="px-4 py-3 w-36 sm:w-44"><span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-28 rounded-md"></span></td>
+                <td class="px-4 py-3"><span aria-hidden="true" class="skeleton-shimmer block h-3.5 w-36 rounded-md"></span></td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
@@ -842,7 +860,13 @@
     <!-- Description -->
     <div class="mt-14 pt-10" style="border-top:1px solid var(--border-color)">
       <h2 class="text-xl font-display font-bold mb-4" style="color:var(--text-primary)">Product Description</h2>
-      <div id="product-description-text" class="text-sm leading-relaxed space-y-3" style="color:var(--text-secondary)"></div>
+      <div id="product-description-text" class="text-sm leading-relaxed space-y-3" style="color:var(--text-secondary)">
+        <div aria-hidden="true" class="space-y-2.5 max-w-3xl">
+          <span class="skeleton-shimmer block h-3.5 w-full rounded-md"></span>
+          <span class="skeleton-shimmer block h-3.5 w-11/12 rounded-md"></span>
+          <span class="skeleton-shimmer block h-3.5 w-2/3 rounded-md"></span>
+        </div>
+      </div>
     </div>
 
     <!-- Related products -->
@@ -857,13 +881,7 @@
           </div>
         </div>
       </div>
-    
-  </div>
-</div>
-
-      </div>
     </div>
-    
   </div>
 </div>
 
@@ -1307,10 +1325,9 @@
 
 
   <!-- SCROLL TO TOP -->
-  <button id="scroll-to-top" aria-label="Scroll to top"
-    style="opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;"
+  <button id="scroll-to-top" type="button" aria-label="Scroll to top"
     class="fixed bottom-24 right-6 z-40 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-    style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+    style="opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
   </button>
 
@@ -1333,7 +1350,7 @@
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js?v=2.3"></script>
   <script src="/assets/js/carousel.js"></script>
-  <script src="/assets/js/products.js?v=3.0"></script>
+  <script src="/assets/js/products.js?v=3.1"></script>
   
 
 </body>

@@ -2666,7 +2666,10 @@
     const notFoundView = document.getElementById('product-not-found-view');
 
     function showNotFound() {
-      if (detailView) detailView.classList.add('hidden');
+      if (detailView) {
+        detailView.classList.add('hidden');
+        detailView.setAttribute('aria-busy', 'false');
+      }
       if (notFoundView) notFoundView.classList.remove('hidden');
       document.title = `${isRtl ? 'المنتج غير موجود' : 'Product Not Found'} — M.SHOP Qatar`;
     }
@@ -2850,10 +2853,19 @@
       const crumbNameEl = document.getElementById('product-crumb-name');
       if (crumbNameEl) crumbNameEl.textContent = pName;
       const catLinkEl = document.getElementById('product-category-link');
-      if (catLinkEl && (product.category || product.category_name)) {
+      const catSepEl = document.getElementById('product-category-sep');
+      if (catLinkEl) {
         const catName = product.category || product.category_name;
-        catLinkEl.textContent = catName;
-        catLinkEl.href = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(product.category_slug || catName)}/`;
+        if (catName) {
+          catLinkEl.textContent = catName;
+          catLinkEl.href = `${isRtl ? '/ar' : ''}/category/${encodeURIComponent(product.category_slug || catName)}/`;
+          catLinkEl.removeAttribute('aria-label');
+          catLinkEl.classList.remove('hidden');
+          if (catSepEl) catSepEl.classList.remove('hidden');
+        } else {
+          catLinkEl.classList.add('hidden');
+          if (catSepEl) catSepEl.classList.add('hidden');
+        }
       }
 
       // Title & Brand & SKU
@@ -2885,6 +2897,7 @@
           <span class="text-sm font-bold" style="color:var(--text-primary)">${rating.toFixed(1)}</span>
           <span class="text-xs" style="color:var(--text-tertiary)">(${reviewsCount} ${isRtl ? 'تقييم' : (reviewsCount === 1 ? 'review' : 'reviews')})</span>
         `;
+        ratingContainer.removeAttribute('aria-hidden');
       }
 
       // ── Normalize Images List (array, JSON string, or comma-separated) ──
@@ -2908,11 +2921,49 @@
 
       // Main Image, Prev/Next Arrows, Badge & Thumbnails
       const mainImg = document.getElementById('main-image');
+      const mainImgWrap = document.getElementById('product-main-image-wrap') || (mainImg ? mainImg.parentElement : null);
       const prevBtn = document.getElementById('gallery-prev-btn');
       const nextBtn = document.getElementById('gallery-next-btn');
       const indexBadge = document.getElementById('gallery-index-badge');
       const thumbsContainer = document.getElementById('product-thumbnails-container');
       let activeImageIdx = 0;
+      let imageLoadSeq = 0;
+
+      function loadMainProductImage(url, altText) {
+        if (!mainImg) return;
+        const targetUrl = url || '/assets/images/products/placeholder.svg';
+        mainImg.alt = altText || pName;
+
+        if (mainImg.getAttribute('data-loaded-src') === targetUrl && mainImg.complete && mainImg.naturalWidth > 0) {
+          if (mainImgWrap) mainImgWrap.classList.add('img-loaded');
+          return;
+        }
+
+        const reqId = ++imageLoadSeq;
+        if (mainImgWrap) mainImgWrap.classList.remove('img-loaded');
+
+        const markLoaded = (loadedKey) => {
+          if (reqId !== imageLoadSeq) return;
+          mainImg.setAttribute('data-loaded-src', loadedKey);
+          if (mainImgWrap) mainImgWrap.classList.add('img-loaded');
+        };
+
+        mainImg.onload = () => markLoaded(targetUrl);
+        mainImg.onerror = () => {
+          if (reqId !== imageLoadSeq) return;
+          if (!mainImg.src.includes('/assets/images/products/placeholder.svg')) {
+            mainImg.onload = () => markLoaded('/assets/images/products/placeholder.svg');
+            mainImg.src = '/assets/images/products/placeholder.svg';
+          } else {
+            markLoaded('/assets/images/products/placeholder.svg');
+          }
+        };
+
+        mainImg.src = targetUrl;
+        if (mainImg.complete && mainImg.naturalWidth > 0) {
+          markLoaded(targetUrl);
+        }
+      }
 
       function setActiveImage(idx) {
         if (idx < 0) idx = imagesList.length - 1;
@@ -2924,12 +2975,7 @@
           (product.imagesAlt && product.imagesAlt[activeImageIdx]) ||
           `${pName} - Image ${activeImageIdx + 1}`;
 
-        if (mainImg) {
-          mainImg.style.opacity = '0.4';
-          mainImg.src = currentUrl;
-          mainImg.alt = currentAlt;
-          setTimeout(() => { mainImg.style.opacity = '1'; }, 50);
-        }
+        loadMainProductImage(currentUrl, currentAlt);
 
         if (indexBadge) {
           indexBadge.textContent = `${activeImageIdx + 1} / ${imagesList.length}`;
@@ -3022,6 +3068,7 @@
           phtml += `<span class="text-lg line-through" style="color:var(--text-tertiary)">${formatPrice(pOrigPrice)}</span>`;
         }
         priceContainer.innerHTML = phtml;
+        priceContainer.removeAttribute('aria-hidden');
       }
 
       // Short Description
@@ -3078,6 +3125,7 @@
         stockContainer.innerHTML = inStock
           ? `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-xs font-bold text-emerald-500">${isRtl ? `متوفر (${pStock} متبقي)` : `In Stock (${pStock} left)`}</span>`
           : `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span class="text-xs font-bold text-rose-500">${isRtl ? 'غير متوفر حالياً' : 'Out of Stock'}</span>`;
+        stockContainer.removeAttribute('aria-hidden');
       }
 
       // Variants Selector (Colour/Size)
@@ -3110,7 +3158,7 @@
               ? `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-xs font-bold text-emerald-500">${isRtl ? `متوفر (${v.stock} متبقي)` : `In Stock (${v.stock} left)`}</span>`
               : `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span class="text-xs font-bold text-rose-500">${isRtl ? 'غير متوفر حالياً' : 'Out of Stock'}</span>`;
           }
-          if (v.image && mainImg) mainImg.src = v.image;
+          if (v.image && mainImg) loadMainProductImage(v.image, `${pName} - ${vName}`);
           renderVariantButtons();
         };
 
@@ -3158,6 +3206,11 @@
       // Wishlist / Liked Button
       const wishBtn = document.getElementById('product-wishlist-btn');
       if (wishBtn) {
+        wishBtn.disabled = false;
+        wishBtn.removeAttribute('aria-disabled');
+        wishBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        wishBtn.classList.add('cursor-pointer');
+        wishBtn.style.pointerEvents = '';
         wishBtn.setAttribute('data-wishlist-toggle', product.slug || product.id);
         if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
           window.Wishlist.sync();
@@ -3269,6 +3322,9 @@
           descSection.classList.add('hidden');
         }
       }
+
+      // Mark main product details as loaded
+      if (detailView) detailView.setAttribute('aria-busy', 'false');
 
       // ════ Dynamic "You May Also Like" Recommendations (Requirement 5) ════
       const relContainer = document.getElementById('product-related-container');
