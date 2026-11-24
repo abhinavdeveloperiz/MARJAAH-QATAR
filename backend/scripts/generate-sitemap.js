@@ -11,6 +11,19 @@ function escapeXml(unsafe) {
     .replace(/'/g, '&apos;');
 }
 
+function findCacheFile(fileName) {
+  const candidates = [
+    path.resolve(__dirname, '..', fileName),
+    path.resolve(__dirname, '../..', fileName),
+    path.resolve(process.cwd(), fileName),
+    path.resolve(process.cwd(), 'backend', fileName),
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) return c;
+  }
+  return null;
+}
+
 function generateSitemapXml(baseUrl = 'https://www.marjaah.shop') {
   baseUrl = baseUrl.replace(/\/+$/, '');
   const today = new Date().toISOString().split('T')[0];
@@ -64,8 +77,8 @@ function generateSitemapXml(baseUrl = 'https://www.marjaah.shop') {
 
   // 2. Categories
   xml += `\n\n  <!-- Category Pages -->`;
-  const categoriesPath = path.resolve(__dirname, '../.categories-cache.json');
-  if (fs.existsSync(categoriesPath)) {
+  const categoriesPath = findCacheFile('.categories-cache.json');
+  if (categoriesPath && fs.existsSync(categoriesPath)) {
     try {
       const categories = JSON.parse(fs.readFileSync(categoriesPath, 'utf-8'));
       for (const cat of categories) {
@@ -102,8 +115,8 @@ function generateSitemapXml(baseUrl = 'https://www.marjaah.shop') {
 
   // 3. Products
   xml += `\n\n  <!-- Product Pages -->`;
-  const productsPath = path.resolve(__dirname, '../.products-cache.json');
-  if (fs.existsSync(productsPath)) {
+  const productsPath = findCacheFile('.products-cache.json');
+  if (productsPath && fs.existsSync(productsPath)) {
     try {
       const products = JSON.parse(fs.readFileSync(productsPath, 'utf-8'));
       for (const prod of products) {
@@ -147,7 +160,12 @@ function generateSitemapXml(baseUrl = 'https://www.marjaah.shop') {
 }
 
 if (require.main === module) {
-  const targetFile = path.resolve(__dirname, '../../frontend/sitemap.xml');
+  const targetCandidates = [
+    path.resolve(__dirname, '../../frontend/sitemap.xml'),
+    path.resolve(__dirname, '../frontend/sitemap.xml'),
+    path.resolve(process.cwd(), 'frontend/sitemap.xml'),
+  ];
+  const targetFile = targetCandidates.find(p => fs.existsSync(path.dirname(p))) || targetCandidates[0];
   console.log(`Generating sitemap for https://www.marjaah.shop ...`);
   const xml = generateSitemapXml('https://www.marjaah.shop');
   fs.writeFileSync(targetFile, xml, 'utf-8');
