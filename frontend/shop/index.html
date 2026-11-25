@@ -721,24 +721,24 @@
         </div>
 
         <!-- Filter Controls: Sort & Items Per Page -->
-        <div id="shop-filter-controls-bar" class="hidden flex flex-wrap items-center justify-between sm:justify-end gap-2 sm:gap-3 w-full sm:w-auto">
+        <div id="shop-filter-controls-bar" class="hidden flex flex-nowrap items-center justify-between sm:justify-end gap-1.5 sm:gap-3 w-full sm:w-auto">
           <!-- Mobile Subcategories Drawer Trigger (Left-side navigation drawer on mobile/tablet) -->
-          <button id="shop-subcategories-open-btn" type="button" onclick="if(window.openShopCategoryDrawer)window.openShopCategoryDrawer()" class="lg:hidden flex items-center gap-1.5 px-3 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#8D9CF5]"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-            <span>Subcategories</span>
+          <button id="shop-subcategories-open-btn" type="button" aria-expanded="false" aria-controls="shop-category-drawer" onclick="if(window.openShopCategoryDrawer)window.openShopCategoryDrawer()" class="lg:hidden flex-1 sm:flex-none min-w-0 flex items-center justify-center gap-1.5 px-2.5 sm:px-3 py-2 min-h-[44px] sm:min-h-0 rounded-xl border text-[11px] sm:text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-[#8D9CF5] shrink-0"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
+            <span class="truncate">Subcategories</span>
           </button>
 
           <!-- Right-Side Filter Sidebar Trigger Button (Desktop + Tablet + Mobile) -->
-          <button id="shop-filter-open-btn" type="button" onclick="if(window.openShopFilterDrawer)window.openShopFilterDrawer()" class="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-xl border text-xs font-bold transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5]"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
+          <button id="shop-filter-open-btn" type="button" aria-expanded="false" aria-controls="shop-filter-drawer" onclick="if(window.openShopFilterDrawer)window.openShopFilterDrawer()" class="flex-1 sm:flex-none min-w-0 flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2 min-h-[44px] sm:min-h-0 rounded-xl border text-[11px] sm:text-xs font-bold whitespace-nowrap transition-all cursor-pointer shadow-xs hover:border-[#8D9CF5] hover:bg-[#8D9CF5]/10" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5] shrink-0"><line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/><line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/><line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/><line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/><line x1="17" x2="23" y1="16" y2="16"/></svg>
             <span>Filters</span>
-            <span id="shop-filter-active-count" class="hidden min-w-[20px] h-5 px-1.5 rounded-full bg-[#4063B2] text-white text-[10px] font-black items-center justify-center">0</span>
+            <span id="shop-filter-active-count" class="hidden min-w-[18px] h-[18px] sm:min-w-[20px] sm:h-5 px-1 sm:px-1.5 rounded-full bg-[#4063B2] text-white text-[10px] font-black items-center justify-center shrink-0">0</span>
           </button>
 
           <!-- Sort Selector -->
-          <form id="shop-sort-form" onsubmit="event.preventDefault()" class="flex items-center gap-2">
-            <select id="shop-sort-select" name="sort"
-              class="px-3.5 py-2 rounded-xl border text-xs font-semibold focus:outline-none cursor-pointer transition-all"
+          <form id="shop-sort-form" onsubmit="event.preventDefault()" class="flex-1 sm:flex-none min-w-0 flex items-center">
+            <select id="shop-sort-select" name="sort" aria-label="Sort products"
+              class="w-full sm:w-auto min-w-0 px-2 sm:px-3.5 py-2 min-h-[44px] sm:min-h-0 rounded-xl border text-[11px] sm:text-xs font-semibold focus:outline-none cursor-pointer transition-all truncate"
               style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
               <option value="featured" selected>Featured First</option>
               <option value="newest">Newest Arrivals</option>
@@ -1435,7 +1435,7 @@
 </div>
 
 <!-- ═══ MOBILE / TABLET CATEGORY & SUBCATEGORY DRAWER ═════════════════════════ -->
-<div id="shop-category-drawer" class="fixed inset-0 z-[125] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+<div id="shop-category-drawer" role="dialog" aria-modal="true" aria-label="Categories and Subcategories" class="fixed inset-0 z-[125] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
   <!-- Backdrop -->
   <div class="absolute inset-0 bg-black/75 backdrop-blur-sm transition-opacity" onclick="if(window.closeShopCategoryDrawer)window.closeShopCategoryDrawer()"></div>
   <!-- Drawer Panel (Slides in from Left) -->
@@ -2057,7 +2057,7 @@
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js?v=2.3"></script>
   <script src="/assets/js/carousel.js"></script>
-  <script src="/assets/js/products.js?v=3.0"></script>
+  <script src="/assets/js/products.js?v=3.2"></script>
   
 
 </body>

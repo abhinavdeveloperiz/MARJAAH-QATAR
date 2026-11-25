@@ -889,8 +889,7 @@
         productsContainer.style.display = 'grid';
       }
       if (sidebar) {
-        sidebar.classList.remove('hidden');
-        sidebar.classList.add('lg:block');
+        sidebar.classList.add('hidden', 'lg:block');
         sidebar.style.display = '';
       }
       if (filterControlsBar) filterControlsBar.classList.remove('hidden');
@@ -1557,14 +1556,17 @@
     const drawer = document.getElementById('shop-category-drawer');
     if (!drawer) return;
     drawer.classList.remove('hidden', 'pointer-events-none');
+    void drawer.offsetWidth;
     drawer.classList.remove('opacity-0');
     drawer.classList.add('opacity-100');
-    const panel = drawer.querySelector('.max-w-\\[92vw\\]') || drawer.querySelector('[style*="translate-x"]');
+    const panel = drawer.querySelector('.max-w-\\[92vw\\]') || drawer.querySelector('[style*="border-right"]');
     if (panel) {
       panel.classList.remove('-translate-x-full');
       panel.classList.add('translate-x-0');
     }
-    document.body.classList.add('overflow-hidden');
+    const openBtn = document.getElementById('shop-subcategories-open-btn');
+    if (openBtn) openBtn.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
   };
 
   window.closeShopCategoryDrawer = function() {
@@ -1572,14 +1574,16 @@
     if (!drawer) return;
     drawer.classList.remove('opacity-100');
     drawer.classList.add('opacity-0');
-    const panel = drawer.querySelector('.max-w-\\[92vw\\]') || drawer.querySelector('[style*="translate-x"]');
+    const panel = drawer.querySelector('.max-w-\\[92vw\\]') || drawer.querySelector('[style*="border-right"]');
     if (panel) {
       panel.classList.remove('translate-x-0');
       panel.classList.add('-translate-x-full');
     }
+    const openBtn = document.getElementById('shop-subcategories-open-btn');
+    if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
     setTimeout(() => {
       drawer.classList.add('hidden', 'pointer-events-none');
-      document.body.classList.remove('overflow-hidden');
+      document.body.style.overflow = '';
     }, 300);
   };
 
@@ -3773,6 +3777,7 @@
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       window.closeShopFilterDrawer();
+      if (window.closeShopCategoryDrawer) window.closeShopCategoryDrawer();
       if (window.closeAllCategoriesModal) window.closeAllCategoriesModal();
     }
   });
