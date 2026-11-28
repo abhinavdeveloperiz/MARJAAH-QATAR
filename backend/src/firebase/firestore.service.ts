@@ -81,6 +81,46 @@ export class FirestoreService implements OnModuleInit {
     this.logger.log('Firebase Firestore and Storage initialized successfully');
   }
 
+  /**
+   * Atomically allocates the next MTQ-XXXXX order number from `counters/orders`.
+   * On first use the counter is seeded from the highest existing order number.
+   */
+  async nextOrderNumber(): Promise<string> {
+    const db = this.getFirestore();
+    const ref = db.collection('counters').doc('orders');
+    const seedSnap = (await ref.get()).exists ? null : await db.collection('orders').select('order_number').get();
+    let seed = 0;
+    if (seedSnap) {
+      seed = seedSnap.size;
+      for (const d of seedSnap.docs) {
+        const m = /^MTQ-(\d+)$/i.exec(String(d.get('order_number') || ''));
+        if (m) seed = Math.max(seed, parseInt(m[1], 10));
+      }
+    }
+    const next = await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      const current = snap.exists ? Number(snap.data()?.last || 0) : seed;
+      const value = current + 1;
+      tx.set(ref, { last: value, updated_at: new Date().toISOString() }, { merge: true });
+      return value;
+    });
+    return `MTQ-${String(next).padStart(5, '0')}`;
+  }
+
+  /** Transactionally decrements product stock (never below zero). Missing/untracked stock is ignored. */
+  async decrementStock(productId: any, quantity: number): Promise<void> {
+    const db = this.getFirestore();
+    const ref = this.doc('products', productId);
+    await db.runTransaction(async (tx) => {
+      const snap = await tx.get(ref);
+      if (!snap.exists) return;
+      const current = snap.data()?.stock_count;
+      if (current === undefined || current === null) return;
+      const newStock = Math.max(0, Number(current) - Number(quantity));
+      tx.update(ref, { stock_count: newStock, in_stock: newStock > 0 });
+    });
+  }
+
   getFirestore(): admin.firestore.Firestore {
     if (!this.db) {
       this.db = admin.firestore();

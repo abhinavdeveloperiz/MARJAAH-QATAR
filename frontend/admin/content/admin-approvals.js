@@ -69,6 +69,8 @@
         return;
       }
 
+      const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
       container.innerHTML = this.approvals.map((appr) => {
         const statusBadges = {
           pending: 'bg-amber-50 text-amber-700 border-amber-200',
@@ -76,50 +78,58 @@
           rejected: 'bg-rose-50 text-rose-700 border-rose-200',
         };
         const statusBadge = statusBadges[appr.status] || statusBadges.pending;
-        const submittedTime = appr.created_at ? new Date(appr.created_at).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) : '—';
+        const rawTime = appr.submitted_at || appr.created_at;
+        const submittedTime = rawTime ? new Date(rawTime).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) : '—';
         const itemTitle = appr.target_title || appr.target_id || 'Item Modification';
+        const opLabel = appr.operation || appr.action || 'edit';
+        const submitterName = (appr.submitted_by && typeof appr.submitted_by === 'object')
+          ? (appr.submitted_by.username || appr.submitted_by.email || 'Staff')
+          : (appr.submitted_by_username || appr.submitted_by || 'Staff');
+        const reviewerName = (appr.reviewed_by && typeof appr.reviewed_by === 'object')
+          ? (appr.reviewed_by.username || appr.reviewed_by.email || '')
+          : (appr.reviewed_by || '');
 
         return `
           <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
             <td class="py-3.5 px-4">
               <div class="flex items-center gap-2">
-                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">${appr.module}</span>
-                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">${appr.action}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">${esc(appr.module)}</span>
+                <span class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-slate-100 text-slate-700 border border-slate-200">${esc(opLabel)}</span>
               </div>
-              <p class="font-bold text-xs text-slate-900 mt-1.5 truncate max-w-xs">${itemTitle}</p>
+              <p class="font-bold text-xs text-slate-900 mt-1.5 truncate max-w-xs">${esc(itemTitle)}</p>
             </td>
             <td class="py-3.5 px-4 text-xs text-slate-600">
-              <span class="font-medium text-slate-800">@${appr.submitted_by_username || appr.submitted_by || 'Staff'}</span>
-              <p class="text-[10px] text-slate-500 font-mono mt-0.5">${submittedTime}</p>
+              <span class="font-medium text-slate-800">@${esc(submitterName)}</span>
+              <p class="text-[10px] text-slate-500 font-mono mt-0.5">${esc(submittedTime)}</p>
             </td>
             <td class="py-3.5 px-4">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusBadge}">
-                ${(appr.status || 'pending').toUpperCase()}
+                ${esc((appr.status || 'pending').toUpperCase())}
               </span>
             </td>
             <td class="py-3.5 px-4 text-xs text-slate-500">
-              ${appr.reviewed_by ? `
-                <div class="text-xs text-slate-700">@${appr.reviewed_by}</div>
-                <div class="text-[10px] text-slate-500 font-mono">${new Date(appr.reviewed_at).toLocaleDateString('en-GB')}</div>
+              ${reviewerName ? `
+                <div class="text-xs text-slate-700">@${esc(reviewerName)}</div>
+                <div class="text-[10px] text-slate-500 font-mono">${appr.reviewed_at ? new Date(appr.reviewed_at).toLocaleDateString('en-GB') : '—'}</div>
               ` : '—'}
             </td>
             <td class="py-3.5 px-4 text-xs text-slate-600">
               ${appr.rejection_reason ? `
-                <span class="text-rose-600 font-medium italic block max-w-xs truncate" title="${appr.rejection_reason}">
-                  "${appr.rejection_reason}"
+                <span class="text-rose-600 font-medium italic block max-w-xs truncate" title="${esc(appr.rejection_reason)}">
+                  "${esc(appr.rejection_reason)}"
                 </span>
-              ` : (appr.status === 'approved' ? '<span class="text-emerald-600 text-[11px] font-semibold">Approved & Published</span>' : '<span class="text-slate-500">Awaiting Decision</span>')}
+              ` : (appr.status === 'approved' ? '<span class="text-emerald-600 text-[11px] font-semibold">Approved &amp; Published</span>' : '<span class="text-slate-500">Awaiting Decision</span>')}
             </td>
             <td class="py-3.5 px-4 text-right">
               <div class="flex items-center justify-end gap-2">
-                <button type="button" onclick="AdminApprovals.openDiffModal('${appr.id}')" class="px-2.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-primary transition cursor-pointer">
+                <button type="button" onclick="AdminApprovals.openDiffModal('${esc(appr.id)}')" class="px-2.5 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-semibold text-primary transition cursor-pointer">
                   Review Diff
                 </button>
                 ${appr.status === 'pending' ? `
-                  <button type="button" onclick="AdminApprovals.approveSubmission('${appr.id}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
+                  <button type="button" onclick="AdminApprovals.approveSubmission('${esc(appr.id)}')" class="px-2.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
                     Approve
                   </button>
-                  <button type="button" onclick="AdminApprovals.promptRejectSubmission('${appr.id}')" class="px-2.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
+                  <button type="button" onclick="AdminApprovals.promptRejectSubmission('${esc(appr.id)}')" class="px-2.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white transition shadow-sm cursor-pointer">
                     Reject
                   </button>
                 ` : ''}
@@ -135,15 +145,22 @@
       if (!appr) return;
       this.selectedApproval = appr;
 
-      document.getElementById('diff-modal-title').textContent = `Review Submission: ${appr.module} (${appr.action})`;
-      document.getElementById('diff-modal-meta').innerHTML = `
-        Submitted by <strong>@${appr.submitted_by_username || appr.submitted_by}</strong> on ${new Date(appr.created_at).toLocaleString('en-GB')}.
-      `;
+      const opLabel = appr.operation || appr.action || 'edit';
+      const submitterName = (appr.submitted_by && typeof appr.submitted_by === 'object')
+        ? (appr.submitted_by.username || appr.submitted_by.email || 'Staff')
+        : (appr.submitted_by_username || appr.submitted_by || 'Staff');
+      const rawTime = appr.submitted_at || appr.created_at;
+
+      document.getElementById('diff-modal-title').textContent = `Review Submission: ${appr.module} (${opLabel})`;
+      const metaEl = document.getElementById('diff-modal-meta');
+      if (metaEl) {
+        metaEl.textContent = `Submitted by @${submitterName} on ${rawTime ? new Date(rawTime).toLocaleString('en-GB') : '—'}.`;
+      }
 
       const beforeEl = document.getElementById('diff-modal-before');
       const afterEl = document.getElementById('diff-modal-after');
 
-      const beforeData = appr.before_data || appr.previous_state || { status: 'Original State / None' };
+      const beforeData = appr.original_data || appr.before_data || appr.previous_state || { status: 'Original State / None' };
       const afterData = appr.after_data || appr.payload || appr.new_state || {};
 
       if (beforeEl) beforeEl.textContent = JSON.stringify(beforeData, null, 2);
@@ -215,16 +232,21 @@
         { key: 'products', name: 'Products Catalog' },
         { key: 'categories', name: 'Categories' },
         { key: 'banners', name: 'Hero Banners' },
-        { key: 'promotional_sections', name: 'Promotional Sections' },
+        { key: 'website_content', name: 'Website Content & Promotional Sections' },
         { key: 'orders', name: 'Order Cancellations / Modifications' },
         { key: 'coupons', name: 'Coupons & Discounts' },
       ];
 
       tbody.innerHTML = MODULES.map((m) => {
-        const cfg = this.configs.find((c) => c.module === m.key) || { requires_approval: false, operations: [] };
-        const reqCreate = cfg.operations?.includes('create') || false;
-        const reqEdit = cfg.operations?.includes('edit') || false;
-        const reqDelete = cfg.operations?.includes('delete') || false;
+        const summaryCfg = this.configs.find((c) => c.id === m.key || (c.module === m.key && !c.operation));
+        const hasOp = (op) => {
+          const perOp = this.configs.find((c) => c.id === `${m.key}_${op}` || (c.module === m.key && c.operation === op));
+          if (perOp && perOp.requires_approval !== undefined) return Boolean(perOp.requires_approval);
+          return Boolean(summaryCfg?.operations?.includes(op));
+        };
+        const reqCreate = hasOp('create');
+        const reqEdit = hasOp('edit');
+        const reqDelete = hasOp('delete');
 
         return `
           <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">

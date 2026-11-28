@@ -5,6 +5,9 @@ import {
   ForbiddenException,
   OnModuleInit,
   Logger,
+  Optional,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import * as bcrypt from 'bcryptjs';
 import * as fs from 'fs';
@@ -13,16 +16,24 @@ import { FirestoreService } from '../firebase/firestore.service';
 import { AuditService } from './audit/audit.service';
 import { SYSTEM_DEFAULT_ROLES, ADMIN_MODULES } from './rbac/permissions';
 import { CartService } from '../cart/cart.service';
+import { ProductsService } from '../products/products.service';
+import { BannersService } from '../banners/banners.service';
+import { CategoriesService } from '../categories/categories.service';
+import { SubcategoriesService } from '../subcategories/subcategories.service';
+import { BrandsService } from '../brands/brands.service';
 
 export interface AdminUserDto {
   username: string;
   password?: string;
   email: string;
+  name?: string;
   first_name?: string;
   last_name?: string;
   phone?: string;
   role_ids: string[];
-  status?: 'active' | 'deactivated' | 'suspended';
+  status?: 'active' | 'deactivated' | 'suspended' | 'inactive';
+  must_change_password?: boolean;
+  force_password_change?: boolean;
 }
 
 @Injectable()
@@ -33,6 +44,11 @@ export class AdminService implements OnModuleInit {
     private readonly firestore: FirestoreService,
     private readonly auditService: AuditService,
     private readonly cartService: CartService,
+    @Optional() @Inject(forwardRef(() => ProductsService)) private readonly productsService?: ProductsService,
+    @Optional() @Inject(forwardRef(() => BannersService)) private readonly bannersService?: BannersService,
+    @Optional() @Inject(forwardRef(() => CategoriesService)) private readonly categoriesService?: CategoriesService,
+    @Optional() @Inject(forwardRef(() => SubcategoriesService)) private readonly subcategoriesService?: SubcategoriesService,
+    @Optional() @Inject(forwardRef(() => BrandsService)) private readonly brandsService?: BrandsService,
   ) {}
 
   async onModuleInit() {
@@ -232,7 +248,10 @@ export class AdminService implements OnModuleInit {
     safeUser.id = adminId;
     safeUser.username = safeUser.username || currentUser?.username || 'admin';
     safeUser.email = safeUser.email || currentUser?.email || 'admin@marjaah.qa';
-    safeUser.name = `${safeUser.first_name || ''} ${safeUser.last_name || ''}`.trim() || safeUser.username;
+    safeUser.name =
+      (safeUser.name && String(safeUser.name).trim()) ||
+      `${safeUser.first_name || ''} ${safeUser.last_name || ''}`.trim() ||
+      safeUser.username;
 
     if (
       safeUser.username === 'admin' ||
@@ -245,15 +264,14 @@ export class AdminService implements OnModuleInit {
       safeUser.status = 'active';
     }
 
-    // Resolve role details & permissions
+    // Resolve role details & merge permissions across ALL assigned roles
     let roleData: any = null;
-    const roleId =
-      (Array.isArray(safeUser.role_ids) && safeUser.role_ids[0]) ||
-      safeUser.role_id ||
-      safeUser.role ||
-      'super_admin';
+    const assignedRoleIds: string[] = Array.isArray(safeUser.role_ids) && safeUser.role_ids.length > 0
+      ? safeUser.role_ids
+      : [safeUser.role_id || safeUser.role || 'super_admin'];
+    const roleId = assignedRoleIds[0];
 
-    if (safeUser.is_superuser || roleId === 'super_admin' || roleId === 'admin') {
+    if (safeUser.is_superuser || assignedRoleIds.includes('super_admin') || assignedRoleIds.includes('admin')) {
       const superRole = SYSTEM_DEFAULT_ROLES.find((r) => r.id === 'super_admin');
       roleData = superRole || {
         id: 'super_admin',
@@ -262,13 +280,34 @@ export class AdminService implements OnModuleInit {
         permissions: {},
       };
     } else {
-      const roleDoc = await this.firestore.collection('admin_roles').doc(roleId).get();
-      if (roleDoc.exists) {
-        roleData = { id: roleDoc.id, ...roleDoc.data() };
-      } else {
-        const sysRole = SYSTEM_DEFAULT_ROLES.find((r) => r.id === roleId);
-        roleData = sysRole || { id: roleId, name: 'Staff', permissions: {} };
+      const rolesSnap = await this.firestore.collection('admin_roles').get();
+      const dbRoles = rolesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as any)).filter((r) => !r.is_deleted);
+      const mergedPerms: Record<string, string[]> = {};
+      const resolvedNames: string[] = [];
+
+      for (const rid of assignedRoleIds) {
+        const found =
+          dbRoles.find((r) => r.id === rid || r.slug === rid) ||
+          SYSTEM_DEFAULT_ROLES.find((r) => r.id === rid);
+        if (found) {
+          resolvedNames.push(found.name || rid);
+          if (found.permissions && typeof found.permissions === 'object') {
+            for (const [mod, actions] of Object.entries(found.permissions)) {
+              const curSet = new Set(mergedPerms[mod] || []);
+              if (Array.isArray(actions)) {
+                actions.forEach((a) => curSet.add(String(a)));
+              }
+              mergedPerms[mod] = Array.from(curSet);
+            }
+          }
+        }
       }
+
+      roleData = {
+        id: roleId,
+        name: resolvedNames.join(' + ') || 'Staff',
+        permissions: mergedPerms,
+      };
     }
 
     return {
@@ -306,10 +345,20 @@ export class AdminService implements OnModuleInit {
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const now = new Date().toISOString();
 
+    const fullName = String(dto.name || '').trim();
+    const nameParts = fullName ? fullName.split(/\s+/) : [];
+    const firstName = (dto.first_name !== undefined ? String(dto.first_name) : (nameParts[0] || '')).trim();
+    const lastName = (dto.last_name !== undefined ? String(dto.last_name) : nameParts.slice(1).join(' ')).trim();
+    const resolvedName = fullName || `${firstName} ${lastName}`.trim() || username;
+    const mustChange = Boolean(dto.must_change_password ?? dto.force_password_change ?? false);
+
     // Resolve role names
     const roleIds = Array.isArray(dto.role_ids) && dto.role_ids.length > 0 ? dto.role_ids : ['customer_support'];
+    if (roleIds.includes('super_admin') && !currentAdmin?.is_superuser) {
+      throw new ForbiddenException('Only a super administrator can assign the Super Administrator role.');
+    }
     const rolesSnap = await this.firestore.collection('admin_roles').get();
-    const allRoles = rolesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
+    const allRoles = rolesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as any)).filter((r) => !r.is_deleted);
     const roleNames = roleIds.map((rid) => {
       const found = allRoles.find((r) => r.id === rid || r.slug === rid) || SYSTEM_DEFAULT_ROLES.find((r) => r.id === rid);
       return found ? found.name : rid;
@@ -319,15 +368,17 @@ export class AdminService implements OnModuleInit {
       username,
       email,
       password: hashedPassword,
-      first_name: dto.first_name || '',
-      last_name: dto.last_name || '',
+      name: resolvedName,
+      first_name: firstName,
+      last_name: lastName,
       phone: dto.phone || '',
       role_ids: roleIds,
       roles: roleNames,
       status: dto.status || 'active',
       is_staff: true,
       is_superuser: roleIds.includes('super_admin'),
-      force_password_change: false,
+      must_change_password: mustChange,
+      force_password_change: mustChange,
       created_by: currentAdmin?.username || 'admin',
       created_at: now,
       updated_at: now,
@@ -343,8 +394,9 @@ export class AdminService implements OnModuleInit {
       username,
       email,
       password: hashedPassword,
-      first_name: dto.first_name || '',
-      last_name: dto.last_name || '',
+      name: resolvedName,
+      first_name: firstName,
+      last_name: lastName,
       role: 'admin',
       is_staff: true,
       is_superuser: payload.is_superuser,
@@ -366,6 +418,11 @@ export class AdminService implements OnModuleInit {
     return { id: username, ...safeUser };
   }
 
+  private redactSecrets(obj: any) {
+    const { password, raw_password, token, reset_token, ...rest } = obj || {};
+    return rest;
+  }
+
   async updateAdminUser(id: string, dto: Partial<AdminUserDto>, currentAdmin: any) {
     // Protect primary admin from demotion or deactivation
     if (id === 'admin') {
@@ -385,6 +442,10 @@ export class AdminService implements OnModuleInit {
 
     const existingData = existing.exists ? existing.data() : { username: 'admin', email: 'admin@marjaah.qa' };
 
+    if (!currentAdmin?.is_superuser && (existingData?.is_superuser || (Array.isArray(dto.role_ids) && dto.role_ids.includes('super_admin')))) {
+      throw new ForbiddenException('Only a super administrator can modify or grant the Super Administrator role.');
+    }
+
     // Prevent non-superadmins from modifying their own roles or privileges
     if (String(currentAdmin.id) === id && !currentAdmin.is_superuser && dto.role_ids) {
       throw new ForbiddenException('You cannot modify your own administrative roles or permissions.');
@@ -396,17 +457,32 @@ export class AdminService implements OnModuleInit {
     };
 
     if (dto.email) updateData.email = dto.email.toLowerCase().trim();
+    if (dto.name !== undefined) {
+      const fullName = String(dto.name || '').trim();
+      const parts = fullName ? fullName.split(/\s+/) : [];
+      updateData.name = fullName || existingData?.username || '';
+      if (dto.first_name === undefined) updateData.first_name = parts[0] || '';
+      if (dto.last_name === undefined) updateData.last_name = parts.slice(1).join(' ');
+    }
     if (dto.first_name !== undefined) updateData.first_name = dto.first_name;
     if (dto.last_name !== undefined) updateData.last_name = dto.last_name;
+    if (dto.name === undefined && (dto.first_name !== undefined || dto.last_name !== undefined)) {
+      updateData.name = `${dto.first_name ?? existingData?.first_name ?? ''} ${dto.last_name ?? existingData?.last_name ?? ''}`.trim();
+    }
     if (dto.phone !== undefined) updateData.phone = dto.phone;
     if (dto.status) updateData.status = dto.status;
+    if (dto.must_change_password !== undefined || dto.force_password_change !== undefined) {
+      const mc = Boolean(dto.must_change_password ?? dto.force_password_change);
+      updateData.must_change_password = mc;
+      updateData.force_password_change = mc;
+    }
 
     if (dto.role_ids) {
       updateData.role_ids = dto.role_ids;
       updateData.is_superuser = dto.role_ids.includes('super_admin');
 
       const rolesSnap = await this.firestore.collection('admin_roles').get();
-      const allRoles = rolesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
+      const allRoles = rolesSnap.docs.map((d) => ({ id: d.id, ...d.data() } as any)).filter((r) => !r.is_deleted);
       updateData.roles = dto.role_ids.map((rid) => {
         const found = allRoles.find((r) => r.id === rid || r.slug === rid) || SYSTEM_DEFAULT_ROLES.find((r) => r.id === rid);
         return found ? found.name : rid;
@@ -435,7 +511,7 @@ export class AdminService implements OnModuleInit {
       module: 'admin_users',
       target_id: id,
       target_title: existingData?.username || id,
-      details: { before: existingData, after: updateData },
+      details: { before: this.redactSecrets(existingData), after: this.redactSecrets(updateData) },
     });
 
     const { password, ...safeUser } = { ...existingData, ...updateData };
@@ -484,6 +560,10 @@ export class AdminService implements OnModuleInit {
     const existing = await docRef.get();
     if (!existing.exists && id !== 'admin') {
       throw new NotFoundException(`Admin user "${id}" not found`);
+    }
+
+    if (existing.exists && (existing.data() as any)?.is_superuser && !currentAdmin?.is_superuser) {
+      throw new ForbiddenException('Only a super administrator can reset a super administrator password.');
     }
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
@@ -554,13 +634,17 @@ export class AdminService implements OnModuleInit {
     const snap = await this.firestore.collection('admin_roles').get();
     const customRoles = snap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
 
-    // Combine with system defaults if any missing
+    // Combine with system defaults, respecting soft-deletions on non-system default roles
     const roleMap = new Map<string, any>();
     for (const r of SYSTEM_DEFAULT_ROLES) {
       roleMap.set(r.id, r);
     }
     for (const r of customRoles) {
-      roleMap.set(r.id, r);
+      if (r.is_deleted) {
+        roleMap.delete(r.id);
+      } else {
+        roleMap.set(r.id, r);
+      }
     }
 
     return Array.from(roleMap.values());
@@ -569,7 +653,11 @@ export class AdminService implements OnModuleInit {
   async getRole(id: string) {
     const doc = await this.firestore.collection('admin_roles').doc(id).get();
     if (doc.exists) {
-      return { id: doc.id, ...doc.data() };
+      const data = doc.data() as any;
+      if (data?.is_deleted) {
+        throw new NotFoundException(`Role "${id}" not found`);
+      }
+      return { id: doc.id, ...data };
     }
     const system = SYSTEM_DEFAULT_ROLES.find((r) => r.id === id);
     if (system) {
@@ -646,18 +734,23 @@ export class AdminService implements OnModuleInit {
   }
 
   async deleteRole(id: string, currentAdmin: any) {
-    if (id === 'super_admin' || SYSTEM_DEFAULT_ROLES.some((r) => r.id === id && r.is_system)) {
+    const sysDef = SYSTEM_DEFAULT_ROLES.find((r) => r.id === id);
+    if (id === 'super_admin' || sysDef?.is_system) {
       throw new ForbiddenException('Built-in system roles cannot be deleted.');
     }
 
     const docRef = this.firestore.collection('admin_roles').doc(id);
     const existing = await docRef.get();
-    if (!existing.exists) {
+    if (!existing.exists && !sysDef) {
       throw new NotFoundException(`Role "${id}" not found`);
     }
 
-    const name = existing.data()?.name || id;
-    await docRef.delete();
+    const name = existing.exists ? (existing.data()?.name || id) : (sysDef?.name || id);
+    if (sysDef) {
+      await docRef.set({ is_deleted: true, deleted_at: new Date().toISOString() }, { merge: true });
+    } else {
+      await docRef.delete();
+    }
 
     await this.auditService.log({
       admin_id: String(currentAdmin.id || currentAdmin.sub || 'admin'),
@@ -935,6 +1028,17 @@ export class AdminService implements OnModuleInit {
 
     await docRef.update(updatePayload);
 
+    // Invalidate downstream caches so newly approved items reflect live on Storefront immediately
+    try {
+      if (data.module === 'products') this.productsService?.invalidateCache();
+      else if (data.module === 'banners') this.bannersService?.invalidateCache();
+      else if (data.module === 'categories') this.categoriesService?.invalidateCache();
+      else if (data.module === 'subcategories') this.subcategoriesService?.invalidateCache();
+      else if (data.module === 'brands') this.brandsService?.invalidateCache();
+      this.cachedDashboardAnalytics = {};
+      this.dashboardCacheExpiresAt = 0;
+    } catch (_) {}
+
     await this.auditService.log({
       admin_id: reviewer.id,
       admin_username: reviewer.username,
@@ -1004,6 +1108,17 @@ export class AdminService implements OnModuleInit {
 
     await docRef.update(updatePayload);
 
+    // Invalidate downstream caches so newly approved items reflect live on Storefront immediately
+    try {
+      if (data.module === 'products') this.productsService?.invalidateCache();
+      else if (data.module === 'banners') this.bannersService?.invalidateCache();
+      else if (data.module === 'categories') this.categoriesService?.invalidateCache();
+      else if (data.module === 'subcategories') this.subcategoriesService?.invalidateCache();
+      else if (data.module === 'brands') this.brandsService?.invalidateCache();
+      this.cachedDashboardAnalytics = {};
+      this.dashboardCacheExpiresAt = 0;
+    } catch (_) {}
+
     await this.auditService.log({
       admin_id: reviewer.id,
       admin_username: reviewer.username,
@@ -1055,6 +1170,8 @@ export class AdminService implements OnModuleInit {
       this.firestore.collection('categories').get(),
       this.firestore.collection('brands').get(),
       this.firestore.collection('contact_messages').get(),
+      this.firestore.collection('approvals').where('status', '==', 'pending').get(),
+      this.firestore.collection('admin_users').get(),
     ];
     if (allProducts.length === 0) {
       promises.push(this.firestore.collection('products').get());
@@ -1066,8 +1183,10 @@ export class AdminService implements OnModuleInit {
     const categoriesSnap = snaps[2];
     const brandsSnap = snaps[3];
     const messagesSnap = snaps[4];
-    if (snaps[5]) {
-      allProducts = snaps[5].docs.map((d: any) => ({ id: d.id, ...d.data() }));
+    const approvalsPendingSnap = snaps[5];
+    const adminUsersSnap = snaps[6];
+    if (snaps[7]) {
+      allProducts = snaps[7].docs.map((d: any) => ({ id: d.id, ...d.data() }));
     }
 
     const allOrders = ordersSnap.docs.map((d: any) => {
@@ -1192,9 +1311,10 @@ export class AdminService implements OnModuleInit {
       revenue: Math.round(s.revenue * 100) / 100,
     }));
 
-    // 8. Best-Selling Products Performance
-    const productSalesMap = new Map<string, { id: string; name: string; brand: string; quantity: number; revenue: number; image?: string }>();
+    // 8. Best-Selling Products Performance (exclude cancelled/refunded orders)
+    const productSalesMap = new Map<string, { id: string; name: string; brand: string; quantity: number; units_sold: number; revenue: number; image?: string }>();
     for (const o of allOrders) {
+      if (o.status === 'cancelled' || o.status === 'returned') continue;
       if (Array.isArray(o.items)) {
         for (const it of o.items) {
           const pid = it.id || it.slug || it.name;
@@ -1203,11 +1323,14 @@ export class AdminService implements OnModuleInit {
             name: it.name || 'Product',
             brand: it.brand || '',
             quantity: 0,
+            units_sold: 0,
             revenue: 0,
             image: it.image || '',
           };
-          curr.quantity += Number(it.quantity) || 1;
-          curr.revenue += (Number(it.price) || 0) * (Number(it.quantity) || 1);
+          const q = Number(it.quantity) || 1;
+          curr.quantity += q;
+          curr.units_sold += q;
+          curr.revenue += (Number(it.price) || 0) * q;
           productSalesMap.set(pid, curr);
         }
       }
@@ -1229,7 +1352,7 @@ export class AdminService implements OnModuleInit {
     const categoryDistribution = Array.from(catSalesMap.values()).sort((a, b) => b.count - a.count).slice(0, 8);
 
     // 10. Traffic Stats from daily analytics
-    let trafficSummary: any = { totalViews: 0, totalVisitors: 0, timeline: [] };
+    let trafficSummary: any = { totalViews: 0, totalVisitors: 0, timeline: [], devices: { desktop: 0, mobile: 0, tablet: 0 } };
     try {
       const dailySnap = await this.firestore.collection('site_analytics_daily').get();
       const dailyDocs = dailySnap.docs.map((d) => ({ id: d.id, ...d.data() } as any));
@@ -1237,12 +1360,32 @@ export class AdminService implements OnModuleInit {
       const recentTraffic = dailyDocs.slice(-daysCount);
       const views = recentTraffic.reduce((sum, d) => sum + (Number(d.total_views) || 0), 0);
       const visitors = recentTraffic.reduce((sum, d) => sum + (Number(d.unique_count) || Math.round((d.total_views || 0) * 0.7)), 0);
+      const devAgg: Record<string, number> = { desktop: 0, mobile: 0, tablet: 0 };
+      recentTraffic.forEach((d) => {
+        if (d.devices) {
+          Object.entries(d.devices).forEach(([k, v]) => {
+            devAgg[k] = (devAgg[k] || 0) + (Number(v) || 0);
+          });
+        }
+      });
+      const devTotal = devAgg.desktop + devAgg.mobile + devAgg.tablet;
+      const mobilePct = devTotal > 0 ? Math.round((devAgg.mobile / devTotal) * 100) : 0;
       trafficSummary = {
         totalViews: views,
         totalVisitors: visitors,
+        devices: devAgg,
+        mobile_percentage: mobilePct,
         timeline: recentTraffic.map((d) => ({ date: d.date, views: d.total_views || 0, visitors: d.unique_count || 0 })),
       };
     } catch {}
+
+    const activeStaffCount = adminUsersSnap
+      ? adminUsersSnap.docs.filter((d: any) => {
+          const st = String(d.data()?.status || 'active').toLowerCase();
+          return st === 'active';
+        }).length
+      : 1;
+    const pendingApprovalsCount = approvalsPendingSnap ? approvalsPendingSnap.size : 0;
 
     const result = {
       period,
@@ -1264,7 +1407,9 @@ export class AdminService implements OnModuleInit {
         outOfStockCount: outOfStockProducts.length,
         totalCategories: categoriesSnap.size,
         totalBrands: brandsSnap.size,
-        pendingApprovals: 0,
+        pendingApprovals: pendingApprovalsCount,
+        activeStaff: Math.max(1, activeStaffCount),
+        active_staff: Math.max(1, activeStaffCount),
         pendingPayments: allOrders.filter((o) => o.payment_status === 'pending').reduce((s, o) => s + (Number(o.total) || 0), 0),
       },
       orderStatuses,
@@ -1295,20 +1440,36 @@ export class AdminService implements OnModuleInit {
   // 5. CREATE ORDERS DIRECTLY FROM ADMIN PANEL (Requirement 11)
   // ═══════════════════════════════════════════════════════════════════════════
   async createAdminOrder(body: any, currentAdmin: any) {
-    const {
-      customer_id,
-      customer_name,
-      customer_email,
-      customer_phone,
-      items,
-      fulfillment_type, // 'delivery' | 'store_pickup'
-      delivery_address,
-      pickup_location_id,
-      payment_method,
-      payment_status,
-      discount_amount,
-      notes,
-    } = body;
+    const customer_id = body?.customer_id;
+    const customer_name = String(body?.customer_name ?? body?.full_name ?? '').trim();
+    const customer_email = String(body?.customer_email ?? body?.email ?? '').trim();
+    const customer_phone = String(body?.customer_phone ?? body?.phone ?? '').trim();
+    const items = body?.items;
+    const fulfillment_type = body?.fulfillment_type || 'delivery'; // 'delivery' | 'store_pickup'
+    const rawAddress = body?.delivery_address;
+    const delivery_address =
+      rawAddress && typeof rawAddress === 'object'
+        ? {
+            building: String(rawAddress.building ?? body?.building ?? '').trim(),
+            street: String(rawAddress.street ?? body?.street ?? '').trim(),
+            zone: String(rawAddress.zone ?? body?.zone ?? '').trim(),
+            city: String(rawAddress.city ?? body?.city ?? '').trim(),
+          }
+        : body?.zone || body?.city || body?.street || body?.building
+          ? {
+              building: String(body?.building ?? '').trim(),
+              street: String(body?.street ?? '').trim(),
+              zone: String(body?.zone ?? '').trim(),
+              city: String(body?.city ?? '').trim(),
+            }
+          : null;
+    const pickup_location_id = String(
+      body?.pickup_location_id ?? body?.store_pickup_location_id ?? body?.store_pickup_location?.id ?? '',
+    ).trim();
+    const payment_method = fulfillment_type === 'store_pickup' ? 'pay_at_store' : 'cash';
+    const payment_status = body?.payment_status;
+    const discount_amount = body?.discount_amount ?? body?.discount;
+    const notes = body?.notes;
 
     if (!Array.isArray(items) || items.length === 0) {
       throw new BadRequestException('Order must contain at least one product item');
@@ -1368,9 +1529,7 @@ export class AdminService implements OnModuleInit {
     const grandTotal = Math.max(0, subtotal - discount + shipping);
 
     // Generate unique order number
-    const countSnap = await this.firestore.collection('orders').get();
-    const orderIndex = countSnap.size + 1;
-    const orderNumber = `MTQ-${String(orderIndex).padStart(5, '0')}`;
+    const orderNumber = await this.firestore.nextOrderNumber();
     const now = new Date().toISOString();
 
     const orderRecord = {
@@ -1390,8 +1549,8 @@ export class AdminService implements OnModuleInit {
       delivery_method: fulfillment_type === 'store_pickup' ? 'pickup' : 'doorstep',
       delivery_address: fulfillment_type === 'delivery' ? delivery_address : null,
       pickup_location: pickupDetails,
-      payment_method: payment_method || (fulfillment_type === 'store_pickup' ? 'pay_at_store' : 'cash'),
-      payment_status: payment_status || (payment_method === 'cash' ? 'cod' : 'pending'),
+      payment_method,
+      payment_status: payment_status || 'cod',
       status: 'placed',
       notes: notes || '',
       created_by_admin: {
@@ -1759,27 +1918,42 @@ export class AdminService implements OnModuleInit {
     // Exclude pure admin user from customer table
     const nonAdminUsers = allUsers.filter(u => u.username !== 'admin' && !u.is_superuser);
 
-    // Aggregate user order statistics
+    // Aggregate user order statistics across user_id AND customer_email (excluding cancelled orders from spend)
     const statsByUser = new Map<string, { totalOrders: number; totalSpent: number; lastOrderDate: string | null }>();
-    for (const o of allOrders) {
-      const uid = String(o.user_id || o.userId || o.customer_email || '').toLowerCase().trim();
-      if (!uid) continue;
-      const s = statsByUser.get(uid) || { totalOrders: 0, totalSpent: 0, lastOrderDate: null };
+    const addOrderToKey = (key: string, o: any) => {
+      if (!key) return;
+      const s = statsByUser.get(key) || { totalOrders: 0, totalSpent: 0, lastOrderDate: null };
       s.totalOrders += 1;
-      s.totalSpent += Number(o.total) || 0;
+      if (o.status !== 'cancelled') {
+        s.totalSpent += Number(o.total) || 0;
+      }
       if (!s.lastOrderDate || new Date(o.created_at || 0) > new Date(s.lastOrderDate)) {
         s.lastOrderDate = o.created_at || null;
       }
-      statsByUser.set(uid, s);
+      statsByUser.set(key, s);
+    };
+    for (const o of allOrders) {
+      const uid = String(o.user_id || o.userId || '').toLowerCase().trim();
+      const email = String(o.customer_email || o.email || '').toLowerCase().trim();
+      if (uid) addOrderToKey(`id:${uid}`, o);
+      if (email) addOrderToKey(`em:${email}`, o);
     }
 
     const now = Date.now();
     const THIRTY_SECONDS = 35 * 1000;
 
     let customers = nonAdminUsers.map((u) => {
-      const idKey = String(u.id).toLowerCase();
-      const emailKey = (u.email || '').toLowerCase();
-      const stats = statsByUser.get(idKey) || statsByUser.get(emailKey) || { totalOrders: 0, totalSpent: 0, lastOrderDate: null };
+      const idKey = `id:${String(u.id).toLowerCase()}`;
+      const emailKey = u.email ? `em:${String(u.email).toLowerCase().trim()}` : '';
+      const idStats = statsByUser.get(idKey);
+      const emailStats = emailKey ? statsByUser.get(emailKey) : undefined;
+      const stats = idStats && emailStats && idStats !== emailStats
+        ? {
+            totalOrders: Math.max(idStats.totalOrders, emailStats.totalOrders),
+            totalSpent: Math.max(idStats.totalSpent, emailStats.totalSpent),
+            lastOrderDate: idStats.lastOrderDate || emailStats.lastOrderDate,
+          }
+        : (idStats || emailStats || { totalOrders: 0, totalSpent: 0, lastOrderDate: null });
       const { password, raw_password, ...safeUser } = u;
 
       const lastSeenStr = u.last_seen || u.last_activity || u.last_login || u.updated_at || null;
@@ -1897,20 +2071,21 @@ export class AdminService implements OnModuleInit {
     const userData = userDoc.data() as any;
     const { password, raw_password, ...safeUser } = userData;
 
-    // Fetch customer's orders
+    // Fetch customer's orders across user_id and customer_email
     const ordersSnap = await this.firestore.collection('orders').get();
     const customerOrders = ordersSnap.docs
       .map((d) => ({ id: d.id, ...d.data() } as any))
       .filter((o) => {
         const oUid = String(o.user_id || o.userId || '').trim();
-        const oEmail = (o.customer_email || '').toLowerCase().trim();
-        return oUid === id || (userData.email && oEmail === userData.email.toLowerCase());
+        const oEmail = (o.customer_email || o.email || '').toLowerCase().trim();
+        return oUid === id || (userData.email && oEmail === userData.email.toLowerCase().trim());
       });
 
     customerOrders.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
 
-    const totalSpent = customerOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
-    const avgOrderValue = customerOrders.length > 0 ? Math.round((totalSpent / customerOrders.length) * 100) / 100 : 0;
+    const activeCustomerOrders = customerOrders.filter((o) => o.status !== 'cancelled');
+    const totalSpent = activeCustomerOrders.reduce((sum, o) => sum + (Number(o.total) || 0), 0);
+    const avgOrderValue = activeCustomerOrders.length > 0 ? Math.round((totalSpent / activeCustomerOrders.length) * 100) / 100 : 0;
 
     const now = Date.now();
     const lastSeenStr = userData.last_seen || userData.last_activity || userData.last_login || userData.updated_at || null;
@@ -1983,17 +2158,28 @@ export class AdminService implements OnModuleInit {
   // ═══════════════════════════════════════════════════════════════════════════
   async getStoreSettings() {
     const doc = await this.firestore.collection('settings').doc('store_info').get();
-    if (doc.exists) {
-      return doc.data();
-    }
-    return {
+    const defaults = {
       store_name: 'MARJAAH TRADING WLL',
       trade_name: 'M.SHOP Qatar',
+      company_name: 'M.SHOP Qatar',
       cr_number: '228717',
       footer_cr_text: 'CR No. 228717 • Qatar',
+      footer_text: 'CR No. 228717 • Qatar',
       phone: '+974 7799 1013',
       email: 'info@marjaah.com',
     };
+    if (doc.exists) {
+      const data = doc.data() || {};
+      return {
+        ...defaults,
+        ...data,
+        company_name: data.company_name || data.trade_name || defaults.company_name,
+        trade_name: data.trade_name || data.company_name || defaults.trade_name,
+        footer_text: data.footer_text || data.footer_cr_text || defaults.footer_text,
+        footer_cr_text: data.footer_cr_text || data.footer_text || defaults.footer_cr_text,
+      };
+    }
+    return defaults;
   }
 
   async updateStoreSettings(dto: any, currentAdmin: any) {
@@ -2001,9 +2187,16 @@ export class AdminService implements OnModuleInit {
     const existing = await docRef.get();
 
     const now = new Date().toISOString();
+    const tradeName = dto.trade_name ?? dto.company_name;
+    const footerCr =
+      dto.footer_cr_text ||
+      dto.footer_text ||
+      (dto.cr_number ? `CR No. ${dto.cr_number} • Qatar` : 'CR No. 228717 • Qatar');
     const updateData = {
       ...dto,
-      footer_cr_text: dto.footer_cr_text || (dto.cr_number ? `CR No. ${dto.cr_number} • Qatar` : 'CR No. 228717 • Qatar'),
+      ...(tradeName !== undefined ? { trade_name: tradeName, company_name: tradeName } : {}),
+      footer_cr_text: footerCr,
+      footer_text: dto.footer_text || footerCr,
       updated_at: now,
       updated_by: currentAdmin.username || 'admin',
     };
@@ -2116,6 +2309,8 @@ export class AdminService implements OnModuleInit {
       .map((o: any) => {
         const isCancellation = o.status === 'cancelled';
         const rr = o.return_request || {};
+        const itemsArr = Array.isArray(o.items) ? o.items : [];
+        const itemsCount = itemsArr.reduce((s: number, it: any) => s + (Number(it.quantity) || 1), 0) || o.item_count || itemsArr.length;
         return {
           order_id: o.id,
           order_number: o.order_number || o.id,
@@ -2128,10 +2323,12 @@ export class AdminService implements OnModuleInit {
           request_id: rr.request_id || (isCancellation ? `CAN-${o.order_number || o.id}` : null),
           reason: isCancellation ? (o.cancellation?.reason || 'Cancelled by customer') : (rr.reason || 'Return request'),
           notes: isCancellation ? (o.cancellation?.notes || '') : (rr.notes || ''),
+          admin_notes: rr.admin_notes || rr.rejection_reason || '',
           requested_at: isCancellation ? (o.cancellation?.cancelled_at || o.updated_at || o.created_at) : (rr.requested_at || o.updated_at),
           return_status: isCancellation ? 'cancelled' : (rr.status || 'pending'),
           return_request: o.return_request || null,
-          items: o.items || [],
+          items: itemsArr,
+          items_count: itemsCount,
           created_at: o.created_at,
         };
       });
@@ -2143,11 +2340,27 @@ export class AdminService implements OnModuleInit {
       total_returns: records.filter((r: any) => r.type === 'return').length,
       pending_returns: records.filter((r: any) => r.type === 'return' && r.return_status === 'pending').length,
       approved_returns: records.filter((r: any) => r.type === 'return' && r.return_status === 'approved').length,
-      rejected_returns: records.filter((r: any) => r.type === 'return' && r.return_status === 'rejected').length,
+      rejected_returns: records.filter((r: any) => r.type === 'return' && (r.return_status === 'declined' || r.return_status === 'rejected')).length,
     };
 
+    let filtered = records;
+    const filterType = String(query?.type || '').toLowerCase().trim();
+    if (filterType && filterType !== 'all') {
+      if (filterType === 'cancellation' || filterType === 'cancelled') {
+        filtered = records.filter((r: any) => r.type === 'cancellation');
+      } else if (filterType === 'return') {
+        filtered = records.filter((r: any) => r.type === 'return');
+      } else if (filterType === 'return_pending' || filterType === 'pending') {
+        filtered = records.filter((r: any) => r.type === 'return' && r.return_status === 'pending');
+      } else if (filterType === 'return_approved' || filterType === 'approved') {
+        filtered = records.filter((r: any) => r.type === 'return' && r.return_status === 'approved');
+      } else if (filterType === 'return_declined' || filterType === 'return_rejected' || filterType === 'declined' || filterType === 'rejected') {
+        filtered = records.filter((r: any) => r.type === 'return' && (r.return_status === 'declined' || r.return_status === 'rejected'));
+      }
+    }
+
     return {
-      items: records,
+      items: filtered,
       stats,
     };
   }

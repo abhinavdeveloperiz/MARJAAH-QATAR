@@ -123,12 +123,13 @@
       const candidates = [
         { tab: 'dashboard', mod: 'dashboard' },
         { tab: 'products', mod: 'products' },
+        { tab: 'categories', mod: 'categories' },
         { tab: 'orders', mod: 'orders' },
         { tab: 'returns-cancellations', mod: 'orders' },
         { tab: 'customers', mod: 'customers' },
         { tab: 'approvals', mod: 'approvals' },
         { tab: 'banners', mod: 'banners' },
-        { tab: 'promotions', mod: 'promotional_sections' },
+        { tab: 'promotions', mod: 'website_content' },
         { tab: 'locations', mod: 'store_locations' },
         { tab: 'users', mod: 'admin_users' },
         { tab: 'roles', mod: 'roles_permissions' },
@@ -149,13 +150,14 @@
       const permMap = {
         'dashboard': 'dashboard',
         'products': 'products',
+        'categories': 'categories',
         'orders': 'orders',
         'returns-cancellations': 'orders',
         'customers': 'customers',
         'approvals': 'approvals',
         'locations': 'store_locations',
         'banners': 'banners',
-        'promotions': 'promotional_sections',
+        'promotions': 'website_content',
         'users': 'admin_users',
         'roles': 'roles_permissions',
         'audit': 'audit_logs',
@@ -293,13 +295,14 @@
       const permMap = {
         'dashboard': 'dashboard',
         'products': 'products',
+        'categories': 'categories',
         'orders': 'orders',
         'returns-cancellations': 'orders',
         'customers': 'customers',
         'approvals': 'approvals',
         'locations': 'store_locations',
         'banners': 'banners',
-        'promotions': 'promotional_sections',
+        'promotions': 'website_content',
         'users': 'admin_users',
         'roles': 'roles_permissions',
         'audit': 'audit_logs',
@@ -417,14 +420,18 @@
 
     async updatePendingBadges() {
       try {
+        const canApprovals = this.can('approvals', 'view');
+        const canOrders = this.can('orders', 'view');
+        const canCustomers = this.can('customers', 'view');
+
         const [approvalsRes, ordersRes, custRes, returnsRes] = await Promise.allSettled([
-          this.api('/api/admin/approvals?status=pending'),
-          this.api('/api/orders?status=placed'),
-          this.api('/api/admin/customers/analytics'),
-          this.api('/api/orders/admin/returns-and-cancellations?type=return_pending'),
+          canApprovals ? this.api('/api/admin/approvals?status=pending', { skipAuthRedirect: true }) : Promise.resolve(null),
+          canOrders ? this.api('/api/orders?status=placed', { skipAuthRedirect: true }) : Promise.resolve(null),
+          canCustomers ? this.api('/api/admin/customers/analytics', { skipAuthRedirect: true }) : Promise.resolve(null),
+          canOrders ? this.api('/api/orders/admin/returns-and-cancellations?type=return_pending', { skipAuthRedirect: true }) : Promise.resolve(null),
         ]);
 
-        if (approvalsRes.status === 'fulfilled') {
+        if (canApprovals && approvalsRes.status === 'fulfilled' && approvalsRes.value) {
           const count = approvalsRes.value.total || (approvalsRes.value.items ? approvalsRes.value.items.length : 0);
           const badge = document.getElementById('badge-pending-approvals');
           const topBadge = document.getElementById('topbar-pending-badge');
@@ -438,7 +445,7 @@
           }
         }
 
-        if (ordersRes.status === 'fulfilled') {
+        if (canOrders && ordersRes.status === 'fulfilled' && ordersRes.value) {
           const count = ordersRes.value.total || (ordersRes.value.items ? ordersRes.value.items.length : 0);
           const badge = document.getElementById('badge-pending-orders');
           if (badge) {
@@ -447,7 +454,7 @@
           }
         }
 
-        if (custRes.status === 'fulfilled') {
+        if (canCustomers && custRes.status === 'fulfilled' && custRes.value) {
           const onlineCount = custRes.value.online_customers || 0;
           const badge = document.getElementById('badge-online-customers');
           if (badge) {
@@ -456,7 +463,7 @@
           }
         }
 
-        if (returnsRes.status === 'fulfilled') {
+        if (canOrders && returnsRes.status === 'fulfilled' && returnsRes.value) {
           const items = Array.isArray(returnsRes.value) ? returnsRes.value : (returnsRes.value?.items || []);
           const pendingCount = items.filter(it => it.type === 'return' && it.return_status === 'pending').length;
           const badge = document.getElementById('badge-pending-returns');
@@ -561,6 +568,9 @@
     },
 
     bindGlobalEvents() {
+      if (this._eventsBound) return;
+      this._eventsBound = true;
+
       window.addEventListener('hashchange', () => {
         const tab = window.location.hash.replace('#', '').trim();
         if (tab && tab !== this.activeTab) {

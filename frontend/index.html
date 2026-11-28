@@ -4047,15 +4047,15 @@
   <script src="/assets/js/analytics.js"></script>
   <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/toast.js"></script>
-  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/cart.js?v=20261128_01"></script>
   <script src="/assets/js/wishlist.js?v=2.4"></script>
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js?v=2.3"></script>
   <script src="/assets/js/carousel.js"></script>
-  <script src="/assets/js/products.js?v=3.0"></script>
+  <script src="/assets/js/products.js?v=20261128_04"></script>
   <script src="/assets/js/google-reviews.js?v=2.0"></script>
   <script src="/assets/js/html2pdf.bundle.min.js"></script>
-  <script src="/assets/js/customer-invoice.js"></script>
+  <script src="/assets/js/customer-invoice.js?v=20261126_02"></script>
   <script src="/assets/js/customer-notifications.js"></script>
   <script>
     (function () {
@@ -4219,6 +4219,11 @@
         'default': 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/hero-mobile.jpg'
       };
 
+      var cachedCategoriesAt = 0;
+      function escModalHtml(str) {
+        return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+      }
+
       function renderModalCategories(items) {
         if (!listContainer) return;
         var isAr = document.documentElement.dir === 'rtl' || window.location.pathname.startsWith('/ar');
@@ -4237,9 +4242,9 @@
           <a href="${href}" class="group relative rounded-2xl overflow-hidden border p-3 flex flex-col items-center text-center transition-all duration-200 hover:-translate-y-1 hover:border-[#8D9CF5] hover:shadow-lg"
              style="background:var(--bg-surface-2);border-color:var(--border-color)">
             <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden mb-2 relative flex-shrink-0" style="background:var(--bg-surface-3)">
-              <img src="${imgUrl}" alt="${name}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" onerror="this.src='${imageFallbacks.default}'" />
+              <img src="${escModalHtml(imgUrl)}" alt="${escModalHtml(name)}" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110" loading="lazy" onerror="this.src='${imageFallbacks.default}'" />
             </div>
-            <h4 class="text-xs font-bold leading-tight line-clamp-2 group-hover:text-[#8D9CF5] transition-colors mb-1" style="color:var(--text-primary)">${name}</h4>
+            <h4 class="text-xs font-bold leading-tight line-clamp-2 group-hover:text-[#8D9CF5] transition-colors mb-1" style="color:var(--text-primary)">${escModalHtml(name)}</h4>
             <span class="text-[10px] font-semibold text-slate-400">${isAr ? 'استكشف' : 'Explore'}</span>
           </a>
         `;
@@ -4247,14 +4252,21 @@
       }
 
       async function loadModalCategories() {
-        if (cachedCategories && cachedCategories.length > 0) return cachedCategories;
+        if (cachedCategories && cachedCategories.length > 0 && (Date.now() - cachedCategoriesAt < 60000)) {
+          return cachedCategories;
+        }
         try {
-          var res = await fetch('/api/categories');
+          var res = await fetch('/api/categories?_t=' + Date.now());
           var data = await res.json();
           if (Array.isArray(data) && data.length > 0) {
             cachedCategories = data.sort(function (a, b) {
+              var featDiff = (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+              if (featDiff !== 0) return featDiff;
+              var ordDiff = (Number(a.order) || 0) - (Number(b.order) || 0);
+              if (ordDiff !== 0) return ordDiff;
               return (b.product_count || 0) - (a.product_count || 0);
             });
+            cachedCategoriesAt = Date.now();
             if (countEl) countEl.textContent = '(' + cachedCategories.length + ' Categories)';
             renderModalCategories(cachedCategories);
           }

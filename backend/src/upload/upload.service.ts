@@ -16,6 +16,14 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/svg+xml',
 ]);
 
+/** Rejects SVGs carrying active content (scripts, event handlers, foreign objects, javascript: URLs). */
+function assertSafeSvg(buffer: Buffer) {
+  const text = buffer.toString('utf8');
+  if (/<\s*script|<\s*foreignObject|<\s*iframe|<\s*embed|<\s*object|\son[a-z]+\s*=|javascript\s*:|data\s*:\s*text\/html/i.test(text)) {
+    throw new BadRequestException('SVG contains active content and was rejected. Upload a clean SVG or a raster image.');
+  }
+}
+
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
 
 @Injectable()
@@ -42,6 +50,8 @@ export class UploadService {
     if (!ALLOWED_MIME_TYPES.has(mime)) {
       throw new BadRequestException(`Unsupported file type: ${mime}. Only JPEG, PNG, WEBP, GIF, and SVG are permitted.`);
     }
+
+    if (mime === 'image/svg+xml') assertSafeSvg(file.buffer);
 
     const folder = this.sanitizeFolder(rawFolder);
     const bucket = this.firestoreService.getBucket();
@@ -98,6 +108,7 @@ export class UploadService {
     if (buffer.length > MAX_FILE_SIZE_BYTES) {
       throw new BadRequestException('File exceeds 5MB maximum allowed size');
     }
+    if (mimeType === 'image/svg+xml') assertSafeSvg(buffer);
 
     const folder = this.sanitizeFolder(rawFolder);
     const bucket = this.firestoreService.getBucket();

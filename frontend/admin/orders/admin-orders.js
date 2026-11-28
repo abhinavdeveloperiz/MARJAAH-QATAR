@@ -1,3 +1,14 @@
+// Only two payment methods exist: Cash on Delivery (doorstep) and Pay at Store (pickup).
+// Legacy online-payment values on old orders are still labelled correctly.
+function AdminOrders_payLabel(o) {
+  const pickup = o && (o.fulfillment_type === 'store_pickup' || o.delivery_method === 'pickup');
+  const pm = String((o && o.payment_method) || (pickup ? 'pay_at_store' : 'cash')).toLowerCase();
+  if (pm === 'pay_at_store') return 'Pay at Store (Pickup)';
+  if (pm === 'cash' || pm === 'cod') return 'Cash on Delivery';
+  if (pm === 'card' || pm === 'credit_card') return 'Card (legacy)';
+  return pm.replace(/_/g, ' ');
+}
+
 
 
 (function () {
@@ -75,7 +86,7 @@
           this.storeLocations = locsRes.locations || locsRes || [];
           return;
         }
-      } catch (_) {}
+      } catch (_) { }
 
       this.storeLocations = [
         {
@@ -111,13 +122,13 @@
         return;
       }
       try {
-        const prodData = await AdminApp.api('/api/products?limit=1500&includeHidden=true&status=all').catch(() => null);
+        const prodData = await AdminApp.api('/api/products?limit=10000&includeHidden=true&status=all').catch(() => null);
         const list = prodData?.products || prodData?.items || prodData?.data || (Array.isArray(prodData) ? prodData : []);
         if (list.length > 0) {
           this.catalogProducts = list;
           window.SmartCache?.setProducts(list);
         }
-      } catch (_) {}
+      } catch (_) { }
     },
 
     renderTable() {
@@ -159,6 +170,7 @@
           placed: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
           pending: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
           processing: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+          ready_for_pickup: 'bg-cyan-500/10 text-cyan-500 border-cyan-500/20',
           shipped: 'bg-purple-500/10 text-purple-400 border-purple-500/20',
           delivered: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
           cancelled: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
@@ -203,7 +215,7 @@
             <td class="py-3.5 px-4">${fulfillmentHtml}</td>
             <td class="py-3.5 px-4">
               <span class="font-display font-black text-xs text-slate-900">${totalVal} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
-              <p class="text-[10px] text-slate-400 capitalize">${o.payment_method || 'Cash'}</p>
+              <p class="text-[10px] text-slate-400">${AdminOrders_payLabel(o)}</p>
             </td>
             <td class="py-3.5 px-4">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border ${statusBadge}">
@@ -211,11 +223,10 @@
               </span>
               ${o.return_request ? `
                 <div class="mt-1">
-                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${
-                    o.return_request.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                    o.return_request.status === 'declined' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                    'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
-                  }">
+                  <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold ${o.return_request.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+              o.return_request.status === 'declined' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                'bg-amber-50 text-amber-700 border border-amber-200 animate-pulse'
+            }">
                     ↩️ RMA ${(o.return_request.status || 'PENDING').toUpperCase()}
                   </span>
                 </div>
@@ -238,8 +249,20 @@
       }).join('');
     },
 
-    openDetailsModal(orderId) {
-      const o = this.orders.find((x) => x.id === orderId);
+    async openOrderModal(orderId) {
+      return this.openDetailsModal(orderId);
+    },
+
+    async openDetailsModal(orderId) {
+      let o = this.orders.find((x) => x.id === orderId || x.order_number === orderId);
+      if (!o && orderId) {
+        try {
+          o = await AdminApp.api(`/api/orders/${encodeURIComponent(orderId)}`);
+        } catch (err) {
+          AdminApp.toast(err.message || 'Unable to load order details', 'error');
+          return;
+        }
+      }
       if (!o) return;
       this.selectedOrder = o;
 
@@ -260,6 +283,10 @@
 
       const statusSelect = document.getElementById('order-modal-status-select');
       if (statusSelect) statusSelect.value = o.status || 'placed';
+      const statusNotesEl = document.getElementById('order-modal-status-notes');
+      if (statusNotesEl) statusNotesEl.value = '';
+      this.toggleEditOrderForm(false);
+      this.populateEditOrderForm(o);
 
       const badgesContainer = document.getElementById('order-modal-badges');
       if (badgesContainer) {
@@ -267,8 +294,10 @@
           placed: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
           pending: 'bg-blue-500/15 text-blue-300 border-blue-500/30',
           processing: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
+          ready_for_pickup: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30',
           shipped: 'bg-purple-500/15 text-purple-300 border-purple-500/30',
           delivered: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
+          returned: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
           cancelled: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
         };
         const stBadge = statusColors[o.status] || statusColors.placed;
@@ -277,8 +306,8 @@
           payStatus === 'paid'
             ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30'
             : payStatus === 'cod'
-            ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
-            : 'bg-slate-700/40 text-slate-300 border-slate-600/40';
+              ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+              : 'bg-slate-700/40 text-slate-300 border-slate-600/40';
 
         badgesContainer.innerHTML = `
           <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider ${stBadge}">
@@ -318,13 +347,12 @@
                   <a href="tel:${custPhone}" class="text-primary hover:underline font-mono text-xs flex items-center gap-1 font-semibold">
                     <span>📞</span> ${custPhone || '—'}
                   </a>
-                  ${
-                    cleanPhoneDigits.length >= 7
-                      ? `<a href="https://wa.me/${cleanPhoneDigits.startsWith('974') ? cleanPhoneDigits : '974' + cleanPhoneDigits}" target="_blank" rel="noopener" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold hover:bg-emerald-100 transition">
+                  ${cleanPhoneDigits.length >= 7
+            ? `<a href="https://wa.me/${cleanPhoneDigits.startsWith('974') ? cleanPhoneDigits : '974' + cleanPhoneDigits}" target="_blank" rel="noopener" class="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold hover:bg-emerald-100 transition">
                           💬 WhatsApp
                         </a>`
-                      : ''
-                  }
+            : ''
+          }
                 </div>
                 <p class="text-slate-600 truncate" title="${custEmail}">
                   <span>✉️</span> ${custEmail ? `<a href="mailto:${custEmail}" class="hover:underline">${custEmail}</a>` : '<span class="italic text-slate-400">Not provided</span>'}
@@ -345,9 +373,8 @@
               </span>
               <span class="text-[10px] font-bold ${isPickup ? 'text-emerald-700' : 'text-primary'}">Qatar Express</span>
             </div>
-            ${
-              isPickup
-                ? `
+            ${isPickup
+            ? `
                   <div>
                     <p class="font-bold text-emerald-800">${loc.name || 'MARJAAH Experience Hub — Al Sadd'}</p>
                     <p class="text-slate-600 mt-0.5">${loc.address || 'Building 42, Al Mirqab Al Jadeed St, Zone 39, Doha'}</p>
@@ -358,7 +385,7 @@
                     </p>
                   </div>
                 `
-                : `
+            : `
                   <div>
                     <p class="font-bold text-slate-900">${addr.full_name || o.customer_name || 'Delivery Recipient'}</p>
                     <p class="text-slate-600 mt-0.5 leading-relaxed">
@@ -370,7 +397,7 @@
                     ${o.notes ? `<p class="text-[11px] text-primary italic pt-1 mt-1 border-t border-slate-200">Delivery Note: "${o.notes}"</p>` : ''}
                   </div>
                 `
-            }
+          }
           </div>
 
           <!-- Card 3: Payment & Logistics -->
@@ -384,7 +411,7 @@
             <div class="space-y-1.5">
               <div class="flex justify-between">
                 <span class="text-slate-500">Payment Method:</span>
-                <span class="text-slate-900 font-bold capitalize">${o.payment_method === 'pay_at_store' ? 'Pay at Store' : o.payment_method || 'Cash on Delivery'}</span>
+                <span class="text-slate-900 font-bold capitalize">${AdminOrders_payLabel(o)}</span>
               </div>
               <div class="flex justify-between">
                 <span class="text-slate-500">Logistics Partner:</span>
@@ -419,9 +446,8 @@
               <p class="text-slate-200"><strong>Customer Reason:</strong> ${rr.reason || 'General Return'}</p>
               ${rr.notes ? `<p class="text-slate-300 italic">"${rr.notes}"</p>` : ''}
               ${rr.admin_notes ? `<p class="text-indigo-300 font-semibold">Staff Review: ${rr.admin_notes}</p>` : ''}
-              ${
-                rr.status === 'pending'
-                  ? `
+              ${rr.status === 'pending'
+              ? `
                     <div class="flex items-center gap-2 pt-2 border-t border-amber-500/20">
                       <button type="button" onclick="AdminReturns.approveReturn('${o.id}', '${orderNum}')" class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white rounded-xl shadow-sm cursor-pointer transition">
                         ✓ Approve &amp; Restock
@@ -431,8 +457,8 @@
                       </button>
                     </div>
                   `
-                  : ''
-              }
+              : ''
+            }
             </div>
           `;
         } else if (o.cancellation_reason || o.status === 'cancelled') {
@@ -508,25 +534,23 @@
                           <span class="text-slate-500">SKU:</span>
                           <span>${sku}</span>
                         </span>
-                        ${
-                          variantName
-                            ? `<span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
+                        ${variantName
+                  ? `<span class="inline-flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">
                                 <span>Variant:</span>
                                 <span>${variantName}</span>
                               </span>`
-                            : ''
-                        }
+                  : ''
+                }
                         <span class="text-[10px] text-slate-500 font-mono">
                           Unit: <strong class="text-slate-900">${unitPrice.toLocaleString()} QAR</strong>
                           ${originalPrice > unitPrice ? `<span class="line-through text-slate-400 ml-1">${originalPrice} QAR</span>` : ''}
                         </span>
-                        ${
-                          lineDiscount > 0
-                            ? `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
+                        ${lineDiscount > 0
+                  ? `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
                                 Saved ${lineDiscount} QAR
                               </span>`
-                            : ''
-                        }
+                  : ''
+                }
                       </div>
                     </div>
                   </div>
@@ -575,22 +599,164 @@
       document.getElementById('order-details-modal').classList.add('hidden');
     },
 
-    async updateStatus() {
+    populateEditOrderForm(o) {
+      if (!o) return;
+      const addr = o.delivery_address || {};
+      const setVal = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.value = val ?? '';
+      };
+      const setSelectVal = (id, val, fallback) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const targetVal = (val || fallback || '').toString();
+        if (targetVal && !Array.from(el.options).some((opt) => opt.value === targetVal)) {
+          const opt = document.createElement('option');
+          opt.value = targetVal;
+          opt.textContent = targetVal;
+          el.appendChild(opt);
+        }
+        el.value = targetVal || fallback || '';
+      };
+
+      setVal('order-edit-customer-name', o.customer_name || o.full_name || addr.full_name || '');
+      setVal('order-edit-customer-phone', o.customer_phone || o.phone || addr.phone || '');
+      setVal('order-edit-customer-email', o.customer_email || o.email || '');
+      setVal('order-edit-building', addr.building || '');
+      setVal('order-edit-street', addr.street || '');
+      setVal('order-edit-zone', addr.zone || '');
+      setVal('order-edit-city', addr.city || 'Doha');
+      setSelectVal('order-edit-payment-method', (o.payment_method === 'pay_at_store' || o.fulfillment_type === 'store_pickup' || o.delivery_method === 'pickup') ? 'pay_at_store' : 'cash', 'cash');
+      setSelectVal('order-edit-payment-status', (o.payment_status || 'cod').toLowerCase(), 'cod');
+      setVal('order-edit-shipping', Number(o.shipping ?? o.shipping_cost ?? 0));
+      setVal('order-edit-discount', Number(o.discount ?? o.discount_amount ?? 0));
+      setVal('order-edit-notes', o.notes || '');
+    },
+
+    toggleEditOrderForm(forceState) {
+      const container = document.getElementById('order-edit-form-container');
+      const toggleBtn = document.getElementById('order-modal-edit-toggle-btn');
+      const labelEl = document.getElementById('order-modal-edit-toggle-label');
+      if (!container) return;
+
+      const shouldShow = typeof forceState === 'boolean' ? forceState : container.classList.contains('hidden');
+      if (shouldShow) {
+        this.populateEditOrderForm(this.selectedOrder);
+        container.classList.remove('hidden');
+        if (toggleBtn) {
+          toggleBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-600');
+          toggleBtn.classList.remove('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        }
+        if (labelEl) labelEl.textContent = 'Hide Edit Form';
+        container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      } else {
+        container.classList.add('hidden');
+        if (toggleBtn) {
+          toggleBtn.classList.remove('bg-indigo-600', 'text-white', 'border-indigo-600');
+          toggleBtn.classList.add('bg-indigo-50', 'text-indigo-700', 'border-indigo-200');
+        }
+        if (labelEl) labelEl.textContent = 'Edit Order';
+      }
+    },
+
+    async saveOrderEdit(e) {
+      e.preventDefault();
       if (!this.selectedOrder) return;
-      const newStatus = document.getElementById('order-modal-status-select').value;
-      const notes = prompt('Enter a status update note for this order (optional):') || '';
+
+      const customer_name = (document.getElementById('order-edit-customer-name')?.value || '').trim();
+      const customer_phone = (document.getElementById('order-edit-customer-phone')?.value || '').trim();
+      if (!customer_name || !customer_phone) {
+        AdminApp.toast('Customer name and phone number are required.', 'warning');
+        return;
+      }
+
+      const payload = {
+        customer_name,
+        customer_phone,
+        customer_email: (document.getElementById('order-edit-customer-email')?.value || '').trim(),
+        delivery_address: {
+          building: (document.getElementById('order-edit-building')?.value || '').trim(),
+          street: (document.getElementById('order-edit-street')?.value || '').trim(),
+          zone: (document.getElementById('order-edit-zone')?.value || '').trim(),
+          city: (document.getElementById('order-edit-city')?.value || '').trim(),
+        },
+        payment_method: document.getElementById('order-edit-payment-method')?.value || 'cash',
+        payment_status: document.getElementById('order-edit-payment-status')?.value || 'cod',
+        shipping: Number(document.getElementById('order-edit-shipping')?.value || 0),
+        discount: Number(document.getElementById('order-edit-discount')?.value || 0),
+        notes: (document.getElementById('order-edit-notes')?.value || '').trim(),
+      };
+
+      const btn = document.getElementById('order-edit-save-btn');
+      const originalHtml = btn ? btn.innerHTML : 'Save Order Changes';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5 align-middle"></span>Saving...';
+      }
 
       try {
-        await AdminApp.api(`/api/orders/${this.selectedOrder.id}/status`, {
+        const res = await AdminApp.api(`/api/orders/${this.selectedOrder.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+        });
+
+        const updatedOrder = res?.order || { ...this.selectedOrder, ...payload };
+        const idx = this.orders.findIndex((x) => x.id === this.selectedOrder.id);
+        if (idx !== -1) this.orders[idx] = { ...this.orders[idx], ...updatedOrder };
+        this.selectedOrder = { ...this.selectedOrder, ...updatedOrder };
+
+        AdminApp.toast(`Order #${this.selectedOrder.order_number || this.selectedOrder.id} updated successfully.`, 'success');
+        this.toggleEditOrderForm(false);
+        this.openDetailsModal(this.selectedOrder.id);
+        this.renderTable();
+        this.load().catch(() => {});
+      } catch (err) {
+        AdminApp.toast(err.message || 'Failed to save order updates', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
+      }
+    },
+
+    async updateStatus() {
+      if (!this.selectedOrder) return;
+      const newStatus = document.getElementById('order-modal-status-select')?.value;
+      const notesEl = document.getElementById('order-modal-status-notes');
+      const notes = notesEl ? notesEl.value.trim() : '';
+      const btn = document.getElementById('order-modal-status-btn');
+      const originalHtml = btn ? btn.innerHTML : 'Update Status';
+
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5 align-middle"></span>Updating...';
+      }
+
+      try {
+        const res = await AdminApp.api(`/api/orders/${this.selectedOrder.id}/status`, {
           method: 'PATCH',
           body: JSON.stringify({ status: newStatus, notes }),
         });
+
+        const updatedOrder = res?.order || { ...this.selectedOrder, status: newStatus };
+        const idx = this.orders.findIndex((x) => x.id === this.selectedOrder.id);
+        if (idx !== -1) this.orders[idx] = { ...this.orders[idx], ...updatedOrder };
+        this.selectedOrder = { ...this.selectedOrder, ...updatedOrder };
+
+        if (notesEl) notesEl.value = '';
         AdminApp.toast(`Order #${this.selectedOrder.order_number || this.selectedOrder.id} status updated to ${newStatus.toUpperCase()}.`, 'success');
-        this.closeDetailsModal();
-        await this.load();
+        this.openDetailsModal(this.selectedOrder.id);
+        this.renderTable();
         AdminApp.updatePendingBadges();
+        this.load().catch(() => {});
       } catch (err) {
         AdminApp.toast(err.message || 'Failed to update order status', 'error');
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalHtml;
+        }
       }
     },
 
@@ -637,8 +803,12 @@
     async openCreateOrderModal() {
       this.orderCart = [];
       document.getElementById('create-order-form').reset();
+      this.toggleCreateOrderFulfillment('delivery');
       this.renderOrderCart();
 
+      if (!this.storeLocations || this.storeLocations.length === 0) {
+        await this.loadStoreLocations();
+      }
       const locSelect = document.getElementById('create-order-pickup-location');
       if (locSelect) {
         locSelect.innerHTML = this.storeLocations.map((l) => `
@@ -647,9 +817,14 @@
       }
 
       if (this.catalogProducts.length === 0) {
+        await this.preloadCatalogProducts();
+      }
+      if (this.catalogProducts.length === 0) {
         try {
-          const res = await AdminApp.api('/api/products?limit=100');
-          this.catalogProducts = res.products || res.items || res || [];
+          const res = await AdminApp.api('/api/products?limit=10000&includeHidden=true&status=all');
+          const list = res?.products || res?.items || res?.data || (Array.isArray(res) ? res : []);
+          this.catalogProducts = list;
+          if (list.length > 0) window.SmartCache?.setProducts(list);
         } catch (e) {
           console.warn('Failed to fetch catalog for order picker:', e);
         }
@@ -783,7 +958,7 @@
                 <span class="font-bold text-slate-900 px-1.5">${it.quantity}</span>
                 <button type="button" onclick="AdminOrders.updateCartQty('${it.product_id}', 1)" class="w-5 h-5 flex items-center justify-center text-slate-600 hover:text-slate-900">&plus;</button>
               </div>
-              <span class="font-bold text-white w-14 text-right">${itemTotal.toFixed(0)} QAR</span>
+              <span class="font-bold text-slate-900 w-14 text-right">${itemTotal.toFixed(0)} QAR</span>
             </div>
           </div>
         `;
@@ -801,16 +976,16 @@
       }
 
       const fulfillment_type = document.querySelector('input[name="create_fulfillment_type"]:checked')?.value || 'delivery';
-      const full_name = document.getElementById('create-order-name').value.trim();
-      const phone = document.getElementById('create-order-phone').value.trim();
-      const email = document.getElementById('create-order-email')?.value?.trim();
+      const customer_name = document.getElementById('create-order-name').value.trim();
+      const customer_phone = document.getElementById('create-order-phone').value.trim();
+      const customer_email = document.getElementById('create-order-email')?.value?.trim() || '';
       const payment_method = document.getElementById('create-order-payment').value;
       const notes = document.getElementById('create-order-notes')?.value?.trim() || 'Created manually by Staff';
 
       const payload = {
-        full_name,
-        phone,
-        email,
+        customer_name,
+        customer_phone,
+        customer_email,
         fulfillment_type,
         payment_method,
         notes,
@@ -827,14 +1002,17 @@
       if (fulfillment_type === 'store_pickup') {
         const locId = document.getElementById('create-order-pickup-location').value;
         const loc = this.storeLocations.find((x) => x.id === locId);
+        payload.pickup_location_id = locId;
         payload.store_pickup_location_id = locId;
         payload.store_pickup_location = loc;
         payload.shipping_cost = 0;
       } else {
-        payload.building = document.getElementById('create-order-building')?.value?.trim() || '';
-        payload.street = document.getElementById('create-order-street')?.value?.trim() || '';
-        payload.zone = document.getElementById('create-order-zone')?.value?.trim() || 'Doha';
-        payload.city = document.getElementById('create-order-city')?.value?.trim() || 'Doha';
+        payload.delivery_address = {
+          building: document.getElementById('create-order-building')?.value?.trim() || '',
+          street: document.getElementById('create-order-street')?.value?.trim() || '',
+          zone: document.getElementById('create-order-zone')?.value?.trim() || 'Doha',
+          city: document.getElementById('create-order-city')?.value?.trim() || 'Doha',
+        };
       }
 
       const submitBtn = document.getElementById('create-order-submit-btn');
@@ -1037,7 +1215,7 @@
       const paymentMethodLabel = {
         cash: 'Cash on Delivery (COD)',
         cod: 'Cash on Delivery (COD)',
-        pay_at_store: 'Pay at Store Hub (Cash/Card)',
+        pay_at_store: 'Pay at Store (Store Pickup)',
         card: 'Credit / Debit Card (Online)',
         credit_card: 'Credit / Debit Card (Online)',
         apple_pay: 'Apple Pay',
@@ -1109,48 +1287,17 @@
             
             <!-- Left: Brand Identity -->
             <div style="flex: 1; min-width: 260px;">
-              <div style="margin-bottom: 8px;">
-                <svg width="180" height="45" viewBox="0 0 230 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="inv-m-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#7E96FC" />
-                      <stop offset="100%" stop-color="#5B73EA" />
-                    </linearGradient>
-                    <linearGradient id="inv-m-purple" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#C4A5FA" />
-                      <stop offset="100%" stop-color="#9F78EB" />
-                    </linearGradient>
-                    <linearGradient id="inv-m-darkblue" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#3C56BE" />
-                      <stop offset="100%" stop-color="#2F47A9" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M 6 26 C 6 26, 6 42, 6 46 C 6 51.5 10.5 56 16 56 C 21.5 56 26 51.5 26 46 C 26 38 18 30 6 26 Z" fill="url(#inv-m-darkblue)"/>
-                  <path d="M 38 32 C 38 32, 38 42, 38 46 C 38 51.5 42.5 56 48 56 C 53.5 56 58 51.5 58 46 C 58 36 50 28 38 32 Z" fill="url(#inv-m-darkblue)"/>
-                  <rect x="3" y="7" width="17" height="44" rx="8.5" transform="rotate(-40 11.5 29)" fill="url(#inv-m-blue)"/>
-                  <g opacity="0.4" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round">
-                    <line x1="16" y1="20" x2="28" y2="34" />
-                    <circle cx="16" cy="20" r="1.5" fill="#FFFFFF" />
-                    <circle cx="28" cy="34" r="1.5" fill="#FFFFFF" />
-                  </g>
-                  <rect x="38" y="7" width="17" height="34" rx="8.5" transform="rotate(40 46.5 24)" fill="url(#inv-m-purple)"/>
-                  <circle cx="63" cy="46" r="4.5" fill="#B592F2"/>
-                  <g fill="#1E293B">
-                    <path d="M 91 19.5 C 89 17.5 86 16 81.5 16 C 75.5 16 71.5 19.5 71.5 24.5 C 71.5 29 74.5 31.8 81 33.5 C 87.5 35.2 89.5 37 89.5 40.5 C 89.5 44.5 85.5 47.5 79.5 47.5 C 74.5 47.5 70.5 45.2 68 42.5 C 66.8 41.2 66.8 39.2 68.2 38 C 69.5 36.8 71.5 36.9 72.8 38.2 C 74.5 40 77 41.5 79.5 41.5 C 82 41.5 83.5 40 83.5 38 C 83.5 35.5 81 34 75.5 32.5 C 69 30.7 65.5 28 65.5 23 C 65.5 16.5 71 10.5 81 10.5 C 86.5 10.5 91.5 12.8 94.5 15.8 C 95.8 17.1 95.7 19.2 94.2 20.5 C 93 21.6 91.9 20.5 91 19.5 Z"/>
-                    <path d="M 104 14 C 104 12.3 105.3 11 107 11 C 108.7 11 110 12.3 110 14 V 25 H 125 V 14 C 125 12.3 126.3 11 128 11 C 129.7 11 131 12.3 131 14 V 44 C 131 45.7 129.7 47 128 47 C 126.3 47 125 45.7 125 44 V 31 H 110 V 44 C 110 45.7 108.7 47 107 47 C 105.3 47 104 45.7 104 44 Z"/>
-                    <path d="M 154 10.5 C 165.5 10.5 174 19 174 29 C 174 39 165.5 47.5 154 47.5 C 142.5 47.5 134 39 134 29 C 134 19 142.5 10.5 154 10.5 Z M 154 16.5 C 146 16.5 140 22 140 29 C 140 36 146 41.5 154 41.5 C 162 41.5 168 36 168 29 C 168 22 162 16.5 154 16.5 Z"/>
-                    <path d="M 183 14 C 183 12.3 184.3 11 186 11 H 198 C 205.5 11 211.5 16 211.5 23.5 C 211.5 31 205.5 36 198 36 H 192 V 44 C 192 45.7 190.7 47 189 47 C 187.3 47 186 45.7 186 44 V 14 H 183 Z M 192 17 V 30 H 198 C 202 30 205.5 27 205.5 23.5 C 205.5 20 202 17 198 17 H 192 Z"/>
-                  </g>
-                </svg>
+              <div style="margin-bottom: 10px;">
+                <img src="/assets/images/branding/logo-light.png?v=5" alt="M.SHOP" style="height: 36px; width: auto; max-width: 180px; object-fit: contain; display: block;" />
               </div>
-              <p style="margin: 0; font-size: 13px; font-weight: 800; color: #0F172A; letter-spacing: 0.5px;">MARJAAH QATAR — Marjaah Trading W.L.L.</p>
-              <p style="margin: 2px 0; font-size: 11px; color: #475569; font-weight: 600;">شركة مرجاح للتجارة ذ.م.م &bull; Commercial Registration (CR) No: <strong style="color: #0F172A;">228717</strong></p>
+              <p style="margin: 0; font-size: 13px; font-weight: 800; color: #0F172A; letter-spacing: 0.5px;">M.SHOP — Marjaah Trading W.L.L.</p>
+              <p style="margin: 2px 0; font-size: 11px; color: #475569; font-weight: 600;"><span dir="rtl">شركة مرجاح للتجارة ذ.م.م</span> &bull; Commercial Registration (CR) No: <strong style="color: #0F172A;">228717</strong></p>
               <p style="margin: 2px 0; font-size: 11px; color: #475569; line-height: 1.4;">
                 Shop No. 8, Building No. 12, Street No. 295, Zone No. 91<br/>
                 SOUQ UMM BESHER, Doha, State of Qatar
               </p>
               <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569;">
-                Tel: <strong style="color: #0F172A;">+974 7799 1013</strong> &bull; Email: <strong style="color: #0F172A;">info@marjaah.com</strong> &bull; Web: <strong style="color: #0F172A;">www.marjaah.com</strong>
+                Tel: <strong style="color: #0F172A;">+974 7799 1013</strong> &bull; Email: <strong style="color: #0F172A;">info@marjaah.com</strong> &bull; Web: <strong style="color: #0F172A;">www.marjaah.shop</strong>
               </p>
             </div>
 
@@ -1227,24 +1374,24 @@
             </div>
 
             <!-- Right: Calculations breakdown -->
-            <div style="width: 280px;">
-              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
-                <span>Subtotal</span>
-                <span style="font-family: monospace; font-weight: 600; color: #0F172A;">${subtotal.toFixed(2)} QAR</span>
+            <div style="width: 340px; max-width: 100%; min-width: 280px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
+                <span style="white-space: nowrap;">Subtotal</span>
+                <span style="font-family: monospace; font-weight: 600; color: #0F172A; white-space: nowrap;">${subtotal.toFixed(2)} QAR</span>
               </div>
-              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
-                <span>Delivery / Shipping Fee</span>
-                <span style="font-family: monospace; font-weight: 600; color: #059669;">${shippingLabel}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
+                <span style="white-space: nowrap;">Delivery / Shipping Fee</span>
+                <span style="font-family: monospace; font-weight: 600; color: #059669; text-align: right; white-space: nowrap;">${shippingLabel}</span>
               </div>
               ${discount > 0 ? `
-              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #E11D48; border-bottom: 1px solid #F1F5F9;">
-                <span>Promotional Discount</span>
-                <span style="font-family: monospace; font-weight: 600;">-${discount.toFixed(2)} QAR</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; color: #E11D48; border-bottom: 1px solid #F1F5F9;">
+                <span style="white-space: nowrap;">Promotional Discount</span>
+                <span style="font-family: monospace; font-weight: 600; white-space: nowrap;">-${discount.toFixed(2)} QAR</span>
               </div>
               ` : ''}
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; margin-top: 6px; background: #F8FAFC; border: 2px solid #0F172A; border-radius: 8px;">
-                <span style="font-size: 13px; font-weight: 800; color: #0F172A;">Total Amount Due / المدفوع</span>
-                <span style="font-family: monospace; font-size: 17px; font-weight: 900; color: #4338CA;">${total.toFixed(2)} QAR</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 14px; margin-top: 8px; background: #F8FAFC; border: 2px solid #0F172A; border-radius: 8px;">
+                <span style="font-size: 12px; font-weight: 800; color: #0F172A; line-height: 1.3; flex: 1; padding-right: 8px;">Total Amount Due <span dir="rtl" style="display: inline-block;">/ المدفوع</span></span>
+                <span style="font-family: monospace; font-size: 17px; font-weight: 900; color: #4338CA; white-space: nowrap; flex-shrink: 0;">${total.toFixed(2)} QAR</span>
               </div>
             </div>
 
@@ -1273,7 +1420,7 @@
 
           <!-- BOTTOM COPYRIGHT & BARCODE SIMULATION -->
           <div style="margin-top: 14px; padding-top: 8px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #94A3B8;">
-            <span>MARJAAH Qatar &bull; State of Qatar &bull; Computer Generated Tax Invoice</span>
+            <span>M.SHOP (Marjaah Trading W.L.L.) &bull; State of Qatar &bull; Computer Generated Tax Invoice</span>
             <span style="font-family: monospace; letter-spacing: 2px; font-weight: 700; color: #64748B;">*${orderNum}*</span>
           </div>
 

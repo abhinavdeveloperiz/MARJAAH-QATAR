@@ -1,9 +1,13 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Optional } from '@nestjs/common';
 import { FirestoreService } from '../firebase/firestore.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class ContactService {
-  constructor(private readonly firestore: FirestoreService) {}
+  constructor(
+    private readonly firestore: FirestoreService,
+    @Optional() private readonly mailService?: MailService,
+  ) {}
 
   async submitMessage(data: { name: string; email: string; phone?: string; subject: string; message: string }) {
     if (!data.name || !data.email || !data.subject || !data.message) {
@@ -64,13 +68,27 @@ export class ContactService {
     if (!doc.exists) {
       throw new NotFoundException(`Message ${id} not found`);
     }
+    const data = doc.data() || {};
+    const trimmed = reply.trim();
     await docRef.update({
-      reply: reply.trim(),
+      reply: trimmed,
       replied_at: new Date().toISOString(),
       status: 'replied',
       updated_at: new Date().toISOString(),
     });
-    return { success: true, id, reply: reply.trim(), status: 'replied' };
+
+    let emailResult: any = { sent: false };
+    if (this.mailService && data.email) {
+      emailResult = await this.mailService.sendContactReply(
+        data.email,
+        data.name || 'Customer',
+        data.subject || 'Inquiry',
+        trimmed,
+        data.message,
+      );
+    }
+
+    return { success: true, id, reply: trimmed, status: 'replied', email_sent: Boolean(emailResult?.sent) };
   }
 
   async deleteMessage(id: string) {

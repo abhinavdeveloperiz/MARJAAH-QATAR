@@ -1,15 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, Query, UseGuards, Request, Req } from '@nestjs/common';
+import { isStaffRequest } from '../auth/staff-check';
 import { PromotionalSectionsService, PromotionalSectionDto } from './promotional-sections.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RbacGuard } from '../admin/rbac/rbac.guard';
@@ -20,8 +10,8 @@ export class PromotionalSectionsController {
   constructor(private readonly promoService: PromotionalSectionsService) {}
 
   @Get()
-  async findAll(@Query('includeInactive') includeInactive?: string) {
-    const showAll = String(includeInactive).toLowerCase() === 'true';
+  async findAll(@Query('includeInactive') includeInactive?: string, @Req() req?: any) {
+    const showAll = String(includeInactive).toLowerCase() === 'true' && isStaffRequest(req);
     return this.promoService.findAll(showAll);
   }
 
@@ -40,6 +30,7 @@ export class PromotionalSectionsController {
   @UseGuards(JwtAuthGuard, RbacGuard)
   @RequirePermission('website_content', 'edit')
   @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() body: Partial<PromotionalSectionDto>, @Request() req: any) {
     return this.promoService.update(id, body, req.user);
   }

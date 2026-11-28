@@ -89,19 +89,37 @@ export class StoreLocationsService implements OnModuleInit {
     return { id: doc.id, ...doc.data() };
   }
 
-  async create(dto: StoreLocationDto, adminUser?: any) {
-    if (!dto.name || !dto.address || !dto.phone) {
+  private normalizeLocationFields(dto: any): Record<string, any> {
+    const out: Record<string, any> = { ...dto };
+    if (dto.working_hours !== undefined && dto.opening_hours === undefined) out.opening_hours = dto.working_hours;
+    if (dto.opening_hours !== undefined && dto.working_hours === undefined) out.working_hours = dto.opening_hours;
+    if (dto.working_hours_ar !== undefined && dto.opening_hours_ar === undefined) out.opening_hours_ar = dto.working_hours_ar;
+    if (dto.instructions !== undefined && dto.pickup_instructions === undefined) out.pickup_instructions = dto.instructions;
+    if (dto.pickup_instructions !== undefined && dto.instructions === undefined) out.instructions = dto.pickup_instructions;
+    if (dto.instructions_ar !== undefined && dto.pickup_instructions_ar === undefined) out.pickup_instructions_ar = dto.instructions_ar;
+    if (dto.is_primary !== undefined && dto.is_default === undefined) out.is_default = Boolean(dto.is_primary);
+    if (dto.is_default !== undefined) out.is_default = Boolean(dto.is_default);
+    if (dto.display_order !== undefined && dto.order === undefined) out.order = Number(dto.display_order) || 0;
+    if (out.order !== undefined) out.order = Number(out.order) || 0;
+    return out;
+  }
+
+  async create(dto: StoreLocationDto & Record<string, any>, adminUser?: any) {
+    const normalized = this.normalizeLocationFields(dto);
+    if (!normalized.name || !normalized.address || !normalized.phone) {
       throw new BadRequestException('Store name, address, and phone number are required');
     }
 
     const now = new Date().toISOString();
-    const payload = {
-      ...dto,
-      city: dto.city || 'Doha',
-      zone: dto.zone || 'Doha',
-      is_active: dto.is_active !== undefined ? Boolean(dto.is_active) : true,
-      is_default: Boolean(dto.is_default),
-      order: Number(dto.order) || 0,
+    const payload: Record<string, any> = {
+      ...normalized,
+      name: normalized.name,
+      opening_hours: normalized.opening_hours || '',
+      city: normalized.city || 'Doha',
+      zone: normalized.zone || 'Doha',
+      is_active: normalized.is_active !== undefined ? Boolean(normalized.is_active) : true,
+      is_default: Boolean(normalized.is_default),
+      order: Number(normalized.order) || 0,
       created_at: now,
       updated_at: now,
     };
@@ -123,7 +141,7 @@ export class StoreLocationsService implements OnModuleInit {
         action: 'create',
         module: 'store_locations',
         target_id: ref.id,
-        target_title: dto.name,
+        target_title: payload.name,
         details: payload,
       });
     }
@@ -131,7 +149,7 @@ export class StoreLocationsService implements OnModuleInit {
     return { id: ref.id, ...payload };
   }
 
-  async update(id: string, dto: Partial<StoreLocationDto>, adminUser?: any) {
+  async update(id: string, dto: Partial<StoreLocationDto> & Record<string, any>, adminUser?: any) {
     const docRef = this.firestore.doc('store_locations', id);
     const existing = await docRef.get();
     if (!existing.exists) {
@@ -140,11 +158,14 @@ export class StoreLocationsService implements OnModuleInit {
 
     const now = new Date().toISOString();
     const updateData: any = {
-      ...dto,
+      ...this.normalizeLocationFields(dto),
       updated_at: now,
     };
+    Object.keys(updateData).forEach((k) => {
+      if (updateData[k] === undefined) delete updateData[k];
+    });
 
-    if (dto.is_default) {
+    if (updateData.is_default) {
       const all = await this.firestore.collection('store_locations').where('is_default', '==', true).get();
       for (const d of all.docs) {
         if (d.id !== id) {
@@ -162,7 +183,7 @@ export class StoreLocationsService implements OnModuleInit {
         action: 'edit',
         module: 'store_locations',
         target_id: id,
-        target_title: dto.name || existing.data()?.name,
+        target_title: updateData.name || existing.data()?.name,
         details: { before: existing.data(), after: updateData },
       });
     }

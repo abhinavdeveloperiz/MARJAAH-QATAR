@@ -273,7 +273,7 @@ export class AdminController {
   @RequirePermission('orders', 'edit')
   async reviewReturnRequest(
     @Param('id') id: string,
-    @Body() body: { status: 'approved' | 'rejected'; notes?: string; restock?: boolean },
+    @Body() body: { status: 'approved' | 'rejected' | 'declined'; notes?: string; admin_notes?: string; restock?: boolean; restock_items?: boolean },
     @Request() req: any,
   ) {
     return this.adminService.reviewReturnRequest(id, req.user, body);
@@ -299,6 +299,7 @@ export class AdminController {
     return this.adminService.getStoreSettings();
   }
 
+  @Post('settings')
   @Put('settings')
   @RequirePermission('settings', 'edit')
   async updateSettings(@Body() body: any, @Request() req: any) {

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
+import { getJwtSecret } from './jwt-secret';
 import { FirestoreService } from '../firebase/firestore.service';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET || 'marjaah_super_secure_jwt_secret_key_2026_qatar_tech_prod',
+      secretOrKey: getJwtSecret(configService.get<string>('JWT_SECRET')),
     });
   }
 
@@ -71,6 +72,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
 
     const data = doc.data();
+    const docStatus = String(data?.status || '').toLowerCase();
+    if (doc.id !== 'admin' && data?.username !== 'admin' && ['suspended', 'deactivated', 'inactive'].includes(docStatus)) {
+      throw new UnauthorizedException(`Account is ${docStatus}. Contact administrator.`);
+    }
     return {
       ...payload,
       ...data,

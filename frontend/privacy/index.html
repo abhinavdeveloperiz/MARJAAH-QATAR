@@ -139,12 +139,12 @@
   </header>
 
   <!-- Mobile Drawer Menu -->
-  <div id="mobile-drawer" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
+  <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
        style="background:var(--bg-surface);border-color:var(--border-color);">
     <div>
       <div class="flex items-center justify-between pb-6" style="border-bottom:1px solid var(--border-color)">
         <span class="font-display font-black text-lg tracking-wider" style="color:var(--text-primary)">MENU</span>
-        <button id="mobile-drawer-close" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
+        <button id="mobile-menu-close" aria-label="Close menu" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
@@ -163,7 +163,7 @@
       </a>
     </div>
   </div>
-  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-[105] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 z-[105] opacity-0 pointer-events-none backdrop-blur-sm transition-opacity duration-300"></div>
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 min-h-screen pt-[72px]">
@@ -270,7 +270,7 @@
             <li><strong>Contact details:</strong> Name, phone / mobile number, and email address.</li>
             <li><strong>Delivery address:</strong> Zone, street, building, and location details anywhere in Qatar.</li>
             <li><strong>Order details:</strong> Products ordered, order value in QAR, and delivery confirmation history.</li>
-            <li><strong>Payment information:</strong> Payment method selected (Cash on Delivery or Online Card / Apple Pay / Google Pay via MyFatoorah). <em>We never store or see your full credit or debit card numbers; all transactions are processed securely by MyFatoorah.</em></li>
+            <li><strong>Payment information:</strong> Payment method selected (Cash on Delivery or Pay at Store). <em>We do not accept online payments and never collect or store credit or debit card numbers on this website.</em></li>
           </ul>
         </section>
 
@@ -302,7 +302,6 @@
             Your information is shared only with trusted service partners strictly necessary to complete your order:
           </p>
           <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
-            <li><strong>Payment Gateway (MyFatoorah):</strong> Encrypted card processing for online payments, Apple Pay, and Google Pay.</li>
             <li><strong>Delivery Couriers:</strong> Delivery name, address, and mobile number to deliver your parcel safely.</li>
           </ul>
         </section>
@@ -360,7 +359,7 @@
             <li><strong>بيانات التواصل:</strong> الاسم، ورقم الهاتف المحمول، والبريد الإلكتروني.</li>
             <li><strong>عنوان التوصيل:</strong> المنطقة، والشارع، والمبنى، وبيانات الموقع في أي مكان داخل قطر.</li>
             <li><strong>تفاصيل الطلب:</strong> المنتجات المطلوبة، وقيمة الطلب بالريال القطري، وتاريخ التسليم.</li>
-            <li><strong>بيانات الدفع:</strong> طريقة الدفع المختارة (الدفع عند الاستلام أو الدفع الإلكتروني عبر بطاقات الائتمان، أو Apple Pay، أو Google Pay بواسطة MyFatoorah). <em>نحن لا نطلع على أرقام بطاقتك الكاملة ولا نحتفظ بها؛ وتتم جميع المعاملات عبر بوابة الدفع الآمنة MyFatoorah.</em></li>
+            <li><strong>بيانات الدفع:</strong> طريقة الدفع المختارة (الدفع عند الاستلام أو الدفع في المتجر). <em>نحن لا نقبل الدفع الإلكتروني ولا نجمع أو نحتفظ بأرقام بطاقات الائتمان أو الخصم على هذا الموقع.</em></li>
           </ul>
         </section>
 
@@ -392,7 +391,6 @@
             تتم مشاركة البيانات الضرورية فقط مع الشركاء المعتمدين لتنفيذ طلبك:
           </p>
           <ul class="list-disc list-inside space-y-1.5 pr-2 text-xs sm:text-sm">
-            <li><strong>بوابة الدفع (MyFatoorah):</strong> لمعالجة الدفع الإلكتروني المشفر ببطاقات الائتمان وApple Pay وGoogle Pay بأمان.</li>
             <li><strong>مندوبي التوصيل:</strong> الاسم ورقم الهاتف والعنوان لتسليم الطلب إليك بدقة وسرعة.</li>
           </ul>
         </section>

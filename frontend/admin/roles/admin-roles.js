@@ -1,6 +1,15 @@
 (function () {
   'use strict';
 
+  function esc(val) {
+    return String(val ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   const MODULES_LIST = [
     { key: 'dashboard', name: 'Dashboard & Analytics' },
     { key: 'products', name: 'Products Catalog' },
@@ -12,10 +21,10 @@
     { key: 'payments', name: 'Payments & Transactions' },
     { key: 'coupons', name: 'Coupons & Discounts' },
     { key: 'banners', name: 'Hero Banners' },
-    { key: 'promotional_sections', name: 'Promotional Sections' },
+    { key: 'website_content', name: 'Website Content & Promotions' },
     { key: 'store_locations', name: 'Store Pickup Locations' },
-    { key: 'website_content', name: 'Website Content' },
-    { key: 'reports', name: 'Reports & Export' },
+    { key: 'approvals', name: 'Approval Workflows' },
+    { key: 'reports_analytics', name: 'Reports & Analytics' },
     { key: 'admin_users', name: 'Admin Staff' },
     { key: 'roles_permissions', name: 'Roles & IAM' },
     { key: 'settings', name: 'Store Settings' },
@@ -50,7 +59,9 @@
       if (!container) return;
 
       container.innerHTML = this.roles.map((r) => {
-        const isSystem = Boolean(r.is_system);
+        const roleId = r.id || r.slug || '';
+        const isSuperAdmin = roleId === 'super_admin' || r.slug === 'super_admin';
+        const isSystem = Boolean(r.is_system) || isSuperAdmin;
         const perms = r.permissions || {};
         const totalPerms = Object.values(perms).reduce((acc, m) => {
           if (Array.isArray(m)) return acc + m.length;
@@ -61,23 +72,23 @@
           <div class="rounded-3xl p-6 border flex flex-col justify-between shadow-sm transition-all duration-300 hover:border-primary/50 bg-white" style="border-color:var(--admin-border)">
             <div>
               <div class="flex items-center justify-between gap-3 mb-2">
-                <h3 class="font-bold text-base text-slate-900">${r.name}</h3>
+                <h3 class="font-bold text-base text-slate-900">${esc(r.name)}</h3>
                 ${isSystem ? `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 uppercase tracking-wider">System Role</span>` : `<span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 uppercase tracking-wider">Custom Role</span>`}
               </div>
-              <p class="text-xs text-slate-500 leading-relaxed mb-4 min-h-[36px]">${r.description || 'No description provided.'}</p>
+              <p class="text-xs text-slate-500 leading-relaxed mb-4 min-h-[36px]">${esc(r.description || 'No description provided.')}</p>
               
               <div class="flex items-center gap-4 text-xs font-semibold py-3 border-t border-slate-200 text-slate-600">
                 <div>Permissions: <strong class="text-slate-900">${totalPerms}</strong></div>
-                <div>Slug: <span class="font-mono text-primary font-bold">${r.slug || r.id}</span></div>
+                <div>Slug: <span class="font-mono text-primary font-bold">${esc(r.slug || r.id)}</span></div>
               </div>
             </div>
 
             <div class="pt-4 border-t border-slate-200 flex items-center justify-between gap-2 mt-2">
-              <button type="button" onclick="AdminRoles.openMatrixModal('${r.id || r.slug}')" class="flex-1 py-2 rounded-xl border border-slate-200 hover:border-primary hover:bg-primary/5 text-xs font-bold text-primary transition cursor-pointer">
-                Configure Permissions
+              <button type="button" ${isSuperAdmin ? 'disabled title="Super Administrator permissions are locked by system policy"' : `onclick="AdminRoles.openMatrixModal('${esc(roleId)}')"`} class="flex-1 py-2 rounded-xl border border-slate-200 text-xs font-bold transition ${isSuperAdmin ? 'bg-slate-50 text-slate-400 cursor-not-allowed' : 'hover:border-primary hover:bg-primary/5 text-primary cursor-pointer'}">
+                ${isSuperAdmin ? 'Master Access (Locked)' : 'Configure Permissions'}
               </button>
               ${!isSystem ? `
-                <button type="button" onclick="AdminRoles.deleteRole('${r.id || r.slug}')" class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 text-rose-500 transition cursor-pointer" title="Delete Role">
+                <button type="button" onclick="AdminRoles.deleteRole('${esc(roleId)}')" class="p-2 rounded-xl border border-slate-200 hover:bg-rose-50 text-rose-500 transition cursor-pointer" title="Delete Role">
                   <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
                 </button>
               ` : ''}
@@ -101,6 +112,10 @@
     openMatrixModal(roleId) {
       const r = this.roles.find((x) => x.id === roleId || x.slug === roleId);
       if (!r) return;
+      if ((r.id === 'super_admin' || r.slug === 'super_admin')) {
+        window.AdminApp?.toast('Super Administrator permissions are locked.', 'info');
+        return;
+      }
       this.selectedRoleId = r.id || r.slug;
 
       document.getElementById('role-modal-title').textContent = `Role Permissions: ${r.name}`;

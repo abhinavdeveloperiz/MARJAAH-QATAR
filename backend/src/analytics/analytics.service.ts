@@ -56,6 +56,7 @@ export class AnalyticsService {
 
         await docRef.update({
           total_views: total,
+          unique_sessions: sessions,
           unique_count: sessions.length || total,
           paths,
           devices,

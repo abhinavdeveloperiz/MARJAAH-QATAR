@@ -1,16 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Patch,
-  Delete,
-  Param,
-  Query,
-  Body,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Query, Body, UseGuards, Request, Req } from '@nestjs/common';
+import { isStaffRequest } from '../auth/staff-check';
 import { BannersService } from './banners.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RbacGuard } from '../admin/rbac/rbac.guard';
@@ -21,8 +10,8 @@ export class BannersController {
   constructor(private readonly bannersService: BannersService) {}
 
   @Get()
-  async findAll(@Query('type') type?: string, @Query('includeInactive') includeInactive?: string) {
-    return this.bannersService.findAll(type, String(includeInactive).toLowerCase() === 'true');
+  async findAll(@Query('type') type?: string, @Query('includeInactive') includeInactive?: string, @Req() req?: any) {
+    return this.bannersService.findAll(type, String(includeInactive).toLowerCase() === 'true' && isStaffRequest(req));
   }
 
   @Get('version')

@@ -682,11 +682,12 @@ document.addEventListener('DOMContentLoaded', function() {
           window.Toast.success('Welcome back!');
         }
         const urlParams = new URLSearchParams(window.location.search);
-        const nextUrl = urlParams.get('next');
-        if (res.user && res.user.role === 'admin') {
-          window.location.href = nextUrl || '/admin/';
+        const rawNext = urlParams.get('next') || '';
+        const safeNext = (rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.startsWith('/\\')) ? rawNext : '';
+        if (res.user && (res.user.role === 'admin' || res.user.is_staff || res.user.is_superuser)) {
+          window.location.href = safeNext || '/admin/';
         } else {
-          window.location.href = nextUrl || '/account/';
+          window.location.href = safeNext || '/account/';
         }
       } else {
         throw new Error(res.message || 'Invalid credentials');

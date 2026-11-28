@@ -1125,6 +1125,10 @@ async function loadOrdersList() {
 
   const pol = window.currentOrderPolicies || {};
 
+  // Keep the loaded orders so each Track button can open its own order instantly.
+  window.__accountOrders = {};
+  orders.forEach(o => { const n = o.order_number || o.id; if (n) window.__accountOrders[n] = o; });
+
   ordersContainer.innerHTML = orders.map(o => {
     const orderNum = o.order_number || (o.id ? (String(o.id).startsWith('MTQ-') ? o.id : `MTQ-${String(o.id).padStart(5, '0')}`) : 'MTQ-00000');
     const status = (o.status || 'placed').toLowerCase();
@@ -1165,12 +1169,18 @@ async function loadOrdersList() {
     if (status === 'processing') {
       badgeClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
       statusText = 'PROCESSING & QC';
+    } else if (status === 'ready_for_pickup') {
+      badgeClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+      statusText = 'READY FOR PICKUP';
     } else if (status === 'shipped') {
       badgeClass = 'bg-purple-500/10 text-purple-400 border border-purple-500/20';
       statusText = 'OUT FOR DELIVERY';
     } else if (status === 'delivered') {
       badgeClass = 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
       statusText = 'DELIVERED';
+    } else if (status === 'returned') {
+      badgeClass = 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+      statusText = 'RETURNED / REFUNDED';
     } else if (status === 'cancelled') {
       badgeClass = 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
       statusText = 'CANCELLED';
@@ -1186,7 +1196,8 @@ async function loadOrdersList() {
     let addrText = '';
     if (o.fulfillment_type === 'store_pickup') {
       const loc = o.store_pickup_location || {};
-      addrText = `🏪 Store Pickup: ${loc.name || 'Store Hub'} (${loc.address || 'Al Sadd, Doha'})`;
+      const hours = loc.working_hours || loc.opening_hours;
+      addrText = `🏪 Store Pickup: ${loc.name || 'Store Hub'} (${loc.address || 'Al Sadd, Doha'})${hours ? ` • ${hours}` : ''}`;
     } else if (typeof o.delivery_address === 'string') {
       addrText = o.delivery_address;
     } else if (o.delivery_address && typeof o.delivery_address === 'object') {
@@ -1205,7 +1216,7 @@ async function loadOrdersList() {
         rrBadge = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
         rrText = 'RMA RETURN APPROVED & RESTOCKED';
         rrIcon = '✅';
-      } else if (rrStatus === 'declined') {
+      } else if (rrStatus === 'declined' || rrStatus === 'rejected') {
         rrBadge = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
         rrText = 'RETURN REQUEST DECLINED';
         rrIcon = '✕';
@@ -1245,7 +1256,7 @@ async function loadOrdersList() {
               ${statusText}
             </span>
             <div>
-              <span class="font-display font-black text-base" style="color:var(--text-primary)">${o.total || 0} <span class="text-xs font-normal text-primary-400 font-sans">QAR</span></span>
+              <span class="font-display font-black text-base" style="color:var(--text-primary)">${o.total ?? 0} <span class="text-xs font-normal text-primary-400 font-sans">QAR</span></span>
             </div>
           </div>
         </div>
@@ -1254,9 +1265,9 @@ async function loadOrdersList() {
         <div class="space-y-2.5">
           ${items.map(i => `
             <div class="flex items-center gap-3 text-xs p-2.5 rounded-xl" style="background:var(--bg-surface-2)">
-              <img src="${i.image || '/assets/images/placeholder.png'}" alt="${i.name}"
+              <img src="${i.image || '/assets/images/products/placeholder.svg'}" alt="${i.name}"
                 class="w-11 h-11 object-contain rounded-lg bg-black/10 p-0.5 flex-shrink-0"
-                onerror="this.src='/assets/images/branding/favicon.png'" />
+                onerror="this.src='/assets/images/products/placeholder.svg'" />
               <div class="min-w-0 flex-1">
                 <p class="font-bold truncate" style="color:var(--text-primary)">${i.name}</p>
                 <p class="text-[11px]" style="color:var(--text-tertiary)">Qty: ${i.quantity || 1} × ${i.price || 0} QAR</p>
@@ -1280,7 +1291,7 @@ async function loadOrdersList() {
         <!-- Actions -->
         <div class="pt-3 border-t flex flex-wrap items-center justify-between gap-3" style="border-color:var(--border-color)">
           <div class="flex flex-wrap items-center gap-2">
-            <a href="/track-order/?id=${encodeURIComponent(orderNum)}"
+            <a href="/track-order/?id=${encodeURIComponent(orderNum)}" onclick="try{sessionStorage.setItem('track_order_${orderNum}'.toUpperCase(), JSON.stringify(window.__accountOrders && window.__accountOrders['${orderNum}'] || {}));}catch(e){}"
               class="btn-primary text-xs px-3.5 py-1.5 rounded-xl font-bold inline-flex items-center gap-1.5 shadow-sm">
               <span>📦</span> Track
             </a>
@@ -1342,8 +1353,9 @@ async function loadAccountData() {
       const freshUser = await window.api.getProfile();
       if (freshUser) {
         applyUserData(freshUser);
-        if (window.api && window.api.setAuth && token) {
-          window.api.setAuth(token, { ...cachedUser, ...freshUser });
+        if (window.api && token) {
+          if (typeof window.api.setToken === 'function') window.api.setToken(token);
+          if (typeof window.api.setUser === 'function') window.api.setUser({ ...cachedUser, ...freshUser });
         }
       }
     } catch (err) {
@@ -1387,8 +1399,9 @@ document.addEventListener('DOMContentLoaded', () => {
           delivery_address: { building, street, zone, city, country: 'Qatar' }
         };
         const token = window.api ? window.api.getToken() : null;
-        if (token && window.api && window.api.setAuth) {
-          window.api.setAuth(token, updated);
+        if (token && window.api) {
+          if (typeof window.api.setToken === 'function') window.api.setToken(token);
+          if (typeof window.api.setUser === 'function') window.api.setUser(updated);
         }
         applyUserData(updated);
 
@@ -1914,9 +1927,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   <!-- SCROLL TO TOP -->
   <button id="scroll-to-top" aria-label="Scroll to top"
-    style="opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;"
     class="fixed bottom-24 right-6 z-40 w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-    style="background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
+    style="opacity:0;transform:translateY(10px);pointer-events:none;transition:opacity 0.3s ease,transform 0.3s ease;background:var(--bg-surface);border:1px solid var(--border-color);color:var(--text-secondary);">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
   </button>
 
@@ -1939,7 +1951,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <script src="/assets/js/scroll.js"></script>
   <script src="/assets/js/carousel.js"></script>
   <script src="/assets/js/html2pdf.bundle.min.js"></script>
-  <script src="/assets/js/customer-invoice.js"></script>
+  <script src="/assets/js/customer-invoice.js?v=20261126_02"></script>
   <script src="/assets/js/customer-notifications.js"></script>
   
 

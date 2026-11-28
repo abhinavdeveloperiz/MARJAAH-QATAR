@@ -5,12 +5,16 @@ import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { getCorsOrigins } from './cors-origins';
 import helmet from 'helmet';
 import * as express from 'express';
 import { onRequest } from 'firebase-functions/v2/https';
 
 const server = express();
 let isInitialized = false;
+
+server.use(express.json({ limit: '10mb' }));
+server.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Normalize path if direct Cloud Functions URL is used without /api prefix
 server.use((req, res, next) => {
@@ -34,7 +38,7 @@ export const createNestServer = async (expressInstance: express.Express) => {
   );
 
   app.enableCors({
-    origin: true,
+    origin: getCorsOrigins(),
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With',

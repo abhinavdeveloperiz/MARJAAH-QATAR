@@ -11,20 +11,23 @@ export class OrdersController {
     private readonly jwtService: JwtService,
   ) {}
 
+  /** Verifies an optional Bearer token; returns null for anonymous callers. */
+  private optionalUser(req: any) {
+    if (req.user) return req.user;
+    const authHeader = req.headers?.['authorization'] || req.headers?.['Authorization'];
+    if (!authHeader) return null;
+    try {
+      const token = String(authHeader).replace(/^Bearer\s+/i, '').trim();
+      const payload = this.jwtService.verify(token);
+      return payload?.sub ? { id: payload.sub, ...payload } : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
   @Post()
   async create(@Body() body: any, @Request() req: any) {
-    let user = req.user || null;
-    const authHeader = req.headers?.['authorization'] || req.headers?.['Authorization'];
-    if (!user && authHeader) {
-      try {
-        const token = String(authHeader).replace(/^Bearer\s+/i, '').trim();
-        const payload = this.jwtService.verify(token);
-        if (payload?.sub) {
-          user = { id: payload.sub, ...payload };
-        }
-      } catch (e) {}
-    }
-    return this.ordersService.createOrder(body, user);
+    return this.ordersService.createOrder(body, this.optionalUser(req));
   }
 
   @UseGuards(JwtAuthGuard)
@@ -72,13 +75,31 @@ export class OrdersController {
 
   @Get(':idOrNumber')
   async findOne(@Param('idOrNumber') idOrNumber: string, @Query('phone') phone: string, @Request() req: any) {
-    return this.ordersService.findOne(idOrNumber, req.user, phone);
+    return this.ordersService.findOne(idOrNumber, this.optionalUser(req), phone);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Patch(':id/status')
-  async updateStatus(@Param('id') id: string, @Body('status') status: string) {
-    return this.ordersService.updateStatus(id, status);
+  async updateStatus(@Param('id') id: string, @Body() body: any) {
+    return this.ordersService.updateStatus(id, body?.status, body?.notes);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Put(':id/status')
+  async updateStatusPut(@Param('id') id: string, @Body() body: any) {
+    return this.ordersService.updateStatus(id, body?.status, body?.notes);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Put(':id')
+  async updateOrderPut(@Param('id') id: string, @Body() body: any) {
+    return this.ordersService.updateOrder(id, body);
+  }
+
+  @UseGuards(JwtAuthGuard, AdminGuard)
+  @Patch(':id')
+  async updateOrderPatch(@Param('id') id: string, @Body() body: any) {
+    return this.ordersService.updateOrder(id, body);
   }
 
   @UseGuards(JwtAuthGuard)

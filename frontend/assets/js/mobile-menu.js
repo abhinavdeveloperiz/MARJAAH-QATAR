@@ -64,6 +64,10 @@
   const searchOverlay = document.getElementById('search-overlay');
   const searchClose = document.getElementById('search-close');
   const searchInput = document.getElementById('search-input');
+  const liveResultsContainer = document.getElementById('search-live-results');
+  let searchDebounceTimer = null;
+  let searchAbortController = null;
+  const escHtml = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
   allSearchBtns.forEach(btn => {
     btn.addEventListener('click', function(e) {
@@ -155,7 +159,7 @@
           if (totalMatches === 0) {
             liveResultsContainer.innerHTML = `
               <div class="p-4 rounded-2xl border border-dashed border-slate-700/80 text-center text-xs text-slate-400">
-                ${isArPage ? `لم يتم العثور على نتائج تطابق "${q}"` : `No matching categories, subcategories, or products for "${q}"`}
+                ${isArPage ? `لم يتم العثور على نتائج تطابق "${escHtml(q)}"` : `No matching categories, subcategories, or products for "${escHtml(q)}"`}
               </div>
             `;
             return;
@@ -174,17 +178,18 @@
                 <div class="space-y-1">
                   ${categories.map(c => {
                     const catUrl = `${isArPage ? '/ar' : ''}/shop/?category=${encodeURIComponent(c.slug || c.id)}`;
-                    const img = c.image || '/assets/images/products/placeholder.svg';
+                    const img = escHtml(c.image || '/assets/images/products/placeholder.svg');
+                    const catLabel = escHtml((isArPage && c.name_ar) ? c.name_ar : (c.name || ''));
                     return `
                       <a href="${catUrl}" class="flex items-center justify-between p-2 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 transition group">
                         <div class="flex items-center gap-2.5 min-w-0">
                           <img src="${img}" class="w-8 h-8 object-cover rounded-lg border border-indigo-400/30 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
                           <div class="min-w-0">
-                            <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition truncate">${c.name || ''}</div>
-                            <div class="text-[10px] text-slate-400 font-medium">${c.product_count || 0} products</div>
+                            <div class="text-xs font-bold text-white group-hover:text-indigo-300 transition truncate">${catLabel}</div>
+                            <div class="text-[10px] text-slate-400 font-medium">${Number(c.product_count || 0)} ${isArPage ? 'منتج' : 'products'}</div>
                           </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Category</span>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">${isArPage ? 'فئة' : 'Category'}</span>
                       </a>
                     `;
                   }).join('')}
@@ -204,8 +209,10 @@
                 <div class="space-y-1">
                   ${subcategories.map(s => {
                     const subUrl = `${isArPage ? '/ar' : ''}/shop/?category=${encodeURIComponent(s.category_slug || '')}&subcategory=${encodeURIComponent(s.slug || s.id)}`;
-                    const colorDot = s.color || '#4063B2';
-                    const img = s.image || '/assets/images/products/placeholder.svg';
+                    const colorDot = escHtml(s.color || '#4063B2');
+                    const img = escHtml(s.image || '/assets/images/products/placeholder.svg');
+                    const subLabel = escHtml((isArPage && s.name_ar) ? s.name_ar : (s.name || ''));
+                    const parLabel = escHtml(s.category_name || (isArPage ? 'فئة' : 'Category'));
                     return `
                       <a href="${subUrl}" class="flex items-center justify-between p-2 rounded-xl bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20 transition group">
                         <div class="flex items-center gap-2.5 min-w-0">
@@ -214,11 +221,11 @@
                             <span class="absolute top-0.5 right-0.5 w-2 h-2 rounded-full border border-white" style="background:${colorDot}"></span>
                           </div>
                           <div class="min-w-0">
-                            <div class="text-xs font-bold text-white group-hover:text-purple-300 transition truncate">${s.name || ''}</div>
-                            <div class="text-[10px] text-slate-400 truncate">in ${s.category_name || 'Category'} &bull; ${s.product_count || 0} items</div>
+                            <div class="text-xs font-bold text-white group-hover:text-purple-300 transition truncate">${subLabel}</div>
+                            <div class="text-[10px] text-slate-400 truncate">${isArPage ? `في ${parLabel} • ${Number(s.product_count || 0)} منتج` : `in ${parLabel} &bull; ${Number(s.product_count || 0)} items`}</div>
                           </div>
                         </div>
-                        <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-purple-500/20 text-purple-300 border border-purple-500/30">Subcategory</span>
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase tracking-wide bg-purple-500/20 text-purple-300 border border-purple-500/30">${isArPage ? 'فئة فرعية' : 'Subcategory'}</span>
                       </a>
                     `;
                   }).join('')}
@@ -237,16 +244,18 @@
                 </div>
                 <div class="space-y-1">
                   ${products.map(p => {
-                    const prodUrl = `${isArPage ? '/ar' : ''}/product/?slug=${encodeURIComponent(p.slug || p.id)}`;
+                    const prodUrl = `${isArPage ? '/ar' : ''}/product/${encodeURIComponent(p.slug || p.id)}/`;
                     const price = Number(p.price || 0).toLocaleString();
-                    const img = p.image || '/assets/images/products/placeholder.svg';
+                    const img = escHtml(p.image || '/assets/images/products/placeholder.svg');
+                    const prodLabel = escHtml((isArPage && p.name_ar) ? p.name_ar : (p.name || ''));
+                    const subMeta = escHtml(p.brand || p.subcategory_name || p.category_name || 'Item');
                     return `
                       <a href="${prodUrl}" class="flex items-center justify-between p-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-indigo-500/30 transition group">
                         <div class="flex items-center gap-2.5 min-w-0">
                           <img src="${img}" class="w-9 h-9 object-cover rounded-xl border border-slate-700/60 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
                           <div class="min-w-0">
-                            <div class="text-xs font-bold text-white group-hover:text-indigo-400 transition truncate">${p.name || ''}</div>
-                            <div class="text-[10px] text-slate-400 truncate">${p.brand || p.subcategory_name || p.category_name || 'Item'}</div>
+                            <div class="text-xs font-bold text-white group-hover:text-indigo-400 transition truncate">${prodLabel}</div>
+                            <div class="text-[10px] text-slate-400 truncate">${subMeta}</div>
                           </div>
                         </div>
                         <div class="text-right flex-shrink-0 pl-2">
@@ -263,7 +272,7 @@
           html += `
             <div class="pt-2 text-center border-t border-slate-700/60 mt-2">
               <a href="${isArPage ? '/ar' : ''}/shop/?search=${encodeURIComponent(q)}" class="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-400 hover:text-indigo-300 transition py-1">
-                <span>${isArPage ? 'عرض جميع النتائج في الكتالوج' : `View all results for "${q}" in Shop`} &rarr;</span>
+                <span>${isArPage ? 'عرض جميع النتائج في الكتالوج' : `View all results for "${escHtml(q)}" in Shop`} &rarr;</span>
               </a>
             </div>
           </div>`;

@@ -13,6 +13,7 @@ import * as path from 'path';
 import { FirestoreService } from '../firebase/firestore.service';
 import { UploadService } from '../upload/upload.service';
 import { CategoriesService } from '../categories/categories.service';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class SubcategoriesService implements OnModuleInit {
@@ -22,6 +23,7 @@ export class SubcategoriesService implements OnModuleInit {
     private readonly firestore: FirestoreService,
     private readonly uploadService: UploadService,
     @Optional() @Inject(forwardRef(() => CategoriesService)) private readonly categoriesService?: CategoriesService,
+    @Optional() @Inject(forwardRef(() => ProductsService)) private readonly productsService?: ProductsService,
   ) {}
 
   private cachedSubcategories: any[] | null = null;
@@ -75,25 +77,29 @@ export class SubcategoriesService implements OnModuleInit {
     }
   }
 
-  private getProductCounts(): Record<string, number> {
+  private async getProductCounts(): Promise<Record<string, number>> {
     const counts: Record<string, number> = {};
     try {
+      let products: any[] | null = null;
       const productsCachePath = path.resolve(process.cwd(), '.products-cache.json');
       if (fs.existsSync(productsCachePath)) {
         const raw = fs.readFileSync(productsCachePath, 'utf-8');
-        const products = JSON.parse(raw);
-        if (Array.isArray(products)) {
-          for (const p of products) {
-            if (p.status === 'hidden' || p.status === 'pending_approval' || p.status === 'rejected') continue;
-            const subId = p.subcategory_id;
-            const subSlug = p.subcategory_slug || (p.subcategory ? String(p.subcategory).toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
-            if (subId) {
-              counts[subId] = (counts[subId] || 0) + 1;
-            }
-            if (subSlug) {
-              counts[subSlug] = (counts[subSlug] || 0) + 1;
-            }
-          }
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) products = parsed;
+      }
+      if (!products) {
+        const snap = await this.firestore.collection('products').get();
+        products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      for (const p of products) {
+        if (p.status === 'hidden' || p.status === 'pending_approval' || p.status === 'rejected' || p.is_active === false) continue;
+        const subId = p.subcategory_id;
+        const subSlug = p.subcategory_slug || (p.subcategory ? String(p.subcategory).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : '');
+        if (subId) {
+          counts[subId] = (counts[subId] || 0) + 1;
+        }
+        if (subSlug) {
+          counts[subSlug] = (counts[subSlug] || 0) + 1;
         }
       }
     } catch (_) {}
@@ -103,7 +109,7 @@ export class SubcategoriesService implements OnModuleInit {
   private async fetchFromFirestore(): Promise<any[]> {
     const snap = await this.firestore.collection('subcategories').get();
     const subcategories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-    const counts = this.getProductCounts();
+    const counts = await this.getProductCounts();
 
     for (const sub of subcategories) {
       const countById = sub.id ? counts[sub.id] : undefined;
@@ -364,9 +370,49 @@ export class SubcategoriesService implements OnModuleInit {
     });
 
     await docRef.update(updateData);
-    this.invalidateCache();
 
-    const counts = this.getProductCounts();
+    const newName = updateData.name || existing.name;
+    const newSlug = updateData.slug || existing.slug;
+    const newCatId = updateData.category_id || existing.category_id;
+    const newCatSlug = updateData.category_slug || existing.category_slug;
+    const newCatName = updateData.category_name || existing.category_name;
+    const changed =
+      (newName && newName !== existing.name) ||
+      (newSlug && newSlug !== existing.slug) ||
+      (newCatId && newCatId !== existing.category_id);
+
+    if (changed) {
+      try {
+        const prodDocs = new Map<string, any>();
+        const pBySubId = await this.firestore.collection('products').where('subcategory_id', '==', id).get();
+        pBySubId.docs.forEach((d) => prodDocs.set(d.id, d.ref));
+        if (existing.slug) {
+          const pBySubSlug = await this.firestore.collection('products').where('subcategory_slug', '==', existing.slug).get();
+          pBySubSlug.docs.forEach((d) => prodDocs.set(d.id, d.ref));
+        }
+        const cascadeUpdate: Record<string, any> = {
+          subcategory_id: id,
+          subcategory: newName,
+          subcategory_name: newName,
+          subcategory_slug: newSlug,
+          updated_at: new Date().toISOString(),
+        };
+        if (newCatId && newCatId !== existing.category_id) {
+          cascadeUpdate.category_id = newCatId;
+          cascadeUpdate.category_slug = newCatSlug;
+          cascadeUpdate.category = newCatName;
+          cascadeUpdate.category_name = newCatName;
+        }
+        await Promise.all(Array.from(prodDocs.values()).map((ref) => ref.update(cascadeUpdate)));
+      } catch (e: any) {
+        this.logger.warn(`Cascade update warning for subcategory ${id}: ${e?.message}`);
+      }
+    }
+
+    this.invalidateCache();
+    if (changed) this.productsService?.invalidateCache(false);
+
+    const counts = await this.getProductCounts();
     const finalSub = { id, ...existing, ...updateData };
     finalSub.product_count = counts[id] !== undefined ? counts[id] : (counts[finalSub.slug] !== undefined ? counts[finalSub.slug] : 0);
     return finalSub;
@@ -382,8 +428,8 @@ export class SubcategoriesService implements OnModuleInit {
     const data = doc.data() as any;
 
     // Dependency Validation: Check if active products are assigned to this subcategory
-    const counts = this.getProductCounts();
-    const assignedProducts = (counts[id] || 0) + (data.slug ? (counts[data.slug] || 0) : 0);
+    const counts = await this.getProductCounts();
+    const assignedProducts = Math.max(counts[id] || 0, data.slug ? (counts[data.slug] || 0) : 0);
 
     if (assignedProducts > 0 && !force) {
       throw new BadRequestException(

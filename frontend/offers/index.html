@@ -656,11 +656,11 @@
           </div>
           <div class="grid grid-cols-3 gap-3 text-center">
             <div class="p-3 rounded-xl border" style="background:var(--bg-surface);border-color:var(--border-color)">
-              <div class="text-2xl font-black font-mono text-[#8D9CF5]">82</div>
+              <div id="offers-hero-deals-count" class="text-2xl font-black font-mono text-[#8D9CF5]">—</div>
               <div class="text-[10px] uppercase font-bold mt-1" style="color:var(--text-secondary)">Deals</div>
             </div>
             <div class="p-3 rounded-xl border" style="background:var(--bg-surface);border-color:var(--border-color)">
-              <div class="text-2xl font-black font-mono text-emerald-400">Up to 50%</div>
+              <div id="offers-hero-max-discount" class="text-2xl font-black font-mono text-emerald-400">Up to 50%</div>
               <div class="text-[10px] uppercase font-bold mt-1" style="color:var(--text-secondary)">Discount</div>
             </div>
             <div class="p-3 rounded-xl border" style="background:var(--bg-surface);border-color:var(--border-color)">
@@ -701,7 +701,7 @@
           </div>
           <div>
             <div class="text-xs font-bold" style="color:var(--text-primary)">Flexible Payments</div>
-            <div class="text-[11px]" style="color:var(--text-secondary)">Card, Apple Pay &amp; COD</div>
+            <div class="text-[11px]" style="color:var(--text-secondary)">Cash on Delivery &amp; Store Pickup</div>
           </div>
         </div>
         <div class="flex items-center gap-3">
@@ -719,35 +719,61 @@
 
   <!-- MAIN OFFERS LISTING & FILTERS -->
   <div class="container-custom py-10">
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
       <!-- Category Tabs -->
       <div class="flex flex-wrap items-center gap-2" id="offers-filter-tabs">
-        <button onclick="setOfferFilter('all')" class="offer-tab-btn active px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-primary-600 text-white shadow-sm" data-filter="all">All Offers (<span id="count-all">82</span>)</button>
+        <button onclick="setOfferFilter('all')" class="offer-tab-btn active px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-primary-600 text-white shadow-sm" data-filter="all">All Offers (<span id="count-all">—</span>)</button>
         <button onclick="setOfferFilter('extra_discount')" class="offer-tab-btn px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)" data-filter="extra_discount">Extra Discount (20%+)</button>
-        <button onclick="setOfferFilter('mobile')" class="offer-tab-btn px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)" data-filter="mobile">Mobile Accessories (39)</button>
-        <button onclick="setOfferFilter('computer')" class="offer-tab-btn px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)" data-filter="computer">Computer Accessories (10)</button>
-        <button onclick="setOfferFilter('laptops')" class="offer-tab-btn px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)" data-filter="laptops">Laptops &amp; PCs (14)</button>
-        <button onclick="setOfferFilter('networking')" class="offer-tab-btn px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer" style="border-color:var(--border-color);color:var(--text-secondary)" data-filter="networking">Networking (9)</button>
       </div>
 
       <!-- Search & Sort Controls -->
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2.5">
         <div class="relative">
           <input type="text" id="offers-search-input" oninput="handleOfferSearch(this.value)" placeholder="Search discounted products..." class="pl-9 pr-3 py-2 rounded-xl text-xs border w-48 sm:w-60 focus:outline-none focus:border-indigo-500" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" />
           <svg class="absolute left-3 top-2.5 w-3.5 h-3.5 text-slate-400 pointer-events-none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
         </div>
         <select id="offers-sort-select" onchange="handleOfferSort(this.value)" class="px-3 py-2 rounded-xl text-xs border cursor-pointer focus:outline-none" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)">
-          <option value="discount">Biggest Discount</option>
+          <option value="discount">Biggest Discount (%)</option>
+          <option value="savings">Highest Savings (QAR)</option>
           <option value="price_low">Price: Low to High</option>
           <option value="price_high">Price: High to Low</option>
           <option value="name">Name A-Z</option>
         </select>
+        <select id="offers-limit-select" onchange="handleOfferPageSizeChange(this.value)" class="px-3 py-2 rounded-xl text-xs border cursor-pointer focus:outline-none" style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary)" title="Deals per page">
+          <option value="24">24 / page</option>
+          <option value="48">48 / page</option>
+          <option value="96">96 / page</option>
+          <option value="all">Show All</option>
+        </select>
       </div>
     </div>
 
+    <div id="offers-summary-bar" class="flex flex-wrap items-center justify-between gap-2 mb-6 text-xs" style="color:var(--text-secondary)">
+      <span id="offers-results-summary">Loading live deals...</span>
+      <button type="button" id="offers-clear-filters-btn" onclick="resetOfferFilters()" class="hidden text-xs font-bold text-indigo-400 hover:text-indigo-300 cursor-pointer">Clear Filters</button>
+    </div>
+
     <!-- SKELETON LOADING STATE -->
-    <div id="offers-loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 hidden">
+    <div id="offers-loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       <div class="p-4 rounded-2xl border animate-pulse space-y-4" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="w-full h-48 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+        <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-3/4"></div>
+        <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-1/2"></div>
+        <div class="h-10 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+      </div>
+      <div class="p-4 rounded-2xl border animate-pulse space-y-4 hidden sm:block" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="w-full h-48 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+        <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-3/4"></div>
+        <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-1/2"></div>
+        <div class="h-10 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+      </div>
+      <div class="p-4 rounded-2xl border animate-pulse space-y-4 hidden lg:block" style="background:var(--bg-surface);border-color:var(--border-color)">
+        <div class="w-full h-48 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+        <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-3/4"></div>
+        <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-1/2"></div>
+        <div class="h-10 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+      </div>
+      <div class="p-4 rounded-2xl border animate-pulse space-y-4 hidden xl:block" style="background:var(--bg-surface);border-color:var(--border-color)">
         <div class="w-full h-48 bg-black/5 dark:bg-white/5 rounded-xl"></div>
         <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-3/4"></div>
         <div class="h-4 bg-black/10 dark:bg-white/10 rounded w-1/2"></div>
@@ -756,571 +782,12 @@
     </div>
 
     <!-- DYNAMIC OFFERS GRID -->
-    <div id="offers-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 55% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">D-Link</span>
-          </div>
+    <div id="offers-grid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
 
-          <a href="/product/d-link-5g-ax1800-wifi-6-router-with-4-x-gigabit-lan-ports-1-x-gigabit-wan-port-1/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="D-Link 5G AX1800 wifi 6 router with 4 x Gigabit LAN ports, 1 x Gigabit WAN port, 1 x USB (DWR-2000M)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/d-link-5g-ax1800-wifi-6-router-with-4-x-gigabit-lan-ports-1-x-gigabit-wan-port-1/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">D-Link 5G AX1800 wifi 6 router with 4 x Gigabit LAN ports, 1 x Gigabit WAN port, 1 x USB (DWR-2000M)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">853 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">1,899 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 1,046 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/d-link-5g-ax1800-wifi-6-router-with-4-x-gigabit-lan-ports-1-x-gigabit-wan-port-1/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/d-link-5g-ax1800-wifi-6-router-with-4-x-gigabit-lan-ports-1-x-gigabit-wan-port-1/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 8% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-yoga-aio-27iah10-f0j2001sax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo Yoga AIO 27IAH10 (Ultra 9 285H, 32GB/1TB, Intel Arc 140T, 27&quot; QHD, Luna Grey, Win11) (F0J2001SAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-yoga-aio-27iah10-f0j2001sax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo Yoga AIO 27IAH10 (Ultra 9 285H, 32GB/1TB, Intel Arc 140T, 27&quot; QHD, Luna Grey, Win11) (F0J2001SAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">7,399 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">7,999 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 600 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-yoga-aio-27iah10-f0j2001sax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-yoga-aio-27iah10-f0j2001sax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 12% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-ideapad-slim-3-15iwc11-83rr00plax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo IdeaPad Slim 3 15IWC11 (Core 5 315, 16GB/512GB, 15.3&quot; WUXGA IPS, Grey, Win11) (83RR00PLAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-ideapad-slim-3-15iwc11-83rr00plax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo IdeaPad Slim 3 15IWC11 (Core 5 315, 16GB/512GB, 15.3&quot; WUXGA IPS, Grey, Win11) (83RR00PLAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">3,799 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">4,299 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 500 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-ideapad-slim-3-15iwc11-83rr00plax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-ideapad-slim-3-15iwc11-83rr00plax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 11% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-loq-15irx9-83dv000aax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo LOQ 15IRX9 (i5-13450HX, 16GB/512GB, RTX 4050 6GB, 15.6&quot; FHD, Grey, Win11) (83DV000AAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-loq-15irx9-83dv000aax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo LOQ 15IRX9 (i5-13450HX, 16GB/512GB, RTX 4050 6GB, 15.6&quot; FHD, Grey, Win11) (83DV000AAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">3,999 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">4,499 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 500 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-loq-15irx9-83dv000aax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-loq-15irx9-83dv000aax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 7% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-loq-tower-17iax10-91ay0013ax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo LOQ Tower 17IAX10 (Ultra 7 255HX, 32GB/1TB, RTX 5060 Ti 8GB, Black, Win11) (91AY0013AX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-loq-tower-17iax10-91ay0013ax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo LOQ Tower 17IAX10 (Ultra 7 255HX, 32GB/1TB, RTX 5060 Ti 8GB, Black, Win11) (91AY0013AX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">6,499 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">6,999 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 500 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-loq-tower-17iax10-91ay0013ax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-loq-tower-17iax10-91ay0013ax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 9% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-ideapad-5-2-in-1-14ahp11-83uj000cax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo IdeaPad 5 2-in-1 14AHP11 (Ryzen 7 250, 16GB/512GB, 14&quot; WUXGA OLED, Grey, Win11) (83UJ000CAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-ideapad-5-2-in-1-14ahp11-83uj000cax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo IdeaPad 5 2-in-1 14AHP11 (Ryzen 7 250, 16GB/512GB, 14&quot; WUXGA OLED, Grey, Win11) (83UJ000CAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">4,099 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">4,499 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 400 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-ideapad-5-2-in-1-14ahp11-83uj000cax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-ideapad-5-2-in-1-14ahp11-83uj000cax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 10% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-83kx008dax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo IdeaPad 5 2-in-1 14IRH9 (i5-13420H, 16GB/512GB, 14&quot; WUXGA, Grey, Win11) (83KX008DAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-83kx008dax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo IdeaPad 5 2-in-1 14IRH9 (i5-13420H, 16GB/512GB, 14&quot; WUXGA, Grey, Win11) (83KX008DAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">3,799 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">4,199 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 400 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-83kx008dax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-83kx008dax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 10% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-i5-13420h-16gb-512gb-14-wuxga-grey-win11-83kx008dax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo IdeaPad 5 2-in-1 14IRH9 (i5-13420H, 16GB/512GB, 14&quot; WUXGA, Grey, Win11) (83KX008DAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-i5-13420h-16gb-512gb-14-wuxga-grey-win11-83kx008dax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo IdeaPad 5 2-in-1 14IRH9 (i5-13420H, 16GB/512GB, 14&quot; WUXGA, Grey, Win11) (83KX008DAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">3,799 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">4,199 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 400 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-i5-13420h-16gb-512gb-14-wuxga-grey-win11-83kx008dax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-ideapad-5-2-in-1-14irh9-i5-13420h-16gb-512gb-14-wuxga-grey-win11-83kx008dax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 42% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">D-Link</span>
-          </div>
-
-          <a href="/product/d-link-ax1500-wifi-6-mesh-router-kit-pack-of-3-m15-mna3/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="D-Link AX1500 Wifi 6 Mesh router kit pack of 3 (M15/MNA3)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/d-link-ax1500-wifi-6-mesh-router-kit-pack-of-3-m15-mna3/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">D-Link AX1500 Wifi 6 Mesh router kit pack of 3 (M15/MNA3)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">520 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">899 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 379 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/d-link-ax1500-wifi-6-mesh-router-kit-pack-of-3-m15-mna3/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/d-link-ax1500-wifi-6-mesh-router-kit-pack-of-3-m15-mna3/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 4% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-yoga-book-9-14iah10-83kj000max/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo Yoga Book 9 14IAH10 (Ultra 7 255H, 32GB/1TB, 2x 14&quot; 2.8K OLED, Teal, Win11) 2 Yrs P-Warranty (83KJ000MAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-yoga-book-9-14iah10-83kj000max/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo Yoga Book 9 14IAH10 (Ultra 7 255H, 32GB/1TB, 2x 14&quot; 2.8K OLED, Teal, Win11) 2 Yrs P-Warranty (83KJ000MAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">7,699 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">7,999 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 300 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-yoga-book-9-14iah10-83kj000max/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-yoga-book-9-14iah10-83kj000max/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 9% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-ideapad-slim-3-15amn8-82xq01u1ax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg"
-                 alt="Lenovo IdeaPad Slim 3 15AMN8 (Ryzen 5 40, 8GB/512GB, 15.6&quot; FHD, Grey, Win11) (82XQ01U1AX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-ideapad-slim-3-15amn8-82xq01u1ax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo IdeaPad Slim 3 15AMN8 (Ryzen 5 40, 8GB/512GB, 15.6&quot; FHD, Grey, Win11) (82XQ01U1AX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">2,899 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">3,199 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 300 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-ideapad-slim-3-15amn8-82xq01u1ax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-ideapad-slim-3-15amn8-82xq01u1ax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
-      <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
-        <div>
-          <div class="flex items-center justify-between gap-2 mb-3">
-            <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
-              EXTRA 2% OFF
-            </span>
-            <span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">Lenovo</span>
-          </div>
-
-          <a href="/product/lenovo-yoga-book-9-14iah10-83kj000lax/" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <img src="https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/1794131404141_3dce80ed882a52923ff63c7dd0e8d490.webp"
-                 alt="Lenovo Yoga Book 9 14IAH10 (Ultra 9 285H, 32GB/1TB, 2x 14&quot; 2.8K OLED, Teal, Win11) 2 Yrs P-Warranty (83KJ000LAX)"
-                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
-                 class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
-          </a>
-
-          <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-            <a href="/product/lenovo-yoga-book-9-14iah10-83kj000lax/" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">Lenovo Yoga Book 9 14IAH10 (Ultra 9 285H, 32GB/1TB, 2x 14&quot; 2.8K OLED, Teal, Win11) 2 Yrs P-Warranty (83KJ000LAX)</a>
-          </h3>
-
-          <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            In Stock &bull; Qatar Showroom
-          </div>
-        </div>
-
-        <div class="pt-3 mt-3 border-t" style="border-color:var(--border-color)">
-          <div class="flex items-baseline justify-between mb-2.5">
-            <div>
-              <span class="text-base sm:text-lg font-black font-mono" style="color:var(--text-primary)">9,499 <span class="text-xs font-semibold" style="color:var(--text-tertiary)">QAR</span></span>
-              <del class="block text-xs font-mono mt-0.5" style="color:var(--text-secondary)">9,699 QAR</del>
-            </div>
-            <span class="px-2 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">
-              Save 200 QAR
-            </span>
-          </div>
-
-          <div class="grid grid-cols-5 gap-2">
-            <a href="/product/lenovo-yoga-book-9-14iah10-83kj000lax/" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-              View Deal
-            </a>
-            <a href="/product/lenovo-yoga-book-9-14iah10-83kj000lax/" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-            </a>
-          </div>
-        </div>
-      </div>
+    <!-- OFFERS PAGINATION BAR -->
+    <div id="offers-pagination" class="hidden mt-8 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4" style="border-color:var(--border-color)">
+      <div id="offers-pagination-info" class="text-xs font-medium" style="color:var(--text-secondary)"></div>
+      <div id="offers-pagination-controls" class="flex flex-wrap items-center gap-1.5"></div>
     </div>
 
     <!-- EMPTY OFFERS STATE -->
@@ -1370,48 +837,133 @@
 
 <script>
   let allOfferProducts = [];
+  let offerCategoriesList = [];
   let currentOfferFilter = 'all';
   let currentOfferSearch = '';
   let currentOfferSort = 'discount';
+  let currentOfferPage = 1;
+  let offerPageSize = 24;
+
+  function escapeOfferHtml(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function getOfferPercent(p) {
+    const orig = p.original_price ? Number(p.original_price) : 0;
+    const cur = Number(p.price || 0);
+    if (orig > cur && orig > 0) {
+      return Math.round(((orig - cur) / orig) * 100);
+    }
+    if (p.discount_percent && Number(p.discount_percent) > 0) {
+      return Math.round(Number(p.discount_percent));
+    }
+    const badgeMatch = String(p.offer_badge || '').match(/(\d+)\s*%/);
+    return badgeMatch ? Number(badgeMatch[1]) : 0;
+  }
+
+  function getOfferSavings(p) {
+    const orig = p.original_price ? Number(p.original_price) : 0;
+    const cur = Number(p.price || 0);
+    return orig > cur ? orig - cur : 0;
+  }
+
+  function resolveProductCategoryKey(p) {
+    const slug = String(p.category_slug || '').trim().toLowerCase();
+    const id = String(p.category_id || '').trim().toLowerCase();
+    const name = String(p.category_name || p.category || '').trim();
+    if (slug) return slug;
+    if (name) return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || id || 'other';
+    return id || 'other';
+  }
+
+  function resolveProductCategoryLabel(p, catMap) {
+    const key = resolveProductCategoryKey(p);
+    if (catMap.has(key)) return catMap.get(key);
+    const id = String(p.category_id || '').trim().toLowerCase();
+    if (id && catMap.has(id)) return catMap.get(id);
+    const rawName = String(p.category_name || p.category || '').trim();
+    return rawName || 'Other Deals';
+  }
+
+  function updateOfferCounts(offersList) {
+    const catMap = new Map();
+    offerCategoriesList.forEach(c => {
+      const label = c.name || c.title || '';
+      if (c.slug) catMap.set(String(c.slug).toLowerCase(), label);
+      if (c.id) catMap.set(String(c.id).toLowerCase(), label);
+    });
+
+    const catCounts = new Map();
+    offersList.forEach(p => {
+      const key = resolveProductCategoryKey(p);
+      const label = resolveProductCategoryLabel(p, catMap);
+      const prev = catCounts.get(key) || { key, label, count: 0 };
+      prev.count += 1;
+      catCounts.set(key, prev);
+    });
+
+    const extraCount = offersList.filter(p => getOfferPercent(p) >= 20).length;
+    const maxPct = offersList.reduce((mx, p) => Math.max(mx, getOfferPercent(p)), 0);
+
+    const heroDealsEl = document.getElementById('offers-hero-deals-count');
+    if (heroDealsEl) heroDealsEl.textContent = String(offersList.length);
+    const heroMaxEl = document.getElementById('offers-hero-max-discount');
+    if (heroMaxEl) heroMaxEl.textContent = maxPct > 0 ? `Up to ${maxPct}%` : 'Special Deals';
+
+    const tabsEl = document.getElementById('offers-filter-tabs');
+    if (!tabsEl) return;
+
+    const sortedCats = Array.from(catCounts.values()).sort((a, b) => b.count - a.count);
+    const tabs = [
+      { key: 'all', label: `All Offers (<span id="count-all">${offersList.length}</span>)` },
+      { key: 'extra_discount', label: `Extra Discount (20%+) (${extraCount})` },
+      ...sortedCats.map(c => ({
+        key: `cat:${c.key}`,
+        label: `${escapeOfferHtml(c.label)} (${c.count})`,
+      })),
+    ];
+
+    tabsEl.innerHTML = tabs.map(t => {
+      const active = currentOfferFilter === t.key;
+      const cls = active
+        ? 'offer-tab-btn active px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer bg-primary-600 text-white shadow-sm'
+        : 'offer-tab-btn px-4 py-2 rounded-xl text-xs font-bold border transition cursor-pointer hover:border-primary-500';
+      const st = active
+        ? 'color:#ffffff;'
+        : 'border-color:var(--border-color);color:var(--text-secondary);background-color:transparent;';
+      return `<button type="button" onclick="setOfferFilter('${escapeOfferHtml(t.key)}')" class="${cls}" style="${st}" data-filter="${escapeOfferHtml(t.key)}">${t.label}</button>`;
+    }).join('');
+  }
 
   async function loadOfferProducts() {
     const loadingEl = document.getElementById('offers-loading');
-    const gridEl = document.getElementById('offers-grid');
     const emptyEl = document.getElementById('offers-empty');
+    if (loadingEl) loadingEl.classList.remove('hidden');
 
     try {
-      let rawProds = [];
-      if (window.api && typeof window.api.getProducts === 'function') {
-        const res = await window.api.getProducts({ limit: 1000 });
-        rawProds = (res && res.items) ? res.items : ((res && res.data) ? res.data : (Array.isArray(res) ? res : []));
-      }
+      const bust = Date.now();
+      const [prodRes, catRes] = await Promise.all([
+        (window.api && typeof window.api.getProducts === 'function')
+          ? window.api.getProducts({ isOffer: 'true', limit: 10000, _t: bust })
+          : fetch(`/api/products?isOffer=true&limit=10000&_t=${bust}`, { cache: 'no-store' }).then(r => r.json()),
+        fetch(`/api/categories?_t=${bust}`).then(r => r.json()).catch(() => []),
+      ]);
+
+      const rawProds = (prodRes && prodRes.items)
+        ? prodRes.items
+        : ((prodRes && prodRes.products) ? prodRes.products : ((prodRes && prodRes.data) ? prodRes.data : (Array.isArray(prodRes) ? prodRes : [])));
+      offerCategoriesList = Array.isArray(catRes) ? catRes : (catRes?.categories || catRes?.items || []);
 
       allOfferProducts = rawProds.filter(p => {
-        return Boolean(p.is_offer) || Boolean(p.is_on_sale) || (p.original_price && Number(p.original_price) > Number(p.price));
+        return Boolean(p.is_offer) || Boolean(p.is_on_sale) || Boolean(p.offer_badge) || Boolean(p.offer_title) || (p.discount_percent && Number(p.discount_percent) > 0) || (p.original_price && Number(p.original_price) > Number(p.price));
       });
 
-      // If fewer than 2 products have deal flag, populate with top items with synthetic discount tag so page is always impressive
-      if (allOfferProducts.length < 2 && rawProds.length > 0) {
-        allOfferProducts = rawProds.map((p, idx) => {
-          const isSale = Boolean(p.is_offer || p.is_on_sale || (p.original_price && Number(p.original_price) > Number(p.price)));
-          if (!isSale && idx < 6) {
-            const orig = Math.round(Number(p.price) * 1.2);
-            return {
-              ...p,
-              original_price: orig,
-              is_offer: true,
-              is_on_sale: true,
-              offer_title: 'Flash Special',
-              offer_badge: 'EXTRA 15% OFF'
-            };
-          }
-          return p;
-        }).filter(p => Boolean(p.is_offer) || Boolean(p.is_on_sale) || (p.original_price && Number(p.original_price) > Number(p.price)));
-      }
-
-      const countAllEl = document.getElementById('count-all');
-      if (countAllEl) countAllEl.textContent = allOfferProducts.length;
-
+      updateOfferCounts(allOfferProducts);
       renderOffers();
     } catch (err) {
       console.error('Failed to load offer products:', err);
@@ -1422,6 +974,7 @@
 
   function setOfferFilter(filter) {
     currentOfferFilter = filter;
+    currentOfferPage = 1;
     document.querySelectorAll('.offer-tab-btn').forEach(btn => {
       const match = btn.getAttribute('data-filter') === filter;
       if (match) {
@@ -1441,65 +994,139 @@
 
   function handleOfferSearch(query) {
     currentOfferSearch = (query || '').toLowerCase().trim();
+    currentOfferPage = 1;
     renderOffers();
   }
 
   function handleOfferSort(sortVal) {
     currentOfferSort = sortVal;
+    currentOfferPage = 1;
     renderOffers();
+  }
+
+  function handleOfferPageSizeChange(val) {
+    offerPageSize = val === 'all' ? 10000 : Math.max(1, Number(val) || 24);
+    currentOfferPage = 1;
+    renderOffers();
+  }
+
+  function goToOfferPage(pageNum) {
+    currentOfferPage = Math.max(1, Number(pageNum) || 1);
+    renderOffers();
+    const tabsEl = document.getElementById('offers-filter-tabs');
+    if (tabsEl && typeof tabsEl.scrollIntoView === 'function') {
+      tabsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  function resetOfferFilters() {
+    currentOfferFilter = 'all';
+    currentOfferSearch = '';
+    currentOfferPage = 1;
+    const inp = document.getElementById('offers-search-input');
+    if (inp) inp.value = '';
+    setOfferFilter('all');
+  }
+
+  function renderOfferPagination(totalItems, totalPages, startIdx, endIdx) {
+    const pagWrap = document.getElementById('offers-pagination');
+    const infoEl = document.getElementById('offers-pagination-info');
+    const ctrlEl = document.getElementById('offers-pagination-controls');
+    if (!pagWrap || !infoEl || !ctrlEl) return;
+
+    if (totalItems === 0 || totalPages <= 1) {
+      if (totalItems > 0) {
+        pagWrap.classList.remove('hidden');
+        infoEl.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} active offers`;
+        ctrlEl.innerHTML = '';
+      } else {
+        pagWrap.classList.add('hidden');
+      }
+      return;
+    }
+
+    pagWrap.classList.remove('hidden');
+    infoEl.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} active offers (Page ${currentOfferPage} of ${totalPages})`;
+
+    const pages = [];
+    for (let i = 1; i <= totalPages; i++) {
+      if (i === 1 || i === totalPages || Math.abs(i - currentOfferPage) <= 1) {
+        pages.push(i);
+      } else if (pages[pages.length - 1] !== '...') {
+        pages.push('...');
+      }
+    }
+
+    const prevDisabled = currentOfferPage <= 1;
+    const nextDisabled = currentOfferPage >= totalPages;
+
+    let html = `
+      <button type="button" ${prevDisabled ? 'disabled' : `onclick="goToOfferPage(${currentOfferPage - 1})"`}
+        class="px-3 py-1.5 rounded-xl border text-xs font-bold transition ${prevDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:border-primary-500 cursor-pointer'}"
+        style="border-color:var(--border-color);color:var(--text-secondary)">Prev</button>
+    `;
+
+    pages.forEach(p => {
+      if (p === '...') {
+        html += `<span class="px-2 text-xs text-slate-500">…</span>`;
+      } else {
+        const active = p === currentOfferPage;
+        html += `
+          <button type="button" onclick="goToOfferPage(${p})"
+            class="w-8 h-8 rounded-xl text-xs font-bold transition cursor-pointer ${active ? 'bg-primary-600 text-white shadow-sm' : 'border hover:border-primary-500'}"
+            style="${active ? '' : 'border-color:var(--border-color);color:var(--text-secondary)'}">${p}</button>
+        `;
+      }
+    });
+
+    html += `
+      <button type="button" ${nextDisabled ? 'disabled' : `onclick="goToOfferPage(${currentOfferPage + 1})"`}
+        class="px-3 py-1.5 rounded-xl border text-xs font-bold transition ${nextDisabled ? 'opacity-40 cursor-not-allowed' : 'hover:border-primary-500 cursor-pointer'}"
+        style="border-color:var(--border-color);color:var(--text-secondary)">Next</button>
+    `;
+
+    ctrlEl.innerHTML = html;
   }
 
   function renderOffers() {
     const loadingEl = document.getElementById('offers-loading');
     const gridEl = document.getElementById('offers-grid');
     const emptyEl = document.getElementById('offers-empty');
+    const summaryEl = document.getElementById('offers-results-summary');
+    const clearBtn = document.getElementById('offers-clear-filters-btn');
+    const pagWrap = document.getElementById('offers-pagination');
 
     let filtered = [...allOfferProducts];
 
-    // Filter by tab
+    // Filter by tab (supports real category keys, Extra 20%+, or All)
     if (currentOfferFilter === 'extra_discount') {
-      filtered = filtered.filter(p => {
-        const orig = Number(p.original_price || p.price);
-        const cur = Number(p.price);
-        const pct = orig > cur ? Math.round(((orig - cur) / orig) * 100) : 0;
-        return pct >= 20 || (p.offer_badge && p.offer_badge.includes('2'));
-      });
-    } else if (currentOfferFilter === 'mobile') {
-      filtered = filtered.filter(p => {
-        const text = `${p.category || ''} ${p.category_id || ''} ${p.subcategory || ''} ${p.name || ''}`.toLowerCase();
-        return text.includes('mobile') || text.includes('cable') || text.includes('charger') || text.includes('power bank') || text.includes('holder');
-      });
-    } else if (currentOfferFilter === 'computer') {
-      filtered = filtered.filter(p => {
-        const text = `${p.category || ''} ${p.category_id || ''} ${p.subcategory || ''} ${p.name || ''}`.toLowerCase();
-        return text.includes('computer') || text.includes('sleeve') || text.includes('hub') || text.includes('bag') || text.includes('case');
-      });
-    } else if (currentOfferFilter === 'laptops') {
-      filtered = filtered.filter(p => {
-        const text = `${p.category || ''} ${p.category_id || ''} ${p.subcategory || ''} ${p.name || ''}`.toLowerCase();
-        return text.includes('laptop') || text.includes('notebook') || text.includes('pc') || text.includes('yoga') || text.includes('thinkpad');
-      });
-    } else if (currentOfferFilter === 'networking') {
-      filtered = filtered.filter(p => {
-        const text = `${p.category || ''} ${p.category_id || ''} ${p.subcategory || ''} ${p.name || ''}`.toLowerCase();
-        return text.includes('network') || text.includes('router') || text.includes('d-link') || text.includes('mesh') || text.includes('access point');
-      });
+      filtered = filtered.filter(p => getOfferPercent(p) >= 20);
+    } else if (currentOfferFilter.startsWith('cat:')) {
+      const targetCatKey = currentOfferFilter.slice(4);
+      filtered = filtered.filter(p => resolveProductCategoryKey(p) === targetCatKey);
     }
 
-    // Search query
+    // Search query across title, Arabic title, SKU, slug, brand, category, and offer metadata
     if (currentOfferSearch) {
+      const tokens = currentOfferSearch.split(/\s+/).filter(Boolean);
       filtered = filtered.filter(p => {
-        const full = `${p.name || ''} ${p.brand || ''} ${p.category || ''} ${p.offer_title || ''} ${p.offer_badge || ''}`.toLowerCase();
-        return full.includes(currentOfferSearch);
+        const full = `${p.name || ''} ${p.name_ar || ''} ${p.brand || ''} ${p.sku || ''} ${p.slug || ''} ${p.category_name || p.category || ''} ${p.subcategory_name || p.subcategory || ''} ${p.offer_title || ''} ${p.offer_badge || ''} ${p.offer_description || ''}`.toLowerCase();
+        return full.includes(currentOfferSearch) || tokens.every(tok => full.includes(tok));
       });
     }
 
     // Sort
     if (currentOfferSort === 'discount') {
       filtered.sort((a, b) => {
-        const discA = (a.original_price && a.original_price > a.price) ? (a.original_price - a.price) : 0;
-        const discB = (b.original_price && b.original_price > b.price) ? (b.original_price - b.price) : 0;
-        return discB - discA;
+        const pctDiff = getOfferPercent(b) - getOfferPercent(a);
+        if (pctDiff !== 0) return pctDiff;
+        return getOfferSavings(b) - getOfferSavings(a);
+      });
+    } else if (currentOfferSort === 'savings') {
+      filtered.sort((a, b) => {
+        const savDiff = getOfferSavings(b) - getOfferSavings(a);
+        if (savDiff !== 0) return savDiff;
+        return getOfferPercent(b) - getOfferPercent(a);
       });
     } else if (currentOfferSort === 'price_low') {
       filtered.sort((a, b) => Number(a.price) - Number(b.price));
@@ -1510,24 +1137,55 @@
     }
 
     if (loadingEl) loadingEl.classList.add('hidden');
+    if (clearBtn) {
+      clearBtn.classList.toggle('hidden', currentOfferFilter === 'all' && !currentOfferSearch);
+    }
 
     if (filtered.length === 0) {
       if (gridEl) gridEl.classList.add('hidden');
+      if (pagWrap) pagWrap.classList.add('hidden');
       if (emptyEl) emptyEl.classList.remove('hidden');
+      if (summaryEl) {
+        summaryEl.textContent = currentOfferSearch
+          ? `0 matching deals found for "${currentOfferSearch}"`
+          : 'No matching offers found in this filter.';
+      }
       return;
+    }
+
+    const totalItems = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / offerPageSize));
+    if (currentOfferPage > totalPages) currentOfferPage = totalPages;
+    const startIdx = (currentOfferPage - 1) * offerPageSize;
+    const endIdx = Math.min(startIdx + offerPageSize, totalItems);
+    const pageItems = filtered.slice(startIdx, endIdx);
+
+    if (summaryEl) {
+      summaryEl.textContent = currentOfferSearch
+        ? `Showing ${startIdx + 1}–${endIdx} of ${totalItems} deals matching "${currentOfferSearch}"`
+        : `Showing ${startIdx + 1}–${endIdx} of ${totalItems} active offers`;
     }
 
     if (emptyEl) emptyEl.classList.add('hidden');
     if (gridEl) gridEl.classList.remove('hidden');
 
-    gridEl.innerHTML = filtered.map(p => {
+    gridEl.innerHTML = pageItems.map(p => {
       const orig = p.original_price ? Number(p.original_price) : 0;
       const cur = Number(p.price || 0);
-      const diff = (orig > cur) ? orig - cur : 0;
-      const pct = (orig > cur && orig > 0) ? Math.round((diff / orig) * 100) : 0;
-      const badgeText = p.offer_badge || (pct > 0 ? `EXTRA ${pct}% OFF` : 'SPECIAL OFFER');
+      const diff = (orig > cur) ? Math.round(orig - cur) : 0;
+      const pct = getOfferPercent(p);
+      const badgeText = escapeOfferHtml(p.offer_badge || (pct > 0 ? `EXTRA ${pct}% OFF` : 'SPECIAL OFFER'));
+      const titleText = escapeOfferHtml(p.offer_title || '');
+      const descText = escapeOfferHtml(p.offer_description || '');
+      const prodName = escapeOfferHtml(p.name || 'High Performance Tech');
+      const brandName = escapeOfferHtml(p.brand || '');
       const imgUrl = (p.images && p.images[0]) || p.image || '/assets/images/products/placeholder.svg';
       const targetUrl = `/product/${encodeURIComponent(p.slug || p.id)}/`;
+      const inStock = Boolean(
+        p.in_stock !== false &&
+        p.in_stock !== 'false' &&
+        (p.stock_count === undefined || p.stock_count === null || Number(p.stock_count) > 0)
+      );
 
       return `
         <div class="group relative rounded-2xl border p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1" style="background:var(--bg-surface);border-color:var(--border-color)">
@@ -1537,29 +1195,31 @@
               <span class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-sm shadow-rose-500/20">
                 ${badgeText}
               </span>
-              ${p.brand ? `<span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">${p.brand}</span>` : ''}
+              ${brandName ? `<span class="text-[11px] font-bold tracking-wider uppercase" style="color:var(--text-secondary)">${brandName}</span>` : ''}
             </div>
 
             <!-- Product Image -->
             <a href="${targetUrl}" class="block relative aspect-square w-full rounded-xl overflow-hidden p-4 mb-3.5 border transition" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-              <img src="${imgUrl}"
-                   alt="${p.name || 'Offer Product'}"
+              <img src="${escapeOfferHtml(imgUrl)}"
+                   alt="${prodName}"
                    onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'"
                    class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105" />
             </a>
 
-            <!-- Campaign tag if any -->
-            ${p.offer_title ? `<div class="text-[10px] font-bold text-rose-500 uppercase tracking-wider mb-1">${p.offer_title}</div>` : ''}
+            <!-- Campaign tag & custom offer details if any -->
+            ${titleText ? `<div class="text-[10px] font-bold text-rose-500 uppercase tracking-wider mb-1">${titleText}</div>` : ''}
 
             <!-- Title -->
             <h3 class="font-bold text-xs sm:text-sm line-clamp-2 leading-snug group-hover:text-primary-500 transition-colors" style="color:var(--text-primary)">
-              <a href="${targetUrl}" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">${p.name || 'High Performance Tech'}</a>
+              <a href="${targetUrl}" class="hover:text-primary-500 transition-colors" style="color:var(--text-primary)">${prodName}</a>
             </h3>
 
+            ${descText ? `<p class="text-[11px] mt-1.5 line-clamp-2 text-rose-500/90 font-medium">${descText}</p>` : ''}
+
             <!-- Stock status -->
-            <div class="flex items-center gap-1.5 mt-2 text-[11px] text-emerald-500 font-medium">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              In Stock &bull; Qatar Showroom
+            <div class="flex items-center gap-1.5 mt-2 text-[11px] ${inStock ? 'text-emerald-500' : 'text-rose-500'} font-medium">
+              <span class="w-1.5 h-1.5 rounded-full ${inStock ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}"></span>
+              ${inStock ? 'In Stock &bull; Qatar Showroom' : 'Currently Out of Stock'}
             </div>
           </div>
 
@@ -1578,10 +1238,15 @@
             </div>
 
             <div class="grid grid-cols-5 gap-2">
-              <button onclick="handleAddToCartOffer('${p.id}')" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-                Add to Cart
-              </button>
+              ${inStock
+                ? `<button onclick="handleAddToCartOffer('${p.id}')" class="col-span-4 btn-primary py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+                    Add to Cart
+                  </button>`
+                : `<button disabled class="col-span-4 py-2.5 rounded-xl text-xs font-bold border border-rose-500/25 bg-rose-500/10 text-rose-500 opacity-70 cursor-not-allowed">
+                    Out of Stock
+                  </button>`
+              }
               <a href="${targetUrl}" class="col-span-1 p-2.5 rounded-xl border flex items-center justify-center hover:bg-black/5 dark:hover:bg-white/5 transition" title="View Details" style="border-color:var(--border-color);color:var(--text-secondary)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </a>
@@ -1590,6 +1255,8 @@
         </div>
       `;
     }).join('');
+
+    renderOfferPagination(totalItems, totalPages, startIdx, endIdx);
   }
 
   function handleAddToCartOffer(prodId) {
@@ -1609,7 +1276,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
-        loadOfferProducts();
+    loadOfferProducts();
   });
 </script>
 
@@ -1936,7 +1603,7 @@
   <script src="/assets/js/analytics.js"></script>
   <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/toast.js"></script>
-  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/cart.js?v=20261128_01"></script>
   <script src="/assets/js/wishlist.js"></script>
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js"></script>

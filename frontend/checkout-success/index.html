@@ -726,25 +726,33 @@ document.addEventListener('DOMContentLoaded', async function() {
       if (isPickup) {
         if (titleEl) titleEl.textContent = 'Store Pickup Location';
         const loc = order.store_pickup_location || {};
+        const hours = loc.working_hours || loc.opening_hours || '';
+        const instr = loc.instructions || loc.pickup_instructions || '';
         document.getElementById('success-address').innerHTML = `
           <div class="flex items-center gap-2">
             <span class="font-bold text-emerald-400">🏪 ${loc.name || 'Store Pickup'}</span>
             <span class="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">Ready for Collection</span>
           </div>
-          <div class="mt-1 text-slate-300">${loc.address || ''}, ${loc.city || 'Doha'}</div>
+          <div class="mt-1 text-slate-300">${loc.address || ''}${loc.city ? `, ${loc.city}` : ', Doha'}</div>
         `;
         if (metaEl) {
           metaEl.classList.remove('hidden');
           metaEl.innerHTML = `
             ${loc.phone ? `<div>📞 Contact: <strong>${loc.phone}</strong></div>` : ''}
-            ${loc.working_hours ? `<div>🕒 Hours: <strong>${loc.working_hours}</strong></div>` : ''}
-            ${loc.instructions ? `<div class="p-2 rounded-lg bg-slate-900/60 border border-emerald-500/20 text-emerald-300 mt-1.5"><strong>Instructions:</strong> ${loc.instructions}</div>` : ''}
+            ${hours ? `<div>🕒 Hours: <strong>${hours}</strong></div>` : ''}
+            ${instr ? `<div class="p-2 rounded-lg bg-slate-900/60 border border-emerald-500/20 text-emerald-300 mt-1.5"><strong>Instructions:</strong> ${instr}</div>` : ''}
           `;
         }
       } else {
         if (titleEl) titleEl.textContent = 'Delivery Address';
-        const parts = [order.building, order.street, order.zone, order.city || 'Doha'].filter(Boolean);
-        document.getElementById('success-address').textContent = parts.join(', ') || 'Doha, Qatar';
+        const addr = order.delivery_address && typeof order.delivery_address === 'object' ? order.delivery_address : {};
+        const parts = [
+          order.building || addr.building,
+          order.street || addr.street,
+          order.zone || addr.zone,
+          order.city || addr.city || 'Doha'
+        ].filter(Boolean);
+        document.getElementById('success-address').textContent = (typeof order.delivery_address === 'string' && order.delivery_address) ? order.delivery_address : (parts.join(', ') || 'Doha, Qatar');
       }
     }
     if (document.getElementById('success-notes')) {

@@ -131,12 +131,12 @@
   </header>
 
   <!-- Mobile Drawer Menu -->
-  <div id="mobile-drawer" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
+  <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
        style="background:var(--bg-surface);border-color:var(--border-color);">
     <div>
       <div class="flex items-center justify-between pb-6" style="border-bottom:1px solid var(--border-color)">
         <span class="font-display font-black text-lg tracking-wider" style="color:var(--text-primary)">MENU</span>
-        <button id="mobile-drawer-close" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
+        <button id="mobile-menu-close" aria-label="Close menu" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
@@ -155,7 +155,7 @@
       </a>
     </div>
   </div>
-  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-[105] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 z-[105] opacity-0 pointer-events-none backdrop-blur-sm transition-opacity duration-300"></div>
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 min-h-screen pt-[72px]">
@@ -176,7 +176,7 @@
           Track Your Order
         </h1>
         <p class="text-xs sm:text-sm leading-relaxed max-w-2xl" style="color:var(--text-secondary)">
-          Track your package delivery across Qatar in real-time. Enter your Order Number or mobile phone number below to check dispatch status.
+          Track your package delivery across Qatar in real-time. Enter your Order Number and the mobile phone number used on the order to check dispatch status.
         </p>
 
         <!-- Navigation Tabs for Policy Pages -->
@@ -216,14 +216,14 @@
                 <label for="order-id-input" class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-primary)">
                   Order Number / ID
                 </label>
-                <input id="order-id-input" type="text" placeholder="e.g. MTQ-00019 or phone number" required
+                <input id="order-id-input" type="text" placeholder="e.g. MTQ-00019" required
                   class="w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none transition-colors"
                   style="background:var(--bg-surface-2);border-color:var(--border-color);color:var(--text-primary);" />
               </div>
 
               <div>
                 <label for="order-phone-input" class="block text-xs font-bold uppercase tracking-wider mb-2" style="color:var(--text-secondary)">
-                  Phone Number (Optional)
+                  Phone Number Used on Order (not needed when signed in)
                 </label>
                 <input id="order-phone-input" type="tel" placeholder="+974 7799 1016"
                   class="w-full px-4 py-3.5 rounded-xl border text-sm focus:outline-none transition-colors"
@@ -521,9 +521,14 @@
             return;
           }
 
+          // Fallback: order opened from the signed-in "My Orders" list (already verified as theirs).
+          const cached = readCachedOrder(cleanId);
+          if (cached) { renderOrderSuccess(cached); return; }
           renderOrderNotFound(cleanId);
         } catch (err) {
           console.error('Order tracking lookup failed:', err);
+          const cachedOnErr = readCachedOrder(cleanId);
+          if (cachedOnErr) { renderOrderSuccess(cachedOnErr); return; }
           renderOrderNotFound(cleanId, err.message);
         } finally {
           if (submitBtn) {
@@ -559,7 +564,7 @@
             <div class="pt-3 border-t border-rose-500/10 text-xs text-slate-400 space-y-1.5 leading-relaxed">
               <p class="font-bold text-slate-200">Helpful Tips:</p>
               <p>• Make sure your Order Number follows the standard M.SHOP format: <code class="text-primary-400 font-mono font-bold">MTQ-00019</code> (found on your SMS or email invoice).</p>
-              <p>• If you ordered with your Qatar mobile number, you can search using your 8-digit phone number (e.g. <code class="text-primary-400 font-mono">77991016</code>).</p>
+              <p>• Enter the same mobile number you used at checkout (e.g. <code class="text-primary-400 font-mono">77991016</code>). If you are signed in to the account that placed the order, the phone number is not required.</p>
               <p>• If you placed this order just moments ago, please allow 1–2 minutes for our fulfillment system to sync.</p>
             </div>
 
@@ -577,8 +582,34 @@
         `;
       }
 
+      function readCachedOrder(id) {
+        const want = String(id || '').replace(/^#+/, '').trim().toUpperCase();
+        const keys = [['session', 'track_order_' + want], ['session', 'last_order'], ['local', 'last_order_placed']];
+        for (const [store, key] of keys) {
+          try {
+            const raw = (store === 'session' ? sessionStorage : localStorage).getItem(key);
+            const o = raw ? JSON.parse(raw) : null;
+            if (!o || !(o.id || o.order_number)) continue;
+            // Orders placed from this browser (checkout) or opened from My Orders.
+            if (key.indexOf('track_order_') === 0 ||
+                String(o.order_number || '').toUpperCase() === want ||
+                String(o.id || '').toUpperCase() === want) return o;
+          } catch (e) { /* ignore corrupt cache */ }
+        }
+        return null;
+      }
+
+      function animateTrackFill() {
+        const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        document.querySelectorAll('.track-fill').forEach(function (el) {
+          if (reduce) el.style.transition = 'none';
+          el.style.width = (el.getAttribute('data-fill') || '0') + '%';
+        });
+      }
+
       function renderOrderSuccess(order) {
         window.currentTrackedOrder = order;
+        setTimeout(animateTrackFill, 60);
         const orderNumber = order.order_number || order.id;
         const status = (order.status || 'placed').toLowerCase();
         const dateStr = order.created_at ? new Date(order.created_at).toLocaleDateString('en-GB', {
@@ -604,6 +635,13 @@
             dotClass: 'bg-amber-400 animate-ping',
             stepIndex: 2
           };
+        } else if (status === 'ready_for_pickup') {
+          badgeConfig = {
+            label: 'Ready for Pickup',
+            colorClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            dotClass: 'bg-emerald-400 animate-pulse',
+            stepIndex: 3
+          };
         } else if (status === 'shipped') {
           badgeConfig = {
             label: 'Out for Delivery',
@@ -618,6 +656,13 @@
             dotClass: 'bg-emerald-400',
             stepIndex: 4
           };
+        } else if (status === 'returned') {
+          badgeConfig = {
+            label: 'Returned / Refunded',
+            colorClass: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+            dotClass: 'bg-amber-400',
+            stepIndex: 0
+          };
         } else if (status === 'cancelled') {
           badgeConfig = {
             label: 'Order Cancelled',
@@ -627,32 +672,20 @@
           };
         }
 
+        const isPickup = order.fulfillment_type === 'store_pickup';
+        const pickupLoc = order.store_pickup_location || {};
         const items = Array.isArray(order.items) ? order.items : [];
-        const addr = order.delivery_address || {};
-        const fullAddr = [addr.building, addr.street, addr.zone, addr.city || 'Doha', addr.country || 'Qatar']
-          .filter(Boolean).join(', ') || 'Doha, State of Qatar';
+        const addr = (order.delivery_address && typeof order.delivery_address === 'object') ? order.delivery_address : {};
+        const fullAddr = (typeof order.delivery_address === 'string' && order.delivery_address)
+          ? order.delivery_address
+          : ([addr.building || order.building, addr.street || order.street, addr.zone || order.zone, addr.city || order.city || 'Doha', addr.country || 'Qatar']
+              .filter(Boolean).join(', ') || 'Doha, State of Qatar');
 
-        const paymentLabel = order.payment_method === 'cash' ? 'Cash on Delivery (COD)' : (order.payment_method ? String(order.payment_method).toUpperCase() : 'Cash / Card on Delivery');
+        const paymentLabel = order.payment_method === 'pay_at_store' ? 'Pay at Store (Store Pickup)' : (order.payment_method === 'card' ? 'Credit / Debit Card' : 'Cash on Delivery (COD)');
 
         const waOrderUrl = 'https://wa.me/97477991013?text=' + encodeURIComponent('Hi M.SHOP Qatar, I am inquiring regarding my Order #' + orderNumber + ' (' + status.toUpperCase() + ')');
 
-        // Stepper markup
-        let timelineHtml = '';
-        if (status === 'cancelled') {
-          timelineHtml = `
-            <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3 text-xs text-rose-300">
-              <span class="text-lg">❌</span>
-              <div>
-                <p class="font-bold text-white">This order was cancelled</p>
-                <p class="text-[11px] text-rose-300/80">Stock has been restored. Please contact our support team if you need a reorder or alternative shipment.</p>
-              </div>
-            </div>
-          `;
-        } else {
-        const isPickup = order.fulfillment_type === 'store_pickup';
-        const pickupLoc = order.store_pickup_location || {};
-
-        if (status === 'shipped' && isPickup) {
+        if ((status === 'shipped' || status === 'ready_for_pickup') && isPickup) {
           badgeConfig = {
             label: 'Ready for Pickup',
             colorClass: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
@@ -668,43 +701,74 @@
           };
         }
 
-        const steps = isPickup ? [
-          { num: 1, title: 'Order Placed', desc: 'Registered in system' },
-          { num: 2, title: 'Preparation & QC', desc: 'Being prepared for pickup' },
-          { num: 3, title: 'Ready for Pickup', desc: pickupLoc.name || 'Store Hub' },
-          { num: 4, title: 'Collected', desc: 'Handed over to customer' }
-        ] : [
-          { num: 1, title: 'Order Placed', desc: 'Registered in Doha system' },
-          { num: 2, title: 'Processing & QC', desc: 'Souq Umm Besher hub' },
-          { num: 3, title: 'Out for Delivery', desc: 'In transit with Doha courier' },
-          { num: 4, title: 'Delivered', desc: 'Delivered to your door' }
-        ];
-
-        timelineHtml = `
-          <div class="py-2">
-            <div class="grid grid-cols-4 gap-2 relative">
-              ${steps.map((st) => {
-                const isDone = badgeConfig.stepIndex > st.num;
-                const isCurrent = badgeConfig.stepIndex === st.num;
-                return `
-                  <div class="flex flex-col items-center text-center relative group">
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all ${
-                      isDone ? 'bg-emerald-500 text-white shadow-md' :
-                      isCurrent ? 'bg-primary-500 text-white ring-4 ring-primary-500/20' :
-                      'bg-slate-800 text-slate-500 border border-slate-700'
-                    }">
-                      ${isDone ? '✓' : st.num}
-                    </div>
-                    <p class="font-display font-bold text-[11px] sm:text-xs mt-2 ${
-                      isCurrent ? 'text-primary-400' : isDone ? 'text-white' : 'text-slate-400'
-                    }">${st.title}</p>
-                    <p class="hidden sm:block text-[10px] text-slate-500 mt-0.5">${st.desc}</p>
-                  </div>
-                `;
-              }).join('')}
+        // Stepper markup
+        let timelineHtml = '';
+        if (status === 'cancelled') {
+          timelineHtml = `
+            <div class="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3 text-xs text-rose-300">
+              <span class="text-lg">❌</span>
+              <div>
+                <p class="font-bold text-white">This order was cancelled</p>
+                <p class="text-[11px] text-rose-300/80">Stock has been restored. Please contact our support team if you need a reorder or alternative shipment.</p>
+              </div>
             </div>
-          </div>
-        `;
+          `;
+        } else if (status === 'returned') {
+          timelineHtml = `
+            <div class="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center gap-3 text-xs text-amber-300">
+              <span class="text-lg">↩️</span>
+              <div>
+                <p class="font-bold text-white">This order was returned / RMA processed</p>
+                <p class="text-[11px] text-amber-200/80">Your return request was processed by our team. Contact support if you need additional details.</p>
+              </div>
+            </div>
+          `;
+        } else {
+          const steps = isPickup ? [
+            { num: 1, title: 'Order Placed', desc: 'Registered in system' },
+            { num: 2, title: 'Preparation & QC', desc: 'Being prepared for pickup' },
+            { num: 3, title: 'Ready for Pickup', desc: pickupLoc.name || 'Store Hub' },
+            { num: 4, title: 'Collected', desc: 'Handed over to customer' }
+          ] : [
+            { num: 1, title: 'Order Placed', desc: 'Registered in Doha system' },
+            { num: 2, title: 'Processing & QC', desc: 'Souq Umm Besher hub' },
+            { num: 3, title: 'Out for Delivery', desc: 'In transit with Doha courier' },
+            { num: 4, title: 'Delivered', desc: 'Delivered to your door' }
+          ];
+
+          timelineHtml = `
+            <div class="py-2">
+              <div class="grid grid-cols-4 gap-2 relative">
+                <!-- Progress line: grey track + animated fill up to the current stage -->
+                <div class="absolute h-1 rounded-full" style="top:14px;left:12.5%;width:75%;background:var(--border-color, #334155)" aria-hidden="true">
+                  <div class="track-fill h-full rounded-full" data-fill="${Math.max(0, Math.min(3, badgeConfig.stepIndex - 1)) / 3 * 100}" style="width:0%;background:linear-gradient(90deg,#10b981,#6366f1);transition:width 1s ease-out"></div>
+                </div>
+                ${steps.map((st) => {
+                  const isDone = badgeConfig.stepIndex > st.num;
+                  const isCurrent = badgeConfig.stepIndex === st.num;
+                  return `
+                    <div class="flex flex-col items-center text-center relative group">
+                      <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs transition-all relative z-10 ${
+                        isDone ? 'bg-emerald-500 text-white shadow-md' :
+                        isCurrent ? 'bg-primary-500 text-white ring-4 ring-primary-500/20' :
+                        'bg-slate-800 text-slate-500 border border-slate-700'
+                      }">
+                        ${isDone ? '✓' : st.num}
+                      </div>
+                      <p class="font-display font-bold text-[11px] sm:text-xs mt-2 ${
+                        isCurrent ? 'text-primary-400' : isDone ? 'text-white' : 'text-slate-400'
+                      }">${escapeHtml(st.title)}</p>
+                      <p class="hidden sm:block text-[10px] text-slate-500 mt-0.5">${escapeHtml(st.desc)}</p>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          `;
+        }
+
+        const pickupHours = pickupLoc.working_hours || pickupLoc.opening_hours || '';
+        const pickupInstructions = pickupLoc.instructions || pickupLoc.pickup_instructions || '';
 
         resultBox.innerHTML = `
           <div class="rounded-3xl border p-6 sm:p-7 space-y-6 shadow-xl" style="background:var(--bg-surface-2);border-color:var(--border-color)">
@@ -745,8 +809,8 @@
                   <p class="font-bold text-xs text-emerald-400">🏪 ${escapeHtml(pickupLoc.name || 'Store Hub')}</p>
                   <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(pickupLoc.address || 'Doha')}, ${escapeHtml(pickupLoc.city || 'Qatar')}</p>
                   ${pickupLoc.phone ? `<p class="text-[11px] text-primary-400 font-mono">📞 ${escapeHtml(pickupLoc.phone)}</p>` : ''}
-                  ${pickupLoc.working_hours ? `<p class="text-[11px] text-slate-400 font-sans">🕒 ${escapeHtml(pickupLoc.working_hours)}</p>` : ''}
-                  ${pickupLoc.instructions ? `<p class="text-[10px] text-emerald-300 bg-slate-900/50 p-1.5 rounded-lg border border-emerald-500/20 mt-1"><strong>Note:</strong> ${escapeHtml(pickupLoc.instructions)}</p>` : ''}
+                  ${pickupHours ? `<p class="text-[11px] text-slate-400 font-sans">🕒 ${escapeHtml(pickupHours)}</p>` : ''}
+                  ${pickupInstructions ? `<p class="text-[10px] text-emerald-300 bg-slate-900/50 p-1.5 rounded-lg border border-emerald-500/20 mt-1"><strong>Note:</strong> ${escapeHtml(pickupInstructions)}</p>` : ''}
                 ` : `
                   <p class="font-bold text-xs text-white">${escapeHtml(addr.full_name || order.customer_name || 'Customer')}</p>
                   <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(fullAddr)}</p>
@@ -773,9 +837,9 @@
               <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
                 ${items.map(it => `
                   <div class="flex items-center gap-3 p-2.5 rounded-xl border" style="background:var(--bg-surface);border-color:var(--border-color)">
-                    <img src="${it.image || '/assets/images/placeholder.png'}" alt="${escapeHtml(it.name)}"
+                    <img src="${escapeHtml(it.image || '/assets/images/products/placeholder.svg')}" alt="${escapeHtml(it.name)}"
                       class="w-12 h-12 object-contain rounded-lg bg-black/20 p-1 flex-shrink-0"
-                      onerror="this.src='/assets/images/branding/favicon.png'" />
+                      onerror="this.src='/assets/images/products/placeholder.svg'" />
                     <div class="min-w-0 flex-1">
                       <p class="font-bold text-xs text-white truncate">${escapeHtml(it.name)}</p>
                       <p class="text-[11px] text-slate-400">Qty: <strong class="text-white">${it.quantity || 1}</strong> × ${it.price || 0} QAR</p>
@@ -791,7 +855,7 @@
             <!-- Total Breakdown -->
             <div class="pt-4 border-t flex flex-wrap items-center justify-between gap-4" style="border-color:var(--border-color)">
               <div>
-                <p class="text-[11px] text-slate-400">Grand Total (COD/Card)</p>
+                <p class="text-[11px] text-slate-400">Grand Total</p>
                 <p class="font-display font-black text-xl text-white">${order.total || 0} <span class="text-xs font-normal text-primary-400 font-sans">QAR</span></p>
               </div>
 
@@ -819,7 +883,7 @@
 
   <!-- PDF Engine & Customer Notifs/Invoice -->
   <script src="/assets/js/html2pdf.bundle.min.js"></script>
-  <script src="/assets/js/customer-invoice.js"></script>
+  <script src="/assets/js/customer-invoice.js?v=20261126_02"></script>
   <script src="/assets/js/customer-notifications.js"></script>
 </body>
 </html>

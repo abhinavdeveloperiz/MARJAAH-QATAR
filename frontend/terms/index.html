@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Terms &amp; Conditions — M.SHOP Qatar</title>
-  <meta name="description" content="Official Terms &amp; Conditions for M.SHOP Qatar, operated by Marjaah Trading WLL (CR No. 228717). Free delivery across Qatar, MyFatoorah secure payments, and consumer rights." />
+  <meta name="description" content="Official Terms &amp; Conditions for M.SHOP Qatar, operated by Marjaah Trading WLL (CR No. 228717). Free delivery across Qatar, cash on delivery or pay at store, and consumer rights." />
   <link rel="canonical" href="https://www.marjaah.shop/terms/" />
   
   <meta name="csrf-token" content="E4UwUg8sVIwN0C82upIB6tDbNfqae3YZJdWrTxFWufLUTe3MFJxzVCoMt7UPZqlk" />
@@ -139,12 +139,12 @@
   </header>
 
   <!-- Mobile Drawer Menu -->
-  <div id="mobile-drawer" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
+  <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
        style="background:var(--bg-surface);border-color:var(--border-color);">
     <div>
       <div class="flex items-center justify-between pb-6" style="border-bottom:1px solid var(--border-color)">
         <span class="font-display font-black text-lg tracking-wider" style="color:var(--text-primary)">MENU</span>
-        <button id="mobile-drawer-close" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
+        <button id="mobile-menu-close" aria-label="Close menu" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
@@ -163,7 +163,7 @@
       </a>
     </div>
   </div>
-  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-[105] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 z-[105] opacity-0 pointer-events-none backdrop-blur-sm transition-opacity duration-300"></div>
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 min-h-screen pt-[72px]">
@@ -325,9 +325,9 @@
             <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Payment</h2>
           </div>
           <ul class="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm">
-            <li>Accepted payment methods: <strong>cash on delivery</strong>, and <strong>online payment</strong> by credit or debit card, <strong>Apple Pay</strong> and <strong>Google Pay</strong>, all processed through <strong>MyFatoorah</strong>.</li>
-            <li><strong>No payment fees.</strong> We do not charge any extra fee for cash on delivery or for paying online. The price you see is the price you pay.</li>
-            <li>Online payments are processed securely by MyFatoorah, our payment gateway. m.shop does not see or store your full card details.</li>
+            <li>Accepted payment methods: <strong>cash on delivery</strong> for doorstep delivery orders, and <strong>pay at store</strong> for store pickup orders. We do not currently accept online payments, and no card details are collected on this website.</li>
+            <li><strong>No payment fees.</strong> We do not charge any extra fee for cash on delivery or for paying at the store. The price you see is the price you pay.</li>
+            <li>Pay at store: you pay when you collect your order from the store pickup location you selected.</li>
             <li>Cash on delivery: please have the exact amount ready where possible.</li>
           </ul>
         </section>
@@ -581,9 +581,9 @@
             <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٧. الدفع</h2>
           </div>
           <ul class="list-disc list-inside space-y-2 pr-2 text-xs sm:text-sm">
-            <li><strong>وسائل الدفع المقبولة:</strong> <strong>الدفع عند الاستلام</strong>، و<strong>الدفع الإلكتروني</strong> ببطاقات الائتمان والخصم و<strong>Apple Pay</strong> و<strong>Google Pay</strong>، وجميعها تتم عبر بوابة <strong>MyFatoorah</strong>.</li>
-            <li><strong>لا توجد رسوم دفع.</strong> لا نفرض أي رسوم إضافية على الدفع عند الاستلام أو على الدفع الإلكتروني. السعر الذي تراه هو السعر الذي تدفعه.</li>
-            <li>تتم معالجة المدفوعات الإلكترونية بشكل آمن عبر بوابة الدفع MyFatoorah، ولا يطّلع m.shop على بيانات بطاقتك الكاملة ولا يحتفظ بها.</li>
+            <li><strong>وسائل الدفع المقبولة:</strong> <strong>الدفع عند الاستلام</strong> لطلبات التوصيل إلى المنزل، و<strong>الدفع في المتجر</strong> لطلبات الاستلام من المتجر. لا نقبل حالياً الدفع الإلكتروني، ولا يتم جمع بيانات البطاقات على هذا الموقع.</li>
+            <li><strong>لا توجد رسوم دفع.</strong> لا نفرض أي رسوم إضافية على الدفع عند الاستلام أو على الدفع في المتجر. السعر الذي تراه هو السعر الذي تدفعه.</li>
+            <li>الدفع في المتجر: تدفع عند استلام طلبك من موقع الاستلام الذي اخترته.</li>
             <li>الدفع عند الاستلام: يُرجى تجهيز المبلغ بالتمام قدر الإمكان.</li>
           </ul>
         </section>

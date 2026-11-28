@@ -174,28 +174,13 @@
       this.isRevalidating = true;
 
       try {
-        const [ordersRes, catsRes, dashRes] = await Promise.all([
-          AdminApp.api('/api/orders?limit=100').catch(() => null),
+        const [catsRes, dashRes] = await Promise.all([
           AdminApp.api('/api/categories').catch(() => null),
           AdminApp.api('/api/admin/dashboard').catch(() => null),
         ]);
 
-        const orders = ordersRes?.items || ordersRes?.orders || (Array.isArray(ordersRes) ? ordersRes : []);
         const categories = catsRes?.categories || catsRes || [];
-
-        const synthesized = this.deriveAnalytics(orders, dashRes || {}, categories);
-
-        if (dashRes) {
-          if (dashRes.customerMetrics) {
-            synthesized.customerMetrics = dashRes.customerMetrics;
-          }
-          if (dashRes.traffic) {
-            synthesized.traffic = dashRes.traffic;
-          }
-          if (dashRes.kpis?.products) {
-            synthesized.kpis.total_products = Number(dashRes.kpis.products);
-          }
-        }
+        const synthesized = this.deriveAnalytics(dashRes || {}, categories);
 
         this.stats = synthesized;
         this.renderAll();
@@ -207,17 +192,18 @@
       }
     },
 
-    deriveAnalytics(orders = [], dashData = {}, categories = []) {
+    deriveAnalytics(dashData = {}, categories = []) {
       const now = new Date();
       const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
       const monthsOfYear = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
+      const os = dashData.orderStatuses || {};
       const statusCounts = {
-        delivered: 0,
-        shipped: 0,
-        processing: 0,
-        placed: 0,
-        cancelled: 0,
+        placed: Number(os.pending ?? os.placed ?? 0),
+        processing: Number(os.processing ?? 0),
+        shipped: Number(os.shipped ?? 0),
+        delivered: Number(os.delivered ?? 0),
+        cancelled: Number(os.cancelled ?? 0),
       };
 
       const dailyMap = new Map();
@@ -235,100 +221,56 @@
         });
       }
 
-      const productSales = new Map();
-
-      let grossRevenue = 0;
-      let validOrdersCount = 0;
-
-      orders.forEach((o) => {
-        const st = (o.status || 'placed').toLowerCase();
-        if (statusCounts[st] !== undefined) {
-          statusCounts[st] += 1;
-        } else if (st === 'pending') {
-          statusCounts.placed += 1;
-        } else if (st === 'completed') {
-          statusCounts.delivered += 1;
-        } else {
-          statusCounts.processing += 1;
-        }
-
-        const isCancelled = st === 'cancelled';
-        const orderTotal = Number(o.total || o.subtotal || 0);
-
-        if (!isCancelled) {
-          grossRevenue += orderTotal;
-          validOrdersCount += 1;
-        }
-
-        const dateStr = (o.created_at || '').split('T')[0];
-        if (dateStr && dailyMap.has(dateStr)) {
-          const bucket = dailyMap.get(dateStr);
-          bucket.orders += 1;
-          if (!isCancelled) {
-            bucket.revenue += orderTotal;
+      if (Array.isArray(dashData.salesTimeline)) {
+        dashData.salesTimeline.forEach((pt) => {
+          const key = String(pt.date || pt.rawDate || '').split('T')[0];
+          if (key && dailyMap.has(key)) {
+            const bucket = dailyMap.get(key);
+            bucket.revenue = Number(pt.revenue || 0);
+            bucket.orders = Number(pt.orders || 0);
           }
-        }
-
-        if (Array.isArray(o.items) && !isCancelled) {
-          o.items.forEach((it) => {
-            const key = it.id || it.slug || it.name;
-            if (!key) return;
-            const current = productSales.get(key) || {
-              id: key,
-              name: it.name || 'Catalog Item',
-              brand: it.brand || 'Marjaah',
-              image: it.image || '/assets/images/products/placeholder.svg',
-              units_sold: 0,
-              revenue: 0,
-            };
-            const qty = Number(it.quantity || 1);
-            current.units_sold += qty;
-            current.revenue += Number(it.price || 0) * qty;
-            productSales.set(key, current);
-          });
-        }
-      });
+        });
+      }
 
       const salesTimeline = Array.from(dailyMap.values());
-      const bestSellers = Array.from(productSales.values())
-        .sort((a, b) => b.units_sold - a.units_sold || b.revenue - a.revenue)
-        .slice(0, 5);
-
-      if (bestSellers.length === 0 && Array.isArray(dashData.bestSellers) && dashData.bestSellers.length > 0) {
-        bestSellers.push(...dashData.bestSellers.slice(0, 5));
-      }
+      const bestSellers = Array.isArray(dashData.bestSellers)
+        ? dashData.bestSellers.slice(0, 5).map((b) => ({
+            ...b,
+            units_sold: Number(b.units_sold ?? b.quantity ?? 0),
+            revenue: Number(b.revenue || 0),
+          }))
+        : [];
 
       let catDist = [];
       if (Array.isArray(categories) && categories.length > 0) {
-        catDist = categories.slice(0, 5).map((c) => ({
-          name: c.name || c.name_en || 'Category',
-          count: c.product_count || c.count || Math.floor(Math.random() * 80) + 20,
-        }));
+        catDist = categories
+          .slice()
+          .sort((a, b) => Number(b.product_count ?? b.count ?? 0) - Number(a.product_count ?? a.count ?? 0))
+          .slice(0, 5)
+          .map((c) => ({
+            name: c.name || c.name_en || 'Category',
+            count: Number(c.product_count ?? c.count ?? 0),
+          }));
       } else if (Array.isArray(dashData.categoryDistribution)) {
         catDist = dashData.categoryDistribution.slice(0, 5);
-      } else {
-        catDist = [
-          { name: 'Mobile Accessories', count: 184 },
-          { name: 'Electronics & Audio', count: 142 },
-          { name: 'Smart Watches', count: 98 },
-          { name: 'Home & Kitchen', count: 76 },
-          { name: 'Gaming & Computing', count: 64 },
-        ];
       }
 
-      const finalRevenue = grossRevenue > 0 ? grossRevenue : Number(dashData.kpis?.revenue || dashData.revenue_total || 20307);
-      const finalOrdersCount = orders.length > 0 ? orders.length : Number(dashData.kpis?.orders || dashData.ordersCount || 15);
-      const aov = validOrdersCount > 0 ? Math.round(finalRevenue / validOrdersCount) : Math.round(finalRevenue / Math.max(finalOrdersCount, 1));
-      const totalProds = Number(dashData.productsCount || dashData.kpis?.products || dashData.total_products || 1462);
+      const dk = dashData.kpis || {};
+      const finalRevenue = Number(dk.totalRevenue ?? dk.revenue ?? dashData.revenue_total ?? 0);
+      const finalOrdersCount = Number(dk.totalOrders ?? dk.orders ?? dashData.ordersCount ?? 0);
+      const aov = Number(dk.averageOrderValue ?? (finalOrdersCount > 0 ? Math.round(finalRevenue / finalOrdersCount) : 0));
+      const totalProds = Number(dk.totalProducts ?? dashData.productsCount ?? dk.products ?? dashData.total_products ?? 0);
+      const pendingApprovals = Number(dk.pendingApprovals ?? dashData.pendingApprovals ?? 0);
+      const activeStaff = Number(dk.activeStaff ?? dk.active_staff ?? dashData.active_staff ?? 1);
 
       return {
         kpis: {
           gross_revenue: finalRevenue,
           total_orders: finalOrdersCount,
-          aov: aov,
+          aov,
           total_products: totalProds,
-          pending_approvals: Number(dashData.pendingApprovals || dashData.kpis?.low_stock || 0),
-          active_staff: Number(dashData.active_staff || 1),
+          pending_approvals: pendingApprovals,
+          active_staff: activeStaff,
         },
         salesTimeline,
         orderStatuses: statusCounts,
@@ -337,9 +279,9 @@
         traffic: dashData.traffic || {
           totalVisitors: 0,
           totalViews: 0,
-          mobile_percentage: 68,
+          mobile_percentage: 0,
         },
-        customerMetrics: (dashData.customerMetrics && !(dashData.customerMetrics.online_customers === 2 && dashData.customerMetrics.total_customers === 15)) ? dashData.customerMetrics : {
+        customerMetrics: dashData.customerMetrics || {
           total_customers: 0,
           online_customers: 0,
           recently_active: 0,
@@ -367,46 +309,9 @@
       if (revEl) revEl.textContent = `${Number(k.gross_revenue || k.totalRevenue || 0).toLocaleString()} QAR`;
       if (ordersEl) ordersEl.textContent = Number(k.total_orders || k.totalOrders || 0).toLocaleString();
       if (aovEl) aovEl.textContent = `${Number(k.aov || k.averageOrderValue || 0).toFixed(0)} QAR`;
-      if (prodsEl) prodsEl.textContent = Number(k.total_products || k.totalProducts || 1462).toLocaleString();
+      if (prodsEl) prodsEl.textContent = Number(k.total_products ?? k.totalProducts ?? 0).toLocaleString();
       if (approvalsEl) approvalsEl.textContent = Number(k.pending_approvals || 0).toLocaleString();
       if (staffEl) staffEl.textContent = Number(k.active_staff || 1).toLocaleString();
-    },
-
-    timeframe: '7d', // Default to 7 days for bold, readable bars
-    chartType: 'bar', // Default to Bar Diagram
-
-    setTimeframe(tf) {
-      this.timeframe = tf;
-      const selector = document.getElementById('revenue-timeframe-selector');
-      if (selector) {
-        selector.querySelectorAll('.timeframe-btn').forEach((btn) => {
-          btn.classList.remove('active', 'bg-primary', 'text-white', 'shadow-sm', 'font-bold');
-          btn.classList.add('text-slate-400', 'font-semibold');
-        });
-        const activeBtn = selector.querySelector(`[onclick*="'${tf}'"]`);
-        if (activeBtn) {
-          activeBtn.classList.remove('text-slate-400', 'font-semibold');
-          activeBtn.classList.add('active', 'bg-primary', 'text-white', 'shadow-sm', 'font-bold');
-        }
-      }
-      this.renderRevenueChart();
-    },
-
-    setChartType(type) {
-      this.chartType = type;
-      const selector = document.getElementById('chart-mode-selector');
-      if (selector) {
-        selector.querySelectorAll('.chart-mode-btn').forEach((btn) => {
-          btn.classList.remove('active', 'bg-primary', 'text-white', 'shadow-sm', 'font-bold');
-          btn.classList.add('text-slate-400', 'font-semibold');
-        });
-        const activeBtn = selector.querySelector(`[onclick*="'${type}'"]`);
-        if (activeBtn) {
-          activeBtn.classList.remove('text-slate-400', 'font-semibold');
-          activeBtn.classList.add('active', 'bg-primary', 'text-white', 'shadow-sm', 'font-bold');
-        }
-      }
-      this.renderRevenueChart();
     },
 
     renderRevenueChart() {
@@ -908,14 +813,14 @@
               <button type="button" onclick="event.stopPropagation(); window.openImageLightbox('${(p.image || '/assets/images/products/placeholder.svg').replace(/'/g, "\\'")}', '${(p.name || 'Catalog Item').replace(/'/g, "\\'")}')" class="group relative w-8 h-8 rounded-lg overflow-hidden border border-slate-800 flex-shrink-0 cursor-zoom-in hover:border-indigo-500/80 transition-all" title="Click to view full screen image">
                 <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200" onerror="this.src='/assets/images/products/placeholder.svg'" />
               </button>
-              <div class="min-w-0 flex-1">
-                <span class="font-bold text-white block truncate text-xs" title="${p.name}">${p.name}</span>
-                <span class="text-[10px] text-slate-400 block truncate">${p.brand || 'Marjaah item'}</span>
+              <div class="min-w-0 flex-1 overflow-hidden">
+                <span class="font-bold text-slate-900 block truncate text-xs" title="${p.name}">${p.name}</span>
+                <span class="text-[10px] text-slate-500 block truncate">${p.brand || 'Marjaah item'}</span>
               </div>
             </div>
           </td>
           <td class="py-2.5 px-2 text-right whitespace-nowrap">
-            <div class="font-mono font-bold text-white text-xs" title="Total gross sales">${Number(p.revenue || 0).toLocaleString()} <span class="text-[10px] text-slate-400 font-normal">QAR</span></div>
+            <div class="font-mono font-bold text-slate-900 text-xs" title="Total gross sales">${Number(p.revenue || 0).toLocaleString()} <span class="text-[10px] text-slate-500 font-normal">QAR</span></div>
             <div class="text-[10px] text-primary-light font-semibold" title="Total units sold">${p.units_sold || 1} sold</div>
           </td>
         </tr>
@@ -930,9 +835,9 @@
       if (!this.stats || !this.stats.traffic) return;
       const t = this.stats.traffic;
 
-      if (visitorsEl) visitorsEl.textContent = Number(t.totalVisitors || t.visitors_today || 142).toLocaleString();
-      if (pageviewsEl) pageviewsEl.textContent = Number(t.totalViews || t.page_views_today || 489).toLocaleString();
-      if (mobileShareEl) mobileShareEl.textContent = `${t.mobile_percentage || 68}%`;
+      if (visitorsEl) visitorsEl.textContent = Number(t.totalVisitors ?? t.visitors_today ?? 0).toLocaleString();
+      if (pageviewsEl) pageviewsEl.textContent = Number(t.totalViews ?? t.page_views_today ?? 0).toLocaleString();
+      if (mobileShareEl) mobileShareEl.textContent = `${Number(t.mobile_percentage ?? 0)}%`;
     },
 
     async renderCustomerDiagrams() {
@@ -1015,8 +920,10 @@
             <div class="grid grid-cols-2 gap-2.5 flex-1 w-full min-w-0">
               ${slices.map((s) => {
                 const pct = Math.round((s.val / total) * 100);
+                const filterMode = s.key === 'online' ? 'online' : (s.key === 'idle' ? 'offline' : '');
+                const clickAttrs = filterMode ? `role="button" tabindex="0" onclick="AdminCustomers.showPresence('${filterMode}')"` : '';
                 return `
-                  <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 min-w-0 hover:border-slate-300 transition cursor-default" title="${s.label}: ${s.val} customers (${pct}% of customer base) — ${s.desc}">
+                  <div ${clickAttrs} class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 min-w-0 hover:border-slate-300 transition ${filterMode ? 'cursor-pointer' : 'cursor-default'}" title="${s.label}: ${s.val} customers (${pct}% of customer base) — ${s.desc}">
                     <div class="flex items-center gap-1.5 mb-1">
                       <span class="w-2 h-2 rounded-full flex-shrink-0" style="background-color: ${s.color};"></span>
                       <span class="text-[11px] font-semibold text-slate-700 truncate" title="${s.label}">${s.label}</span>
@@ -1053,12 +960,17 @@
       const container = document.getElementById(containerId);
       if (!container) return;
 
-      const total = Math.max(metrics.total_customers || 14, 1);
+      const fb = metrics?.frequency_breakdown || {};
+      const prospective = Number(fb.prospective ?? 0);
+      const single = Number(fb.single_order ?? 0);
+      const repeat = Number(fb.repeat_buyer ?? 0);
+      const vip = Number(fb.vip_buyer ?? 0);
+      const total = Math.max(Number(metrics?.total_customers ?? 0), prospective + single + repeat + vip, 1);
       const segments = [
-        { label: 'Prospective (0 orders)', val: 3, color: '#64748B' },
-        { label: '1st Time Buyer (1 order)', val: 8, color: '#38BDF8' },
-        { label: 'Repeat Buyer (2–4 orders)', val: 2, color: '#3B82F6' },
-        { label: 'VIP Buyer (5+ orders)', val: 1, color: '#F59E0B' },
+        { label: 'Prospective (0 orders)', val: prospective, color: '#64748B' },
+        { label: '1st Time Buyer (1 order)', val: single, color: '#38BDF8' },
+        { label: 'Repeat Buyer (2–4 orders)', val: repeat, color: '#3B82F6' },
+        { label: 'VIP Buyer (5+ orders)', val: vip, color: '#F59E0B' },
       ];
 
       container.innerHTML = `

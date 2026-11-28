@@ -41,7 +41,7 @@
       }
 
       try {
-        const data = await AdminApp.api('/api/banners');
+        const data = await AdminApp.api('/api/banners?includeInactive=true');
         this.banners = data.banners || data.items || data || [];
         this.renderBannersTable();
       } catch (err) {
@@ -273,18 +273,27 @@
       };
 
       try {
+        let res;
         if (!this.selectedBannerId) {
-          await AdminApp.api('/api/banners', {
+          res = await AdminApp.api('/api/banners', {
             method: 'POST',
             body: JSON.stringify(payload),
           });
-          AdminApp.toast('Hero Banner created successfully.', 'success');
+          if (res?.pending_approval || res?.status === 'pending_approval') {
+            AdminApp.toast('Banner creation submitted for Supervisor Approval.', 'info');
+          } else {
+            AdminApp.toast('Hero Banner created successfully.', 'success');
+          }
         } else {
-          await AdminApp.api(`/api/banners/${this.selectedBannerId}`, {
+          res = await AdminApp.api(`/api/banners/${this.selectedBannerId}`, {
             method: 'PATCH',
             body: JSON.stringify(payload),
           });
-          AdminApp.toast('Hero Banner updated successfully.', 'success');
+          if (res?.pending_approval || res?.status === 'pending_approval') {
+            AdminApp.toast('Banner changes submitted for Supervisor Approval.', 'info');
+          } else {
+            AdminApp.toast('Hero Banner updated successfully.', 'success');
+          }
         }
 
         try { localStorage.removeItem('marjaah_hero_banner_cache'); } catch(e){}
@@ -376,12 +385,16 @@
       AdminApp.toast('Updating banner status...', 'info');
 
       try {
-        await AdminApp.api(`/api/banners/${bannerId}`, {
+        const res = await AdminApp.api(`/api/banners/${bannerId}`, {
           method: 'PATCH',
           body: JSON.stringify({ is_active: !currentStatus }),
         });
         try { localStorage.removeItem('marjaah_hero_banner_cache'); } catch(e){}
-        AdminApp.toast(`Hero Banner is now ${!currentStatus ? 'ACTIVE' : 'INACTIVE'}.`, 'success');
+        if (res?.pending_approval || res?.status === 'pending_approval') {
+          AdminApp.toast('Status change submitted for Supervisor Approval.', 'info');
+        } else {
+          AdminApp.toast(`Hero Banner is now ${!currentStatus ? 'ACTIVE' : 'INACTIVE'}.`, 'success');
+        }
         await this.loadBanners();
       } catch (err) {
         console.error('Toggle banner status error:', err);
@@ -397,7 +410,7 @@
       }
 
       try {
-        const data = await AdminApp.api('/api/promotional-sections');
+        const data = await AdminApp.api('/api/promotional-sections?includeInactive=true');
         this.promotions = data.sections || data.items || data || [];
         this.renderPromotionsTable();
       } catch (err) {
@@ -418,16 +431,18 @@
       }
 
       container.innerHTML = this.promotions.map((p) => {
-        const isActive = p.is_active !== false;
+        const isActive = p.is_active !== false && p.status !== 'inactive' && p.status !== 'pending_approval';
+        const priceVal = p.product_price ?? p.card_price;
+        const orderVal = p.display_order ?? p.order ?? 1;
         return `
           <tr id="promo-row-${p.id}" class="border-b border-slate-200 hover:bg-slate-50 transition-all duration-200">
             <td class="py-3 px-4">
               <div class="flex items-center gap-3">
-                <img src="${p.image || '/assets/images/products/placeholder.svg'}" class="w-12 h-12 object-cover rounded-xl border border-slate-200 bg-slate-100 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
+                <img src="${p.image || p.image_desktop || '/assets/images/products/placeholder.svg'}" class="w-12 h-12 object-cover rounded-xl border border-slate-200 bg-slate-100 flex-shrink-0" onerror="this.src='/assets/images/products/placeholder.svg'" />
                 <div class="min-w-0">
-                  <span class="text-[9px] uppercase font-bold tracking-widest text-primary">${p.tag || p.badge || 'PROMOTION'}</span>
-                  <p class="font-bold text-xs text-slate-900 truncate max-w-xs">${p.title}</p>
-                  <p class="text-[11px] text-slate-500 truncate max-w-xs">${p.subtitle || '—'}</p>
+                  <span class="text-[9px] uppercase font-bold tracking-widest text-primary">${p.tag || p.badge || p.badge_text || 'PROMOTION'}</span>
+                  <p class="font-bold text-xs text-slate-900 truncate max-w-xs">${p.title || '—'}</p>
+                  <p class="text-[11px] text-slate-500 truncate max-w-xs">${p.subtitle || p.description || '—'}</p>
                 </div>
               </div>
             </td>
@@ -435,13 +450,13 @@
               <span class="font-semibold text-slate-900">${p.cta_text || 'DISCOVER ALL'}</span>
               <p class="text-[10px] text-slate-500 font-mono truncate max-w-[180px]">${p.cta_link || '/shop/'}</p>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-700 font-mono">${p.display_order !== undefined ? p.display_order : 1}</td>
+            <td class="py-3 px-4 text-xs text-slate-700 font-mono">${orderVal}</td>
             <td class="py-3 px-4">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
-                ${isActive ? 'ACTIVE' : 'INACTIVE'}
+                ${p.status === 'pending_approval' ? 'PENDING APPROVAL' : (isActive ? 'ACTIVE' : 'INACTIVE')}
               </span>
             </td>
-            <td class="py-3 px-4 text-xs text-slate-600 font-mono">${p.product_price ? `QAR ${p.product_price}` : '—'}</td>
+            <td class="py-3 px-4 text-xs text-slate-600 font-mono">${priceVal ? (String(priceVal).toUpperCase().includes('QAR') ? priceVal : `QAR ${priceVal}`) : '—'}</td>
             <td class="py-3 px-4 text-right">
               <div class="flex items-center justify-end gap-1.5">
                 <button type="button" id="promo-edit-btn-${p.id}" onclick="AdminContent.openPromotionModal('${p.id}')" title="Edit Promo Section" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition cursor-pointer">
@@ -480,14 +495,15 @@
         if (!p) return;
         document.getElementById('promo-modal-title').textContent = 'Edit Promotional Section';
         if (submitBtn) submitBtn.innerHTML = '<span>Update Promotion</span>';
-        document.getElementById('promo-modal-tag').value = p.tag || p.badge || '';
+        document.getElementById('promo-modal-tag').value = p.tag || p.badge || p.badge_text || '';
         document.getElementById('promo-modal-heading').value = p.title || '';
         document.getElementById('promo-modal-desc').value = p.subtitle || p.description || '';
         document.getElementById('promo-modal-cta-text').value = p.cta_text || 'DISCOVER ALL PRODUCTS';
         document.getElementById('promo-modal-cta-link').value = p.cta_link || '/shop/';
-        document.getElementById('promo-modal-image').value = p.image || '';
-        document.getElementById('promo-modal-product-name').value = p.product_name || '';
-        document.getElementById('promo-modal-product-price').value = p.product_price || '';
+        document.getElementById('promo-modal-image').value = p.image || p.image_desktop || '';
+        document.getElementById('promo-modal-product-name').value = p.product_name || p.card_tag || '';
+        const rawPromoPrice = p.product_price ?? p.card_price ?? '';
+        document.getElementById('promo-modal-product-price').value = rawPromoPrice !== '' ? String(rawPromoPrice).replace(/[^0-9.]/g, '') : '';
         document.getElementById('promo-modal-active').checked = p.is_active !== false;
       } else {
         document.getElementById('promo-modal-title').textContent = 'Add Promotional Section';
@@ -563,30 +579,35 @@
       const payload = {
         tag,
         badge: tag,
+        badge_text: tag,
         title,
         subtitle,
         description: subtitle,
         cta_text,
         cta_link,
         image,
+        image_desktop: image,
         product_name,
+        card_tag: product_name,
         product_price,
+        card_price: product_price,
         is_active,
       };
 
       try {
+        let res;
         if (!this.selectedPromoId) {
-          await AdminApp.api('/api/promotional-sections', {
+          res = await AdminApp.api('/api/promotional-sections', {
             method: 'POST',
             body: JSON.stringify(payload),
           });
-          AdminApp.toast('Promotional section created successfully.', 'success');
+          AdminApp.toast(res?.pending_approval ? 'Promotional section submitted for approval.' : 'Promotional section created successfully.', res?.pending_approval ? 'info' : 'success');
         } else {
-          await AdminApp.api(`/api/promotional-sections/${this.selectedPromoId}`, {
-            method: 'PATCH',
+          res = await AdminApp.api(`/api/promotional-sections/${this.selectedPromoId}`, {
+            method: 'PUT',
             body: JSON.stringify(payload),
           });
-          AdminApp.toast('Promotional section updated successfully.', 'success');
+          AdminApp.toast(res?.pending_approval ? 'Promotional update submitted for approval.' : 'Promotional section updated successfully.', res?.pending_approval ? 'info' : 'success');
         }
         this.closePromotionModal();
         await this.loadPromotions();
@@ -637,8 +658,8 @@
       AdminApp.toast('Deleting promotional section...', 'info');
 
       try {
-        await AdminApp.api(`/api/promotional-sections/${promoId}`, { method: 'DELETE' });
-        AdminApp.toast('Promotional section deleted.', 'success');
+        const res = await AdminApp.api(`/api/promotional-sections/${promoId}`, { method: 'DELETE' });
+        AdminApp.toast(res?.pending_approval ? 'Deletion submitted for Supervisor Approval.' : 'Promotional section deleted.', res?.pending_approval ? 'info' : 'success');
         await this.loadPromotions();
       } catch (err) {
         AdminApp.toast(err.message || 'Failed to delete section', 'error');
@@ -658,7 +679,7 @@
       }
 
       try {
-        const data = await AdminApp.api('/api/store-locations');
+        const data = await AdminApp.api('/api/store-locations?includeInactive=true');
         this.locations = data.locations || data.items || data || [];
         this.renderLocationsTable();
       } catch (err) {
@@ -680,18 +701,21 @@
 
       container.innerHTML = this.locations.map((loc) => {
         const isActive = loc.is_active !== false;
+        const isPrimary = Boolean(loc.is_primary || loc.is_default);
+        const hours = loc.working_hours || loc.opening_hours || '9:00 AM - 10:00 PM';
+        const instr = loc.instructions || loc.pickup_instructions || 'Order ID required';
         return `
           <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
             <td class="py-3.5 px-4">
               <div class="flex items-center gap-2">
                 <span class="font-bold text-xs text-slate-900">${loc.name}</span>
-                ${loc.is_primary ? `<span class="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider border border-primary/20">Main Hub</span>` : ''}
+                ${isPrimary ? `<span class="text-[9px] px-2 py-0.5 rounded bg-primary/10 text-primary font-bold uppercase tracking-wider border border-primary/20">Main Hub</span>` : ''}
               </div>
-              <p class="text-[11px] text-slate-500 mt-0.5">${loc.address}, ${loc.city || 'Doha'}</p>
+              <p class="text-[11px] text-slate-500 mt-0.5">${loc.address || ''}${loc.city ? `, ${loc.city}` : ''}</p>
             </td>
             <td class="py-3.5 px-4 text-xs text-slate-700 font-mono">${loc.phone || '—'}</td>
-            <td class="py-3.5 px-4 text-xs text-slate-700">${loc.working_hours || '9:00 AM - 10:00 PM'}</td>
-            <td class="py-3.5 px-4 text-xs text-slate-500 italic max-w-xs truncate">${loc.instructions || 'Order ID required'}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-700">${hours}</td>
+            <td class="py-3.5 px-4 text-xs text-slate-500 italic max-w-xs truncate">${instr}</td>
             <td class="py-3.5 px-4">
               <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${isActive ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-100 text-slate-600 border border-slate-200'}">
                 ${isActive ? 'ACTIVE' : 'INACTIVE'}
@@ -725,9 +749,9 @@
         document.getElementById('location-modal-address').value = l.address || '';
         document.getElementById('location-modal-city').value = l.city || 'Doha';
         document.getElementById('location-modal-phone').value = l.phone || '';
-        document.getElementById('location-modal-hours').value = l.working_hours || '';
-        document.getElementById('location-modal-instructions').value = l.instructions || '';
-        document.getElementById('location-modal-primary').checked = Boolean(l.is_primary);
+        document.getElementById('location-modal-hours').value = l.working_hours || l.opening_hours || '';
+        document.getElementById('location-modal-instructions').value = l.instructions || l.pickup_instructions || '';
+        document.getElementById('location-modal-primary').checked = Boolean(l.is_primary || l.is_default);
         document.getElementById('location-modal-active').checked = l.is_active !== false;
       } else {
         document.getElementById('location-modal-title').textContent = 'Add Store Pickup Location';
@@ -754,7 +778,19 @@
       const is_primary = document.getElementById('location-modal-primary').checked;
       const is_active = document.getElementById('location-modal-active').checked;
 
-      const payload = { name, address, city, phone, working_hours, instructions, is_primary, is_active };
+      const payload = {
+        name,
+        address,
+        city,
+        phone,
+        working_hours,
+        opening_hours: working_hours,
+        instructions,
+        pickup_instructions: instructions,
+        is_primary,
+        is_default: is_primary,
+        is_active,
+      };
 
       try {
         if (!this.selectedLocId) {
@@ -765,7 +801,7 @@
           AdminApp.toast('Store pickup location added successfully.', 'success');
         } else {
           await AdminApp.api(`/api/store-locations/${this.selectedLocId}`, {
-            method: 'PATCH',
+            method: 'PUT',
             body: JSON.stringify(payload),
           });
           AdminApp.toast('Store pickup location updated successfully.', 'success');
@@ -794,13 +830,13 @@
         this.settings = data || {};
 
         document.getElementById('settings-store-name').value = this.settings.store_name || 'M.SHOP Qatar';
-        document.getElementById('settings-company-name').value = this.settings.company_name || 'Marjaah Trading WLL';
+        document.getElementById('settings-company-name').value = this.settings.company_name || this.settings.trade_name || 'Marjaah Trading WLL';
         document.getElementById('settings-cr-number').value = this.settings.cr_number || '228717';
         document.getElementById('settings-contact-email').value = this.settings.email || 'info@marjaah.com';
         document.getElementById('settings-contact-phone').value = this.settings.phone || '+974 7799 1013';
         document.getElementById('settings-whatsapp').value = this.settings.whatsapp || '+974 7799 1013';
         document.getElementById('settings-address').value = this.settings.address || 'Al Sadd, Doha, State of Qatar';
-        document.getElementById('settings-footer-text').value = this.settings.footer_text || 'CR No. 228717 • Qatar';
+        document.getElementById('settings-footer-text').value = this.settings.footer_text || this.settings.footer_cr_text || 'CR No. 228717 • Qatar';
       } catch (err) {
         console.error('Failed to load store settings:', err);
       }
@@ -808,20 +844,24 @@
 
     async saveSettings(e) {
       e.preventDefault();
+      const company_name = document.getElementById('settings-company-name').value.trim();
+      const footer_text = document.getElementById('settings-footer-text').value.trim();
       const payload = {
         store_name: document.getElementById('settings-store-name').value.trim(),
-        company_name: document.getElementById('settings-company-name').value.trim(),
+        company_name,
+        trade_name: company_name,
         cr_number: document.getElementById('settings-cr-number').value.trim(),
         email: document.getElementById('settings-contact-email').value.trim(),
         phone: document.getElementById('settings-contact-phone').value.trim(),
         whatsapp: document.getElementById('settings-whatsapp').value.trim(),
         address: document.getElementById('settings-address').value.trim(),
-        footer_text: document.getElementById('settings-footer-text').value.trim(),
+        footer_text,
+        footer_cr_text: footer_text,
       };
 
       try {
         await AdminApp.api('/api/admin/settings', {
-          method: 'POST',
+          method: 'PUT',
           body: JSON.stringify(payload),
         });
         AdminApp.toast('Store settings & CR configuration saved successfully.', 'success');

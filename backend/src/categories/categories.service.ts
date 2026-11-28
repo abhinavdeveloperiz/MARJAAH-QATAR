@@ -5,6 +5,7 @@ import { FirestoreService } from '../firebase/firestore.service';
 import { UploadService } from '../upload/upload.service';
 import { SeoService } from '../seo/seo.service';
 import { SubcategoriesService } from '../subcategories/subcategories.service';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class CategoriesService implements OnModuleInit {
@@ -15,7 +16,18 @@ export class CategoriesService implements OnModuleInit {
     private readonly uploadService: UploadService,
     @Optional() @Inject(forwardRef(() => SeoService)) private readonly seoService?: SeoService,
     @Optional() @Inject(forwardRef(() => SubcategoriesService)) private readonly subcategoriesService?: SubcategoriesService,
+    @Optional() @Inject(forwardRef(() => ProductsService)) private readonly productsService?: ProductsService,
   ) {}
+
+  private slugify(text: string): string {
+    return String(text || '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '') || `cat-${Date.now()}`;
+  }
 
   private cachedCategories: any[] | null = null;
   private cacheExpiresAt = 0;
@@ -68,21 +80,28 @@ export class CategoriesService implements OnModuleInit {
     }
   }
 
-  private getProductCounts(): Record<string, number> {
+  private async getProductCounts(): Promise<Record<string, number>> {
     const counts: Record<string, number> = {};
     try {
+      let products: any[] | null = null;
       const productsCachePath = path.resolve(process.cwd(), '.products-cache.json');
       if (fs.existsSync(productsCachePath)) {
         const raw = fs.readFileSync(productsCachePath, 'utf-8');
-        const products = JSON.parse(raw);
-        if (Array.isArray(products)) {
-          for (const p of products) {
-            if (p.status === 'hidden' || p.status === 'pending_approval') continue;
-            const slug = p.category_slug || (p.category ? String(p.category).toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
-            if (slug) {
-              counts[slug] = (counts[slug] || 0) + 1;
-            }
-          }
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) products = parsed;
+      }
+      if (!products) {
+        const snap = await this.firestore.collection('products').get();
+        products = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      for (const p of products) {
+        if (p.status === 'hidden' || p.status === 'pending_approval' || p.status === 'rejected' || p.is_active === false) continue;
+        const slug = p.category_slug || (p.category ? String(p.category).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') : '');
+        if (slug) {
+          counts[slug] = (counts[slug] || 0) + 1;
+        }
+        if (p.category_id) {
+          counts[String(p.category_id)] = (counts[String(p.category_id)] || 0) + 1;
         }
       }
     } catch (_) {}
@@ -92,12 +111,10 @@ export class CategoriesService implements OnModuleInit {
   private async fetchFromFirestore(): Promise<any[]> {
     const snap = await this.firestore.collection('categories').get();
     const categories = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-    const counts = this.getProductCounts();
+    const counts = await this.getProductCounts();
     for (const cat of categories) {
       const slug = cat.slug || cat.id;
-      if (counts[slug] !== undefined) {
-        cat.product_count = counts[slug];
-      }
+      cat.product_count = counts[slug] !== undefined ? counts[slug] : (counts[cat.id] !== undefined ? counts[cat.id] : 0);
     }
     categories.sort((a, b) => (a.order || 0) - (b.order || 0));
     this.cachedCategories = categories;
@@ -189,19 +206,23 @@ export class CategoriesService implements OnModuleInit {
   }
 
   async create(data: any) {
-    if (!data.name || !data.slug) {
-      throw new BadRequestException('Name and slug are required');
+    const name = String(data.name || '').trim();
+    if (!name) {
+      throw new BadRequestException('Category name is required');
     }
+    const slug = data.slug && String(data.slug).trim() ? this.slugify(String(data.slug)) : this.slugify(name);
     const now = new Date().toISOString();
 
     let image = data.image;
     if (image && typeof image === 'string' && image.startsWith('data:')) {
-      const uploadRes = await this.uploadService.uploadBase64(image, `cat_${data.slug}.jpg`, 'categories');
+      const uploadRes = await this.uploadService.uploadBase64(image, `cat_${slug}_${Date.now()}.jpg`, 'categories');
       image = uploadRes.url;
     }
 
     const category = {
       ...data,
+      name,
+      slug,
       image: image || null,
       is_featured: Boolean(data.is_featured),
       order: Number(data.order) || 0,
@@ -222,13 +243,23 @@ export class CategoriesService implements OnModuleInit {
       throw new NotFoundException(`Category ${id} not found`);
     }
 
+    const existing = doc.data() as any;
+    const now = new Date().toISOString();
     const updateData: any = {
       ...data,
-      updated_at: new Date().toISOString(),
+      updated_at: now,
     };
 
+    if (data.name !== undefined) {
+      updateData.name = String(data.name).trim();
+    }
+    if (data.slug !== undefined) {
+      const trimmedSlug = String(data.slug).trim();
+      updateData.slug = trimmedSlug ? this.slugify(trimmedSlug) : this.slugify(updateData.name || existing.name || id);
+    }
+
     if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
-      const uploadRes = await this.uploadService.uploadBase64(data.image, `cat_${id}.jpg`, 'categories');
+      const uploadRes = await this.uploadService.uploadBase64(data.image, `cat_${id}_${Date.now()}.jpg`, 'categories');
       updateData.image = uploadRes.url;
     }
 
@@ -239,16 +270,86 @@ export class CategoriesService implements OnModuleInit {
     });
 
     await docRef.update(updateData);
+
+    const newName = updateData.name || existing.name;
+    const newSlug = updateData.slug || existing.slug;
+    const nameChanged = newName && newName !== existing.name;
+    const slugChanged = newSlug && newSlug !== existing.slug;
+
+    // Cascade category name/slug updates to subcategories and products
+    if (nameChanged || slugChanged) {
+      try {
+        const subSnapById = await this.firestore.collection('subcategories').where('category_id', '==', id).get();
+        const subDocs = new Map<string, any>();
+        subSnapById.docs.forEach((d) => subDocs.set(d.id, d.ref));
+        if (existing.slug) {
+          const subSnapBySlug = await this.firestore.collection('subcategories').where('category_slug', '==', existing.slug).get();
+          subSnapBySlug.docs.forEach((d) => subDocs.set(d.id, d.ref));
+        }
+        await Promise.all(
+          Array.from(subDocs.values()).map((ref) =>
+            ref.update({
+              category_id: id,
+              category_name: newName,
+              category_slug: newSlug,
+              updated_at: now,
+            }),
+          ),
+        );
+
+        const prodDocs = new Map<string, any>();
+        const pById = await this.firestore.collection('products').where('category_id', '==', id).get();
+        pById.docs.forEach((d) => prodDocs.set(d.id, d.ref));
+        if (existing.slug) {
+          const pBySlug = await this.firestore.collection('products').where('category_slug', '==', existing.slug).get();
+          pBySlug.docs.forEach((d) => prodDocs.set(d.id, d.ref));
+        }
+        await Promise.all(
+          Array.from(prodDocs.values()).map((ref) =>
+            ref.update({
+              category_id: id,
+              category: newName,
+              category_name: newName,
+              category_slug: newSlug,
+              updated_at: now,
+            }),
+          ),
+        );
+      } catch (e: any) {
+        this.logger.warn(`Cascade update warning for category ${id}: ${e?.message}`);
+      }
+    }
+
     this.invalidateCache();
-    return { id, ...doc.data(), ...updateData };
+    this.subcategoriesService?.invalidateCache();
+    this.productsService?.invalidateCache(false);
+    return { id, ...existing, ...updateData };
   }
 
-  async remove(id: string) {
+  async remove(id: string, force = false) {
     const docRef = this.firestore.doc('categories', id);
     const doc = await docRef.get();
     if (!doc.exists) {
       throw new NotFoundException(`Category ${id} not found`);
     }
+    const data = doc.data() as any;
+
+    if (!force) {
+      const subs = await this.findSubcategories(id, data?.slug);
+      if (subs.length > 0) {
+        throw new BadRequestException(
+          `Cannot delete category "${data?.name || id}" because ${subs.length} subcategor${subs.length === 1 ? 'y belongs' : 'ies belong'} to it. Remove or reassign them first.`,
+        );
+      }
+      const counts = await this.getProductCounts();
+      const prodCount = Math.max(counts[id] || 0, data?.slug ? (counts[data.slug] || 0) : 0);
+      if (prodCount > 0) {
+        throw new BadRequestException(
+          `Cannot delete category "${data?.name || id}" because ${prodCount} product(s) are currently assigned to it.`,
+        );
+      }
+    }
+
     await docRef.delete();
     this.invalidateCache();
     return { success: true, message: `Category ${id} deleted` };

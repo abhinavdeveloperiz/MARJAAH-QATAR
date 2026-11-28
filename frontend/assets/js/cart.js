@@ -107,7 +107,9 @@
       }
 
       const qty = Math.max(1, Number(quantity) || 1);
-      const existing = this.items.find(i => i.slug === product.slug);
+      const variantName = (product.variant_name || '').trim();
+      const cartKey = variantName ? `${product.slug}::${variantName}` : product.slug;
+      const existing = this.items.find(i => (i.cartKey || (i.variant_name ? `${i.slug}::${i.variant_name}` : i.slug)) === cartKey);
 
       if (existing) {
         existing.quantity += qty;
@@ -119,7 +121,10 @@
         this.items.push({
           id: product.id || '',
           slug: product.slug,
-          name: product.name || 'Product',
+          cartKey,
+          variant_name: variantName || undefined,
+          sku: product.sku || undefined,
+          name: variantName ? `${product.name || 'Product'} (${variantName})` : (product.name || 'Product'),
           name_ar: product.name_ar || '',
           price: Number(product.price) || 0,
           original_price: product.original_price ? Number(product.original_price) : null,
@@ -135,11 +140,11 @@
       // Trigger tracking for GA4, Meta Pixel, Snapchat Pixel
       if (global.MShopTracker && typeof global.MShopTracker.trackAddToCart === 'function') {
         try {
-          const itemAdded = this.items.find(i => i.slug === product.slug);
+          const itemAdded = this.items.find(i => (i.cartKey || i.slug) === cartKey);
           global.MShopTracker.trackAddToCart({
             sku: (itemAdded && itemAdded.sku) || product.sku || product.slug,
             id: product.id || product.slug,
-            name: product.name,
+            name: (itemAdded && itemAdded.name) || product.name,
             price: product.price,
             quantity: qty
           });
@@ -152,8 +157,8 @@
       this.openDrawer();
     }
 
-    updateQuantity(slug, quantity) {
-      const idx = this.items.findIndex(i => i.slug === slug);
+    updateQuantity(keyOrSlug, quantity) {
+      const idx = this.items.findIndex(i => (i.cartKey || (i.variant_name ? `${i.slug}::${i.variant_name}` : i.slug)) === keyOrSlug || i.slug === keyOrSlug);
       if (idx !== -1) {
         const qty = Number(quantity);
         if (qty <= 0) {
@@ -165,8 +170,8 @@
       }
     }
 
-    removeItem(slug) {
-      const idx = this.items.findIndex(i => i.slug === slug);
+    removeItem(keyOrSlug) {
+      const idx = this.items.findIndex(i => (i.cartKey || (i.variant_name ? `${i.slug}::${i.variant_name}` : i.slug)) === keyOrSlug || i.slug === keyOrSlug);
       if (idx !== -1) {
         this.items.splice(idx, 1);
         this.save();
@@ -270,7 +275,9 @@
         return;
       }
 
-      const itemsHtml = this.items.map(item => `
+      const itemsHtml = this.items.map(item => {
+        const safeKey = String(item.cartKey || (item.variant_name ? `${item.slug}::${item.variant_name}` : item.slug)).replace(/'/g, "\\'");
+        return `
         <div class="flex items-center gap-3 p-3 rounded-2xl border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
           <div class="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface)">
             <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
@@ -283,15 +290,16 @@
             </div>
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-1 bg-black/20 rounded-lg p-0.5 border" style="border-color:var(--border-color)">
-                <button onclick="cart.updateQuantity('${item.slug}', ${item.quantity - 1})" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold hover:bg-white/10 transition" style="color:var(--text-secondary)">-</button>
+                <button onclick="cart.updateQuantity('${safeKey}', ${item.quantity - 1})" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold hover:bg-white/10 transition" style="color:var(--text-secondary)">-</button>
                 <span class="text-xs font-bold px-2" style="color:var(--text-primary)">${item.quantity}</span>
-                <button onclick="cart.updateQuantity('${item.slug}', ${item.quantity + 1})" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold hover:bg-white/10 transition" style="color:var(--text-secondary)">+</button>
+                <button onclick="cart.updateQuantity('${safeKey}', ${item.quantity + 1})" class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold hover:bg-white/10 transition" style="color:var(--text-secondary)">+</button>
               </div>
-              <button onclick="cart.removeItem('${item.slug}')" class="text-xs text-rose-400 hover:text-rose-300 transition font-medium">${isAr ? 'حذف' : 'Remove'}</button>
+              <button onclick="cart.removeItem('${safeKey}')" class="text-xs text-rose-400 hover:text-rose-300 transition font-medium">${isAr ? 'حذف' : 'Remove'}</button>
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       content.innerHTML = `
         <div class="flex-1 overflow-y-auto p-4 space-y-2.5">
@@ -349,7 +357,9 @@
         return;
       }
 
-      const rows = this.items.map(item => `
+      const rows = this.items.map(item => {
+        const safeKey = String(item.cartKey || (item.variant_name ? `${item.slug}::${item.variant_name}` : item.slug)).replace(/'/g, "\\'");
+        return `
         <div class="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 rounded-3xl border gap-4" style="background:var(--bg-surface);border-color:var(--border-color)">
           <div class="flex items-center gap-4 w-full sm:w-auto">
             <div class="w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0" style="background:var(--bg-surface-2)">
@@ -359,24 +369,26 @@
               <h3 class="font-bold text-sm sm:text-base leading-tight mb-1" style="color:var(--text-primary)">
                 <a href="/product/${encodeURIComponent(item.slug)}/" class="hover:text-primary-400 transition">${isAr && item.name_ar ? item.name_ar : item.name}</a>
               </h3>
+              ${item.sku ? `<p class="text-[11px] font-mono mb-0.5" style="color:var(--text-tertiary)">SKU: ${item.sku}</p>` : ''}
               <p class="text-xs font-semibold" style="color:var(--color-accent)">${item.price} QAR</p>
             </div>
           </div>
           <div class="flex items-center justify-between w-full sm:w-auto gap-6">
             <div class="flex items-center gap-2 bg-black/20 rounded-xl p-1 border" style="border-color:var(--border-color)">
-              <button onclick="cart.updateQuantity('${item.slug}', ${item.quantity - 1})" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white/10" style="color:var(--text-secondary)">-</button>
+              <button onclick="cart.updateQuantity('${safeKey}', ${item.quantity - 1})" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white/10" style="color:var(--text-secondary)">-</button>
               <span class="text-sm font-bold px-3" style="color:var(--text-primary)">${item.quantity}</span>
-              <button onclick="cart.updateQuantity('${item.slug}', ${item.quantity + 1})" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white/10" style="color:var(--text-secondary)">+</button>
+              <button onclick="cart.updateQuantity('${safeKey}', ${item.quantity + 1})" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold hover:bg-white/10" style="color:var(--text-secondary)">+</button>
             </div>
             <span class="font-display font-black text-base sm:text-lg min-w-[90px] text-right" style="color:var(--text-primary)">
               ${(item.price * item.quantity).toFixed(0)} QAR
             </span>
-            <button onclick="cart.removeItem('${item.slug}')" class="text-rose-400 hover:text-rose-300 p-2 transition">
+            <button onclick="cart.removeItem('${safeKey}')" class="text-rose-400 hover:text-rose-300 p-2 transition">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
             </button>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
 
       pageContainer.innerHTML = `
         <div class="grid lg:grid-cols-3 gap-8">
@@ -419,7 +431,7 @@
         this.notify();
       }
 
-      document.addEventListener('click', (e) => {
+      document.addEventListener('click', async (e) => {
         const addBtn = e.target.closest('[data-add-to-cart]');
         if (addBtn) {
           e.preventDefault();
@@ -430,7 +442,30 @@
           const name = addBtn.dataset.name;
           const price = addBtn.dataset.price;
           const image = addBtn.dataset.image;
-          if (name && price) {
+          const variantName = addBtn.dataset.variantName;
+          const variantPrice = addBtn.dataset.variantPrice;
+          const variantOrigPrice = addBtn.dataset.variantOrigPrice;
+          const variantSku = addBtn.dataset.variantSku;
+          const variantImage = addBtn.dataset.variantImage;
+
+          if (variantName) {
+            let baseProd = (global.productsMap && global.productsMap[slug]) || null;
+            if (!baseProd && global.api) {
+              try {
+                baseProd = await global.api.getProduct(slug);
+              } catch (_) {}
+            }
+            const merged = {
+              ...(baseProd || { slug, name: slug, in_stock: true }),
+              slug: (baseProd && baseProd.slug) || slug,
+              variant_name: variantName,
+              sku: variantSku || (baseProd && baseProd.sku) || undefined,
+              price: variantPrice ? Number(variantPrice) : Number(baseProd?.price || 0),
+              original_price: variantOrigPrice ? Number(variantOrigPrice) : (baseProd?.original_price || null),
+              image: variantImage || baseProd?.image,
+            };
+            this.addItem(merged, 1);
+          } else if (name && price) {
             this.addItem({ slug, name, price, image }, 1);
           } else {
             this.addItem(slug, 1);

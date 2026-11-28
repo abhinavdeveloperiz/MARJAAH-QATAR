@@ -43,11 +43,6 @@ export class RbacGuard implements CanActivate {
       throw new ForbiddenException('Administrative staff privileges required');
     }
 
-    // 1. Super Admin master override
-    if (user.is_superuser || user.username === 'admin' || user.id === 'admin') {
-      return true;
-    }
-
     // 2. Fetch fresh user doc from admin_users (or users) to verify status & revoked sessions
     let userDoc = await this.firestore.collection('admin_users').doc(String(user.id)).get();
     if (!userDoc.exists) {
@@ -57,7 +52,7 @@ export class RbacGuard implements CanActivate {
     let liveUserData = userDoc.exists ? userDoc.data() : user;
 
     // Check account status
-    if (liveUserData?.status === 'deactivated') {
+    if (liveUserData?.status === 'deactivated' || liveUserData?.status === 'inactive') {
       throw new ForbiddenException('Your administrator account has been deactivated by the primary administrator.');
     }
     if (liveUserData?.status === 'suspended') {
@@ -73,8 +68,10 @@ export class RbacGuard implements CanActivate {
       }
     }
 
-    // If superuser on live document
-    if (liveUserData?.is_superuser) {
+    // Superuser is decided from the LIVE record (status/revocation already enforced above).
+    // JWT claims are only trusted when no live record exists (legacy admin_credentials login).
+    const isPrimaryAdmin = user.username === 'admin' || String(user.id) === 'admin';
+    if (liveUserData?.is_superuser || liveUserData?.role === 'super_admin' || isPrimaryAdmin || (!userDoc.exists && user.is_superuser)) {
       return true;
     }
 

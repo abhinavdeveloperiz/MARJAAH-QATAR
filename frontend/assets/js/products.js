@@ -37,15 +37,23 @@
     let discountPct = 0;
     if (originalPrice && Number(originalPrice) > Number(price)) {
       discountPct = Math.round(((Number(originalPrice) - Number(price)) / Number(originalPrice)) * 100);
+    } else if (product.discount_percent && Number(product.discount_percent) > 0) {
+      discountPct = Math.round(Number(product.discount_percent));
     }
+
+    const offerBadgeText = String(product.offer_badge || '').trim();
+    const offerTitleText = String(product.offer_title || '').trim();
+    const isOffer = Boolean(product.is_offer || product.is_on_sale || discountPct > 0 || offerBadgeText || offerTitleText);
+    const dealRibbonLabel = offerBadgeText || (discountPct > 0 ? `-${discountPct}%` : (isOffer ? (isRtl ? 'عرض خاص' : 'Special Deal') : ''));
 
     let priceHtml = `<span class="font-display font-black text-base sm:text-lg" style="color:var(--text-primary)">${formatPrice(price)}</span>`;
     if (originalPrice && Number(originalPrice) > Number(price)) {
       priceHtml += `<span class="text-[11px] sm:text-xs line-through" style="color:var(--text-tertiary)">${formatPrice(originalPrice)}</span>`;
     }
 
-    const ratingVal = Number(product.rating || product.average_rating || 0);
     const reviewCount = Number(product.review_count || product.reviews_count || 0);
+    // A rating is only real when customers have actually reviewed the product.
+    const ratingVal = reviewCount > 0 ? Number(product.rating || product.average_rating || 0) : 0;
     let ratingHtml = '';
     if (ratingVal > 0) {
       ratingHtml = `
@@ -96,7 +104,7 @@
            style="background:var(--bg-surface);border:1px solid var(--border-color);transition-delay:${delay}ms">
         <a href="${productHref}" class="relative overflow-hidden block img-shimmer-wrap" style="aspect-ratio:4/3;background:var(--bg-surface-2)">
           ${cornerBadgeHtml ? `<div class="absolute ${badgePos} z-10 pointer-events-none">${cornerBadgeHtml}</div>` : ''}
-          ${discountPct > 0 ? `<div class="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 z-10 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-black uppercase tracking-wide bg-rose-500 text-white shadow-xs pointer-events-none">-${discountPct}%</div>` : ''}
+          ${dealRibbonLabel ? `<div class="absolute bottom-2.5 left-2.5 sm:bottom-3 sm:left-3 z-10 px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-black uppercase tracking-wide bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-xs pointer-events-none max-w-[85%] truncate">${dealRibbonLabel}</div>` : ''}
           <button data-wishlist-toggle="${slug}" aria-label="Toggle liked product" aria-pressed="${isSaved ? 'true' : 'false'}"
             class="${isSaved ? 'wishlist-active ' : ''}absolute ${heartPos} z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all duration-200 opacity-90 hover:opacity-100 hover:scale-110 shadow-sm cursor-pointer"
             style="background:rgba(255,255,255,0.92);border:1px solid var(--border-color);backdrop-filter:blur(6px)">
@@ -107,6 +115,7 @@
         <div class="p-3 sm:p-4 flex flex-col flex-1">
           <div class="mb-1.5">
             ${brandName ? `<span class="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block truncate" style="color:var(--color-accent)">${brandName}</span>` : ''}
+            ${offerTitleText ? `<span class="inline-block text-[10px] font-bold text-rose-500 uppercase tracking-wider mt-0.5 truncate max-w-full">🔥 ${offerTitleText}</span>` : ''}
             <a href="${productHref}" class="block text-xs sm:text-sm font-semibold leading-snug mt-1 line-clamp-2 min-h-[2.5rem] sm:min-h-[2.75rem] transition-colors duration-200 hover:opacity-80 break-words" style="color:var(--text-primary)">
               ${name}
             </a>
@@ -913,7 +922,8 @@
         breadcrumbCurrent.classList.remove('hidden');
         if (shopState.subcategoryName) {
           const catLabel = shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : '');
-          breadcrumbCurrent.innerHTML = `${catLabel ? `<a href="javascript:void(0)" onclick="if(window.selectShopCategory)window.selectShopCategory('${shopState.category}')" class="hover:underline">${catLabel}</a> <span class="mx-1 text-slate-400">/</span> ` : ''}<span class="text-[#8D9CF5] font-bold">${shopState.subcategoryName}</span>`;
+          const escB = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+          breadcrumbCurrent.innerHTML = `${catLabel ? `<a href="javascript:void(0)" onclick="if(window.selectShopCategory)window.selectShopCategory('${escB(shopState.category)}')" class="hover:underline">${escB(catLabel)}</a> <span class="mx-1 text-slate-400">/</span> ` : ''}<span class="text-[#8D9CF5] font-bold">${escB(shopState.subcategoryName)}</span>`;
         } else {
           breadcrumbCurrent.textContent = shopState.categoryName || (shopState.category ? shopState.category.replace(/-/g, ' ') : (isRtl ? 'جميع المنتجات' : 'All Products'));
         }
@@ -1265,7 +1275,7 @@
     categories.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
 
     const totalCatalogProducts = categories.reduce((sum, c) => sum + (Number(c.product_count) || 0), 0);
-    if (totalCountEl) totalCountEl.textContent = (totalCatalogProducts || 1462).toLocaleString();
+    if (totalCountEl) totalCountEl.textContent = (totalCatalogProducts || 0).toLocaleString();
 
     const activeCatSlug = (shopState.category || '').toLowerCase();
     const activeSubSlug = (shopState.subcategory || '').toLowerCase();
@@ -1879,7 +1889,7 @@
       const currentCatObj = categories.find(c => (c.slug || c.id || '').toLowerCase() === activeCat);
       if (currentCatObj) {
         shopState.categoryName = (isRtl && currentCatObj.name_ar) ? currentCatObj.name_ar : (currentCatObj.name || activeCat);
-        if (shopState.viewMode === 'products') {
+        if (shopState.viewMode === 'products' && !shopState.subcategoryName && !shopState.subcategory) {
           const pageTitle = document.getElementById('shop-page-title');
           const breadcrumbCurrent = document.getElementById('shop-breadcrumb-current');
           if (pageTitle) pageTitle.textContent = shopState.categoryName;
@@ -2426,8 +2436,8 @@
     if (searchParams.has('isOffer')) {
       shopState.isOffer = searchParams.get('isOffer') === 'true';
     }
-    if (searchParams.has('search')) {
-      const sVal = searchParams.get('search').trim();
+    if (searchParams.has('search') || searchParams.has('q')) {
+      const sVal = (searchParams.get('search') || searchParams.get('q') || '').trim();
       shopState.search = sVal;
       categoryState.search = sVal;
     }
@@ -2437,7 +2447,7 @@
 
     if (initialCategory) {
       shopState.category = initialCategory;
-      if (shopState.subcategory || shopState.brand || shopState.minPrice || shopState.maxPrice || shopState.inStock || shopState.isOffer || (searchParams.has('search') && shopState.search) || searchParams.get('view') === 'products') {
+      if (shopState.subcategory || shopState.brand || shopState.minPrice || shopState.maxPrice || shopState.inStock || shopState.isOffer || Boolean(shopState.search) || searchParams.get('view') === 'products') {
         shopState.viewMode = 'products';
       } else {
         shopState.viewMode = 'subcategories';
@@ -2881,8 +2891,16 @@
 
       // Rating & Reviews Count
       const ratingContainer = document.getElementById('product-rating-container');
-      if (ratingContainer) {
-        const rating = Number(product.rating || product.ratings || 5.0);
+      const detailReviews = Number(product.review_count || product.reviews_count || product.reviewsCount || 0);
+      const realRating = detailReviews > 0 ? Number(product.rating || product.ratings || product.average_rating || 0) : 0;
+      if (ratingContainer && !(realRating > 0)) {
+        // No real rating on this product: show nothing instead of a fake 5.0
+        ratingContainer.innerHTML = '';
+        ratingContainer.setAttribute('aria-hidden', 'true');
+        ratingContainer.style.display = 'none';
+      } else if (ratingContainer) {
+        ratingContainer.style.display = '';
+        const rating = realRating;
         const reviewsCount = Number(product.review_count || product.reviews_count || product.reviewsCount || 0);
         const fullStars = Math.floor(rating);
         const hasHalf = rating % 1 >= 0.5;
@@ -3064,16 +3082,64 @@
 
       setActiveImage(0);
 
-      // Price Container
+      // Special Offer Banner + Price Container
       const priceContainer = document.getElementById('product-price-container');
-      if (priceContainer) {
-        let phtml = `<span class="text-4xl font-display font-black" style="color:var(--text-primary)">${formatPrice(pPrice)}</span>`;
-        if (pOrigPrice && pOrigPrice > pPrice) {
-          phtml += `<span class="text-lg line-through" style="color:var(--text-tertiary)">${formatPrice(pOrigPrice)}</span>`;
+      const offerBannerEl = document.getElementById('product-offer-banner');
+      const offerBadgeEl = document.getElementById('product-offer-badge');
+      const offerTitleEl = document.getElementById('product-offer-title');
+      const offerDescEl = document.getElementById('product-offer-description');
+      const origNum = pOrigPrice ? Number(pOrigPrice) : 0;
+      const priceNum = Number(pPrice || 0);
+      const hasDiscount = Boolean(origNum && origNum > priceNum && origNum > 0);
+      const pctOff = hasDiscount
+        ? Math.round(((origNum - priceNum) / origNum) * 100)
+        : (product.discount_percent ? Math.round(Number(product.discount_percent)) : 0);
+      const customOfferBadge = String(product.offer_badge || '').trim();
+      const customOfferTitle = String(product.offer_title || '').trim();
+      const customOfferDesc = String(product.offer_description || '').trim();
+      const hasActiveOffer = Boolean(product.is_offer || product.is_on_sale || hasDiscount || customOfferBadge || customOfferTitle || customOfferDesc);
+
+      if (offerBannerEl) {
+        if (hasActiveOffer) {
+          if (offerBadgeEl) {
+            offerBadgeEl.textContent = customOfferBadge || (pctOff > 0 ? (isRtl ? `خصم ${pctOff}%` : `EXTRA ${pctOff}% OFF`) : (isRtl ? 'عرض خاص' : 'SPECIAL OFFER'));
+          }
+          if (offerTitleEl) {
+            offerTitleEl.textContent = customOfferTitle ? `🔥 ${customOfferTitle}` : (isRtl ? '🔥 عرض لفترة محدودة' : '🔥 Limited Time Deal');
+          }
+          if (offerDescEl) {
+            if (customOfferDesc) {
+              offerDescEl.textContent = customOfferDesc;
+              offerDescEl.classList.remove('hidden');
+            } else {
+              offerDescEl.textContent = '';
+              offerDescEl.classList.add('hidden');
+            }
+          }
+          offerBannerEl.classList.remove('hidden');
+        } else {
+          offerBannerEl.classList.add('hidden');
+        }
+      }
+
+      const renderPriceDisplay = (curVal, origVal) => {
+        if (!priceContainer) return;
+        const cNum = Number(curVal || 0);
+        const oNum = origVal ? Number(origVal) : 0;
+        let phtml = `<span class="text-4xl font-display font-black" style="color:var(--text-primary)">${formatPrice(cNum)}</span>`;
+        if (oNum > cNum) {
+          const diffQar = Math.round(oNum - cNum);
+          const pct = Math.round(((oNum - cNum) / oNum) * 100);
+          phtml += `<span class="text-lg line-through" style="color:var(--text-tertiary)">${formatPrice(oNum)}</span>`;
+          if (diffQar > 0) {
+            phtml += `<span class="px-2.5 py-1 rounded-lg text-xs font-bold font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/20">${isRtl ? `وفر ${diffQar} ر.ق (-${pct}%)` : `Save ${diffQar.toLocaleString()} QAR (-${pct}%)`}</span>`;
+          }
         }
         priceContainer.innerHTML = phtml;
         priceContainer.removeAttribute('aria-hidden');
-      }
+      };
+
+      renderPriceDisplay(pPrice, pOrigPrice);
 
       // Short Description
       const shortDescEl = document.getElementById('product-short-description');
@@ -3132,61 +3198,11 @@
         stockContainer.removeAttribute('aria-hidden');
       }
 
-      // Variants Selector (Colour/Size)
-      const variantsBox = document.getElementById('product-variants-container');
-      const variantsOptions = document.getElementById('product-variants-options');
-      const variantLabel = document.getElementById('product-selected-variant-label');
-      let variantsList = product.variants;
-      if (typeof variantsList === 'string') {
-        try { variantsList = JSON.parse(variantsList); } catch (e) { variantsList = []; }
-      }
-      if (variantsBox && variantsOptions && Array.isArray(variantsList) && variantsList.length > 0) {
-        let activeVariantIdx = 0;
-        const updateSelectedVariant = (idx) => {
-          activeVariantIdx = idx;
-          const v = variantsList[idx];
-          const vName = (isRtl && (v.nameAr || v.name_ar)) || v.name || v.color || v.size || `Variant ${idx + 1}`;
-          if (variantLabel) variantLabel.textContent = vName;
-          if (v.price && priceContainer) {
-            let phtml = `<span class="text-4xl font-display font-black" style="color:var(--text-primary)">${formatPrice(v.price)}</span>`;
-            const origP = v.original_price || (pOrigPrice && pOrigPrice > v.price ? pOrigPrice : null);
-            if (origP && origP > v.price) {
-              phtml += `<span class="text-lg line-through" style="color:var(--text-tertiary)">${formatPrice(origP)}</span>`;
-            }
-            priceContainer.innerHTML = phtml;
-          }
-          if (v.sku && skuEl) skuEl.textContent = `SKU: ${v.sku}`;
-          if (v.stock !== undefined && stockContainer) {
-            const vInStock = Number(v.stock) > 0;
-            stockContainer.innerHTML = vInStock
-              ? `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-xs font-bold text-emerald-500">${isRtl ? `متوفر (${v.stock} متبقي)` : `In Stock (${v.stock} left)`}</span>`
-              : `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span class="text-xs font-bold text-rose-500">${isRtl ? 'غير متوفر حالياً' : 'Out of Stock'}</span>`;
-          }
-          if (v.image && mainImg) loadMainProductImage(v.image, `${pName} - ${vName}`);
-          renderVariantButtons();
-        };
-
-        const renderVariantButtons = () => {
-          variantsOptions.innerHTML = variantsList.map((v, i) => {
-            const isSel = i === activeVariantIdx;
-            const label = (isRtl && (v.nameAr || v.name_ar)) || v.name || v.color || v.size || `Variant ${i + 1}`;
-            return `
-              <button type="button" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${isSel ? 'bg-[#4063B2] text-white shadow-md' : 'border border-slate-700/30 text-slate-300 hover:text-white'}" onclick="window.__selectVariant(${i})">
-                ${label}
-              </button>
-            `;
-          }).join('');
-        };
-
-        window.__selectVariant = updateSelectedVariant;
-        updateSelectedVariant(0);
-        variantsBox.classList.remove('hidden');
-      }
-
-      // Add to Cart Button
+      // Add to Cart Button (sync helper used both initially & when switching variants)
       const addBtn = document.getElementById('product-add-to-cart-btn');
-      if (addBtn) {
-        if (!inStock) {
+      const syncAddToCartBtnState = (isAvailable, variantData = null) => {
+        if (!addBtn) return;
+        if (!isAvailable) {
           addBtn.disabled = true;
           addBtn.setAttribute('aria-disabled', 'true');
           addBtn.removeAttribute('data-add-to-cart');
@@ -3205,6 +3221,84 @@
           const span = addBtn.querySelector('span');
           if (span) span.textContent = isRtl ? 'أضف إلى السلة' : 'Add to Cart';
         }
+        if (variantData) {
+          addBtn.dataset.variantName = variantData.name || '';
+          addBtn.dataset.variantPrice = variantData.price !== undefined && variantData.price !== null ? String(variantData.price) : '';
+          addBtn.dataset.variantOrigPrice = variantData.origPrice !== undefined && variantData.origPrice !== null ? String(variantData.origPrice) : '';
+          addBtn.dataset.variantSku = variantData.sku || '';
+          addBtn.dataset.variantImage = variantData.image || '';
+        } else {
+          delete addBtn.dataset.variantName;
+          delete addBtn.dataset.variantPrice;
+          delete addBtn.dataset.variantOrigPrice;
+          delete addBtn.dataset.variantSku;
+          delete addBtn.dataset.variantImage;
+        }
+      };
+
+      syncAddToCartBtnState(inStock, null);
+
+      // Variants Selector (Colour/Size)
+      const variantsBox = document.getElementById('product-variants-container');
+      const variantsOptions = document.getElementById('product-variants-options');
+      const variantLabel = document.getElementById('product-selected-variant-label');
+      let variantsList = product.variants;
+      if (typeof variantsList === 'string') {
+        try { variantsList = JSON.parse(variantsList); } catch (e) { variantsList = []; }
+      }
+      if (variantsBox && variantsOptions && Array.isArray(variantsList) && variantsList.length > 0) {
+        let activeVariantIdx = 0;
+        const updateSelectedVariant = (idx) => {
+          activeVariantIdx = idx;
+          const v = variantsList[idx];
+          const vName = (isRtl && (v.nameAr || v.name_ar)) || v.name || [v.color || v.colour, v.size || v.spec].filter(Boolean).join(' / ') || `Variant ${idx + 1}`;
+          if (variantLabel) variantLabel.textContent = vName;
+
+          const vPrice = v.price !== undefined && v.price !== null && v.price !== '' && Number(v.price) > 0 ? Number(v.price) : priceNum;
+          const origP = v.original_price || (pOrigPrice && Number(pOrigPrice) > vPrice ? Number(pOrigPrice) : null);
+          if (priceContainer) {
+            renderPriceDisplay(vPrice, origP);
+          }
+
+          if (v.sku && skuEl) skuEl.textContent = `SKU: ${v.sku}`;
+          else if (skuEl) skuEl.textContent = `SKU: ${product.sku || product.id || 'N/A'}`;
+
+          const hasVarStock = v.stock !== undefined && v.stock !== null && v.stock !== '';
+          const vInStock = hasVarStock ? Number(v.stock) > 0 : inStock;
+          if (stockContainer) {
+            stockContainer.innerHTML = vInStock
+              ? `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span class="text-xs font-bold text-emerald-500">${isRtl ? `متوفر (${hasVarStock ? v.stock : pStock} متبقي)` : `In Stock (${hasVarStock ? v.stock : pStock} left)`}</span>`
+              : `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span class="text-xs font-bold text-rose-500">${isRtl ? 'غير متوفر حالياً' : 'Out of Stock'}</span>`;
+          }
+
+          syncAddToCartBtnState(vInStock, {
+            name: vName,
+            price: vPrice,
+            origPrice: origP,
+            sku: v.sku || product.sku || '',
+            image: v.image || primaryImage,
+          });
+
+          if (v.image && mainImg) loadMainProductImage(v.image, `${pName} - ${vName}`);
+          renderVariantButtons();
+        };
+
+        const renderVariantButtons = () => {
+          variantsOptions.innerHTML = variantsList.map((v, i) => {
+            const isSel = i === activeVariantIdx;
+            const label = (isRtl && (v.nameAr || v.name_ar)) || v.name || [v.color || v.colour, v.size || v.spec].filter(Boolean).join(' / ') || `Variant ${i + 1}`;
+            const isVarOut = v.stock !== undefined && v.stock !== null && v.stock !== '' && Number(v.stock) <= 0;
+            return `
+              <button type="button" class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${isSel ? 'bg-[#4063B2] text-white shadow-md' : 'border hover:border-[#4063B2]'} ${isVarOut ? 'opacity-50 line-through' : ''}" style="${isSel ? '' : 'border-color:var(--border-color);color:var(--text-primary);background:var(--bg-surface)'}" onclick="window.__selectVariant(${i})">
+                ${label}
+              </button>
+            `;
+          }).join('');
+        };
+
+        window.__selectVariant = updateSelectedVariant;
+        updateSelectedVariant(0);
+        variantsBox.classList.remove('hidden');
       }
 
       // Wishlist / Liked Button
@@ -3374,14 +3468,17 @@
       }
       if (!Array.isArray(categories) || categories.length === 0) return;
 
-      // Prioritize categories with products or featured status
+      // Prioritize featured categories, then display order, then product count
+      const escHome = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const sorted = categories
         .filter(c => c && c.name)
         .sort((a, b) => {
-          const aCount = a.product_count || 0;
-          const bCount = b.product_count || 0;
-          if (bCount !== aCount) return bCount - aCount;
-          return (a.order || 0) - (b.order || 0);
+          const aFeat = a.is_featured ? 1 : 0;
+          const bFeat = b.is_featured ? 1 : 0;
+          if (bFeat !== aFeat) return bFeat - aFeat;
+          const orderDiff = (Number(a.order) || 0) - (Number(b.order) || 0);
+          if (orderDiff !== 0) return orderDiff;
+          return (Number(b.product_count) || 0) - (Number(a.product_count) || 0);
         });
 
       if (sorted.length === 0) return;
@@ -3416,15 +3513,15 @@
         <div class="col-span-2 md:col-span-1 lg:col-span-2 row-span-2">
           <a href="${primHref}">
             <div class="h-[400px] group relative rounded-3xl overflow-hidden border border-[#4063B2]/30 hover:border-[#8D9CF5] hover:shadow-[0_0_30px_rgba(141,156,245,0.3)] transition-all duration-500">
-              <img src="${primImg}" alt="${primName}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              <img src="${escHome(primImg)}" alt="${escHome(primName)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                 onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/categories/cat-laptops.jpg'" />
               <div class="absolute inset-0 bg-gradient-to-t from-[#070B14] via-[#070B14]/40 to-transparent"></div>
               <div class="absolute bottom-0 left-0 right-0 p-8">
                 <span class="inline-block px-3 py-1 rounded-full bg-[#4063B2]/30 text-[#8D9CF5] border border-[#8D9CF5]/40 text-xs mb-2 font-sans font-bold">
-                  ${primCount} ${primary.name_ar ? `• ${primary.name_ar}` : ''}
+                  ${escHome(primCount)} ${primary.name_ar ? `• ${escHome(primary.name_ar)}` : ''}
                 </span>
-                <h3 class="text-white text-3xl font-black font-display mb-1">${primName}</h3>
-                <p class="text-xs text-slate-300 font-sans mb-3">${primary.name_ar || 'Explore all products in this collection'}</p>
+                <h3 class="text-white text-3xl font-black font-display mb-1">${escHome(primName)}</h3>
+                <p class="text-xs text-slate-300 font-sans mb-3">${escHome(primary.name_ar || 'Explore all products in this collection')}</p>
                 <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
                   <span class="text-[#8D9CF5] text-sm font-bold font-sans tracking-wider uppercase">${isArabic ? 'تسوق المجموعة' : 'Shop Collection'}</span>
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-[#8D9CF5] ${isArabic ? 'rotate-180' : ''}"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
@@ -3446,12 +3543,12 @@
           <div>
             <a href="${href}">
               <div class="h-[190px] group relative rounded-2xl overflow-hidden border border-white/10 hover:border-[#8D9CF5]/70 hover:shadow-[0_0_20px_rgba(141,156,245,0.25)] transition-all duration-300">
-                <img src="${img}" alt="${name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                <img src="${escHome(img)}" alt="${escHome(name)}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   onerror="this.src='/assets/images/products/placeholder.svg'" />
                 <div class="absolute inset-0 bg-gradient-to-t from-[#070B14]/90 via-[#070B14]/30 to-transparent"></div>
                 <div class="absolute bottom-0 left-0 right-0 p-4">
-                  <span class="text-[10px] text-[#38BDF8] font-bold font-sans tracking-wider uppercase truncate block">${countBadge}</span>
-                  <h3 class="text-white text-lg font-bold font-display leading-tight group-hover:text-[#8D9CF5] transition-colors truncate">${name}</h3>
+                  <span class="text-[10px] text-[#38BDF8] font-bold font-sans tracking-wider uppercase truncate block">${escHome(countBadge)}</span>
+                  <h3 class="text-white text-lg font-bold font-display leading-tight group-hover:text-[#8D9CF5] transition-colors truncate">${escHome(name)}</h3>
                 </div>
               </div>
             </a>
@@ -3602,16 +3699,23 @@
       }
       if (!Array.isArray(categories) || categories.length === 0) return;
 
+      const escFooter = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const isArabic = isRtl || window.location.pathname.startsWith('/ar');
       const topCats = categories
         .filter(c => c && c.name)
-        .sort((a, b) => (b.product_count || 0) - (a.product_count || 0))
+        .sort((a, b) => {
+          const featDiff = (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+          if (featDiff !== 0) return featDiff;
+          const orderDiff = (Number(a.order) || 0) - (Number(b.order) || 0);
+          if (orderDiff !== 0) return orderDiff;
+          return (Number(b.product_count) || 0) - (Number(a.product_count) || 0);
+        })
         .slice(0, 5);
 
       let html = topCats.map(c => {
         const slug = c.slug || c.id;
         const name = (isArabic && c.name_ar) ? c.name_ar : c.name;
-        return `<li><a href="${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(slug)}" class="text-xs transition-colors hover:text-[#8D9CF5]" style="color:var(--text-secondary);font-size:12px">${name}</a></li>`;
+        return `<li><a href="${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(slug)}" class="text-xs transition-colors hover:text-[#8D9CF5]" style="color:var(--text-secondary);font-size:12px">${escFooter(name)}</a></li>`;
       }).join('');
 
       html += `<li><a href="${isArabic ? '/ar' : ''}/categories/" class="view-all-link text-xs font-semibold tracking-wide text-[#8D9CF5] hover:underline flex items-center gap-1 mt-1.5" style="font-size:12px">${isArabic ? 'جميع الفئات ←' : 'View All Categories →'}</a></li>`;
@@ -3657,6 +3761,7 @@
           categories = await res.json();
         }
 
+        const escCat = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         const isArabic = isRtl || window.location.pathname.startsWith('/ar');
         const defaultImages = {
           'mobile-accessories': 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/hero-mobile.jpg',
@@ -3668,7 +3773,15 @@
           'networking': 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/tplink-deco-xe75.jpg'
         };
 
-        grid.innerHTML = (categories || []).map(cat => {
+        const sortedModalCats = (categories || []).slice().sort((a, b) => {
+          const featDiff = (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+          if (featDiff !== 0) return featDiff;
+          const orderDiff = (Number(a.order) || 0) - (Number(b.order) || 0);
+          if (orderDiff !== 0) return orderDiff;
+          return (Number(b.product_count) || 0) - (Number(a.product_count) || 0);
+        });
+
+        grid.innerHTML = sortedModalCats.map(cat => {
           const slug = cat.slug || cat.id;
           const name = (isArabic && cat.name_ar) ? cat.name_ar : (cat.name || slug);
           const img = cat.image || defaultImages[slug] || defaultImages[cat.id] || 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
@@ -3676,16 +3789,16 @@
 
           return `
             <a href="${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(slug)}"
-               data-cat-name="${(name + ' ' + slug).toLowerCase()}"
+               data-cat-name="${escCat((name + ' ' + slug).toLowerCase())}"
                class="group relative rounded-2xl overflow-hidden border border-slate-700/30 hover:border-[#8D9CF5] hover:shadow-lg transition-all duration-300 flex flex-col"
                style="background:var(--bg-surface-2)">
               <div class="w-full aspect-[4/3] overflow-hidden bg-slate-900/50 relative">
-                <img src="${img}" alt="${name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108" onerror="this.src='/assets/images/products/placeholder.svg'" loading="lazy" />
+                <img src="${escCat(img)}" alt="${escCat(name)}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108" onerror="this.src='/assets/images/products/placeholder.svg'" loading="lazy" />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                ${count ? `<span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#4063B2]/90 text-white backdrop-blur-xs">${count}</span>` : ''}
+                ${count ? `<span class="absolute bottom-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#4063B2]/90 text-white backdrop-blur-xs">${escCat(count)}</span>` : ''}
               </div>
               <div class="p-3">
-                <h4 class="text-sm font-bold truncate group-hover:text-[#8D9CF5] transition-colors" style="color:var(--text-primary)">${name}</h4>
+                <h4 class="text-sm font-bold truncate group-hover:text-[#8D9CF5] transition-colors" style="color:var(--text-primary)">${escCat(name)}</h4>
               </div>
             </a>
           `;
@@ -3693,7 +3806,7 @@
 
         grid.dataset.loaded = 'true';
 
-        const modalSearch = document.getElementById('modal-categories-search');
+        const modalSearch = document.getElementById('modal-category-search-input') || document.getElementById('modal-categories-search');
         if (modalSearch) {
           modalSearch.oninput = (e) => {
             const val = e.target.value.toLowerCase().trim();
@@ -3767,10 +3880,6 @@
     window.closeShopFilterDrawer();
   };
 
-  window.clearAllShopFilters = function () {
-    returnToShopCategories();
-  };
-
   window.openMobileFilterDrawer = window.openShopFilterDrawer;
   window.closeMobileFilterDrawer = window.closeShopFilterDrawer;
 
@@ -3781,6 +3890,15 @@
       if (window.closeAllCategoriesModal) window.closeAllCategoriesModal();
     }
   });
+
+  function escHtml(v) {
+    return String(v ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 
   // ─── 2.56 DYNAMIC HERO BANNER HYDRATION (Requirement 3 & 1) ────────────────
   // Implements instant local storage hydration and smart DB change detection to skip continuous fetching.
@@ -3850,29 +3968,25 @@
         ? (b.image_mobile || b.mobile_image || b.image_desktop || b.image || b.image_url)
         : (b.image_desktop || b.image || b.image_url || b.image_mobile);
       if (targetImg && bgImgEl) {
-        bgImgEl.style.backgroundImage = "url('" + targetImg + "')";
+        bgImgEl.style.backgroundImage = "url('" + String(targetImg).replace(/['"\\()]/g, '') + "')";
       }
 
-      let rawPrimaryText = isRtl && (b.cta_text_ar || b.button_text_ar)
+      const primaryText = isRtl && (b.cta_text_ar || b.button_text_ar)
         ? (b.cta_text_ar || b.button_text_ar)
         : (b.cta_text || b.button_text || 'Shop All Collections');
-      if (rawPrimaryText === 'Explore Catalog') {
-        rawPrimaryText = 'Shop All Collections';
-      }
-      const primaryText = rawPrimaryText;
       const primaryLink = b.cta_link || b.link_url || '/shop/';
 
       if (actionsEl) {
-        let btnsHtml = '<a href="' + primaryLink + '" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#4063B2] to-[#8D9CF5] text-white text-xs font-bold uppercase tracking-wider hover:brightness-110 shadow-lg shadow-[#4063B2]/20 transition-all duration-200">' +
-          '<span>' + primaryText + '</span>' +
+        let btnsHtml = '<a href="' + escHtml(primaryLink) + '" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#4063B2] to-[#8D9CF5] text-white text-xs font-bold uppercase tracking-wider hover:brightness-110 shadow-lg shadow-[#4063B2]/20 transition-all duration-200">' +
+          '<span>' + escHtml(primaryText) + '</span>' +
           '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>' +
         '</a>';
 
         const secText = isRtl && b.secondary_cta_text_ar ? b.secondary_cta_text_ar : b.secondary_cta_text;
         const secLink = b.secondary_cta_link || '/shop/?category=home-appliances';
         if (secText) {
-          btnsHtml += '<a href="' + secLink + '" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/20 backdrop-blur-md transition-all duration-200">' +
-            '<span>' + secText + '</span>' +
+          btnsHtml += '<a href="' + escHtml(secLink) + '" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider border border-white/20 backdrop-blur-md transition-all duration-200">' +
+            '<span>' + escHtml(secText) + '</span>' +
           '</a>';
         }
         actionsEl.innerHTML = btnsHtml;
@@ -3950,12 +4064,18 @@
       }
 
       // ── STEP 3: FETCH FROM DB (Only when changed or no cache) ──
-      const res = await fetch('/api/banners?type=hero');
+      const res = await fetch('/api/banners?type=hero&_t=' + Date.now());
       if (!res.ok) return;
       const banners = await res.json();
-      if (!Array.isArray(banners) || banners.length === 0) return;
-      const activeBanners = banners.filter(b => b.is_active !== false && b.status !== 'inactive');
-      if (activeBanners.length === 0) return;
+      const activeBanners = Array.isArray(banners)
+        ? banners.filter(b => b.is_active !== false && b.status !== 'inactive' && b.status !== 'pending_approval' && b.status !== 'rejected')
+        : [];
+      if (activeBanners.length === 0) {
+        try { localStorage.removeItem(HERO_STORAGE_KEY); } catch (_) {}
+        const dots = document.getElementById('hero-banner-dots');
+        if (dots) dots.remove();
+        return;
+      }
 
       // Save fresh data & version to local storage
       saveLocalHeroCache(dbVersion || String(Date.now()), activeBanners);
@@ -3965,6 +4085,9 @@
 
       if (activeBanners.length > 1) {
         setupBannerRotation(activeBanners);
+      } else {
+        const dots = document.getElementById('hero-banner-dots');
+        if (dots) dots.remove();
       }
     } catch (e) {
       console.warn('[HeroBanner] Sync error:', e);
@@ -3977,32 +4100,41 @@
     if (!container) return;
 
     try {
-      const res = await fetch('/api/promotional-sections');
+      const res = await fetch('/api/promotional-sections?_t=' + Date.now());
       if (!res.ok) return;
-      const sections = await res.json();
-      if (!Array.isArray(sections) || sections.length === 0) return;
+      const rawSections = await res.json();
+      const sections = Array.isArray(rawSections)
+        ? rawSections.filter(s => s && s.is_active !== false && s.status !== 'inactive' && s.status !== 'pending_approval' && s.status !== 'rejected')
+        : [];
+      if (sections.length === 0) {
+        container.innerHTML = '';
+        return;
+      }
 
       const isRtl = document.documentElement.dir === 'rtl';
       const isMobile = window.innerWidth < 768;
 
       container.innerHTML = sections.map(function(sec) {
         const title = isRtl && sec.title_ar ? sec.title_ar : (sec.title || 'NEXT-GEN MOBILE & POWER ESSENTIALS');
-        const badge = isRtl && sec.badge_ar ? sec.badge_ar : (sec.badge || 'PREMIUM MOBILE ESSENTIALS • إكسسوارات الجوال الأصلية');
-        const subtitle = isRtl && sec.subtitle_ar ? sec.subtitle_ar : (sec.subtitle || 'Genuine high-speed fast chargers, high-capacity power banks, and accessories across Qatar.');
-        const img = isMobile ? (sec.image_mobile || sec.image_desktop || '/assets/images/banners/hero-mobile.jpg') : (sec.image_desktop || '/assets/images/banners/hero-mobile.jpg');
+        const badge = isRtl && (sec.badge_ar || sec.tag_ar) ? (sec.badge_ar || sec.tag_ar) : (sec.badge || sec.tag || sec.badge_text || 'PREMIUM MOBILE ESSENTIALS • إكسسوارات الجوال الأصلية');
+        const subtitle = isRtl && sec.subtitle_ar ? sec.subtitle_ar : (sec.subtitle || sec.description || 'Genuine high-speed fast chargers, high-capacity power banks, and accessories across Qatar.');
+        const img = isMobile ? (sec.image_mobile || sec.image_desktop || sec.image || '/assets/images/banners/hero-mobile.jpg') : (sec.image_desktop || sec.image || '/assets/images/banners/hero-mobile.jpg');
         const ctaText = isRtl && sec.cta_text_ar ? sec.cta_text_ar : (sec.cta_text || 'SHOP MOBILE ACCESSORIES');
         const ctaLink = sec.cta_link || '/shop/?category=mobile-accessories';
-        const secCtaText = isRtl && sec.secondary_cta_text_ar ? sec.secondary_cta_text_ar : (sec.secondary_cta_text || 'CHAT ON WHATSAPP');
+        const secCtaText = isRtl && sec.secondary_cta_text_ar ? sec.secondary_cta_text_ar : (sec.secondary_cta_text || '');
         const secCtaLink = sec.secondary_cta_link || 'https://wa.me/97477991013';
 
-        const cardTag = sec.card_tag || 'FAST CHARGING & POWER';
-        const cardPrice = sec.card_price || 'FROM QAR 49';
-        const cardLink = sec.card_link || '/shop/?category=mobile-accessories';
+        const cardTag = sec.card_tag || sec.product_name || 'FEATURED SELECTION';
+        const rawCardPrice = sec.card_price !== undefined ? sec.card_price : sec.product_price;
+        const cardPrice = rawCardPrice !== undefined && rawCardPrice !== null && rawCardPrice !== ''
+          ? (typeof rawCardPrice === 'number' || /^\d+(\.\d+)?$/.test(String(rawCardPrice).trim()) ? `FROM QAR ${rawCardPrice}` : String(rawCardPrice))
+          : '';
+        const cardLink = sec.card_link || sec.product_link || ctaLink;
 
-        let titleHtml = title;
+        let titleHtml = escHtml(title);
         if (title.indexOf('&') !== -1) {
           const parts = title.split('&');
-          titleHtml = parts[0].trim() + ' &amp;<br /><span class="text-outline">' + parts.slice(1).join('&').trim() + '</span>';
+          titleHtml = escHtml(parts[0].trim()) + ' &amp;<br /><span class="text-outline">' + escHtml(parts.slice(1).join('&').trim()) + '</span>';
         }
 
         return '<section class="py-24 md:py-36 px-6 sm:px-12 md:px-16 overflow-hidden" style="background-color:var(--bg-surface);border-top:1px solid var(--border-color);color:var(--text-primary)">' +
@@ -4010,31 +4142,31 @@
             '<div class="lg:col-span-6 relative cursor-pointer group">' +
               '<div class="absolute w-full h-full bg-gradient-to-br from-[#4063B2]/20 to-[#8D9CF5]/20 rounded-3xl pointer-events-none -top-8 -left-8 md:-top-12 md:-left-12 z-0"></div>' +
               '<div class="relative z-10 aspect-[4/5] overflow-hidden rounded-2xl bg-surface-2 transition-transform duration-500 ease-out">' +
-                '<img src="' + img + '" alt="' + title.replace(/"/g, '&quot;') + '" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />' +
+                '<img src="' + escHtml(img) + '" alt="' + escHtml(title) + '" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105" />' +
                 '<div class="absolute inset-0 bg-black/20 pointer-events-none"></div>' +
                 '<div class="absolute bottom-6 left-6 right-6 p-4 bg-[#070B14]/85 backdrop-blur-md border border-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-between rounded-xl">' +
                   '<div>' +
-                    '<p class="text-[10px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">' + cardTag + '</p>' +
-                    (cardPrice ? '<p class="font-display text-lg text-white font-bold">' + cardPrice + '</p>' : '') +
+                    '<p class="text-[10px] font-sans font-bold uppercase tracking-widest text-[#8D9CF5]">' + escHtml(cardTag) + '</p>' +
+                    (cardPrice ? '<p class="font-display text-lg text-white font-bold">' + escHtml(cardPrice) + '</p>' : '') +
                   '</div>' +
-                  '<a href="' + cardLink + '" class="text-xs font-sans font-bold uppercase tracking-widest text-white underline underline-offset-4">EXPLORE</a>' +
+                  '<a href="' + escHtml(cardLink) + '" class="text-xs font-sans font-bold uppercase tracking-widest text-white underline underline-offset-4">EXPLORE</a>' +
                 '</div>' +
               '</div>' +
             '</div>' +
             '<div class="lg:col-span-6 space-y-8">' +
-              '<span class="font-display text-sm md:text-base uppercase tracking-widest text-[#8D9CF5] font-bold block">' + badge + '</span>' +
+              '<span class="font-display text-sm md:text-base uppercase tracking-widest text-[#8D9CF5] font-bold block">' + escHtml(badge) + '</span>' +
               '<h2 class="font-display text-5xl sm:text-6xl md:text-7xl leading-tight uppercase tracking-tight font-black" style="color:var(--text-primary)">' +
                 titleHtml +
               '</h2>' +
               '<p class="text-base sm:text-lg font-sans leading-relaxed max-w-xl" style="color:var(--text-secondary)">' +
-                subtitle +
+                escHtml(subtitle) +
               '</p>' +
               '<div class="pt-4 flex flex-wrap items-center gap-6">' +
-                '<a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300" style="color:var(--text-primary)" href="' + ctaLink + '">' +
-                  '<span>' + ctaText + '</span>' +
+                '<a class="group inline-flex items-center gap-4 text-xs font-sans font-bold tracking-widest uppercase transition-colors duration-300" style="color:var(--text-primary)" href="' + escHtml(ctaLink) + '">' +
+                  '<span>' + escHtml(ctaText) + '</span>' +
                   '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-300 group-hover:translate-x-2"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>' +
                 '</a>' +
-                (secCtaText ? '<a href="' + secCtaLink + '" target="_blank" rel="noopener noreferrer" class="text-xs font-sans font-bold tracking-widest uppercase text-slate-400 hover:text-white underline underline-offset-4 transition-colors">' + secCtaText + '</a>' : '') +
+                (secCtaText ? '<a href="' + escHtml(secCtaLink) + '" target="_blank" rel="noopener noreferrer" class="text-xs font-sans font-bold tracking-widest uppercase text-slate-400 hover:text-white underline underline-offset-4 transition-colors">' + escHtml(secCtaText) + '</a>' : '') +
               '</div>' +
             '</div>' +
           '</div>' +

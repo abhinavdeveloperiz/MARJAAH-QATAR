@@ -85,13 +85,14 @@ export class PromotionalSectionsService implements OnModuleInit {
       const now = new Date().getTime();
       items = items.filter((item) => {
         if (item.is_active === false) return false;
+        if (item.status === 'pending_approval' || item.status === 'rejected') return false;
         if (item.start_date && new Date(item.start_date).getTime() > now) return false;
         if (item.end_date && new Date(item.end_date).getTime() < now) return false;
         return true;
       });
     }
 
-    items.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+    items.sort((a, b) => (Number(a.order ?? a.display_order) || 0) - (Number(b.order ?? b.display_order) || 0));
     return items;
   }
 
@@ -103,17 +104,41 @@ export class PromotionalSectionsService implements OnModuleInit {
     return { id: doc.id, ...doc.data() };
   }
 
-  async create(dto: PromotionalSectionDto, adminUser?: any) {
-    if (!dto.title || !dto.image_desktop) {
+  private normalizePromoFields(dto: any, existing: any = {}): Record<string, any> {
+    const out: Record<string, any> = { ...dto };
+    if (dto.description !== undefined && dto.subtitle === undefined) out.subtitle = dto.description;
+    if (dto.badge_text !== undefined && dto.badge === undefined) out.badge = dto.badge_text;
+    if (dto.image !== undefined && dto.image_desktop === undefined) out.image_desktop = dto.image;
+    if (dto.image_desktop !== undefined && dto.image === undefined) out.image = dto.image_desktop;
+    if (dto.mobile_image !== undefined && dto.image_mobile === undefined) out.image_mobile = dto.mobile_image;
+    if (dto.product_name !== undefined && dto.card_tag === undefined) out.card_tag = dto.product_name;
+    if (dto.product_price !== undefined && dto.card_price === undefined) out.card_price = String(dto.product_price);
+    if (dto.product_link !== undefined && dto.card_link === undefined) out.card_link = dto.product_link;
+    if (dto.display_order !== undefined && dto.order === undefined) out.order = Number(dto.display_order) || 0;
+    if (out.order !== undefined) out.order = Number(out.order) || 0;
+    if (!out.image_mobile && (out.image_desktop || existing.image_desktop)) {
+      out.image_mobile = out.image_desktop || existing.image_desktop;
+    }
+    return out;
+  }
+
+  async create(dto: PromotionalSectionDto & Record<string, any>, adminUser?: any) {
+    const normalized = this.normalizePromoFields(dto);
+    const desktopImg = normalized.image_desktop || normalized.image;
+    if (!normalized.title || !desktopImg) {
       throw new BadRequestException('Title and desktop image are required');
     }
 
     const now = new Date().toISOString();
-    const payload = {
-      ...dto,
-      is_active: dto.is_active !== undefined ? Boolean(dto.is_active) : true,
-      order: Number(dto.order) || 0,
-      image_mobile: dto.image_mobile || dto.image_desktop,
+    const payload: Record<string, any> = {
+      ...normalized,
+      title: normalized.title,
+      subtitle: normalized.subtitle || '',
+      image_desktop: desktopImg,
+      image: desktopImg,
+      image_mobile: normalized.image_mobile || desktopImg,
+      is_active: normalized.is_active !== undefined ? Boolean(normalized.is_active) : true,
+      order: Number(normalized.order) || 0,
       created_at: now,
       updated_at: now,
     };
@@ -127,7 +152,7 @@ export class PromotionalSectionsService implements OnModuleInit {
         action: 'create',
         module: 'website_content',
         target_id: ref.id,
-        target_title: dto.title,
+        target_title: payload.title,
         details: payload,
       });
     }
@@ -135,7 +160,7 @@ export class PromotionalSectionsService implements OnModuleInit {
     return { id: ref.id, ...payload };
   }
 
-  async update(id: string, dto: Partial<PromotionalSectionDto>, adminUser?: any) {
+  async update(id: string, dto: Partial<PromotionalSectionDto> & Record<string, any>, adminUser?: any) {
     const docRef = this.firestore.doc('promotional_sections', id);
     const existing = await docRef.get();
     if (!existing.exists) {
@@ -144,9 +169,12 @@ export class PromotionalSectionsService implements OnModuleInit {
 
     const now = new Date().toISOString();
     const updateData: any = {
-      ...dto,
+      ...this.normalizePromoFields(dto, existing.data() || {}),
       updated_at: now,
     };
+    Object.keys(updateData).forEach((k) => {
+      if (updateData[k] === undefined) delete updateData[k];
+    });
 
     await docRef.update(updateData);
 
@@ -157,7 +185,7 @@ export class PromotionalSectionsService implements OnModuleInit {
         action: 'edit',
         module: 'website_content',
         target_id: id,
-        target_title: dto.title || existing.data()?.title,
+        target_title: updateData.title || existing.data()?.title,
         details: { before: existing.data(), after: updateData },
       });
     }

@@ -194,15 +194,15 @@
             </td>
 
             <!-- Joined Date -->
-            <td class="py-3 px-4 whitespace-nowrap text-slate-400 font-mono">
+            <td class="py-3 px-4 whitespace-nowrap text-slate-600 font-mono">
               ${joinedDate}
             </td>
 
             <!-- Orders & Spend -->
             <td class="py-3 px-4 text-center whitespace-nowrap">
               <div class="space-y-0.5">
-                <span class="font-bold text-white text-xs">${Number(c.total_orders || 0)} orders</span>
-                <span class="text-[11px] font-bold text-indigo-300 font-mono block">${Number(c.total_spent || 0).toLocaleString()} QAR</span>
+                <span class="font-bold text-slate-900 text-xs">${Number(c.total_orders || 0)} orders</span>
+                <span class="text-[11px] font-bold text-primary font-mono block">${Number(c.total_spent || 0).toLocaleString()} QAR</span>
               </div>
             </td>
 
@@ -300,6 +300,29 @@
       if (popover && !popover.classList.contains('hidden')) {
         popover.classList.add('hidden');
         if (chevron) chevron.classList.remove('rotate-180');
+      }
+    },
+
+    // Opens the customer list filtered by presence ('online' | 'offline' | 'all') so admins can see who it is.
+    showPresence(mode) {
+      const go = () => {
+        this.filters.presence = mode;
+        this.page = 1;
+        this.updateFilterMenuUI();
+        this.loadCustomers();
+        const table = document.getElementById('customers-table-body');
+        const target = table && (table.closest('.admin-card') || table);
+        if (target && typeof target.scrollIntoView === 'function') {
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+        }
+      };
+      const onCustomers = (location.hash || '').replace('#', '') === 'customers';
+      if (!onCustomers && window.AdminApp && typeof AdminApp.navigateTo === 'function') {
+        AdminApp.navigateTo('customers');
+        setTimeout(go, 350);
+      } else {
+        go();
       }
     },
 

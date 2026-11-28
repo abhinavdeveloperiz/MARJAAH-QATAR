@@ -134,6 +134,7 @@ export class BannersService implements OnModuleInit {
       const now = Date.now();
       banners = banners.filter(b => {
         if (b.is_active === false) return false;
+        if (b.status === 'pending_approval' || b.status === 'rejected') return false;
         if (b.start_date && new Date(b.start_date).getTime() > now) return false;
         if (b.end_date && new Date(b.end_date).getTime() < now) return false;
         return true;
@@ -173,19 +174,20 @@ export class BannersService implements OnModuleInit {
     const requiresApproval = this.adminService ? await this.adminService.isApprovalRequired('banners', 'create') : false;
     const isSuperUser = Boolean(adminUser?.is_superuser || adminUser?.username === 'admin');
 
+    const pendingApproval = requiresApproval && !isSuperUser;
     const now = new Date().toISOString();
     const banner = {
       ...data,
       title: data.title || data.headline,
       headline: data.headline || data.title,
       subtitle: data.subtitle || '',
-      is_active: data.is_active !== undefined ? Boolean(data.is_active) : true,
+      is_active: pendingApproval ? false : (data.is_active !== undefined ? Boolean(data.is_active) : true),
       order: Number(data.order) || 0,
       banner_type: data.banner_type || 'hero',
       image_desktop: data.image_desktop || data.image || '/assets/images/banners/hero-station.jpg',
       image_mobile: data.image_mobile || data.image_desktop || data.image || '/assets/images/banners/hero-station.jpg',
       image: data.image || data.image_desktop,
-      status: (requiresApproval && !isSuperUser) ? 'pending_approval' : 'active',
+      status: pendingApproval ? 'pending_approval' : 'active',
       created_at: now,
       updated_at: now,
     };

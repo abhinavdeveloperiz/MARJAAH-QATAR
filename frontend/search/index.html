@@ -775,15 +775,15 @@
           categoriesGrid.innerHTML = categories.map(cat => {
             const catName = isArabic && cat.name_ar ? cat.name_ar : (cat.name || 'Category');
             const catSlug = cat.slug || cat.id;
-            const catImg = cat.image || '/assets/images/categories/placeholder.png';
+            const catImg = cat.image || '/assets/images/products/placeholder.svg';
             const catUrl = `${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(catSlug)}`;
             return `
               <a href="${catUrl}" class="group block p-2.5 sm:p-3 rounded-2xl border transition-all duration-300 hover:scale-[1.02] hover:border-indigo-500/50"
                  style="background:var(--bg-surface);border-color:var(--border-color);">
                 <div class="flex items-center gap-3">
                   <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl overflow-hidden flex-shrink-0 bg-slate-800 border border-slate-700/60 p-1 flex items-center justify-center">
-                    <img src="${catImg}" alt="${escapeHtml(catName)}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
-                         onerror="this.src='/assets/images/branding/favicon.png'" />
+                    <img src="${escapeHtml(catImg)}" alt="${escapeHtml(catName)}" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                         onerror="this.src='/assets/images/products/placeholder.svg'" />
                   </div>
                   <div class="min-w-0 flex-1">
                     <div class="text-xs uppercase tracking-wider text-indigo-400 font-bold mb-0.5">${isArabic ? 'فئة' : 'Category'}</div>
@@ -807,13 +807,14 @@
             const parentCatSlug = sub.category_slug || (sub.category_name ? sub.category_name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
             const subSlug = sub.slug || (sub.name ? sub.name.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '');
             const color = sub.color || '#6366F1';
-            const icon = sub.icon || 'ph-tag';
+            const rawIcon = String(sub.icon || 'ph-tag').trim();
+            const icon = rawIcon.startsWith('ph-') ? rawIcon : `ph-${rawIcon}`;
             const subUrl = `${isArabic ? '/ar' : ''}/shop/?category=${encodeURIComponent(parentCatSlug)}&subcategory=${encodeURIComponent(subSlug)}`;
             return `
               <a href="${subUrl}" class="inline-flex items-center gap-2 px-3 py-2 rounded-xl border text-xs sm:text-sm font-semibold transition-all duration-200 hover:scale-105 hover:border-indigo-400 group"
                  style="background:var(--bg-surface);border-color:var(--border-color);color:var(--text-primary);">
-                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color:${color};box-shadow:0 0 8px ${color}88;"></span>
-                <i class="ph-bold ${icon} text-slate-400 group-hover:text-indigo-400 transition-colors"></i>
+                <span class="w-2.5 h-2.5 rounded-full flex-shrink-0" style="background-color:${escapeHtml(color)};box-shadow:0 0 8px ${escapeHtml(color)}88;"></span>
+                <i class="ph-bold ${escapeHtml(icon)} text-slate-400 group-hover:text-indigo-400 transition-colors"></i>
                 <span class="truncate">${escapeHtml(subName)}</span>
                 <span class="text-[10px] text-slate-400 group-hover:text-slate-300 font-normal">(${escapeHtml(sub.category_name || '')})</span>
               </a>
@@ -830,7 +831,9 @@
           productsGrid.innerHTML = products.map(p => renderProductCard(p)).join('');
 
           // Sync wishlist icons
-          if (window.Wishlist && typeof window.Wishlist.syncButtons === 'function') {
+          if (window.Wishlist && typeof window.Wishlist.sync === 'function') {
+            window.Wishlist.sync();
+          } else if (window.Wishlist && typeof window.Wishlist.syncButtons === 'function') {
             window.Wishlist.syncButtons();
           } else if (typeof syncWishlistButtons === 'function') {
             syncWishlistButtons();
@@ -855,10 +858,11 @@
         const originalPrice = Number(p.compare_at_price || p.original_price || p.regular_price || 0);
         const hasDiscount = originalPrice > price;
         const discountPercent = hasDiscount ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0;
-        const image = (Array.isArray(p.images) && p.images[0]) || p.image || '/assets/images/branding/favicon.png';
+        const image = (Array.isArray(p.images) && p.images[0]) || p.image || '/assets/images/products/placeholder.svg';
         const rating = Number(p.rating) || 4.8;
         const reviewCount = Number(p.review_count || p.reviews_count || 12);
-        const inStock = p.in_stock !== false && p.stock_status !== 'out_of_stock' && (p.inventory_quantity === undefined || p.inventory_quantity > 0);
+        const stockNum = p.stock_count !== undefined ? Number(p.stock_count) : (p.stock !== undefined ? Number(p.stock) : p.inventory_quantity);
+        const inStock = p.in_stock !== false && p.stock_status !== 'out_of_stock' && p.stock_status !== 'outofstock' && (stockNum === undefined || isNaN(stockNum) || stockNum > 0);
         const productUrl = `${isArabic ? '/ar' : ''}/product/?slug=${encodeURIComponent(slug)}`;
 
         return `
@@ -868,10 +872,10 @@
             <!-- Image Container -->
             <div class="relative aspect-square w-full rounded-t-2xl overflow-hidden bg-slate-900/40 p-3 flex items-center justify-center">
               <a href="${productUrl}" class="w-full h-full flex items-center justify-center">
-                <img src="${image}" alt="${escapeHtml(title)}"
+                <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}"
                      loading="lazy"
                      class="w-full h-full object-contain group-hover:scale-108 transition-transform duration-500"
-                     onerror="this.src='/assets/images/branding/favicon.png'" />
+                     onerror="this.src='/assets/images/products/placeholder.svg'" />
               </a>
 
               <!-- Discount Pill -->

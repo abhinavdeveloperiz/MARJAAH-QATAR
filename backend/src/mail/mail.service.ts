@@ -167,4 +167,67 @@ Support: info@marjaah.com | +974 7799 1013
       return { sent: false, error: err.message };
     }
   }
+
+  /**
+   * Send customer inquiry reply email from Admin Support
+   */
+  async sendContactReply(
+    toEmail: string,
+    customerName: string,
+    subject: string,
+    replyText: string,
+    originalMessage?: string,
+  ): Promise<{ sent: boolean; messageId?: string; reason?: string; error?: string }> {
+    const fromAddress = process.env.SMTP_FROM || `"M.SHOP Support" <${process.env.SMTP_USER || 'info@marjaah.com'}>`;
+    const escapeHtml = (s: string) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+    const safeName = escapeHtml(customerName || 'Customer');
+    const safeSubject = escapeHtml(subject || 'Your Inquiry');
+    const safeReply = escapeHtml(replyText).replace(/\n/g, '<br>');
+    const safeOrig = originalMessage ? escapeHtml(originalMessage).replace(/\n/g, '<br>') : '';
+
+    const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>Reply to Your Inquiry</title></head>
+<body style="margin:0;padding:24px;background:#F8FAFC;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;color:#0F172A;">
+  <div style="max-width:580px;margin:0 auto;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;">
+    <div style="padding:20px 28px;background:#0F172A;color:#FFFFFF;">
+      <strong style="font-size:18px;letter-spacing:0.5px;">M<span style="color:#4063B2;">.</span>SHOP Qatar Support</strong>
+    </div>
+    <div style="padding:28px;">
+      <p style="margin:0 0 12px;font-size:15px;">Hello ${safeName},</p>
+      <p style="margin:0 0 16px;font-size:14px;color:#475569;">Thank you for contacting Marjaah Trading W.L.L regarding <strong>${safeSubject}</strong>. Here is our team's response:</p>
+      <div style="padding:16px 20px;background:#F1F5F9;border-left:4px solid #4063B2;border-radius:8px;font-size:14px;line-height:1.6;color:#0F172A;">
+        ${safeReply}
+      </div>
+      ${safeOrig ? `<p style="margin:20px 0 6px;font-size:11px;font-weight:700;text-transform:uppercase;color:#64748B;">Your Original Message</p><div style="padding:12px 16px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;color:#64748B;line-height:1.5;">${safeOrig}</div>` : ''}
+      <p style="margin:24px 0 0;font-size:12px;color:#64748B;">Best regards,<br><strong>M.SHOP – Marjaah Trading WLL</strong> · Doha, Qatar (+974 7799 1013)</p>
+    </div>
+  </div>
+</body>
+</html>`.trim();
+
+    if (!this.transporter) {
+      this.initTransporter();
+    }
+    if (!this.transporter) {
+      this.logger.warn(`[EMAIL SKIPPED] Transporter not ready. Reply to ${toEmail}: ${replyText}`);
+      return { sent: false, reason: 'SMTP not configured' };
+    }
+
+    try {
+      const info = await this.transporter.sendMail({
+        from: fromAddress,
+        to: toEmail,
+        subject: `Re: ${subject || 'Your M.SHOP Inquiry'}`,
+        text: `Hello ${customerName || 'Customer'},\n\n${replyText}\n\n---\nM.SHOP Qatar Support (+974 7799 1013)`,
+        html: htmlContent,
+      });
+      return { sent: true, messageId: info.messageId };
+    } catch (err: any) {
+      this.logger.error(`Failed to send contact reply to ${toEmail}: ${err.message}`);
+      return { sent: false, error: err.message };
+    }
+  }
 }

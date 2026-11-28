@@ -216,14 +216,20 @@
 
   <!-- Scripts -->
   <script src="/assets/js/api.js"></script>
-  <script src="/assets/js/cart.js"></script>
-  <script src="/assets/js/products.js?v=3.0"></script>
+  <script src="/assets/js/theme.js"></script>
+  <script src="/assets/js/toast.js"></script>
+  <script src="/assets/js/cart.js?v=20261128_01"></script>
+  <script src="/assets/js/wishlist.js"></script>
+  <script src="/assets/js/mobile-menu.js"></script>
+  <script src="/assets/js/analytics.js"></script>
+  <script src="/assets/js/products.js?v=20261128_03"></script>
   <script>
     (async function() {
       const isRtl = document.documentElement.getAttribute('dir') === 'rtl' || window.location.pathname.startsWith('/ar');
       const grid = document.getElementById('all-categories-grid');
       const filterInput = document.getElementById('categories-filter-input');
       const countBadge = document.getElementById('categories-count-badge');
+      const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
       let allCategories = [];
 
@@ -275,9 +281,9 @@
               </div>
               <div class="p-5 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 class="font-display font-bold text-lg mb-1 group-hover:text-[#8D9CF5] transition-colors" style="color:var(--text-primary)">${name}</h3>
-                  ${cat.name_ar && !isRtl ? `<p class="text-xs text-slate-400 mb-2">${cat.name_ar}</p>` : ''}
-                  ${cat.name && isRtl ? `<p class="text-xs text-slate-400 mb-2">${cat.name}</p>` : ''}
+                  <h3 class="font-display font-bold text-lg mb-1 group-hover:text-[#8D9CF5] transition-colors" style="color:var(--text-primary)">${esc(name)}</h3>
+                  ${cat.name_ar && !isRtl ? `<p class="text-xs text-slate-400 mb-2">${esc(cat.name_ar)}</p>` : ''}
+                  ${cat.name && isRtl ? `<p class="text-xs text-slate-400 mb-2">${esc(cat.name)}</p>` : ''}
                 </div>
                 <div class="pt-3 border-t mt-3 flex items-center justify-between text-xs font-bold text-[#8D9CF5]" style="border-color:var(--border-color)">
                   <span>${isRtl ? 'تصفح المنتجات' : 'Browse Products'}</span>
@@ -293,8 +299,8 @@
         let res = await fetch('/api/categories');
         allCategories = await res.json();
         if (!Array.isArray(allCategories) || allCategories.length === 0) {
-          if (global.api && typeof global.api.getCategories === 'function') {
-            allCategories = await global.api.getCategories();
+          if (window.api && typeof window.api.getCategories === 'function') {
+            allCategories = await window.api.getCategories();
           }
         }
       } catch (e) {
@@ -302,9 +308,15 @@
       }
 
       if (Array.isArray(allCategories) && allCategories.length > 0) {
-        // Sort categories by product_count desc, then order
-        allCategories.sort((a, b) => (b.product_count || 0) - (a.product_count || 0));
-        if (countBadge) countBadge.textContent = `${allCategories.length} Categories`;
+        // Sort by featured first, then admin display order asc, then product count desc
+        allCategories.sort((a, b) => {
+          const featDiff = (b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0);
+          if (featDiff !== 0) return featDiff;
+          const ordDiff = (Number(a.order) || 0) - (Number(b.order) || 0);
+          if (ordDiff !== 0) return ordDiff;
+          return (b.product_count || 0) - (a.product_count || 0);
+        });
+        if (countBadge) countBadge.textContent = `${allCategories.length} ${isRtl ? 'فئة' : 'Categories'}`;
         renderCategories(allCategories);
       }
 

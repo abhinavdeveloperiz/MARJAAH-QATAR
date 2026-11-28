@@ -72,6 +72,7 @@ export class BrandsService implements OnModuleInit {
 
     productsSnap.docs.forEach(doc => {
       const p = doc.data() as any;
+      if (p.status === 'hidden' || p.status === 'pending_approval' || p.status === 'rejected' || p.is_active === false) return;
       const bName = (p.brand || p.brand_name || '').trim();
       if (bName) {
         const key = bName.toLowerCase();
@@ -149,23 +150,40 @@ export class BrandsService implements OnModuleInit {
   }
 
   async create(data: any) {
-    if (!data.name) {
+    const name = String(data.name || '').trim();
+    if (!name) {
       throw new BadRequestException('Brand name is required');
     }
+    const slug = (data.slug && String(data.slug).trim())
+      ? String(data.slug).toLowerCase().trim().replace(/[^a-z0-9-]+/g, '-').replace(/^-+|-+$/g, '')
+      : name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 
     let logo = data.logo || '';
     if (logo && typeof logo === 'string' && logo.startsWith('data:')) {
       const uploadRes = await this.uploadService.uploadBase64(
         logo,
-        `brand_${data.slug || 'logo'}.jpg`,
+        `brand_${slug || 'logo'}_${Date.now()}.jpg`,
         'brands',
       );
       logo = uploadRes.url;
     }
 
+    let image = data.image || '';
+    if (image && typeof image === 'string' && image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(
+        image,
+        `brand_img_${slug || 'img'}_${Date.now()}.jpg`,
+        'brands',
+      );
+      image = uploadRes.url;
+    }
+
     const brand = {
       ...data,
-      logo,
+      name,
+      slug,
+      logo: logo || image || '',
+      image: image || logo || '',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
@@ -189,10 +207,18 @@ export class BrandsService implements OnModuleInit {
     if (data.logo && typeof data.logo === 'string' && data.logo.startsWith('data:')) {
       const uploadRes = await this.uploadService.uploadBase64(
         data.logo,
-        `brand_${id}.jpg`,
+        `brand_${id}_${Date.now()}.jpg`,
         'brands',
       );
       updateData.logo = uploadRes.url;
+    }
+    if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(
+        data.image,
+        `brand_img_${id}_${Date.now()}.jpg`,
+        'brands',
+      );
+      updateData.image = uploadRes.url;
     }
 
     Object.keys(updateData).forEach((key) => {

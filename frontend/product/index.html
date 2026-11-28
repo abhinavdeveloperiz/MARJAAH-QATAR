@@ -762,8 +762,17 @@
           <span class="skeleton-shimmer inline-block h-3.5 w-20 rounded-md"></span>
         </div>
 
+        <!-- Special Offer Banner (populated dynamically when product has an active offer) -->
+        <div id="product-offer-banner" class="hidden mb-4 p-3.5 rounded-2xl border border-rose-500/30 bg-gradient-to-r from-rose-500/10 via-amber-500/10 to-rose-500/5 space-y-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="product-offer-badge" class="px-2.5 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-wider bg-gradient-to-r from-rose-500 to-amber-500 text-white shadow-xs">SPECIAL OFFER</span>
+            <span id="product-offer-title" class="text-xs font-bold text-rose-500 uppercase tracking-wider"></span>
+          </div>
+          <p id="product-offer-description" class="hidden text-xs leading-relaxed" style="color:var(--text-secondary)"></p>
+        </div>
+
         <!-- Price -->
-        <div id="product-price-container" class="flex items-baseline gap-3 mb-6" aria-hidden="true">
+        <div id="product-price-container" class="flex flex-wrap items-baseline gap-3 mb-6" aria-hidden="true">
           <span class="skeleton-shimmer inline-block h-10 w-36 rounded-xl"></span>
           <span class="skeleton-shimmer inline-block h-6 w-20 rounded-lg"></span>
         </div>
@@ -1345,12 +1354,12 @@
   <script src="/assets/js/analytics.js"></script>
   <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/toast.js"></script>
-  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/cart.js?v=20261128_01"></script>
   <script src="/assets/js/wishlist.js?v=2.4"></script>
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js?v=2.3"></script>
   <script src="/assets/js/carousel.js"></script>
-  <script src="/assets/js/products.js?v=3.1"></script>
+  <script src="/assets/js/products.js?v=20261128_04"></script>
   
 
 </body>

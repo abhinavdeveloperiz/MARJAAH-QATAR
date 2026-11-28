@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Refund &amp; Exchange Policy — M.SHOP Qatar</title>
-  <meta name="description" content="Official Refund &amp; Exchange Policy for M.SHOP Qatar (Marjaah Trading WLL). 7-day returns, free collection for defective items, MyFatoorah card &amp; COD refunds, and Qatar Consumer Law protection." />
+  <meta name="description" content="Official Refund &amp; Exchange Policy for M.SHOP Qatar (Marjaah Trading WLL). 7-day returns, free collection for defective items, cash and bank transfer refunds, and Qatar Consumer Law protection." />
   <link rel="canonical" href="https://www.marjaah.shop/returns/" />
   
   <meta name="csrf-token" content="E4UwUg8sVIwN0C82upIB6tDbNfqae3YZJdWrTxFWufLUTe3MFJxzVCoMt7UPZqlk" />
@@ -139,12 +139,12 @@
   </header>
 
   <!-- Mobile Drawer Menu -->
-  <div id="mobile-drawer" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
+  <div id="mobile-menu" class="fixed inset-y-0 right-0 z-[110] w-[300px] sm:w-[340px] transform translate-x-full transition-transform duration-300 ease-out border-l flex flex-col justify-between p-6 shadow-2xl"
        style="background:var(--bg-surface);border-color:var(--border-color);">
     <div>
       <div class="flex items-center justify-between pb-6" style="border-bottom:1px solid var(--border-color)">
         <span class="font-display font-black text-lg tracking-wider" style="color:var(--text-primary)">MENU</span>
-        <button id="mobile-drawer-close" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
+        <button id="mobile-menu-close" aria-label="Close menu" class="p-2 -mr-2 cursor-pointer" style="color:var(--text-secondary)">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
       </div>
@@ -163,7 +163,7 @@
       </a>
     </div>
   </div>
-  <div id="drawer-backdrop" class="fixed inset-0 bg-black/60 z-[105] hidden backdrop-blur-sm transition-opacity duration-300"></div>
+  <div id="mobile-menu-overlay" class="fixed inset-0 bg-black/60 z-[105] opacity-0 pointer-events-none backdrop-blur-sm transition-opacity duration-300"></div>
 
   <!-- MAIN CONTENT -->
   <main class="flex-1 min-h-screen pt-[72px]">
@@ -204,7 +204,7 @@
         <!-- Meta Summary Badge Bar -->
         <div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs pt-2" style="color:var(--text-secondary)">
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            🛡️ <strong>7 Days:</strong> Return or Exchange
+            🛡️ <strong><span data-return-window-days>7</span> Days:</strong> Return or Exchange
           </span>
           <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg border" style="background:var(--bg-surface-2);border-color:var(--border-color)">
             ⚖️ <strong>Law No. 8 of 2008:</strong> Qatar Consumer Protection
@@ -249,7 +249,7 @@
             <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Return or exchange for any reason</h2>
           </div>
           <p>
-            You may return or exchange a product <strong>within 7 days of delivery</strong> even if it is not defective (for example, you changed your mind or it is not what you expected), provided:
+            You may return or exchange a product <strong>within <span data-return-window-days>7</span> days of delivery</strong> even if it is not defective (for example, you changed your mind or it is not what you expected), provided:
           </p>
           <ul class="list-disc list-inside space-y-1.5 pl-2 text-xs sm:text-sm">
             <li>The product is <strong>unused</strong>, in <strong>original condition</strong>, and in its <strong>original packaging</strong> with all accessories, manuals and free gifts;</li>
@@ -270,7 +270,7 @@
             <li>Contact us as soon as you notice the problem, with your order number and a photo or short description.</li>
             <li>We will, at our cost, <strong>repair it, replace it, or refund you in full</strong>, as required by <strong>Qatar Consumer Protection Law No. 8 of 2008</strong>.</li>
             <li><strong>We cover the return delivery cost for these cases.</strong></li>
-            <li>Manufacturer warranty claims after the 7-day period follow the warranty terms in Part 1, section 10.</li>
+            <li>Manufacturer warranty claims after the <span data-return-window-days>7</span>-day period follow the warranty terms in Part 1, section 10.</li>
           </ul>
         </section>
 
@@ -293,8 +293,7 @@
             <h2 class="text-lg sm:text-xl font-display font-bold" style="color:var(--text-primary)">Refunds</h2>
           </div>
           <ul class="list-disc list-inside space-y-2 pl-2 text-xs sm:text-sm">
-            <li>Online card payments are refunded to the <strong>same card</strong> through <strong>MyFatoorah</strong>.</li>
-            <li>Cash-on-delivery orders are refunded in <strong>cash</strong> or by <strong>bank transfer</strong>, whichever you prefer. For a bank transfer we will ask for your account details (IBAN and account name).</li>
+            <li>Orders paid by <strong>cash on delivery</strong> or <strong>at the store</strong> are refunded in <strong>cash</strong> or by <strong>bank transfer</strong>, whichever you prefer. For a bank transfer we will ask for your account details (IBAN and account name).</li>
             <li>We process refunds within <strong>5–7 working days</strong> after we receive and check the returned item. Your bank may need extra time to show the amount in your account.</li>
             <li>Because delivery is free, there is no delivery fee to refund. You are refunded the full price you paid for the product.</li>
           </ul>
@@ -439,8 +438,7 @@
             <h2 class="text-lg sm:text-xl font-bold font-cairo" style="color:var(--text-primary)">٤. استرداد المبالغ</h2>
           </div>
           <ul class="list-disc list-inside space-y-2 pr-2 text-xs sm:text-sm">
-            <li>تُرد المدفوعات الإلكترونية بالبطاقة إلى <strong>البطاقة نفسها</strong> عبر بوابة <strong>MyFatoorah</strong>.</li>
-            <li>أما طلبات الدفع عند الاستلام فتُرد <strong>نقداً</strong> أو عبر <strong>تحويل بنكي</strong>، حسب رغبتك. وفي حالة التحويل البنكي سنطلب بيانات حسابك (رقم الآيبان واسم صاحب الحساب).</li>
+            <li>الطلبات المدفوعة <strong>عند الاستلام</strong> أو <strong>في المتجر</strong> تُرد <strong>نقداً</strong> أو عبر <strong>تحويل بنكي</strong>، حسب رغبتك. وفي حالة التحويل البنكي سنطلب بيانات حسابك (رقم الآيبان واسم صاحب الحساب).</li>
             <li>تتم معالجة الاسترداد خلال <strong>٥ إلى ٧ أيام عمل</strong> بعد استلامنا للمنتج وفحصه. وقد يحتاج البنك إلى وقت إضافي لإظهار المبلغ في حسابك.</li>
             <li>ولأن التوصيل مجاني، لا توجد رسوم توصيل تُرد؛ ويُرد لك كامل المبلغ المدفوع عن المنتج.</li>
           </ul>
@@ -634,7 +632,7 @@
               +974 7799 1013</a>
             </li>
             <li><a href="tel:+97477991016" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-primary-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
               +974 7799 1016</a>
             </li>
             <li><a href="mailto:info@marjaah.com" class="flex items-center gap-2 text-xs transition-colors hover:text-primary-500" style="color:var(--text-secondary)">
@@ -700,11 +698,23 @@
       }
     }
 
-    // Auto-detect if user navigated with /ar/ path, #ar hash or lang=ar param
-    document.addEventListener('DOMContentLoaded', function() {
+    // Auto-detect if user navigated with /ar/ path, #ar hash or lang=ar param & load live return window policy
+    document.addEventListener('DOMContentLoaded', async function() {
       if (window.location.pathname.startsWith('/ar') || window.location.hash === '#ar' || window.location.search.includes('lang=ar')) {
         switchPolicyLang('ar');
       }
+      try {
+        const res = await fetch('/api/orders/policies');
+        if (res.ok) {
+          const pol = await res.json();
+          const days = Number(pol?.return_window_days);
+          if (days > 0) {
+            document.querySelectorAll('[data-return-window-days]').forEach((el) => {
+              el.textContent = String(days);
+            });
+          }
+        }
+      } catch (_) {}
     });
   </script>
 

@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Patch, Body, Query, Headers, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body, Query, Headers, UseGuards, Request, ForbiddenException } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -23,6 +23,19 @@ export class AuthController {
   @Post('admin-login')
   async adminLogin(@Body() body: any) {
     return this.authService.adminLogin(body);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
+  @Post('admin/change-password')
+  async changeAdminPassword(
+    @Request() req: any,
+    @Body() body: { current_password?: string; new_password?: string },
+  ) {
+    if (!req.user?.is_staff && !req.user?.is_superuser) {
+      throw new ForbiddenException('Administrative staff privileges required');
+    }
+    return this.authService.changeAdminPassword(req.user, body);
   }
 
   @Throttle({ default: { limit: 15, ttl: 60000 } })
@@ -111,9 +124,6 @@ export class AuthController {
           userId = String(verified.user.id);
         }
       } catch (e) {}
-    }
-    if (!userId && (body?.user_id || body?.userId || body?.id || body?.email)) {
-      userId = String(body.user_id || body.userId || body.id || body.email).trim();
     }
     if (userId) {
       await this.authService.updatePresence(userId);

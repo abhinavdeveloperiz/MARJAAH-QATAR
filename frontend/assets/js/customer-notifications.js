@@ -63,7 +63,7 @@
       if (!document.getElementById('customer-notifications-dropdown')) {
         const drawer = document.createElement('div');
         drawer.id = 'customer-notifications-dropdown';
-        drawer.className = 'hidden fixed top-16 right-3 sm:right-6 md:right-16 z-[130] w-[92vw] sm:w-84 max-w-sm rounded-2xl border shadow-2xl overflow-hidden backdrop-blur-xl animate-fade-in-up';
+        drawer.className = 'hidden fixed top-16 right-3 sm:right-6 md:right-16 z-[130] w-[92vw] sm:w-80 max-w-sm rounded-2xl border shadow-2xl overflow-hidden backdrop-blur-xl animate-fade-in-up';
         drawer.style.background = 'var(--bg-surface, #111C38)';
         drawer.style.borderColor = 'var(--border-color, rgba(255,255,255,0.12))';
         drawer.innerHTML = `
@@ -76,7 +76,7 @@
               Mark all read
             </button>
           </div>
-          <div id="customer-notifications-list" class="max-h-80 overflow-y-auto divide-y" style="divide-color:var(--border-color, rgba(255,255,255,0.06))">
+          <div id="customer-notifications-list" class="max-h-80 overflow-y-auto divide-y divide-slate-800/40" style="border-color:var(--border-color, rgba(255,255,255,0.06))">
             <div class="p-6 text-center text-xs text-slate-400">Loading order alerts...</div>
           </div>
           <div class="p-2.5 text-center border-t text-[11px]" style="border-color:var(--border-color, rgba(255,255,255,0.08));background:var(--bg-surface-2, rgba(0,0,0,0.2))">
@@ -216,16 +216,20 @@
         return;
       }
 
+      const escNotif = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
       const icons = {
         placed: '🛍️',
         pending: '⏳',
         processing: '⚙️',
+        ready_for_pickup: '🏪',
         shipped: '🚚',
         delivered: '✅',
         cancelled: '❌',
         return_requested: '↩️',
+        return_pending: '↩️',
         return_approved: '🎉',
         return_rejected: '⚠️',
+        return_declined: '⚠️',
       };
 
       listContainer.innerHTML = items.map((n) => {
@@ -234,18 +238,18 @@
         const dateStr = n.timestamp ? new Date(n.timestamp).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Recent';
 
         return `
-          <div class="p-3 transition-colors hover:bg-white/5 cursor-pointer ${isUnread ? 'bg-indigo-500/5' : ''}" onclick="CustomerNotifications.onNotificationClick('${n.id}', '${n.order_number}')">
+          <div class="p-3 transition-colors hover:bg-white/5 cursor-pointer ${isUnread ? 'bg-indigo-500/5' : ''}" onclick="CustomerNotifications.onNotificationClick('${escNotif(n.id)}', '${escNotif(n.order_number)}')">
             <div class="flex items-start gap-2.5">
               <span class="text-base flex-shrink-0 mt-0.5">${icon}</span>
               <div class="flex-1 min-w-0">
                 <div class="flex items-center justify-between gap-1">
-                  <p class="font-bold text-xs truncate ${isUnread ? 'text-indigo-400' : 'text-slate-200'}">${n.title}</p>
+                  <p class="font-bold text-xs truncate ${isUnread ? 'text-indigo-400' : 'text-slate-200'}">${escNotif(n.title)}</p>
                   ${isUnread ? '<span class="w-2 h-2 rounded-full bg-indigo-500 flex-shrink-0"></span>' : ''}
                 </div>
-                <p class="text-[11px] text-slate-400 line-clamp-2 mt-0.5">${n.message}</p>
+                <p class="text-[11px] text-slate-400 line-clamp-2 mt-0.5">${escNotif(n.message)}</p>
                 <div class="flex items-center justify-between mt-1 text-[10px] text-slate-500">
-                  <span class="font-mono">#${n.order_number}</span>
-                  <span>${dateStr}</span>
+                  <span class="font-mono">#${escNotif(n.order_number)}</span>
+                  <span>${escNotif(dateStr)}</span>
                 </div>
               </div>
             </div>
@@ -262,12 +266,15 @@
         placed: '🛍️',
         pending: '⏳',
         processing: '⚙️',
+        ready_for_pickup: '🏪',
         shipped: '🚚',
         delivered: '✅',
         cancelled: '❌',
         return_requested: '↩️',
+        return_pending: '↩️',
         return_approved: '🎉',
         return_rejected: '⚠️',
+        return_declined: '⚠️',
       };
 
       document.getElementById('notif-sheet-icon').textContent = icons[notif.type] || '📦';

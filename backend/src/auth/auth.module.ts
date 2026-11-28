@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { getJwtSecret } from './jwt-secret';
 import { JwtStrategy } from './jwt.strategy';
 
 @Module({
@@ -12,7 +13,7 @@ import { JwtStrategy } from './jwt.strategy';
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({
-        secret: configService.get<string>('JWT_SECRET') || process.env.JWT_SECRET || 'marjaah_super_secure_jwt_secret_key_2026_qatar_tech_prod',
+        secret: getJwtSecret(configService.get<string>('JWT_SECRET')),
         signOptions: { expiresIn: '30d' },
       }),
       inject: [ConfigService],

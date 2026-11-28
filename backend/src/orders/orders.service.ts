@@ -39,11 +39,16 @@ export class OrdersService {
     let customerPhone = (body.phone || body.customer_phone || delivery?.phone || currentUser?.phone || guest?.phone || '').trim();
 
     // 3. Fulfillment Method: Doorstep Delivery vs Store Pickup (Requirement 1)
-    const isStorePickup = body.fulfillment_type === 'store_pickup' || body.delivery_method === 'pickup' || body.payment_method === 'pay_at_store';
+    const isStorePickup = body.fulfillment_type === 'store_pickup' || body.delivery_method === 'pickup';
     let pickupDetails: any = null;
 
     if (isStorePickup) {
-      const locId = body.pickup_location_id || body.pickup_location?.id || body.pickup_location?.location_id;
+      const passedLoc = body.pickup_location || body.store_pickup_location;
+      const locId =
+        body.pickup_location_id ||
+        body.store_pickup_location_id ||
+        passedLoc?.id ||
+        passedLoc?.location_id;
       if (locId) {
         const locDoc = await this.firestore.doc('store_locations', String(locId)).get();
         if (locDoc.exists) {
@@ -55,16 +60,21 @@ export class OrdersService {
             zone: locData.zone || 'Doha',
             city: locData.city || 'Doha',
             phone: locData.phone,
-            opening_hours: locData.opening_hours,
-            pickup_instructions: locData.pickup_instructions,
+            opening_hours: locData.opening_hours || locData.working_hours || '',
+            pickup_instructions: locData.pickup_instructions || locData.instructions || '',
           };
         }
       }
 
       // If no valid location found by ID, check if location payload is passed or pick default store
       if (!pickupDetails) {
-        if (body.pickup_location && body.pickup_location.name) {
-          pickupDetails = body.pickup_location;
+        if (passedLoc && passedLoc.name) {
+          pickupDetails = {
+            ...passedLoc,
+            location_id: passedLoc.location_id || passedLoc.id || null,
+            opening_hours: passedLoc.opening_hours || passedLoc.working_hours || '',
+            pickup_instructions: passedLoc.pickup_instructions || passedLoc.instructions || '',
+          };
         } else {
           // Fetch default active location
           const defSnap = await this.firestore.collection('store_locations')
@@ -80,8 +90,8 @@ export class OrdersService {
               zone: locData.zone,
               city: locData.city,
               phone: locData.phone,
-              opening_hours: locData.opening_hours,
-              pickup_instructions: locData.pickup_instructions,
+              opening_hours: locData.opening_hours || locData.working_hours || '',
+              pickup_instructions: locData.pickup_instructions || locData.instructions || '',
             };
           } else {
             throw new BadRequestException('Please select a valid store pickup location to proceed.');
@@ -90,7 +100,8 @@ export class OrdersService {
       }
     }
 
-    // Delivery address snapshot
+    // Delivery address snapshot (supports both nested `delivery.*` / `address.*` and top-level checkout fields)
+    const addrSrc = delivery || address || {};
     const deliveryAddress = isStorePickup
       ? {
           full_name: customerName,
@@ -102,19 +113,17 @@ export class OrdersService {
           country: 'Qatar',
         }
       : {
-          full_name: delivery?.full_name || customerName,
-          phone: delivery?.phone || customerPhone,
-          building: delivery?.building || '',
-          street: delivery?.street || '',
-          zone: delivery?.zone || '',
-          city: delivery?.city || 'Doha',
-          country: delivery?.country || 'Qatar',
+          full_name: addrSrc.full_name || customerName,
+          phone: addrSrc.phone || customerPhone,
+          building: addrSrc.building || body.building || '',
+          street: addrSrc.street || body.street || '',
+          zone: addrSrc.zone || body.zone || '',
+          city: addrSrc.city || body.city || 'Doha',
+          country: addrSrc.country || body.country || 'Qatar',
         };
 
     // 4. Generate order sequence number
-    const countSnap = await this.firestore.collection('orders').get();
-    const orderIndex = countSnap.size + 1;
-    const orderNumber = `MTQ-${String(orderIndex).padStart(5, '0')}`;
+    const orderNumber = await this.firestore.nextOrderNumber();
     const now = new Date().toISOString();
 
     const orderData = {
@@ -133,8 +142,9 @@ export class OrdersService {
       shipping: 0, // Store Pickup and Free Doorstep Delivery across Qatar
       total: validatedCart.total,
       item_count: validatedCart.count,
-      payment_method: payment_method || (isStorePickup ? 'pay_at_store' : 'cash'),
-      payment_status: (payment_method === 'cash' || payment_method === 'pay_at_store') ? 'cod' : 'pending',
+      // Only two payment methods exist: Cash on Delivery (doorstep) and Pay at Store (pickup). No online payment.
+      payment_method: isStorePickup ? 'pay_at_store' : 'cash',
+      payment_status: 'cod',
       status: 'placed',
       notes: notes || '',
       timeline: [
@@ -157,18 +167,7 @@ export class OrdersService {
     // 6. Deduct stock counts in Firestore products
     for (const item of validatedCart.items) {
       try {
-        const prodRef = this.firestore.doc('products', item.id);
-        const prodDoc = await prodRef.get();
-        if (prodDoc.exists) {
-          const currentStock = prodDoc.data()?.stock_count;
-          if (currentStock !== undefined && currentStock !== null) {
-            const newStock = Math.max(0, currentStock - item.quantity);
-            await prodRef.update({
-              stock_count: newStock,
-              in_stock: newStock > 0,
-            });
-          }
-        }
+        await this.firestore.decrementStock(item.id, item.quantity);
       } catch (e) {
         // Continue even if stock deduction warning occurs
       }
@@ -340,31 +339,6 @@ export class OrdersService {
       }
     }
 
-    // 3. Fallback: Search by phone number if input is purely phone or phone query is supplied
-    if (!order) {
-      const phoneCandidates = [phone, raw, clean].filter(p => {
-        if (!p) return false;
-        const digits = p.replace(/[^0-9]/g, '');
-        return digits.length >= 7;
-      });
-
-      if (phoneCandidates.length > 0) {
-        const targetDigits = (phoneCandidates[0] as string).replace(/[^0-9]/g, '');
-        const snap = await this.firestore.collection('orders')
-          .limit(50)
-          .get();
-
-        for (const docItem of snap.docs) {
-          const d = docItem.data();
-          const ordPhone = (d.customer_phone || d.delivery_address?.phone || '').replace(/[^0-9]/g, '');
-          if (ordPhone && (ordPhone === targetDigits || ordPhone.endsWith(targetDigits) || targetDigits.endsWith(ordPhone))) {
-            order = { id: docItem.id, ...d };
-            break;
-          }
-        }
-      }
-    }
-
     if (!order) {
       throw new NotFoundException(`Order not found: ${idOrNumber}`);
     }
@@ -380,24 +354,59 @@ export class OrdersService {
       }
     }
 
-    // Authorization check
-    const isAdmin = currentUser?.is_staff || currentUser?.role === 'admin';
-    if (!isAdmin && currentUser) {
+    // Authorization: staff, the owning customer, or a guest who proves the order phone number.
+    // Anything else gets the same "not found" as a missing order to prevent enumeration.
+    const isAdmin = Boolean(currentUser?.is_staff || currentUser?.is_superuser || currentUser?.role === 'admin');
+    if (!isAdmin) {
+      const digits = (v: any) => String(v || '').replace(/[^0-9]/g, '');
       const ordUserId = String(order.user_id || order.userId || '').trim();
-      const ordEmail = (order.customer_email || order.email || '').toLowerCase().trim();
-      const curUserId = String(currentUser.id || currentUser.sub || '').trim();
-      const curEmail = (currentUser.email || '').toLowerCase().trim();
+      const ordEmail = String(order.customer_email || order.email || '').toLowerCase().trim();
+      const ordPhoneDigits = digits(order.customer_phone || order.delivery_address?.phone || order.phone);
+      const curUserId = String(currentUser?.id || currentUser?.sub || '').trim();
 
-      if (ordUserId && curUserId && ordUserId !== curUserId && ordEmail !== curEmail) {
-        throw new ForbiddenException('Access denied to this order');
+      // Same ownership rule as the "my orders" list: user id, account email, or account phone.
+      // The JWT may not carry email/phone, so read the live account record.
+      let curEmail = String(currentUser?.email || '').toLowerCase().trim();
+      let curPhone = digits(currentUser?.phone);
+      if (curUserId && (!curEmail || !curPhone)) {
+        try {
+          const uDoc = await this.firestore.doc('users', curUserId).get();
+          if (uDoc.exists) {
+            const u: any = uDoc.data() || {};
+            curEmail = curEmail || String(u.email || '').toLowerCase().trim();
+            curPhone = curPhone || digits(u.phone);
+          }
+        } catch (_) {}
+      }
+      const isOwner = Boolean(
+        (ordUserId && curUserId && ordUserId === curUserId) ||
+        (ordEmail && curEmail && ordEmail === curEmail) ||
+        (ordPhoneDigits.length >= 7 && curPhone.length >= 7 &&
+          (ordPhoneDigits === curPhone || ordPhoneDigits.endsWith(curPhone) || curPhone.endsWith(ordPhoneDigits))),
+      );
+
+      const supplied = digits(phone);
+      const phoneVerified = supplied.length >= 7 && ordPhoneDigits.length >= 7 &&
+        (ordPhoneDigits === supplied || ordPhoneDigits.endsWith(supplied) || supplied.endsWith(ordPhoneDigits));
+
+      if (!isOwner && !phoneVerified) {
+        throw new NotFoundException(`Order not found: ${idOrNumber}`);
       }
     }
 
     return order;
   }
 
-  async updateStatus(id: string, status: string) {
-    const validStatuses = ['pending', 'placed', 'processing', 'shipped', 'delivered', 'cancelled'];
+  async updateStatus(id: string, status: string, notes?: string, adminUser?: any) {
+    const validStatuses = [
+      'pending',
+      'placed',
+      'processing',
+      'ready_for_pickup',
+      'shipped',
+      'delivered',
+      'cancelled',
+    ];
     if (!validStatuses.includes(status)) {
       throw new BadRequestException(`Invalid status: ${status}`);
     }
@@ -408,15 +417,181 @@ export class OrdersService {
       throw new NotFoundException(`Order not found: ${id}`);
     }
 
-    await docRef.update({
+    const existing = doc.data() || {};
+    const now = new Date().toISOString();
+    const trimmedNotes = typeof notes === 'string' ? notes.trim() : '';
+    const timeline = Array.isArray(existing.timeline) ? [...existing.timeline] : [];
+    timeline.push({
       status,
-      updated_at: new Date().toISOString(),
+      timestamp: now,
+      note: trimmedNotes || `Status updated to ${status}`,
+      updated_by: adminUser?.email || adminUser?.uid || 'admin',
     });
+
+    const updates: Record<string, any> = {
+      status,
+      updated_at: now,
+      timeline,
+    };
+    if (status === 'delivered' && !existing.delivered_at) {
+      updates.delivered_at = now;
+    }
+    if (trimmedNotes) {
+      updates.status_note = trimmedNotes;
+    }
+
+    await docRef.update(updates);
 
     return {
       success: true,
       id,
       status,
+      order: { id, ...existing, ...updates },
+    };
+  }
+
+  async updateOrder(id: string, data: any, adminUser?: any) {
+    const docRef = this.firestore.doc('orders', id);
+    const doc = await docRef.get();
+    if (!doc.exists) {
+      throw new NotFoundException(`Order not found: ${id}`);
+    }
+
+    const existing = doc.data() || {};
+    const now = new Date().toISOString();
+    const updates: Record<string, any> = {
+      updated_at: now,
+    };
+
+    const validStatuses = [
+      'pending',
+      'placed',
+      'processing',
+      'ready_for_pickup',
+      'shipped',
+      'delivered',
+      'cancelled',
+    ];
+    if (data?.status !== undefined && data.status !== '') {
+      const nextStatus = String(data.status).trim();
+      if (!validStatuses.includes(nextStatus)) {
+        throw new BadRequestException(`Invalid status: ${nextStatus}`);
+      }
+      updates.status = nextStatus;
+    }
+
+    if (data?.customer_name !== undefined || data?.full_name !== undefined) {
+      const name = String(data.customer_name ?? data.full_name ?? '').trim();
+      if (!name) {
+        throw new BadRequestException('Customer name cannot be empty');
+      }
+      updates.customer_name = name;
+      updates.full_name = name;
+    }
+
+    if (data?.customer_phone !== undefined || data?.phone !== undefined) {
+      const phone = String(data.customer_phone ?? data.phone ?? '').trim();
+      if (!phone) {
+        throw new BadRequestException('Customer phone cannot be empty');
+      }
+      updates.customer_phone = phone;
+      updates.phone = phone;
+    }
+
+    if (data?.customer_email !== undefined || data?.email !== undefined) {
+      const email = String(data.customer_email ?? data.email ?? '').trim();
+      updates.customer_email = email;
+      updates.email = email;
+    }
+
+    const hasTopLevelAddress =
+      data?.building !== undefined ||
+      data?.street !== undefined ||
+      data?.zone !== undefined ||
+      data?.city !== undefined;
+    if ((data?.delivery_address && typeof data.delivery_address === 'object') || hasTopLevelAddress) {
+      const addr = data?.delivery_address && typeof data.delivery_address === 'object' ? data.delivery_address : {};
+      const prevAddr = existing.delivery_address && typeof existing.delivery_address === 'object' ? existing.delivery_address : {};
+      updates.delivery_address = {
+        ...prevAddr,
+        building: String(addr.building ?? data?.building ?? prevAddr.building ?? '').trim(),
+        street: String(addr.street ?? data?.street ?? prevAddr.street ?? '').trim(),
+        zone: String(addr.zone ?? data?.zone ?? prevAddr.zone ?? '').trim(),
+        city: String(addr.city ?? data?.city ?? prevAddr.city ?? '').trim(),
+      };
+    }
+
+    if (data?.pickup_location_id !== undefined || data?.store_pickup_location_id !== undefined) {
+      updates.pickup_location_id = String(data.pickup_location_id ?? data.store_pickup_location_id ?? '').trim();
+    }
+
+    if (data?.fulfillment_type !== undefined) {
+      updates.fulfillment_type = String(data.fulfillment_type).trim();
+    }
+
+    if (data?.payment_method !== undefined && data.payment_method !== '') {
+      const nextMethod = String(data.payment_method).trim();
+      if (!['cash', 'pay_at_store'].includes(nextMethod)) {
+        throw new BadRequestException('Payment method must be Cash on Delivery or Pay at Store.');
+      }
+      updates.payment_method = nextMethod;
+    }
+
+    if (data?.payment_status !== undefined && data.payment_status !== '') {
+      const validPaymentStatuses = ['pending', 'cod', 'paid', 'failed', 'refunded', 'awaiting_payment', 'cancelled'];
+      const nextPayStatus = String(data.payment_status).trim();
+      if (!validPaymentStatuses.includes(nextPayStatus)) {
+        throw new BadRequestException(`Invalid payment status: ${nextPayStatus}`);
+      }
+      updates.payment_status = nextPayStatus;
+    }
+
+    if (data?.notes !== undefined) {
+      updates.notes = String(data.notes).trim();
+    }
+
+    const rawShipping = data?.shipping !== undefined ? data.shipping : data?.shipping_cost;
+    const rawDiscount = data?.discount !== undefined ? data.discount : data?.discount_amount;
+    if (rawShipping !== undefined || rawDiscount !== undefined || data?.subtotal !== undefined) {
+      const existingSubtotal =
+        existing.subtotal !== undefined
+          ? Number(existing.subtotal)
+          : Array.isArray(existing.items)
+            ? existing.items.reduce((sum: number, item: any) => sum + Number(item.price || 0) * Number(item.quantity || 1), 0)
+            : Number(existing.total || 0);
+      const nextSubtotal = data?.subtotal !== undefined ? Math.max(0, Number(data.subtotal) || 0) : existingSubtotal;
+      const nextShipping =
+        rawShipping !== undefined
+          ? Math.max(0, Number(rawShipping) || 0)
+          : Math.max(0, Number(existing.shipping ?? existing.shipping_cost ?? 0) || 0);
+      const nextDiscount =
+        rawDiscount !== undefined
+          ? Math.max(0, Number(rawDiscount) || 0)
+          : Math.max(0, Number(existing.discount ?? existing.discount_amount ?? 0) || 0);
+
+      updates.subtotal = Number(nextSubtotal.toFixed(2));
+      updates.shipping = Number(nextShipping.toFixed(2));
+      updates.shipping_cost = Number(nextShipping.toFixed(2));
+      updates.discount = Number(nextDiscount.toFixed(2));
+      updates.discount_amount = Number(nextDiscount.toFixed(2));
+      updates.total = Number(Math.max(0, nextSubtotal - nextDiscount + nextShipping).toFixed(2));
+    }
+
+    const timeline = Array.isArray(existing.timeline) ? [...existing.timeline] : [];
+    timeline.push({
+      status: updates.status || existing.status || 'placed',
+      timestamp: now,
+      note: 'Order details updated by Admin',
+      updated_by: adminUser?.email || adminUser?.uid || 'admin',
+    });
+    updates.timeline = timeline;
+
+    await docRef.update(updates);
+
+    return {
+      success: true,
+      id,
+      order: { id, ...existing, ...updates },
     };
   }
 
@@ -737,18 +912,19 @@ export class OrdersService {
     const timeline = Array.isArray(order.timeline) ? [...order.timeline] : [];
 
     if (body.status === 'approved') {
+      const approveNote = body.notes || body.admin_notes || '';
       const updatedReturnRequest = {
         ...order.return_request,
         status: 'approved',
         approved_at: nowIso,
-        admin_notes: body.notes || 'Return approved by administration',
+        admin_notes: approveNote || 'Return approved by administration',
         reviewed_by: currentUser?.username || currentUser?.email || 'admin',
       };
 
       timeline.push({
         status: 'return_approved',
         title: 'Return Request Approved (RMA)',
-        note: body.notes || 'Return request approved. Goods returned & inventory restored.',
+        note: approveNote || 'Return request approved. Goods returned & inventory restored.',
         timestamp: nowIso,
       });
 
@@ -831,6 +1007,8 @@ export class OrdersService {
       .map((o) => {
         const isCancellation = o.status === 'cancelled';
         const rr = o.return_request || {};
+        const itemsArr = Array.isArray(o.items) ? o.items : [];
+        const itemsCount = itemsArr.reduce((s: number, it: any) => s + (Number(it.quantity) || 1), 0) || o.item_count || itemsArr.length;
         return {
           order_id: o.id,
           order_number: o.order_number || o.id,
@@ -843,10 +1021,12 @@ export class OrdersService {
           request_id: rr.request_id || (isCancellation ? `CAN-${o.order_number || o.id}` : null),
           reason: isCancellation ? (o.cancellation?.reason || 'Cancelled by customer') : (rr.reason || 'Return request'),
           notes: isCancellation ? (o.cancellation?.notes || '') : (rr.notes || ''),
+          admin_notes: rr.admin_notes || rr.rejection_reason || '',
           requested_at: isCancellation ? (o.cancellation?.cancelled_at || o.updated_at || o.created_at) : (rr.requested_at || o.updated_at),
           return_status: isCancellation ? 'cancelled' : (rr.status || 'pending'),
           return_request: o.return_request || null,
-          items: o.items || [],
+          items: itemsArr,
+          items_count: itemsCount,
           created_at: o.created_at,
         };
       });
@@ -859,11 +1039,27 @@ export class OrdersService {
       total_returns: records.filter((r) => r.type === 'return').length,
       pending_returns: records.filter((r) => r.type === 'return' && r.return_status === 'pending').length,
       approved_returns: records.filter((r) => r.type === 'return' && r.return_status === 'approved').length,
-      rejected_returns: records.filter((r) => r.type === 'return' && r.return_status === 'rejected').length,
+      rejected_returns: records.filter((r) => r.type === 'return' && (r.return_status === 'declined' || r.return_status === 'rejected')).length,
     };
 
+    let filtered = records;
+    const filterType = String(query?.type || '').toLowerCase().trim();
+    if (filterType && filterType !== 'all') {
+      if (filterType === 'cancellation' || filterType === 'cancelled') {
+        filtered = records.filter((r) => r.type === 'cancellation');
+      } else if (filterType === 'return') {
+        filtered = records.filter((r) => r.type === 'return');
+      } else if (filterType === 'return_pending' || filterType === 'pending') {
+        filtered = records.filter((r) => r.type === 'return' && r.return_status === 'pending');
+      } else if (filterType === 'return_approved' || filterType === 'approved') {
+        filtered = records.filter((r) => r.type === 'return' && r.return_status === 'approved');
+      } else if (filterType === 'return_declined' || filterType === 'return_rejected' || filterType === 'declined' || filterType === 'rejected') {
+        filtered = records.filter((r) => r.type === 'return' && (r.return_status === 'declined' || r.return_status === 'rejected'));
+      }
+    }
+
     return {
-      items: records,
+      items: filtered,
       stats,
     };
   }
@@ -918,18 +1114,19 @@ export class OrdersService {
       // Return requests
       if (o.return_request) {
         const rr = o.return_request;
+        const isDeclined = rr.status === 'rejected' || rr.status === 'declined';
         notifications.push({
-          id: `notif-${o.id}-return-${rr.status}-${new Date(rr.updated_at || rr.requested_at || Date.now()).getTime()}`,
+          id: `notif-${o.id}-return-${rr.status}-${new Date(rr.updated_at || rr.declined_at || rr.rejected_at || rr.approved_at || rr.requested_at || Date.now()).getTime()}`,
           order_id: o.id,
           order_number: orderNum,
           type: `return_${rr.status}`,
-          title: rr.status === 'approved' ? `Return Approved #${orderNum}` : (rr.status === 'rejected' ? `Return Declined #${orderNum}` : `Return Requested #${orderNum}`),
+          title: rr.status === 'approved' ? `Return Approved #${orderNum}` : (isDeclined ? `Return Declined #${orderNum}` : `Return Requested #${orderNum}`),
           message: rr.status === 'approved'
             ? `Your return request (${rr.request_id}) for #${orderNum} has been APPROVED.`
-            : (rr.status === 'rejected'
-              ? `Your return request (${rr.request_id}) for #${orderNum} was declined: ${rr.rejection_reason || 'Conditions not met.'}`
+            : (isDeclined
+              ? `Your return request (${rr.request_id}) for #${orderNum} was declined: ${rr.rejection_reason || rr.admin_notes || 'Conditions not met.'}`
               : `Your return request (${rr.request_id}) for #${orderNum} has been received and is pending review.`),
-          timestamp: rr.approved_at || rr.rejected_at || rr.requested_at,
+          timestamp: rr.approved_at || rr.declined_at || rr.rejected_at || rr.requested_at,
         });
       }
     }

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -26,13 +26,14 @@ export class CategoriesController {
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() body: any) {
     return this.categoriesService.update(id, body);
   }
 
   @UseGuards(JwtAuthGuard, AdminGuard)
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.categoriesService.remove(id);
+  async remove(@Param('id') id: string, @Query('force') force?: string) {
+    return this.categoriesService.remove(id, String(force).toLowerCase() === 'true');
   }
 }

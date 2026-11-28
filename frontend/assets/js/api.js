@@ -152,6 +152,9 @@
 
         return data;
       } catch (error) {
+        if (error && error.status) {
+          throw error;
+        }
         if (!options._isRetry) {
           // If calling via one method fails (e.g. cross-origin/CORS or relative rewrite), retry with alternate
           const isDirectUrl = url.includes('run.app') || url.includes('cloudfunctions.net');

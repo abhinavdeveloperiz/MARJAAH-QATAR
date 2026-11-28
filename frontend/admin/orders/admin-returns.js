@@ -165,7 +165,7 @@
         } else if (this.currentFilter === 'approved_returns') {
           if (item.type !== 'return' || item.return_status !== 'approved') return false;
         } else if (this.currentFilter === 'declined_returns') {
-          if (item.type !== 'return' || item.return_status !== 'declined') return false;
+          if (item.type !== 'return' || (item.return_status !== 'declined' && item.return_status !== 'rejected')) return false;
         } else if (this.currentFilter === 'cancellations') {
           if (item.type !== 'cancellation' && item.order_status !== 'cancelled') return false;
         }
@@ -187,7 +187,8 @@
 
       tableBody.innerHTML = filtered.map((it) => {
         const orderNum = it.order_number || (it.order_id ? (String(it.order_id).startsWith('MTQ-') ? it.order_id : `MTQ-${String(it.order_id).padStart(5, '0')}`) : 'MTQ-00000');
-        const dateFormatted = it.request_date ? new Date(it.request_date).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) : 'Recent';
+        const rawDate = it.requested_at || it.request_date || it.created_at;
+        const dateFormatted = rawDate ? new Date(rawDate).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' }) : 'Recent';
 
         const isReturn = it.type === 'return';
         const typeBadge = isReturn
@@ -198,7 +199,7 @@
         if (isReturn) {
           if (it.return_status === 'approved') {
             statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">APPROVED &amp; RESTOCKED</span>`;
-          } else if (it.return_status === 'declined') {
+          } else if (it.return_status === 'declined' || it.return_status === 'rejected') {
             statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">DECLINED</span>`;
           } else {
             statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 animate-pulse">PENDING REVIEW</span>`;
@@ -220,7 +221,7 @@
               </button>
             ` : ''}
 
-            <button type="button" onclick="AdminOrders.openOrderModal('${it.order_id}')"
+            <button type="button" onclick="AdminOrders.openDetailsModal('${it.order_id}')"
               class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 hover:text-slate-900 transition cursor-pointer" title="View Full Order Details">
               <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
             </button>
@@ -250,7 +251,7 @@
             </td>
             <td class="py-3 px-4">
               <span class="font-display font-black text-xs text-slate-900">${Number(it.total || 0).toFixed(0)} <span class="text-[10px] font-normal text-slate-400">QAR</span></span>
-              <p class="text-[10px] text-slate-400">${it.items_count || 1} item(s)</p>
+              <p class="text-[10px] text-slate-400">${Number(it.items_count ?? 0)} item(s)</p>
             </td>
             <td class="py-3 px-4">${statusBadge}</td>
             <td class="py-3 px-4 text-right">${actionsHtml}</td>
@@ -286,8 +287,10 @@
       const modal = document.getElementById('return-decline-modal');
       const orderIdInput = document.getElementById('decline-target-order-id');
       const titleEl = document.getElementById('decline-modal-order-num');
+      const notesEl = document.getElementById('decline-reason-notes');
       if (orderIdInput) orderIdInput.value = orderId;
       if (titleEl) titleEl.textContent = `#${orderNum}`;
+      if (notesEl) notesEl.value = '';
       if (modal) modal.classList.remove('hidden');
     },
 

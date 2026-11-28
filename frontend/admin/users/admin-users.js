@@ -65,7 +65,7 @@
       });
 
       if (filtered.length === 0) {
-        container.innerHTML = `<tr><td colspan="7" class="py-12 text-center text-xs text-slate-400">No admin staff accounts found.</td></tr>`;
+        container.innerHTML = `<tr><td colspan="6" class="py-12 text-center text-xs text-slate-400">No admin staff accounts found.</td></tr>`;
         return;
       }
 
@@ -78,8 +78,9 @@
         const statusBadge = {
           active: '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Active</span>',
           inactive: '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Inactive</span>',
+          deactivated: '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Deactivated</span>',
           suspended: '<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>Suspended</span>',
-        }[status] || status;
+        }[status] || `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">${status}</span>`;
 
         return `
           <tr class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
@@ -181,6 +182,8 @@
 
       const statusSelect = document.getElementById('user-modal-status');
       if (statusSelect) statusSelect.value = 'active';
+      const mustChangeEl = document.getElementById('user-modal-must-change');
+      if (mustChangeEl) mustChangeEl.checked = false;
 
       document.getElementById('user-modal').classList.remove('hidden');
     },
@@ -212,6 +215,9 @@
       const statusSelect = document.getElementById('user-modal-status');
       if (statusSelect) statusSelect.value = u.status || 'active';
 
+      const mustChangeEl = document.getElementById('user-modal-must-change');
+      if (mustChangeEl) mustChangeEl.checked = Boolean(u.must_change_password || u.force_password_change);
+
       document.getElementById('user-modal').classList.remove('hidden');
     },
 
@@ -228,6 +234,7 @@
       const roleId = document.getElementById('user-modal-role').value;
       const status = document.getElementById('user-modal-status').value;
       const password = document.getElementById('user-modal-password').value;
+      const mustChange = Boolean(document.getElementById('user-modal-must-change')?.checked);
 
       const payload = {
         name,
@@ -236,6 +243,8 @@
         phone,
         role_ids: roleId ? [roleId] : ['customer_support'],
         status,
+        must_change_password: mustChange,
+        force_password_change: mustChange,
       };
 
       try {

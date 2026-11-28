@@ -4,11 +4,17 @@ dotenv.config();
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, Logger } from '@nestjs/common';
+import { getCorsOrigins } from './cors-origins';
 import helmet from 'helmet';
+import * as express from 'express';
 
 async function bootstrap() {
   const logger = new Logger('Bootstrap');
   const app = await NestFactory.create(AppModule);
+
+  // Support Base64 image payloads for categories, subcategories, brands, and products
+  app.use(express.json({ limit: '10mb' }));
+  app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
   // Security HTTP Headers
   app.use(
@@ -20,9 +26,8 @@ async function bootstrap() {
   );
 
   // Configure CORS
-  const corsOrigin = process.env.CORS_ORIGIN;
   app.enableCors({
-    origin: corsOrigin && corsOrigin !== '*' ? corsOrigin.split(',').map((o) => o.trim()) : true,
+    origin: getCorsOrigins(),
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type,Accept,Authorization,X-Requested-With',

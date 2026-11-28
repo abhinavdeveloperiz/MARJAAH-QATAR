@@ -75,7 +75,7 @@
       const paymentMethodLabel = {
         cash: 'Cash on Delivery (COD)',
         cod: 'Cash on Delivery (COD)',
-        pay_at_store: 'Pay at Store Hub (Cash/Card)',
+        pay_at_store: 'Pay at Store (Store Pickup)',
         card: 'Credit / Debit Card (Online)',
         credit_card: 'Credit / Debit Card (Online)',
         apple_pay: 'Apple Pay',
@@ -147,48 +147,17 @@
             
             <!-- Left: Brand Identity -->
             <div style="flex: 1; min-width: 260px;">
-              <div style="margin-bottom: 8px;">
-                <svg width="180" height="45" viewBox="0 0 230 58" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <defs>
-                    <linearGradient id="cust-inv-m-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#7E96FC" />
-                      <stop offset="100%" stop-color="#5B73EA" />
-                    </linearGradient>
-                    <linearGradient id="cust-inv-m-purple" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#C4A5FA" />
-                      <stop offset="100%" stop-color="#9F78EB" />
-                    </linearGradient>
-                    <linearGradient id="cust-inv-m-darkblue" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stop-color="#3C56BE" />
-                      <stop offset="100%" stop-color="#2F47A9" />
-                    </linearGradient>
-                  </defs>
-                  <path d="M 6 26 C 6 26, 6 42, 6 46 C 6 51.5 10.5 56 16 56 C 21.5 56 26 51.5 26 46 C 26 38 18 30 6 26 Z" fill="url(#cust-inv-m-darkblue)"/>
-                  <path d="M 38 32 C 38 32, 38 42, 38 46 C 38 51.5 42.5 56 48 56 C 53.5 56 58 51.5 58 46 C 58 36 50 28 38 32 Z" fill="url(#cust-inv-m-darkblue)"/>
-                  <rect x="3" y="7" width="17" height="44" rx="8.5" transform="rotate(-40 11.5 29)" fill="url(#cust-inv-m-blue)"/>
-                  <g opacity="0.4" stroke="#FFFFFF" stroke-width="1.2" stroke-linecap="round">
-                    <line x1="16" y1="20" x2="28" y2="34" />
-                    <circle cx="16" cy="20" r="1.5" fill="#FFFFFF" />
-                    <circle cx="28" cy="34" r="1.5" fill="#FFFFFF" />
-                  </g>
-                  <rect x="38" y="7" width="17" height="34" rx="8.5" transform="rotate(40 46.5 24)" fill="url(#cust-inv-m-purple)"/>
-                  <circle cx="63" cy="46" r="4.5" fill="#B592F2"/>
-                  <g fill="#1E293B">
-                    <path d="M 91 19.5 C 89 17.5 86 16 81.5 16 C 75.5 16 71.5 19.5 71.5 24.5 C 71.5 29 74.5 31.8 81 33.5 C 87.5 35.2 89.5 37 89.5 40.5 C 89.5 44.5 85.5 47.5 79.5 47.5 C 74.5 47.5 70.5 45.2 68 42.5 C 66.8 41.2 66.8 39.2 68.2 38 C 69.5 36.8 71.5 36.9 72.8 38.2 C 74.5 40 77 41.5 79.5 41.5 C 82 41.5 83.5 40 83.5 38 C 83.5 35.5 81 34 75.5 32.5 C 69 30.7 65.5 28 65.5 23 C 65.5 16.5 71 10.5 81 10.5 C 86.5 10.5 91.5 12.8 94.5 15.8 C 95.8 17.1 95.7 19.2 94.2 20.5 C 93 21.6 91.9 20.5 91 19.5 Z"/>
-                    <path d="M 104 14 C 104 12.3 105.3 11 107 11 C 108.7 11 110 12.3 110 14 V 25 H 125 V 14 C 125 12.3 126.3 11 128 11 C 129.7 11 131 12.3 131 14 V 44 C 131 45.7 129.7 47 128 47 C 126.3 47 125 45.7 125 44 V 31 H 110 V 44 C 110 45.7 108.7 47 107 47 C 105.3 47 104 45.7 104 44 Z"/>
-                    <path d="M 154 10.5 C 165.5 10.5 174 19 174 29 C 174 39 165.5 47.5 154 47.5 C 142.5 47.5 134 39 134 29 C 134 19 142.5 10.5 154 10.5 Z M 154 16.5 C 146 16.5 140 22 140 29 C 140 36 146 41.5 154 41.5 C 162 41.5 168 36 168 29 C 168 22 162 16.5 154 16.5 Z"/>
-                    <path d="M 183 14 C 183 12.3 184.3 11 186 11 H 198 C 205.5 11 211.5 16 211.5 23.5 C 211.5 31 205.5 36 198 36 H 192 V 44 C 192 45.7 190.7 47 189 47 C 187.3 47 186 45.7 186 44 V 14 H 183 Z M 192 17 V 30 H 198 C 202 30 205.5 27 205.5 23.5 C 205.5 20 202 17 198 17 H 192 Z"/>
-                  </g>
-                </svg>
+              <div style="margin-bottom: 10px;">
+                <img src="/assets/images/branding/logo-light.png?v=5" alt="M.SHOP" style="height: 36px; width: auto; max-width: 180px; object-fit: contain; display: block;" />
               </div>
-              <p style="margin: 0; font-size: 13px; font-weight: 800; color: #0F172A; letter-spacing: 0.5px;">MARJAAH QATAR — Marjaah Trading W.L.L.</p>
-              <p style="margin: 2px 0; font-size: 11px; color: #475569; font-weight: 600;">شركة مرجاح للتجارة ذ.م.م &bull; Commercial Registration (CR) No: <strong style="color: #0F172A;">228717</strong></p>
+              <p style="margin: 0; font-size: 13px; font-weight: 800; color: #0F172A; letter-spacing: 0.5px;">M.SHOP — Marjaah Trading W.L.L.</p>
+              <p style="margin: 2px 0; font-size: 11px; color: #475569; font-weight: 600;"><span dir="rtl">شركة مرجاح للتجارة ذ.م.م</span> &bull; Commercial Registration (CR) No: <strong style="color: #0F172A;">228717</strong></p>
               <p style="margin: 2px 0; font-size: 11px; color: #475569; line-height: 1.4;">
                 Shop No. 8, Building No. 12, Street No. 295, Zone No. 91<br/>
                 SOUQ UMM BESHER, Doha, State of Qatar
               </p>
               <p style="margin: 2px 0 0 0; font-size: 11px; color: #475569;">
-                Tel: <strong style="color: #0F172A;">+974 7799 1013</strong> &bull; Email: <strong style="color: #0F172A;">info@marjaah.com</strong> &bull; Web: <strong style="color: #0F172A;">www.marjaah.com</strong>
+                Tel: <strong style="color: #0F172A;">+974 7799 1013</strong> &bull; Email: <strong style="color: #0F172A;">info@marjaah.com</strong> &bull; Web: <strong style="color: #0F172A;">www.marjaah.shop</strong>
               </p>
             </div>
 
@@ -265,24 +234,24 @@
             </div>
 
             <!-- Right: Calculations breakdown -->
-            <div style="width: 280px;">
-              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
-                <span>Subtotal</span>
-                <span style="font-family: monospace; font-weight: 600; color: #0F172A;">${subtotal.toFixed(2)} QAR</span>
+            <div style="width: 340px; max-width: 100%; min-width: 280px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
+                <span style="white-space: nowrap;">Subtotal</span>
+                <span style="font-family: monospace; font-weight: 600; color: #0F172A; white-space: nowrap;">${subtotal.toFixed(2)} QAR</span>
               </div>
-              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
-                <span>Delivery / Shipping Fee</span>
-                <span style="font-family: monospace; font-weight: 600; color: #059669;">${shippingLabel}</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; color: #475569; border-bottom: 1px solid #F1F5F9;">
+                <span style="white-space: nowrap;">Delivery / Shipping Fee</span>
+                <span style="font-family: monospace; font-weight: 600; color: #059669; text-align: right; white-space: nowrap;">${shippingLabel}</span>
               </div>
               ${discount > 0 ? `
-              <div style="display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; color: #E11D48; border-bottom: 1px solid #F1F5F9;">
-                <span>Promotional Discount</span>
-                <span style="font-family: monospace; font-weight: 600;">-${discount.toFixed(2)} QAR</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; color: #E11D48; border-bottom: 1px solid #F1F5F9;">
+                <span style="white-space: nowrap;">Promotional Discount</span>
+                <span style="font-family: monospace; font-weight: 600; white-space: nowrap;">-${discount.toFixed(2)} QAR</span>
               </div>
               ` : ''}
-              <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; margin-top: 6px; background: #F8FAFC; border: 2px solid #0F172A; border-radius: 8px;">
-                <span style="font-size: 13px; font-weight: 800; color: #0F172A;">Total Amount Due / المدفوع</span>
-                <span style="font-family: monospace; font-size: 17px; font-weight: 900; color: #4338CA;">${total.toFixed(2)} QAR</span>
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 10px 14px; margin-top: 8px; background: #F8FAFC; border: 2px solid #0F172A; border-radius: 8px;">
+                <span style="font-size: 12px; font-weight: 800; color: #0F172A; line-height: 1.3; flex: 1; padding-right: 8px;">Total Amount Due <span dir="rtl" style="display: inline-block;">/ المدفوع</span></span>
+                <span style="font-family: monospace; font-size: 17px; font-weight: 900; color: #4338CA; white-space: nowrap; flex-shrink: 0;">${total.toFixed(2)} QAR</span>
               </div>
             </div>
 
@@ -311,7 +280,7 @@
 
           <!-- BOTTOM COPYRIGHT & BARCODE SIMULATION -->
           <div style="margin-top: 14px; padding-top: 8px; border-top: 1px solid #F1F5F9; display: flex; justify-content: space-between; align-items: center; font-size: 9px; color: #94A3B8;">
-            <span>MARJAAH Qatar &bull; State of Qatar &bull; Computer Generated Tax Invoice</span>
+            <span>M.SHOP (Marjaah Trading W.L.L.) &bull; State of Qatar &bull; Computer Generated Tax Invoice</span>
             <span style="font-family: monospace; letter-spacing: 2px; font-weight: 700; color: #64748B;">*${orderNum}*</span>
           </div>
 
@@ -391,7 +360,8 @@
           if (window.api && typeof window.api.getOrder === 'function') {
             order = await window.api.getOrder(orderOrId);
           } else {
-            const res = await fetch(`/api/orders/${orderOrId}`);
+            const tk = (window.api && window.api.getToken && window.api.getToken()) || localStorage.getItem('marjaah_auth_token') || '';
+            const res = await fetch(`/api/orders/${orderOrId}`, { headers: tk ? { Authorization: `Bearer ${tk}` } : {} });
             order = await res.json();
           }
         } catch (e) {

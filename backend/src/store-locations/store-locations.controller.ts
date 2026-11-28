@@ -1,15 +1,5 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Put,
-  Delete,
-  Param,
-  Body,
-  Query,
-  UseGuards,
-  Request,
-} from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Param, Body, Query, UseGuards, Request, Req } from '@nestjs/common';
+import { isStaffRequest } from '../auth/staff-check';
 import { StoreLocationsService, StoreLocationDto } from './store-locations.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RbacGuard } from '../admin/rbac/rbac.guard';
@@ -20,8 +10,8 @@ export class StoreLocationsController {
   constructor(private readonly storeLocationsService: StoreLocationsService) {}
 
   @Get()
-  async findAll(@Query('includeInactive') includeInactive?: string) {
-    const showAll = String(includeInactive).toLowerCase() === 'true';
+  async findAll(@Query('includeInactive') includeInactive?: string, @Req() req?: any) {
+    const showAll = String(includeInactive).toLowerCase() === 'true' && isStaffRequest(req);
     return this.storeLocationsService.findAll(showAll);
   }
 
@@ -40,6 +30,7 @@ export class StoreLocationsController {
   @UseGuards(JwtAuthGuard, RbacGuard)
   @RequirePermission('store_locations', 'edit')
   @Put(':id')
+  @Patch(':id')
   async update(@Param('id') id: string, @Body() body: Partial<StoreLocationDto>, @Request() req: any) {
     return this.storeLocationsService.update(id, body, req.user);
   }

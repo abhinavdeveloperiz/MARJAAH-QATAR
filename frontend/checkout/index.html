@@ -700,10 +700,10 @@
             <h2 class="font-bold text-base sm:text-lg" style="color:var(--text-primary)">Payment Method</h2>
           </div>
 
-          <!-- Payment Options: Only Cash on Delivery active for now; online card & QR temporarily hidden -->
+          <!-- Payment: no online payment. COD for doorstep delivery, Pay at Store for store pickup. -->
           <div class="grid grid-cols-1 gap-3 mb-6" id="payment-method-selector">
-            <!-- 1. Cash on Delivery (Active Sole Payment Method) -->
-            <label class="relative flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option shadow-sm" data-method="cash" style="background:var(--bg-surface-2);border-color:var(--color-accent, #6366f1)">
+            <!-- 1. Cash on Delivery (doorstep delivery) -->
+            <label id="pay-option-cash" class="relative flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option shadow-sm" data-method="cash" style="background:var(--bg-surface-2);border-color:var(--color-accent, #6366f1)">
               <div class="flex items-center gap-3">
                 <input type="radio" name="payment_method" value="cash" checked class="accent-primary-500 w-5 h-5 cursor-pointer" />
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400 flex-shrink-0">
@@ -714,72 +714,38 @@
                     <span class="text-sm sm:text-base font-bold" style="color:var(--text-primary)">Cash on Delivery (COD)</span>
                     <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Doorstep</span>
                   </div>
-                  <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Pay with cash or card to courier upon receiving your order at your address across Qatar</p>
+                  <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Pay in cash to the courier when your order arrives at your address across Qatar</p>
                 </div>
               </div>
             </label>
 
-            <!-- 2. Credit / Debit Card & Apple Pay (MyFatoorah) -->
-            <label class="relative flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option shadow-sm" data-method="card" style="background:var(--bg-surface-2);border-color:var(--border-color)">
+            <!-- 2. Pay at Store (store pickup) -->
+            <label id="pay-option-store" class="hidden relative flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 rounded-2xl border cursor-pointer transition-all duration-200 payment-card-option shadow-sm" data-method="pay_at_store" style="background:var(--bg-surface-2);border-color:var(--color-accent, #6366f1)">
               <div class="flex items-center gap-3">
-                <input type="radio" name="payment_method" value="card" class="accent-primary-500 w-5 h-5 cursor-pointer" />
-                <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-400 flex-shrink-0">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+                <input type="radio" name="payment_method" value="pay_at_store" class="accent-primary-500 w-5 h-5 cursor-pointer" />
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-indigo-500/10 text-indigo-400 flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"/><path d="M2 7h20"/></svg>
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
-                    <span class="text-sm sm:text-base font-bold" style="color:var(--text-primary)">Debit / Credit Card &amp; Apple Pay</span>
-                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">MyFatoorah</span>
+                    <span class="text-sm sm:text-base font-bold" style="color:var(--text-primary)">Pay at Store (Store Pickup)</span>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">Pickup</span>
                   </div>
-                  <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Visa, Mastercard, QPay local debit cards, and Apple Pay secure checkout</p>
+                  <p class="text-xs mt-0.5" style="color:var(--text-secondary)">Collect your order from the store and pay there at pickup</p>
                 </div>
               </div>
             </label>
           </div>
 
-          <!-- Channel 1: Cash on Delivery Sub-Panel -->
-          <div id="channel-panel-cash" class="payment-channel-pane p-5 rounded-2xl border space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-emerald-500/10 text-emerald-400 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              </div>
-              <div>
-                <h4 class="font-bold text-sm" style="color:var(--text-primary)">
-                  Doorstep Delivery &amp; Payment
-                </h4>
-                <p class="text-xs mt-1 leading-relaxed" style="color:var(--text-secondary)">
-                  Our courier will bring your order to your door. You can pay conveniently with cash or card machine upon delivery anywhere in Qatar.
-                </p>
-              </div>
-            </div>
+          <p class="text-xs mb-5" style="color:var(--text-tertiary)">No online payment is required. You pay only when you receive your order.</p>
 
+          <!-- Cash on Delivery note for courier -->
+          <div id="channel-panel-cash" class="payment-channel-pane p-5 rounded-2xl border space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
             <div>
               <label class="block text-xs font-semibold mb-1" style="color:var(--text-secondary)">
                 Change required / Payment note for courier (optional)
               </label>
               <input type="text" name="cash_change_req" value="" placeholder="e.g. Need change for QAR 500 note" class="input w-full text-xs" />
-            </div>
-          </div>
-
-          <!-- Channel 2: MyFatoorah Sub-Panel -->
-          <div id="channel-panel-card" class="payment-channel-pane hidden p-5 rounded-2xl border space-y-4" style="background:var(--bg-surface-2);border-color:var(--border-color)">
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-500/10 text-blue-400 flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
-              </div>
-              <div>
-                <h4 class="font-bold text-sm" style="color:var(--text-primary)">
-                  MyFatoorah Payment Gateway
-                </h4>
-                <p class="text-xs mt-1 leading-relaxed" style="color:var(--text-secondary)">
-                  You will be safely routed through MyFatoorah's 256-bit encrypted gateway. Accepts all Qatar bank debit cards (QPay/NAPS), Visa, Mastercard, and Apple Pay with zero transaction fees.
-                </p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3 pt-2 text-xs font-semibold" style="color:var(--text-tertiary)">
-              <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">🔒 256-bit SSL</span>
-              <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10">💳 QPay / NAPS</span>
-              <span class="px-2.5 py-1 rounded-md bg-white/5 border border-white/10"> Apple Pay</span>
             </div>
           </div>
 
@@ -843,137 +809,30 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-  const radioOptions = document.querySelectorAll('input[name="payment_method"]');
-  const cardPanels = {
-    'cash': document.getElementById('channel-panel-cash'),
-    'card': document.getElementById('channel-panel-card'),
-    'qr': document.getElementById('channel-panel-qr'),
-    'qpay': document.getElementById('channel-panel-qr'),
-  };
-  const cardOptionLabels = document.querySelectorAll('.payment-card-option');
+  const cashRadio = document.querySelector('input[name="payment_method"][value="cash"]');
+  const storeRadio = document.querySelector('input[name="payment_method"][value="pay_at_store"]');
+  const cashOption = document.getElementById('pay-option-cash');
+  const storeOption = document.getElementById('pay-option-store');
+  const cashPanel = document.getElementById('channel-panel-cash');
   const submitBtnText = document.getElementById('submit-btn-text');
   const isRtl = document.documentElement.dir === 'rtl' || document.documentElement.lang === 'ar';
 
-  function updatePaymentChannel(selectedVal) {
-    selectedVal = selectedVal || 'cash';
-
-    // Hide all channel panels
-    Object.values(cardPanels).forEach(panel => {
-      if (panel) panel.classList.add('hidden');
-    });
-
-    // Show active panel
-    const activePanel = cardPanels[selectedVal] || cardPanels['cash'];
-    if (activePanel) {
-      activePanel.classList.remove('hidden');
-    }
-
-    // Highlight selected card container
-    cardOptionLabels.forEach(label => {
-      const radio = label.querySelector('input');
-      if (radio && radio.value === selectedVal) {
-        label.style.borderColor = 'var(--color-accent, #6366f1)';
-        label.style.background = 'var(--bg-surface-3, rgba(99,102,241,0.06))';
-      } else {
-        label.style.borderColor = 'var(--border-color, rgba(255,255,255,0.08))';
-        label.style.background = 'var(--bg-surface-2)';
-      }
-    });
-
-    // Update CTA button label context
+  // Payment is tied to fulfillment: delivery => Cash on Delivery, store pickup => Pay at Store.
+  window.syncPaymentWithFulfillment = function (fulfillment) {
+    const pickup = fulfillment === 'store_pickup';
+    if (cashOption) cashOption.classList.toggle('hidden', pickup);
+    if (storeOption) storeOption.classList.toggle('hidden', !pickup);
+    if (cashPanel) cashPanel.classList.toggle('hidden', pickup);
+    if (cashRadio) cashRadio.checked = !pickup;
+    if (storeRadio) storeRadio.checked = pickup;
     if (submitBtnText) {
-      if (selectedVal === 'card') {
-        submitBtnText.textContent = isRtl ? 'المتابعة للدفع الآمن عبر MyFatoorah' : 'Pay via MyFatoorah (Card & Apple Pay)';
-      } else {
-        submitBtnText.textContent = isRtl ? 'تأكيد وإتمام الطلب (الدفع عند الاستلام)' : 'Place Order (Cash on Delivery)';
-      }
+      submitBtnText.textContent = pickup
+        ? (isRtl ? 'تأكيد الطلب (الدفع في المتجر)' : 'Place Order (Pay at Store)')
+        : (isRtl ? 'تأكيد وإتمام الطلب (الدفع عند الاستلام)' : 'Place Order (Cash on Delivery)');
     }
-  }
+  };
+  window.syncPaymentWithFulfillment('delivery');
 
-  // Radio change listeners
-  radioOptions.forEach(radio => {
-    radio.addEventListener('change', function () {
-      if (this.checked) {
-        updatePaymentChannel(this.value);
-      }
-    });
-  });
-
-  // Initial channel trigger
-  const checkedRadio = document.querySelector('input[name="payment_method"]:checked');
-  if (checkedRadio) {
-    updatePaymentChannel(checkedRadio.value);
-  }
-
-  // Live Card Preview formatting
-  const inputCardNumber = document.getElementById('input-card-number');
-  const inputCardHolder = document.getElementById('input-card-holder');
-  const inputCardExpiry = document.getElementById('input-card-expiry');
-  const previewNumber = document.getElementById('preview-card-number');
-  const previewHolder = document.getElementById('preview-card-holder');
-  const previewExpiry = document.getElementById('preview-card-expiry');
-  const cardBrandLogo = document.getElementById('card-brand-logo');
-
-  if (inputCardNumber) {
-    inputCardNumber.addEventListener('input', function (e) {
-      let val = e.target.value.replace(/\D/g, '').substring(0, 16);
-      let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
-      e.target.value = formatted;
-
-      if (previewNumber) {
-        previewNumber.textContent = formatted.padEnd(19, '•');
-      }
-
-      // Detect Brand
-      if (cardBrandLogo) {
-        if (val.startsWith('4')) {
-          cardBrandLogo.innerHTML = '<span class="text-blue-400 font-black tracking-widest text-base">VISA</span>';
-        } else if (val.startsWith('51') || val.startsWith('52') || val.startsWith('53') || val.startsWith('54') || val.startsWith('55')) {
-          cardBrandLogo.innerHTML = '<span class="text-amber-400 font-black tracking-widest text-base">MASTERCARD</span>';
-        } else if (val.startsWith('34') || val.startsWith('37')) {
-          cardBrandLogo.innerHTML = '<span class="text-cyan-300 font-black tracking-widest text-base">AMEX</span>';
-        } else {
-          cardBrandLogo.innerHTML = '<span>VISA / MASTERCARD</span>';
-        }
-      }
-    });
-  }
-
-  if (inputCardHolder) {
-    inputCardHolder.addEventListener('input', function (e) {
-      if (previewHolder) {
-        previewHolder.textContent = e.target.value.toUpperCase() || (isRtl ? 'اسم العميل' : 'YOUR NAME');
-      }
-    });
-  }
-
-  if (inputCardExpiry) {
-    inputCardExpiry.addEventListener('input', function (e) {
-      let val = e.target.value.replace(/\D/g, '').substring(0, 4);
-      if (val.length >= 3) {
-        val = val.substring(0, 2) + '/' + val.substring(2);
-      }
-      e.target.value = val;
-      if (previewExpiry) {
-        previewExpiry.textContent = val || 'MM/YY';
-      }
-    });
-  }
-
-  // Copy Fawran ID
-  const btnCopyFawran = document.getElementById('btn-copy-fawran');
-  if (btnCopyFawran) {
-    btnCopyFawran.addEventListener('click', function () {
-      const text = document.getElementById('fawran-id-text')?.textContent || 'MARJAAH-QATAR';
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = btnCopyFawran.textContent;
-        btnCopyFawran.textContent = isRtl ? 'تم النسخ ✓' : 'Copied! ✓';
-        setTimeout(() => {
-          btnCopyFawran.textContent = originalText;
-        }, 2000);
-      });
-    });
-  }
   // ── Store Pickup Locations State & Loader (Requirement 1) ──
   let storeLocations = [];
   let selectedPickupLocation = null;
@@ -981,9 +840,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function loadStoreLocations() {
     try {
-      const res = await fetch('/api/store-locations');
-      if (res.ok) {
-        storeLocations = await res.json();
+      if (window.api && typeof window.api.get === 'function') {
+        storeLocations = await window.api.get('/api/store-locations');
+      } else {
+        const res = await fetch('/api/store-locations');
+        if (res.ok) storeLocations = await res.json();
+      }
+      if (!Array.isArray(storeLocations)) {
+        storeLocations = storeLocations?.locations || storeLocations?.items || [];
       }
     } catch (e) {
       console.warn('Failed to load store locations:', e);
@@ -994,6 +858,7 @@ document.addEventListener('DOMContentLoaded', function () {
   function renderPickupLocations() {
     const list = document.getElementById('pickup-locations-list');
     if (!list) return;
+    const esc = (v) => String(v ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
     if (!storeLocations || storeLocations.length === 0) {
       list.innerHTML = `
@@ -1005,31 +870,34 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     if (!selectedPickupLocation && storeLocations.length > 0) {
-      selectedPickupLocation = storeLocations[0];
+      selectedPickupLocation = storeLocations.find(l => l.is_default || l.is_primary) || storeLocations[0];
     }
 
     list.innerHTML = storeLocations.map((loc) => {
       const isSelected = selectedPickupLocation && (selectedPickupLocation.id === loc.id);
+      const isPrimary = Boolean(loc.is_primary || loc.is_default);
+      const hours = loc.working_hours || loc.opening_hours || '';
+      const instructions = loc.instructions || loc.pickup_instructions || '';
       return `
-        <label class="flex flex-col sm:flex-row sm:items-start justify-between p-4 rounded-xl border cursor-pointer transition-all duration-200 pickup-location-card ${isSelected ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700/60 hover:border-slate-500'}" data-loc-id="${loc.id}">
+        <label class="flex flex-col sm:flex-row sm:items-start justify-between p-4 rounded-xl border cursor-pointer transition-all duration-200 pickup-location-card ${isSelected ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-700/60 hover:border-slate-500'}" data-loc-id="${esc(loc.id)}">
           <div class="flex items-start gap-3">
-            <input type="radio" name="pickup_location_radio" value="${loc.id}" ${isSelected ? 'checked' : ''} class="accent-emerald-500 mt-1 cursor-pointer" />
+            <input type="radio" name="pickup_location_radio" value="${esc(loc.id)}" ${isSelected ? 'checked' : ''} class="accent-emerald-500 mt-1 cursor-pointer" />
             <div>
               <div class="flex items-center gap-2">
-                <h4 class="font-bold text-sm text-slate-100">${loc.name}</h4>
-                ${loc.is_primary ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold uppercase tracking-wider">Main Hub</span>` : ''}
+                <h4 class="font-bold text-sm text-slate-100">${esc(loc.name)}</h4>
+                ${isPrimary ? `<span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 font-bold uppercase tracking-wider">Main Hub</span>` : ''}
               </div>
               <p class="text-xs text-slate-300 mt-1 flex items-center gap-1.5">
                 <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-emerald-400"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
-                ${loc.address}, ${loc.city || 'Doha'}
+                ${esc(loc.address || '')}${loc.city ? `, ${esc(loc.city)}` : ', Doha'}
               </p>
               <div class="flex flex-wrap gap-y-1 gap-x-3 text-[11px] text-slate-400 mt-1.5">
-                ${loc.phone ? `<span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${loc.phone}</span>` : ''}
-                ${loc.working_hours ? `<span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="10" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${loc.working_hours}</span>` : ''}
+                ${loc.phone ? `<span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.38 2 2 0 0 1 3.58 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${esc(loc.phone)}</span>` : ''}
+                ${hours ? `<span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><circle cx="12" cy="10" r="10"/><polyline points="12 6 12 12 16 14"/></svg>${esc(hours)}</span>` : ''}
               </div>
-              ${loc.instructions ? `
+              ${instructions ? `
                 <div class="mt-2 text-[11px] bg-slate-900/60 p-2 rounded-lg text-emerald-300/90 border border-emerald-500/20">
-                  <strong>Pickup Instructions:</strong> ${loc.instructions}
+                  <strong>Pickup Instructions:</strong> ${esc(instructions)}
                 </div>
               ` : ''}
             </div>
@@ -1051,6 +919,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.querySelectorAll('input[name="fulfillment_type"]').forEach(radio => {
     radio.addEventListener('change', (e) => {
       activeFulfillment = e.target.value;
+      if (window.syncPaymentWithFulfillment) window.syncPaymentWithFulfillment(activeFulfillment);
       const deliveryFields = document.getElementById('delivery-address-fields');
       const pickupPanel = document.getElementById('store-pickup-panel');
       const zoneInput = document.getElementById('id_zone');
@@ -1084,11 +953,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const shippingEl = document.getElementById('checkout-shipping');
     const totalEl = document.getElementById('checkout-total');
 
+    const submitBtn = document.getElementById('btn-submit-order');
+
     if (items.length === 0) {
       if (container) {
         container.innerHTML = '<p class="text-xs text-rose-400">Your cart is empty. Please add items to checkout.</p>';
       }
+      if (subtotalEl) subtotalEl.textContent = '0 QAR';
+      if (shippingEl) shippingEl.textContent = '0 QAR';
+      if (totalEl) totalEl.textContent = '0 QAR';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
       return;
+    }
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
     }
 
     if (container) {
@@ -1127,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.cart.onChange(renderCheckoutSummary);
   }
 
-  // Pre-fill user data if logged in
+  // Pre-fill user data & saved delivery address if logged in
   if (window.api && window.api.getUser()) {
     const user = window.api.getUser();
     if (user.full_name && document.getElementById('id_full_name')) {
@@ -1138,6 +1021,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     if (user.phone && document.getElementById('id_phone')) {
       document.getElementById('id_phone').value = user.phone;
+    }
+    const addr = user.delivery_address || {};
+    if ((addr.building || user.building) && document.getElementById('id_building')) {
+      document.getElementById('id_building').value = addr.building || user.building;
+    }
+    if ((addr.street || user.street) && document.getElementById('id_street')) {
+      document.getElementById('id_street').value = addr.street || user.street;
+    }
+    if ((addr.zone || user.zone) && document.getElementById('id_zone')) {
+      document.getElementById('id_zone').value = addr.zone || user.zone;
+    }
+    if ((addr.city || user.city) && document.getElementById('id_city')) {
+      document.getElementById('id_city').value = addr.city || user.city;
     }
   }
 
@@ -1172,6 +1068,14 @@ document.addEventListener('DOMContentLoaded', function () {
       if (submitText) submitText.textContent = isRtl ? 'جاري تأكيد الطلب...' : 'Placing Order...';
 
       try {
+        const payMethod = activeFulfillment === 'store_pickup' ? 'pay_at_store' : 'cash';
+        const baseNotes = document.getElementById('id_notes')?.value?.trim() || '';
+        const cashChangeReq = (document.querySelector('input[name="cash_change_req"]')?.value || '').trim();
+        const combinedNotes = [
+          baseNotes,
+          payMethod === 'cash' && cashChangeReq ? `Cash Change Requested: ${cashChangeReq}` : '',
+        ].filter(Boolean).join(' | ');
+
         const orderData = {
           full_name: document.getElementById('id_full_name').value.trim(),
           phone: document.getElementById('id_phone').value.trim(),
@@ -1183,12 +1087,16 @@ document.addEventListener('DOMContentLoaded', function () {
           street: activeFulfillment === 'store_pickup' ? '' : (document.getElementById('id_street')?.value?.trim() || ''),
           zone: activeFulfillment === 'store_pickup' ? (selectedPickupLocation?.city || 'Al Sadd') : document.getElementById('id_zone').value.trim(),
           city: activeFulfillment === 'store_pickup' ? (selectedPickupLocation?.city || 'Doha') : (document.getElementById('id_city')?.value?.trim() || 'Doha'),
-          payment_method: document.querySelector('input[name="payment_method"]:checked')?.value || 'cash',
-          notes: document.getElementById('id_notes')?.value?.trim() || '',
+          payment_method: payMethod,
+          cash_change_req: cashChangeReq || undefined,
+          notes: combinedNotes,
           shipping_cost: activeFulfillment === 'store_pickup' ? 0 : undefined,
           items: items.map(i => ({
+            id: i.id || undefined,
             product_id: i.id || i.slug,
             slug: i.slug,
+            variant_name: i.variant_name || undefined,
+            sku: i.sku || undefined,
             name: i.name,
             price: Number(i.price),
             quantity: Number(i.quantity),
@@ -1553,7 +1461,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <script src="/assets/js/analytics.js"></script>
   <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/toast.js"></script>
-  <script src="/assets/js/cart.js?v=2.1"></script>
+  <script src="/assets/js/cart.js?v=20261128_01"></script>
   <script src="/assets/js/wishlist.js"></script>
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js"></script>

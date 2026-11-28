@@ -5,6 +5,9 @@ import { FirestoreService } from '../firebase/firestore.service';
 import { UploadService } from '../upload/upload.service';
 import { AdminService } from '../admin/admin.service';
 import { SeoService } from '../seo/seo.service';
+import { CategoriesService } from '../categories/categories.service';
+import { SubcategoriesService } from '../subcategories/subcategories.service';
+import { BrandsService } from '../brands/brands.service';
 
 export interface ProductFilterQuery {
   page?: number;
@@ -49,6 +52,9 @@ export class ProductsService implements OnModuleInit {
     private readonly uploadService: UploadService,
     @Optional() @Inject(forwardRef(() => AdminService)) private readonly adminService?: AdminService,
     @Optional() @Inject(forwardRef(() => SeoService)) private readonly seoService?: SeoService,
+    @Optional() @Inject(forwardRef(() => CategoriesService)) private readonly categoriesService?: CategoriesService,
+    @Optional() @Inject(forwardRef(() => SubcategoriesService)) private readonly subcategoriesService?: SubcategoriesService,
+    @Optional() @Inject(forwardRef(() => BrandsService)) private readonly brandsService?: BrandsService,
   ) {}
 
   private cachedProducts: any[] | null = null;
@@ -107,7 +113,7 @@ export class ProductsService implements OnModuleInit {
     this.refreshCacheInBackground().catch(() => {});
   }
 
-  invalidateCache() {
+  invalidateCache(cascade = true) {
     this.cachedProducts = null;
     this.cacheExpiresAt = 0;
     try {
@@ -118,6 +124,59 @@ export class ProductsService implements OnModuleInit {
         fs.unlinkSync(this.DISK_CACHE_PATH);
       }
     } catch (_) {}
+    if (cascade) {
+      try { this.categoriesService?.invalidateCache(); } catch (_) {}
+      try { this.subcategoriesService?.invalidateCache(); } catch (_) {}
+      try { this.brandsService?.invalidateCache(); } catch (_) {}
+    }
+    this.refreshCacheInBackground().then(() => {
+      if (cascade) {
+        try { this.categoriesService?.invalidateCache(); } catch (_) {}
+        try { this.subcategoriesService?.invalidateCache(); } catch (_) {}
+        try { this.brandsService?.invalidateCache(); } catch (_) {}
+      }
+    }).catch(() => {});
+  }
+
+  private upsertCachedProduct(product: any) {
+    if (!product || !product.id) {
+      this.invalidateCache();
+      return;
+    }
+    if (Array.isArray(this.cachedProducts)) {
+      const idx = this.cachedProducts.findIndex((p) => p.id === product.id);
+      if (idx !== -1) {
+        this.cachedProducts[idx] = { ...this.cachedProducts[idx], ...product };
+      } else {
+        this.cachedProducts.unshift(product);
+      }
+      this.cacheExpiresAt = Date.now() + this.CACHE_TTL_MS;
+      try {
+        fs.promises.writeFile(this.DISK_CACHE_PATH, JSON.stringify(this.cachedProducts)).catch(() => {});
+      } catch (_) {}
+    } else {
+      this.invalidateCache();
+    }
+    try { this.seoService?.invalidateSitemapCache(); } catch (_) {}
+    try { this.categoriesService?.invalidateCache(); } catch (_) {}
+    try { this.subcategoriesService?.invalidateCache(); } catch (_) {}
+    try { this.brandsService?.invalidateCache(); } catch (_) {}
+  }
+
+  private removeCachedProduct(id: string) {
+    if (Array.isArray(this.cachedProducts)) {
+      this.cachedProducts = this.cachedProducts.filter((p) => p.id !== id);
+      this.cacheExpiresAt = Date.now() + this.CACHE_TTL_MS;
+      try {
+        fs.promises.writeFile(this.DISK_CACHE_PATH, JSON.stringify(this.cachedProducts)).catch(() => {});
+      } catch (_) {}
+    } else {
+      this.invalidateCache();
+    }
+    try { this.seoService?.invalidateSitemapCache(); } catch (_) {}
+    try { this.categoriesService?.invalidateCache(); } catch (_) {}
+    try { this.subcategoriesService?.invalidateCache(); } catch (_) {}
+    try { this.brandsService?.invalidateCache(); } catch (_) {}
   }
 
   private async refreshCacheInBackground(): Promise<void> {
@@ -181,9 +240,13 @@ export class ProductsService implements OnModuleInit {
     let products = [...allProducts];
 
     // 0. Status filter (Active vs Hidden / Pending Approval) - hide hidden & pending products on storefront unless requested
-    const includeHidden = String(query.includeHidden).toLowerCase() === 'true' || query.status === 'all';
+    const statusParam = query.status ? String(query.status).toLowerCase().trim() : '';
+    const includeHidden = String(query.includeHidden).toLowerCase() === 'true' || statusParam === 'all' || ['hidden', 'pending_approval', 'rejected'].includes(statusParam);
     if (!includeHidden) {
       products = products.filter(p => p.status !== 'hidden' && p.status !== 'pending_approval' && p.status !== 'rejected');
+    }
+    if (statusParam && statusParam !== 'all') {
+      products = products.filter(p => (p.status || 'active').toLowerCase() === statusParam);
     }
 
     // 0b. Compatibility filter
@@ -309,10 +372,10 @@ export class ProductsService implements OnModuleInit {
       });
     }
     if (query.isOnSale !== undefined && String(query.isOnSale).toLowerCase() === 'true') {
-      products = products.filter(p => Boolean(p.is_on_sale) || Boolean(p.is_offer) || (p.original_price && Number(p.original_price) > Number(p.price)));
+      products = products.filter(p => Boolean(p.is_on_sale) || Boolean(p.is_offer) || Boolean(p.offer_badge) || Boolean(p.offer_title) || (p.original_price && Number(p.original_price) > Number(p.price)));
     }
     if (query.isOffer !== undefined && String(query.isOffer).toLowerCase() === 'true') {
-      products = products.filter(p => Boolean(p.is_offer) || Boolean(p.is_on_sale) || (p.original_price && Number(p.original_price) > Number(p.price)));
+      products = products.filter(p => Boolean(p.is_offer) || Boolean(p.is_on_sale) || Boolean(p.offer_badge) || Boolean(p.offer_title) || (p.original_price && Number(p.original_price) > Number(p.price)));
     }
     const isBestSellerFlag = query.isBestSeller ?? query.is_best_seller ?? query.bestseller;
     if (isBestSellerFlag !== undefined && String(isBestSellerFlag).toLowerCase() === 'true') {
@@ -519,22 +582,82 @@ export class ProductsService implements OnModuleInit {
     };
   }
 
+  private normalizeSlugText(raw: string): string {
+    return String(raw || '')
+      .replace(/\s*[\-\|]\s*(M\.SHOP|MARJAAH|Qatar|Store|Shop).*$/i, '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+  }
+
+  private async ensureUniqueSlug(rawSource: string, excludeId?: string): Promise<string> {
+    const base = this.normalizeSlugText(rawSource) || `product-${Date.now()}`;
+    let existingSlugs = new Set<string>();
+
+    if (this.cachedProducts && this.cachedProducts.length > 0) {
+      for (const p of this.cachedProducts) {
+        if (excludeId && p.id === excludeId) continue;
+        if (p.slug) existingSlugs.add(String(p.slug).toLowerCase());
+      }
+    } else {
+      const snap = await this.firestore.collection('products').where('slug', '>=', base).where('slug', '<=', `${base}\uf8ff`).get();
+      snap.docs.forEach((d) => {
+        if (excludeId && d.id === excludeId) return;
+        const s = (d.data() as any)?.slug;
+        if (s) existingSlugs.add(String(s).toLowerCase());
+      });
+    }
+
+    if (!existingSlugs.has(base)) return base;
+    let counter = 2;
+    let candidate = `${base}-${counter}`;
+    while (existingSlugs.has(candidate)) {
+      counter++;
+      candidate = `${base}-${counter}`;
+    }
+    return candidate;
+  }
+
   async findOne(slugOrId: string) {
+    let rawKey = slugOrId;
+    try {
+      rawKey = decodeURIComponent(slugOrId);
+    } catch (_) {}
+    rawKey = String(rawKey || '').trim();
+    const lowerSlug = rawKey.toLowerCase();
+
     // 1. Try by doc ID
-    const doc = await this.firestore.doc('products', slugOrId).get();
+    const doc = await this.firestore.doc('products', rawKey).get();
     let product: any = null;
 
     if (doc.exists) {
       product = { id: doc.id, ...doc.data() };
     } else {
-      // 2. Try by slug
-      const snap = await this.firestore.collection('products')
-        .where('slug', '==', slugOrId)
+      // 2. Try exact slug in Firestore
+      let snap = await this.firestore.collection('products')
+        .where('slug', '==', rawKey)
         .limit(1)
         .get();
 
+      if (snap.empty && lowerSlug !== rawKey) {
+        snap = await this.firestore.collection('products')
+          .where('slug', '==', lowerSlug)
+          .limit(1)
+          .get();
+      }
+
       if (!snap.empty) {
         product = { id: snap.docs[0].id, ...snap.docs[0].data() };
+      } else {
+        // 3. Fallback search in cached catalog (handles case-insensitive / urlSlug / sanitized matches)
+        const all = await this.getAllProducts();
+        const found = all.find((p) => {
+          const ps = String(p.slug || '').toLowerCase();
+          const pus = String(p.urlSlug || '').toLowerCase();
+          return p.id === rawKey || ps === lowerSlug || pus === lowerSlug;
+        });
+        if (found) product = found;
       }
     }
 
@@ -782,26 +905,32 @@ export class ProductsService implements OnModuleInit {
       str = str.replace(betweenMatch[0], ' ');
     }
 
-    // 2. Under / Below / Less than / Max / <= / Up to X [currency]
+    // 2. Under / Below / Less than / Max / <= / Up to X [currency] (EN + AR)
     const underMatch =
       str.match(
         /(?:under|below|less\s+than|max|up\s+to|within|<=\s*|<\s*)\s*(\d+(?:\.\d+)?)(?:\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$))?/i,
       ) ||
       str.match(
         /(\d+(?:\.\d+)?)\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$)?\s*(?:and\s+below|or\s+less|max)/i,
+      ) ||
+      str.match(
+        /(?:أقل\s+من|اقل\s+من|تحت|دون|بحد\s+أقصى|لغاية|حتى)\s*(\d+(?:\.\d+)?)(?:\s*(?:ريال|ر\.?ق|qar))?/i,
       );
     if (underMatch) {
       maxPrice = parseFloat(underMatch[1]);
       str = str.replace(underMatch[0], ' ');
     }
 
-    // 3. Above / Over / More than / Min / >= / From X [currency]
+    // 3. Above / Over / More than / Min / >= / From X [currency] (EN + AR)
     const aboveMatch =
       str.match(
         /(?:above|over|more\s+than|min|starting\s+from|from|>=\s*|>\s*)\s*(\d+(?:\.\d+)?)(?:\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$))?/i,
       ) ||
       str.match(
         /(\d+(?:\.\d+)?)\s*(?:qar|qr|riyal|riyals|dhs|aed|usd|\$)?\s*(?:and\s+above|or\s+more|min)/i,
+      ) ||
+      str.match(
+        /(?:أكثر\s+من|اكثر\s+من|فوق|أعلى\s+من|اعلى\s+من)\s*(\d+(?:\.\d+)?)(?:\s*(?:ريال|ر\.?ق|qar))?/i,
       );
     if (aboveMatch) {
       minPrice = parseFloat(aboveMatch[1]);
@@ -810,10 +939,12 @@ export class ProductsService implements OnModuleInit {
 
     // Clean currency symbols and orphan words
     str = str.replace(/\b(qar|qr|riyal|riyals|dhs|aed|usd)\b/gi, ' ');
+    str = str.replace(/(?:ريال|قطري|ر\.ق)/g, ' ');
     str = str.replace(/[^\w\s\u0600-\u06FF]/g, ' ');
     const stopWords = new Set([
       'in', 'for', 'with', 'of', 'the', 'a', 'an', 'at', 'by',
       'under', 'below', 'above', 'over', 'between', 'and', 'or', 'to',
+      'من', 'في', 'مع', 'بين', 'تحت', 'فوق', 'أقل', 'اقل', 'أكثر', 'اكثر', 'و', 'أو', 'او',
     ]);
     const terms = str
       .split(/\s+/)
@@ -1307,12 +1438,8 @@ export class ProductsService implements OnModuleInit {
     if (!data.name || !data.price) {
       throw new BadRequestException('Product name and price are required');
     }
-    const rawSlugSource = data.slug || data.seo_title || data.name;
-    const slug = rawSlugSource
-      .replace(/\s*[\-\|]\s*(M\.SHOP|MARJAAH|Qatar|Store|Shop).*$/i, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+    const rawSlugSource = data.slug || data.seo_title || data.name || data.sku;
+    const slug = await this.ensureUniqueSlug(rawSlugSource);
     const now = new Date().toISOString();
 
     // Check approval requirement
@@ -1348,6 +1475,17 @@ export class ProductsService implements OnModuleInit {
 
     const catSub = await this.resolveCategoryAndSubcategory(data);
 
+    const origPriceNum = data.original_price ? Number(data.original_price) : null;
+    const sellPriceNum = Number(data.price);
+    const hasOfferPriceDrop = Boolean(origPriceNum && !isNaN(sellPriceNum) && origPriceNum > sellPriceNum);
+    const isOfferFlag = Boolean(data.is_offer || data.is_on_sale || hasOfferPriceDrop);
+    const computedDiscountPct =
+      data.discount_percent !== undefined && data.discount_percent !== null && data.discount_percent !== ''
+        ? Number(data.discount_percent)
+        : hasOfferPriceDrop && origPriceNum
+          ? Math.round(((origPriceNum - sellPriceNum) / origPriceNum) * 100)
+          : null;
+
     const product = {
       ...data,
       ...catSub,
@@ -1356,8 +1494,8 @@ export class ProductsService implements OnModuleInit {
       image: primaryImage,
       images,
       image_alts: data.image_alts || {},
-      price: Number(data.price),
-      original_price: data.original_price ? Number(data.original_price) : null,
+      price: sellPriceNum,
+      original_price: origPriceNum,
       stock_count: data.stock_count !== undefined ? Number(data.stock_count) : 10,
       in_stock: data.in_stock !== undefined ? Boolean(data.in_stock) : true,
       status: finalStatus,
@@ -1378,7 +1516,17 @@ export class ProductsService implements OnModuleInit {
       is_favorite: Boolean(data.is_favorite || data.isFavorite || data.is_liked || data.isLiked),
       is_liked: Boolean(data.is_liked || data.isLiked || data.is_favorite || data.isFavorite),
       is_new: Boolean(data.is_new),
-      is_on_sale: Boolean(data.is_on_sale),
+      is_offer: isOfferFlag,
+      is_on_sale: isOfferFlag,
+      offer_type: data.offer_type ? String(data.offer_type).trim() : '',
+      offer_title: data.offer_title ? String(data.offer_title).trim() : '',
+      offer_badge: data.offer_badge ? String(data.offer_badge).trim() : '',
+      offer_description: data.offer_description ? String(data.offer_description).trim() : '',
+      discount_percent: computedDiscountPct,
+      offer_previous_state:
+        data.offer_previous_state && typeof data.offer_previous_state === 'object'
+          ? data.offer_previous_state
+          : null,
       is_best_seller: Boolean(data.is_best_seller),
       rating: Number(data.rating) || 5.0,
       review_count: Number(data.review_count) || 0,
@@ -1394,7 +1542,11 @@ export class ProductsService implements OnModuleInit {
     });
 
     const ref = await this.firestore.collection('products').add(product);
-    this.invalidateCache();
+    if (requiresApproval && !isSuperUser && this.adminService && adminUser) {
+      this.invalidateCache();
+    } else {
+      this.upsertCachedProduct({ id: ref.id, ...product });
+    }
 
     if (requiresApproval && !isSuperUser && this.adminService && adminUser) {
       await this.adminService.createApprovalSubmission({
@@ -1457,11 +1609,6 @@ export class ProductsService implements OnModuleInit {
       Object.assign(updateData, catSub);
     }
 
-    if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
-      const uploadRes = await this.uploadService.uploadBase64(data.image, `prod_${id}.jpg`, 'products');
-      updateData.image = uploadRes.url;
-    }
-
     if (data.images && Array.isArray(data.images)) {
       updateData.images = await Promise.all(
         data.images.map(async (img: any, idx: number) => {
@@ -1470,11 +1617,25 @@ export class ProductsService implements OnModuleInit {
             return res.url;
           }
           return img;
-        })
+        }),
       );
+      if (updateData.images.length > 0) {
+        updateData.image = updateData.images[0];
+      } else if (!data.image) {
+        updateData.image = 'https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg';
+      }
+    } else if (data.image && typeof data.image === 'string' && data.image.startsWith('data:')) {
+      const uploadRes = await this.uploadService.uploadBase64(data.image, `prod_${id}.jpg`, 'products');
+      updateData.image = uploadRes.url;
     }
 
-    if (data.price !== undefined) updateData.price = Number(data.price);
+    if (data.price !== undefined) {
+      const priceNum = Number(data.price);
+      if (isNaN(priceNum) || priceNum < 0) {
+        throw new BadRequestException('Invalid product price');
+      }
+      updateData.price = priceNum;
+    }
     if (data.original_price !== undefined) updateData.original_price = data.original_price ? Number(data.original_price) : null;
     if (data.stock_count !== undefined) {
       updateData.stock_count = Number(data.stock_count);
@@ -1495,17 +1656,13 @@ export class ProductsService implements OnModuleInit {
     if (data.colour !== undefined || data.color !== undefined) updateData.colour = data.colour ?? data.color ?? '';
     if (data.variants !== undefined) updateData.variants = Array.isArray(data.variants) ? data.variants : [];
     if (data.image_alts !== undefined) updateData.image_alts = data.image_alts;
-    if (data.seo_title !== undefined) updateData.seo_title = data.seo_title;
-    if (data.meta_description !== undefined) updateData.meta_description = data.meta_description;
-    if (data.slug !== undefined && data.slug) {
-      updateData.slug = String(data.slug).trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    } else if (data.seo_title && !data.slug) {
-      updateData.slug = String(data.seo_title)
-        .replace(/\s*[\-\|]\s*(M\.SHOP|MARJAAH|Qatar|Store|Shop).*$/i, '')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+    if (data.seo_title !== undefined) updateData.seo_title = String(data.seo_title).trim();
+    if (data.meta_description !== undefined) updateData.meta_description = String(data.meta_description).trim();
+    if (data.slug !== undefined) {
+      const slugSource = String(data.slug).trim() || String(data.seo_title || '').trim() || String(data.name || doc.data()?.name || '').trim();
+      updateData.slug = await this.ensureUniqueSlug(slugSource, id);
+    } else if (data.seo_title && !doc.data()?.slug) {
+      updateData.slug = await this.ensureUniqueSlug(String(data.seo_title), id);
     }
 
     if (data.is_featured !== undefined || data.isFeatured !== undefined) {
@@ -1515,6 +1672,24 @@ export class ProductsService implements OnModuleInit {
       const favVal = Boolean(data.is_favorite ?? data.isFavorite ?? data.is_liked ?? data.isLiked);
       updateData.is_favorite = favVal;
       updateData.is_liked = favVal;
+    }
+    if (data.is_offer !== undefined || data.is_on_sale !== undefined) {
+      const offerVal = Boolean(data.is_offer ?? data.is_on_sale);
+      updateData.is_offer = offerVal;
+      updateData.is_on_sale = offerVal;
+    }
+    if (data.offer_type !== undefined) updateData.offer_type = data.offer_type ? String(data.offer_type).trim() : '';
+    if (data.offer_title !== undefined) updateData.offer_title = data.offer_title ? String(data.offer_title).trim() : '';
+    if (data.offer_badge !== undefined) updateData.offer_badge = data.offer_badge ? String(data.offer_badge).trim() : '';
+    if (data.offer_description !== undefined) updateData.offer_description = data.offer_description ? String(data.offer_description).trim() : '';
+    if (data.discount_percent !== undefined) {
+      updateData.discount_percent = data.discount_percent !== null && data.discount_percent !== '' ? Number(data.discount_percent) : null;
+    }
+    if (data.offer_previous_state !== undefined) {
+      updateData.offer_previous_state =
+        data.offer_previous_state && typeof data.offer_previous_state === 'object'
+          ? data.offer_previous_state
+          : null;
     }
 
     // Ensure no undefined properties are passed to Firestore update
@@ -1547,8 +1722,9 @@ export class ProductsService implements OnModuleInit {
     }
 
     await docRef.update(updateData);
-    this.invalidateCache();
-    return { id, ...doc.data(), ...updateData };
+    const updatedProduct = { id, ...doc.data(), ...updateData };
+    this.upsertCachedProduct(updatedProduct);
+    return updatedProduct;
   }
 
   async bulkUpsert(items: any[]) {
@@ -1827,7 +2003,7 @@ export class ProductsService implements OnModuleInit {
     }
 
     await docRef.delete();
-    this.invalidateCache();
+    this.removeCachedProduct(id);
     return { success: true, message: `Product ${id} deleted` };
   }
 }

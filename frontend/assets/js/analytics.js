@@ -167,28 +167,61 @@
       const total = order.totalAmount || order.total || 0;
       if (window.gtag && config.gaMeasurementId) {
         window.gtag('event', 'purchase', {
-          transaction_id: order.orderNumber || order.id,
-          currency: 'QAR',
-          value: total,
-          items: (order.items || []).map(i => ({ item_id: i.sku || i.id, item_name: i.name, price: i.price, quantity: i.quantity }))
-        });
-      }
-      if (window.fbq && config.metaPixelId) {
-        window.fbq('track', 'Purchase', {
-          value: total,
-          currency: 'QAR',
-          content_type: 'product'
-        });
-      }
-      if (window.snaptr && config.snapchatPixelId) {
-        window.snaptr('track', 'PURCHASE', {
-          price: total,
-          currency: 'QAR',
-          transaction_id: order.orderNumber || order.id
-        });
-      }
+        transaction_id: order.order_number || order.orderNumber || order.id,
+        currency: 'QAR',
+        value: total,
+        items: (order.items || []).map(i => ({ item_id: i.sku || i.id, item_name: i.name, price: i.price, quantity: i.quantity }))
+      });
     }
+    if (window.fbq && config.metaPixelId) {
+      window.fbq('track', 'Purchase', {
+        value: total,
+        currency: 'QAR',
+        content_type: 'product'
+      });
+    }
+    if (window.snaptr && config.snapchatPixelId) {
+      window.snaptr('track', 'PURCHASE', {
+        price: total,
+        currency: 'QAR',
+        transaction_id: order.order_number || order.orderNumber || order.id
+      });
+    }
+  }
   };
 
   window.MShopTracker = Tracker;
+
+  // Send privacy-safe first-party pageview telemetry for Admin Executive Dashboard
+  try {
+    const pathname = window.location.pathname || '/';
+    if (!pathname.startsWith('/admin')) {
+      let sid = sessionStorage.getItem('marjaah_analytics_sid');
+      if (!sid) {
+        sid = 'sid_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        sessionStorage.setItem('marjaah_analytics_sid', sid);
+      }
+      const w = window.innerWidth || 1280;
+      const device = w < 768 ? 'mobile' : (w < 1024 ? 'tablet' : 'desktop');
+      const locale = pathname.startsWith('/ar') ? 'ar' : 'en';
+      const payload = JSON.stringify({
+        path: pathname,
+        referrer: document.referrer || 'direct',
+        device,
+        locale,
+        sessionId: sid,
+      });
+      if (navigator.sendBeacon) {
+        const blob = new Blob([payload], { type: 'application/json' });
+        navigator.sendBeacon('/api/analytics/track', blob);
+      } else {
+        fetch('/api/analytics/track', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: payload,
+          keepalive: true,
+        }).catch(() => {});
+      }
+    }
+  } catch (_) {}
 })(window);

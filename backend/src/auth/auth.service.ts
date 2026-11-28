@@ -21,32 +21,12 @@ export class AuthService implements OnModuleInit {
   }
 
   async ensureAdminCredentials() {
-    try {
-      const credRef = this.firestore.collection('admin_credentials').doc('admin');
-      const doc = await credRef.get();
-      if (!doc.exists) {
-        const hash = await bcrypt.hash('admin', 10);
-        await credRef.set({
-          username: 'admin',
-          password: hash,
-          raw_password: 'admin',
-          email: 'admin@marjaah.qa',
-          first_name: 'Admin',
-          last_name: 'Marjaah',
-          role: 'admin',
-          is_staff: true,
-          is_superuser: true,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        });
-        this.logger.log('Default admin credentials seeded into Firestore collection "admin_credentials"');
-      }
-    } catch (e: any) {
-      this.logger.warn(`Could not ensure admin credentials: ${e.message}`);
-    }
+    // Default credentials are never seeded. Provision the primary admin with a
+    // bcrypt hash via the seed script or the RBAC admin-users API.
+    return;
   }
 
-  async register(dto: { email: string; password: string; username?: string; first_name?: string; last_name?: string; phone?: string }) {
+  async register(dto: { email: string; password: string; username?: string; first_name?: string; last_name?: string; full_name?: string; phone?: string }) {
     if (!dto.email || !dto.password) {
       throw new BadRequestException('Email and password are required');
     }
@@ -62,19 +42,27 @@ export class AuthService implements OnModuleInit {
       throw new ConflictException('User with this email already exists');
     }
 
+    const fullName = String(dto.full_name || '').trim();
+    const nameParts = fullName ? fullName.split(/\s+/) : [];
+    const firstName = (dto.first_name !== undefined ? String(dto.first_name) : (nameParts[0] || '')).trim();
+    const lastName = (dto.last_name !== undefined ? String(dto.last_name) : nameParts.slice(1).join(' ')).trim();
+    const resolvedFullName = fullName || [firstName, lastName].filter(Boolean).join(' ');
+
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const now = new Date().toISOString();
 
     const newUser = {
       email,
       username,
-      first_name: dto.first_name || '',
-      last_name: dto.last_name || '',
+      first_name: firstName,
+      last_name: lastName,
+      full_name: resolvedFullName,
       phone: dto.phone || '',
       password: hashedPassword,
       is_staff: false,
       is_superuser: false,
       role: 'customer',
+      status: 'active',
       created_at: now,
       updated_at: now,
     };
@@ -124,43 +112,16 @@ export class AuthService implements OnModuleInit {
     }
 
     if (adminUserData) {
-      if (adminUserData.status === 'suspended' || adminUserData.status === 'inactive') {
+      if (['suspended', 'inactive', 'deactivated'].includes(String(adminUserData.status || '').toLowerCase())) {
         throw new UnauthorizedException(`Account is ${adminUserData.status}. Contact administrator.`);
       }
 
       let passwordMatch = false;
       const storedPass = adminUserData.password || '';
-      const rawPass = adminUserData.raw_password || '';
 
       if (storedPass) {
         if (storedPass.startsWith('$2a$') || storedPass.startsWith('$2b$')) {
           passwordMatch = await bcrypt.compare(password, storedPass);
-        } else {
-          passwordMatch = (password === storedPass);
-        }
-      }
-
-      if (!passwordMatch && rawPass) {
-        passwordMatch = (password === rawPass);
-      }
-
-      // Check standard administrative fallbacks if primary admin
-      const isPrimarySuperAdmin = adminUserDoc.id === 'admin' || adminUserData.username === 'admin' || adminUserData.email === 'admin@marjaah.qa';
-      if (!passwordMatch && isPrimarySuperAdmin) {
-        if (password === 'admin' || password === 'admin@marjaah.qa' || password === 'Admin@123' || password === 'Admin123!') {
-          passwordMatch = true;
-        } else {
-          try {
-            const credDoc = await this.firestore.collection('admin_credentials').doc('admin').get();
-            if (credDoc.exists) {
-              const cData = credDoc.data() || {};
-              if (cData.raw_password && password === cData.raw_password) {
-                passwordMatch = true;
-              } else if (cData.password && (cData.password.startsWith('$2a$') || cData.password.startsWith('$2b$'))) {
-                passwordMatch = await bcrypt.compare(password, cData.password);
-              }
-            }
-          } catch (e) {}
         }
       }
 
@@ -187,7 +148,7 @@ export class AuthService implements OnModuleInit {
         is_superuser: roleId === 'super_admin' || Boolean(adminUserData.is_superuser),
       }, '24h');
 
-      const { password: _, ...safeUser } = adminUserData;
+      const { password: _, raw_password: _rp, ...safeUser } = adminUserData;
       return {
         success: true,
         token,
@@ -283,25 +244,11 @@ export class AuthService implements OnModuleInit {
       throw new UnauthorizedException('Invalid admin credentials');
     }
 
-    // Verify password: check bcrypt, plaintext (from direct Firestore edit), or raw_password
+    // Only bcrypt hashes are accepted; no plaintext or hardcoded fallbacks.
     let passwordMatch = false;
     const storedPass = adminData.password || '';
-    const rawPass = adminData.raw_password || '';
-
-    if (storedPass) {
-      if (storedPass.startsWith('$2a$') || storedPass.startsWith('$2b$')) {
-        passwordMatch = await bcrypt.compare(password, storedPass);
-      } else {
-        passwordMatch = (password === storedPass);
-      }
-    }
-
-    if (!passwordMatch && rawPass) {
-      passwordMatch = (password === rawPass);
-    }
-
-    if (!passwordMatch && (username.toLowerCase() === 'admin' || username.toLowerCase() === 'admin@marjaah.qa')) {
-      passwordMatch = (password === 'admin' || password === 'admin@marjaah.qa' || password === 'Admin@123' || password === 'Admin123!');
+    if (storedPass && (storedPass.startsWith('$2a$') || storedPass.startsWith('$2b$'))) {
+      passwordMatch = await bcrypt.compare(password, storedPass);
     }
 
     if (!passwordMatch) {
@@ -384,30 +331,17 @@ export class AuthService implements OnModuleInit {
     const user = doc.data();
 
     let passwordMatch = false;
-    if (user.password) {
-      if (user.password.startsWith('$2a$') || user.password.startsWith('$2b$')) {
-        passwordMatch = await bcrypt.compare(dto.password, user.password);
-      } else if (user.password.startsWith('pbkdf2_sha256$')) {
-        passwordMatch = dto.password === 'admin' || dto.password === 'Admin@123' || (dto.password.length > 0 && user.username === 'admin' && dto.password === 'admin');
-        if (passwordMatch) {
-          const newHash = await bcrypt.hash(dto.password, 10);
-          await doc.ref.update({ password: newHash });
-        }
-      } else {
-        passwordMatch = (dto.password === user.password);
-      }
-    }
-
-    if (!passwordMatch && user.raw_password) {
-      passwordMatch = (dto.password === user.raw_password);
-    }
-
-    if (!passwordMatch && (user.username === 'admin' || user.email === 'admin@marjaah.qa')) {
-      passwordMatch = (dto.password === 'admin' || dto.password === 'Admin@123');
+    if (user.password && (user.password.startsWith('$2a$') || user.password.startsWith('$2b$'))) {
+      passwordMatch = await bcrypt.compare(dto.password, user.password);
     }
 
     if (!passwordMatch) {
       throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const userStatus = String(user.status || '').toLowerCase();
+    if (user.username !== 'admin' && ['suspended', 'inactive', 'deactivated'].includes(userStatus)) {
+      throw new UnauthorizedException('Your account has been suspended or deactivated. Contact support.');
     }
 
     const now = new Date().toISOString();
@@ -450,6 +384,10 @@ export class AuthService implements OnModuleInit {
       if (!userDoc.empty) {
         userId = userDoc.docs[0].id;
         userData = userDoc.docs[0].data();
+        const fbStatus = String(userData?.status || '').toLowerCase();
+        if (['suspended', 'inactive', 'deactivated'].includes(fbStatus)) {
+          throw new UnauthorizedException('Your account has been suspended or deactivated. Contact support.');
+        }
       } else {
         // Create new user for Firebase auth
         const now = new Date().toISOString();
@@ -635,7 +573,7 @@ export class AuthService implements OnModuleInit {
       user_id: userDoc ? userDoc.id : null,
     });
 
-    this.logger.log(`[PASSWORD RESET OTP] Generated for ${emailNorm}: ${code}`);
+    this.logger.log(`[PASSWORD RESET OTP] Generated for ${emailNorm}`);
 
     // Send email using MailService
     const mailResult = await this.mailService.sendPasswordResetOtp(emailNorm, code);
@@ -646,7 +584,6 @@ export class AuthService implements OnModuleInit {
         ? 'A 6-digit verification code has been sent to your email address. Please check your inbox and enter the code.'
         : 'A 6-digit verification code has been generated. Please check your email or enter the code below.',
       email: emailNorm,
-      code: !mailResult.sent ? code : undefined,
     };
   }
 
@@ -735,7 +672,7 @@ export class AuthService implements OnModuleInit {
     if (!adminSnap.empty) {
       await adminSnap.docs[0].ref.update({
         password: hashedPassword,
-        raw_password: dto.new_password,
+        raw_password: admin.firestore.FieldValue.delete(),
         updated_at: now,
       });
       updated = true;
@@ -791,6 +728,10 @@ export class AuthService implements OnModuleInit {
       }
 
       const userData = userDoc.data();
+      const verifiedStatus = String(userData?.status || '').toLowerCase();
+      if (['suspended', 'inactive', 'deactivated'].includes(verifiedStatus)) {
+        throw new UnauthorizedException('User account is suspended or deactivated');
+      }
       const { password: _, raw_password: __, ...safeUser } = userData || {};
       return {
         valid: true,
@@ -811,6 +752,100 @@ export class AuthService implements OnModuleInit {
       }
       throw new UnauthorizedException(err.message || 'Token verification failed');
     }
+  }
+
+  /**
+   * Lets a signed-in admin change their own password.
+   * Verifies the current password, enforces strength rules, revokes older sessions
+   * and returns a fresh token so the current session stays active.
+   */
+  async changeAdminPassword(
+    reqUser: any,
+    dto: { current_password?: string; new_password?: string },
+  ) {
+    const currentPassword = String(dto?.current_password || '');
+    const newPassword = String(dto?.new_password || '');
+    const id = String(reqUser?.id || reqUser?.sub || '');
+    if (!id) throw new UnauthorizedException('Authentication required');
+
+    if (!currentPassword || !newPassword) {
+      throw new BadRequestException('Current password and new password are required');
+    }
+    if (newPassword.length < 8 || newPassword.length > 128) {
+      throw new BadRequestException('New password must be 8–128 characters long');
+    }
+    if (!/[A-Za-z]/.test(newPassword) || !/\d/.test(newPassword)) {
+      throw new BadRequestException('New password must contain at least one letter and one number');
+    }
+    if (newPassword === currentPassword) {
+      throw new BadRequestException('New password must be different from the current password');
+    }
+
+    const docRef = this.firestore.collection('admin_users').doc(id);
+    const snap = await docRef.get();
+    if (!snap.exists) throw new UnauthorizedException('Admin account not found');
+    const data: any = snap.data() || {};
+
+    let match = false;
+    const stored = String(data.password || '');
+    if (stored) {
+      match = /^\$2[aby]\$/.test(stored) && await bcrypt.compare(currentPassword, stored);
+    }
+    const isPrimary = id === 'admin' || data.username === 'admin';
+    if (!match && isPrimary && !data.password_changed_at) {
+      try {
+        const cred = await this.firestore.collection('admin_credentials').doc('admin').get();
+        const c: any = cred.exists ? cred.data() : {};
+        if (c?.password && /^\$2[aby]\$/.test(c.password)) {
+          match = await bcrypt.compare(currentPassword, c.password);
+        }
+      } catch (_) {}
+    }
+    if (!match) throw new UnauthorizedException('Current password is incorrect');
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    const nowMs = Date.now();
+    const now = new Date(nowMs).toISOString();
+    // Floor to whole seconds so the fresh token (iat is in seconds) is never "older" than the revocation.
+    const revokedAt = new Date(Math.floor(nowMs / 1000) * 1000).toISOString();
+
+    await docRef.set({
+      password: hashed,
+      raw_password: admin.firestore.FieldValue.delete(),
+      must_change_password: false,
+      force_password_change: false,
+      password_changed_at: now,
+      session_revoked_at: revokedAt,
+      updated_at: now,
+    }, { merge: true });
+
+    const username = data.username || id;
+    await this.firestore.collection('admin_credentials').doc(String(username)).set(
+      { password: hashed, updated_at: now },
+      { merge: true },
+    );
+
+    try {
+      await this.firestore.collection('audit_logs').add({
+        admin_id: id,
+        admin_username: username,
+        action: 'change_own_password',
+        module: 'admin_users',
+        target_id: id,
+        target_title: username,
+        timestamp: now,
+        created_at: now,
+      });
+    } catch (_) {}
+
+    const roleId = data.role_id || (Array.isArray(data.role_ids) && data.role_ids[0]) || data.role || 'custom';
+    const token = this.generateToken(id, {
+      username: data.username,
+      email: data.email,
+      is_staff: true,
+      role: roleId,
+    }, '24h');
+    return { success: true, message: 'Password changed successfully.', token, expires_in: 86400 };
   }
 
   private generateToken(userId: string, user: any, expiresIn: any = '24h'): string {

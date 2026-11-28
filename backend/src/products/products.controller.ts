@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   Body,
+  Header,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -43,6 +44,7 @@ export class ProductsController {
   }
 
   @Get()
+  @Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   async findAll(@Query() query: ProductFilterQuery) {
     return this.productsService.findAll(query);
   }
@@ -100,6 +102,13 @@ export class ProductsController {
   @RequirePermission('products', 'edit')
   @Put(':id')
   async update(@Param('id') id: string, @Body() body: any, @Request() req: any) {
+    return this.productsService.update(id, body, req.user);
+  }
+
+  @UseGuards(JwtAuthGuard, RbacGuard)
+  @RequirePermission('products', 'edit')
+  @Patch(':id')
+  async patchUpdate(@Param('id') id: string, @Body() body: any, @Request() req: any) {
     return this.productsService.update(id, body, req.user);
   }
 

@@ -120,7 +120,6 @@
               name="username" 
               required 
               placeholder="e.g. admin" 
-              value="admin"
               class="w-full pl-11 pr-4 py-3 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 transition-all"
             />
           </div>
@@ -223,6 +222,10 @@
         try {
           const res = await window.api.adminLogin({ username, password });
           if (res && res.token) {
+            localStorage.setItem('marjaah_admin_token', res.token);
+            if (res.user) {
+              localStorage.setItem('marjaah_admin_user', JSON.stringify(res.user));
+            }
             window.api.setToken(res.token);
             window.api.setUser(res.user);
             if (window.Toast) {
@@ -230,9 +233,10 @@
             }
 
             const urlParams = new URLSearchParams(window.location.search);
-            const nextUrl = urlParams.get('next') || '/admin/';
+            const rawNext = (urlParams.get('next') || '').trim();
+            const safeNext = (rawNext.startsWith('/admin') && !rawNext.startsWith('//')) ? rawNext : '/admin/';
             setTimeout(() => {
-              window.location.href = nextUrl;
+              window.location.href = safeNext;
             }, 500);
           } else {
             throw new Error(res.message || 'Authorization failed. Please check credentials.');
