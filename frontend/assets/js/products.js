@@ -9,6 +9,11 @@
 
   function renderProductCard(product, index = 0) {
     const slug = product.slug || product.id;
+    // Remember rendered products so "Add to Cart" can use them instantly instead of re-fetching.
+    if (slug) {
+      window.productsMap = window.productsMap || {};
+      window.productsMap[slug] = product;
+    }
     const name = (isRtl && product.name_ar) ? product.name_ar : (product.name || 'Product');
     const price = product.price;
     const originalPrice = product.original_price;
@@ -347,48 +352,48 @@
     const section = sectionId ? document.getElementById(sectionId) : container.closest('section');
 
     try {
-      let data;
       const queryStr = typeof queryParams === 'string' ? queryParams : '?' + new URLSearchParams(queryParams).toString();
-      try {
-        const res = await fetch(`/api/products${queryStr}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        data = await res.json();
-      } catch (err) {
-        if (global.api && typeof global.api.getProducts === 'function') {
-          data = await global.api.getProducts(queryParams);
-        } else {
-          throw err;
+      const url = `/api/products${queryStr}`;
+
+      const render = (data) => {
+        let items = [];
+        if (Array.isArray(data)) {
+          items = data;
+        } else if (data && Array.isArray(data.items)) {
+          items = data.items;
+        } else if (data && Array.isArray(data.products)) {
+          items = data.products;
+        } else if (data && Array.isArray(data.data)) {
+          items = data.data;
         }
-      }
 
-      let items = [];
-      if (Array.isArray(data)) {
-        items = data;
-      } else if (data && Array.isArray(data.items)) {
-        items = data.items;
-      } else if (data && Array.isArray(data.products)) {
-        items = data.products;
-      } else if (data && Array.isArray(data.data)) {
-        items = data.data;
-      }
+        if (items.length === 0) {
+          if (section) {
+            section.style.display = 'none';
+          } else {
+            container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium">${isRtl ? 'لم يتم العثور على منتجات.' : 'No products found.'}</div>`;
+          }
+          return;
+        }
 
-      if (items.length === 0) {
         if (section) {
-          section.style.display = 'none';
-        } else {
-          container.innerHTML = `<div class="col-span-full py-12 text-center text-slate-500 font-medium">${isRtl ? 'لم يتم العثور على منتجات.' : 'No products found.'}</div>`;
+          section.style.display = '';
         }
-        return;
-      }
 
-      if (section) {
-        section.style.display = '';
-      }
+        container.innerHTML = items.map((p, idx) => renderProductCard(p, idx)).join('');
+        if (window.Wishlist && typeof window.Wishlist.sync === 'function') window.Wishlist.sync();
+        if (window.observeAnimations) window.observeAnimations();
+        container.querySelectorAll('.card, [data-animate]').forEach(card => card.classList.add('anim-visible'));
+      };
 
-      container.innerHTML = items.map((p, idx) => renderProductCard(p, idx)).join('');
-      if (window.Wishlist && typeof window.Wishlist.sync === 'function') window.Wishlist.sync();
-      if (window.observeAnimations) window.observeAnimations();
-      container.querySelectorAll('.card, [data-animate]').forEach(card => card.classList.add('anim-visible'));
+      if (global.MQCache && typeof global.MQCache.swr === 'function') {
+        // Instant paint from the browser cache, then update only if the server data changed.
+        await global.MQCache.swr(url, render);
+      } else {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        render(await res.json());
+      }
     } catch (err) {
       console.error('Error loading products for #' + containerId, err);
       if (section) {

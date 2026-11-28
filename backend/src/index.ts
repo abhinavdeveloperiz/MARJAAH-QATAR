@@ -59,7 +59,8 @@ export const createNestServer = async (expressInstance: express.Express) => {
 export const api = onRequest(
   {
     region: 'us-central1',
-    cors: true,
+    // Browsers reach the API same-origin via Firebase Hosting (/api/** rewrite); only allow known origins.
+    cors: getCorsOrigins(),
     memory: '512MiB',
     timeoutSeconds: 60,
     minInstances: 0,

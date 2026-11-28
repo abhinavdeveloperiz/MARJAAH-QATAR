@@ -143,7 +143,26 @@
       const container = document.getElementById('products-table-body');
       const seq = ++this.fetchSeq;
 
-      if (container) {
+      // Stale-while-revalidate: if this exact page/filter was loaded before in this session, show it
+      // instantly (no spinner) and refresh from the server in the background.
+      const cacheKeyParams = new URLSearchParams();
+      cacheKeyParams.set('page', String(this.currentPage));
+      cacheKeyParams.set('limit', String(this.pageSize));
+      const peek = (id) => (document.getElementById(id)?.value || '');
+      const cacheKey = [cacheKeyParams.toString(), peek('products-search-input').trim(), peek('products-category-filter'), peek('products-subcategory-filter'), peek('products-badge-filter'), peek('products-status-filter')].join('|');
+      this._pageCache = this._pageCache || new Map();
+      const cachedPage = this._pageCache.get(cacheKey);
+      let paintedFromCache = false;
+      if (cachedPage) {
+        this.products = cachedPage.products.map((p) => ({ ...p }));
+        this.totalProducts = cachedPage.total;
+        this.totalPages = cachedPage.totalPages;
+        this.currentPage = Math.min(this.currentPage, this.totalPages);
+        this.renderTable();
+        paintedFromCache = true;
+      }
+
+      if (container && !paintedFromCache) {
         container.innerHTML = `
           <tr>
             <td colspan="7" class="py-12 text-center text-xs text-slate-400">
@@ -178,15 +197,26 @@
         const res = await AdminApp.api(`/api/products?${params.toString()}`);
         if (seq !== this.fetchSeq) return; // Ignore stale out-of-order response
 
-        this.products = res.items || res.products || res.data || [];
-        this.totalProducts = Number(res.total !== undefined ? res.total : this.products.length);
-        this.totalPages = Math.max(1, Number(res.totalPages || Math.ceil(this.totalProducts / this.pageSize) || 1));
-        this.currentPage = Math.min(this.currentPage, this.totalPages);
+        const fresh = res.items || res.products || res.data || [];
+        const freshTotal = Number(res.total !== undefined ? res.total : fresh.length);
+        const freshPages = Math.max(1, Number(res.totalPages || Math.ceil(freshTotal / this.pageSize) || 1));
+        this._pageCache.set(cacheKey, { products: fresh, total: freshTotal, totalPages: freshPages });
+        if (this._pageCache.size > 30) this._pageCache.delete(this._pageCache.keys().next().value);
 
-        this.renderTable();
+        // Re-render only if the server data differs from what is already on screen.
+        const changed = !paintedFromCache || JSON.stringify(cachedPage.products) !== JSON.stringify(fresh) || cachedPage.total !== freshTotal;
+        this.products = fresh;
+        this.totalProducts = freshTotal;
+        this.totalPages = freshPages;
+        this.currentPage = Math.min(this.currentPage, this.totalPages);
+        if (changed) this.renderTable();
       } catch (err) {
         if (seq !== this.fetchSeq) return;
         console.error('Failed to fetch products page:', err);
+        if (paintedFromCache) {
+          AdminApp.toast('Could not refresh products from the server — showing the last loaded list.', 'error');
+          return;
+        }
         if (container) {
           container.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-rose-400">Failed to load catalog products.</td></tr>`;
         }
@@ -1807,24 +1837,36 @@
       const prodId = this.deleteTargetId;
       if (!prodId) return;
 
-      const btn = document.getElementById('products-delete-confirm-btn');
-      const btnText = document.getElementById('products-delete-btn-text');
-      if (btn) btn.disabled = true;
-      if (btnText) btnText.textContent = 'Deleting...';
+      // Optimistic: remove the row immediately, then confirm with the server; restore it on failure.
+      const removedIndex = this.products.findIndex((x) => x.id === prodId);
+      const removed = removedIndex >= 0 ? this.products[removedIndex] : null;
+      const prevTotal = this.totalProducts;
+      if (removed) {
+        this.products.splice(removedIndex, 1);
+        this.totalProducts = Math.max(0, prevTotal - 1);
+        this.renderTable();
+      }
+      this.closeDeleteModal();
 
       try {
-        await AdminApp.api(`/api/products/${prodId}`, {
+        const res = await AdminApp.api(`/api/products/${prodId}`, {
           method: 'DELETE',
         });
-        window.SmartCache?.removeProduct(prodId);
-        AdminApp.toast('Product deleted successfully.', 'success');
-        this.closeDeleteModal();
+        if (res && res.pending_approval) {
+          // Deletion needs another admin's approval: the product stays, so put it back.
+          AdminApp.toast(res.message || 'Delete request submitted for approval.', 'info');
+        } else {
+          window.SmartCache?.removeProduct(prodId);
+          AdminApp.toast('Product deleted successfully.', 'success');
+        }
         await this.load();
       } catch (err) {
-        AdminApp.toast(err.message || 'Failed to delete product', 'error');
-      } finally {
-        if (btn) btn.disabled = false;
-        if (btnText) btnText.textContent = 'Delete Product';
+        if (removed) {
+          this.products.splice(Math.min(removedIndex, this.products.length), 0, removed);
+          this.totalProducts = prevTotal;
+          this.renderTable();
+        }
+        AdminApp.toast((err.message || 'Failed to delete product') + ' — the product was restored.', 'error');
       }
     },
   };

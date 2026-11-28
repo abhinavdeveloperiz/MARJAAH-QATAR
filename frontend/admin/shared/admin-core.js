@@ -53,7 +53,13 @@
 
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
-          throw new Error(data.message || `Request failed (${res.status})`);
+          const msg = Array.isArray(data.message) ? data.message.join(', ') : data.message;
+          throw new Error(msg || `Request failed (${res.status})`);
+        }
+        // Any successful write to products invalidates the cached product pages.
+        const method = String(opts.method || 'GET').toUpperCase();
+        if (method !== 'GET' && /^\/api\/(admin\/)?products/.test(url) && window.AdminProducts && window.AdminProducts._pageCache) {
+          window.AdminProducts._pageCache.clear();
         }
         return data;
       } catch (err) {

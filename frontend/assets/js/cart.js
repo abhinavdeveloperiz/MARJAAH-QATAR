@@ -230,9 +230,17 @@
         overlay.classList.add('is-active');
         overlay.classList.remove('pointer-events-none', 'opacity-0');
       }
+      // Give the drawer its own history entry so the phone Back button closes it
+      // instead of leaving the page/app.
+      if (!this._drawerHistory) {
+        try {
+          history.pushState({ mqCartDrawer: true }, '');
+          this._drawerHistory = true;
+        } catch (e) { /* history unavailable */ }
+      }
     }
 
-    closeDrawer() {
+    closeDrawer(fromPopState) {
       const overlay = document.getElementById('cart-overlay');
       const drawer = document.getElementById('cart-drawer');
       if (drawer) {
@@ -242,6 +250,13 @@
       if (overlay) {
         overlay.classList.remove('is-active');
         overlay.classList.add('pointer-events-none', 'opacity-0');
+      }
+      if (this._drawerHistory) {
+        this._drawerHistory = false;
+        // Closed with the X / overlay: drop the extra history entry we pushed.
+        if (!fromPopState && history.state && history.state.mqCartDrawer) {
+          try { history.back(); } catch (e) {}
+        }
       }
     }
 
@@ -283,7 +298,7 @@
             <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='https://storage.googleapis.com/marjaah-ab2a6.firebasestorage.app/products/placeholder.svg'" />
           </div>
           <div class="flex-1 min-w-0">
-            <h4 class="text-xs sm:text-sm font-semibold truncate leading-tight mb-1" style="color:var(--text-primary)">${isAr && item.name_ar ? item.name_ar : item.name}</h4>
+            <h4 class="text-xs sm:text-sm font-semibold break-words leading-snug mb-1" style="overflow-wrap:anywhere;color:var(--text-primary)">${isAr && item.name_ar ? item.name_ar : item.name}</h4>
             <div class="flex items-center gap-2 mb-2">
               <span class="text-xs font-bold" style="color:var(--color-accent)">${item.price} QAR</span>
               ${item.original_price ? `<span class="text-[10px] line-through" style="color:var(--text-tertiary)">${item.original_price} QAR</span>` : ''}
@@ -489,6 +504,9 @@
   }
 
   global.cart = new LocalCart();
+  window.addEventListener('popstate', () => {
+    if (global.cart._drawerHistory) global.cart.closeDrawer(true);
+  });
   global.CartSystem = global.cart;
   global.openCart = () => global.cart.openDrawer();
   global.closeCart = () => global.cart.closeDrawer();

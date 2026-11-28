@@ -14,7 +14,6 @@
     "deploy:all": "npx firebase-tools deploy",
     "deploy:hosting": "npx firebase-tools deploy --only hosting",
     "deploy:hosting:prod": "npx firebase-tools deploy --only hosting:marjaah-ab2a6",
-    "deploy:hosting:dev": "npx firebase-tools deploy --only hosting:dev-demo-url",
     "deploy:backend": "npx firebase-tools deploy --only functions:api"
   }
 }

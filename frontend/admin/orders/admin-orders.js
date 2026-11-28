@@ -733,14 +733,23 @@ function AdminOrders_payLabel(o) {
         btn.innerHTML = '<span class="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-1.5 align-middle"></span>Updating...';
       }
 
+      // Optimistic: show the new status immediately, then confirm with the server; revert on failure.
+      const orderId = this.selectedOrder.id;
+      const prevSelected = { ...this.selectedOrder };
+      const idx0 = this.orders.findIndex((x) => x.id === orderId);
+      const prevListItem = idx0 !== -1 ? { ...this.orders[idx0] } : null;
+      if (idx0 !== -1) this.orders[idx0] = { ...this.orders[idx0], status: newStatus };
+      this.selectedOrder = { ...this.selectedOrder, status: newStatus };
+      this.renderTable();
+
       try {
-        const res = await AdminApp.api(`/api/orders/${this.selectedOrder.id}/status`, {
+        const res = await AdminApp.api(`/api/orders/${orderId}/status`, {
           method: 'PATCH',
           body: JSON.stringify({ status: newStatus, notes }),
         });
 
         const updatedOrder = res?.order || { ...this.selectedOrder, status: newStatus };
-        const idx = this.orders.findIndex((x) => x.id === this.selectedOrder.id);
+        const idx = this.orders.findIndex((x) => x.id === orderId);
         if (idx !== -1) this.orders[idx] = { ...this.orders[idx], ...updatedOrder };
         this.selectedOrder = { ...this.selectedOrder, ...updatedOrder };
 
@@ -751,7 +760,13 @@ function AdminOrders_payLabel(o) {
         AdminApp.updatePendingBadges();
         this.load().catch(() => {});
       } catch (err) {
-        AdminApp.toast(err.message || 'Failed to update order status', 'error');
+        // Roll the UI back to what the database still has.
+        const idx = this.orders.findIndex((x) => x.id === orderId);
+        if (idx !== -1 && prevListItem) this.orders[idx] = prevListItem;
+        this.selectedOrder = prevSelected;
+        this.renderTable();
+        try { this.openDetailsModal(orderId); } catch (_) {}
+        AdminApp.toast((err.message || 'Failed to update order status') + ' — status was not changed.', 'error');
       } finally {
         if (btn) {
           btn.disabled = false;
@@ -771,6 +786,14 @@ function AdminOrders_payLabel(o) {
 
       const restock = confirm(`Would you like to restore the ordered product(s) back into available inventory stock?\n\n• OK = Restock products\n• Cancel = Do not restock`);
 
+      // Optimistic: remove the row now; restore it if the server refuses.
+      const delIdx = this.orders.findIndex((x) => x.id === orderId);
+      const delRow = delIdx !== -1 ? this.orders[delIdx] : null;
+      if (delRow) {
+        this.orders.splice(delIdx, 1);
+        this.renderTable();
+      }
+
       try {
         const res = await AdminApp.api(`/api/admin/orders/${orderId}?restock=${restock}`, {
           method: 'DELETE',
@@ -788,7 +811,11 @@ function AdminOrders_payLabel(o) {
         }
         AdminApp.updatePendingBadges();
       } catch (err) {
-        AdminApp.toast(err.message || 'Failed to delete order', 'error');
+        if (delRow) {
+          this.orders.splice(Math.min(delIdx, this.orders.length), 0, delRow);
+          this.renderTable();
+        }
+        AdminApp.toast((err.message || 'Failed to delete order') + ' — the order was restored.', 'error');
       }
     },
 

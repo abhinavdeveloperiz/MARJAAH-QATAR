@@ -59,6 +59,9 @@ export class ProductsService implements OnModuleInit {
 
   private cachedProducts: any[] | null = null;
   private cacheExpiresAt = 0;
+  private loadedVersion = '';
+  private lastVersionCheck = 0;
+  private readonly VERSION_CHECK_MS = 5000;
   private isRefreshing = false;
   private pendingFetchPromise: Promise<any[]> | null = null;
   private readonly CACHE_TTL_MS = 60 * 60 * 1000;
@@ -113,9 +116,19 @@ export class ProductsService implements OnModuleInit {
     this.refreshCacheInBackground().catch(() => {});
   }
 
+  /** Publishes a new catalog version so every other instance refreshes its cache. */
+  private publishCatalogChange() {
+    this.firestore.bumpCatalogVersion().then((v) => { this.loadedVersion = v; }).catch(() => {});
+  }
+
+  async getCatalogVersionRemote() {
+    return (await this.firestore.getCatalogVersion()) || this.loadedVersion;
+  }
+
   invalidateCache(cascade = true) {
     this.cachedProducts = null;
     this.cacheExpiresAt = 0;
+    this.publishCatalogChange();
     try {
       this.seoService?.invalidateSitemapCache();
     } catch (_) {}
@@ -139,6 +152,7 @@ export class ProductsService implements OnModuleInit {
   }
 
   private upsertCachedProduct(product: any) {
+    this.publishCatalogChange();
     if (!product || !product.id) {
       this.invalidateCache();
       return;
@@ -164,6 +178,7 @@ export class ProductsService implements OnModuleInit {
   }
 
   private removeCachedProduct(id: string) {
+    this.publishCatalogChange();
     if (Array.isArray(this.cachedProducts)) {
       this.cachedProducts = this.cachedProducts.filter((p) => p.id !== id);
       this.cacheExpiresAt = Date.now() + this.CACHE_TTL_MS;
@@ -192,10 +207,13 @@ export class ProductsService implements OnModuleInit {
   }
 
   private async fetchFromFirestore(): Promise<any[]> {
+    const versionBefore = await this.firestore.getCatalogVersion();
     const snap = await this.firestore.collection('products').get();
     const docs = snap.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
     this.cachedProducts = docs;
     this.cacheExpiresAt = Date.now() + this.CACHE_TTL_MS;
+    this.loadedVersion = versionBefore;
+    this.lastVersionCheck = Date.now();
 
     // Asynchronously save snapshot to disk for instant server reboot hydration
     try {
@@ -207,6 +225,16 @@ export class ProductsService implements OnModuleInit {
 
   private async getAllProducts(): Promise<any[]> {
     const now = Date.now();
+    // 0. Cross-instance freshness: at most one tiny read every few seconds; if another instance
+    //    (or the admin) changed the catalog, serve the cache now and refresh in the background.
+    if (this.cachedProducts && now - this.lastVersionCheck > this.VERSION_CHECK_MS) {
+      this.lastVersionCheck = now;
+      const remote = await this.firestore.getCatalogVersion();
+      if (remote && remote !== this.loadedVersion) {
+        this.refreshCacheInBackground().catch(() => {});
+      }
+    }
+
     // 1. Fresh in-memory cache: instant 0ms response
     if (this.cachedProducts && now < this.cacheExpiresAt) {
       return this.cachedProducts;

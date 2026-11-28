@@ -81,6 +81,24 @@ export class FirestoreService implements OnModuleInit {
     this.logger.log('Firebase Firestore and Storage initialized successfully');
   }
 
+  /** Shared catalog version (meta/catalog). Bumped on every product write so every instance sees changes quickly. */
+  async getCatalogVersion(): Promise<string> {
+    try {
+      const snap = await this.collection('meta').doc('catalog').get();
+      return snap.exists ? String(snap.data()?.version || '') : '';
+    } catch (_) {
+      return '';
+    }
+  }
+
+  async bumpCatalogVersion(): Promise<string> {
+    const version = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+    try {
+      await this.collection('meta').doc('catalog').set({ version, updated_at: new Date().toISOString() }, { merge: true });
+    } catch (_) {}
+    return version;
+  }
+
   /**
    * Atomically allocates the next MTQ-XXXXX order number from `counters/orders`.
    * On first use the counter is seeded from the highest existing order number.

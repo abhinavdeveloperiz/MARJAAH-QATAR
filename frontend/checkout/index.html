@@ -82,10 +82,13 @@
   </script>
 
   <!-- Global CSS (design tokens + component classes) -->
-  <link rel="stylesheet" href="/assets/css/globals.css" />
+  <link rel="stylesheet" href="/assets/css/globals.css?v=20261128_06" />
 
   <!-- Inline anim & RTL font helpers -->
   <style>
+  /* Checkout never grows wider than the screen: grid items may shrink below their content width. */
+  #checkout-form > *, #checkout-form .grid > * { min-width: 0; max-width: 100%; }
+  #checkout-form input, #checkout-form textarea, #checkout-form select { max-width: 100%; min-width: 0; box-sizing: border-box; }
     [data-animate] { opacity: 0; transform: translateY(18px); transition: opacity 0.7s cubic-bezier(0.16,1,0.3,1), transform 0.7s cubic-bezier(0.16,1,0.3,1); }
     [data-animate].anim-visible { opacity: 1; transform: none; }
     .navbar-scrolled { background: rgba(255,255,255,0.95) !important; backdrop-filter: blur(12px); border-bottom: 1px solid rgba(13,19,38,0.10) !important; box-shadow: 0 4px 24px rgba(0,0,0,0.08) !important; }
@@ -267,7 +270,7 @@
     })();
   </script>
   
-  <script src="/assets/js/api.js"></script>
+  <script src="/assets/js/api.js?v=20261128_06"></script>
 </head>
 <body style="background-color:var(--bg-base);color:var(--text-primary);margin:0;padding:0;" class="font-sans antialiased m-0 p-0">
 
@@ -599,7 +602,7 @@
       </h1>
     </div>
 
-    <form method="post" id="checkout-form" class="grid lg:grid-cols-3 gap-8">
+    <form method="post" id="checkout-form" class="grid grid-cols-1 lg:grid-cols-3 gap-8 w-full max-w-full">
       
 
       <!-- Left Column: Delivery & Payment Details -->
@@ -752,7 +755,7 @@
           <!-- General Delivery Notes -->
           <div class="mt-5">
             <label class="block text-xs font-bold mb-1.5" style="color:var(--text-secondary)">Special Delivery Instructions (optional)</label>
-            <textarea name="notes" cols="40" rows="2" class="input" placeholder="E.g. Ring bell on arrival, leave at reception, etc." id="id_notes">
+            <textarea name="notes" rows="2" class="input w-full max-w-full resize-y" placeholder="E.g. Ring bell on arrival, leave at reception, etc." id="id_notes">
 </textarea>
           </div>
         </div>
@@ -981,7 +984,7 @@ document.addEventListener('DOMContentLoaded', function () {
             <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.src='/assets/images/products/placeholder.svg'" />
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-xs font-semibold truncate leading-tight" style="color:var(--text-primary)">${item.name}</p>
+            <p class="text-xs font-semibold break-words leading-snug" style="color:var(--text-primary)">${item.name}</p>
             <p class="text-[11px]" style="color:var(--text-tertiary)">x${item.quantity}</p>
           </div>
           <span class="text-xs font-bold flex-shrink-0" style="color:var(--text-primary)">
@@ -1461,7 +1464,7 @@ document.addEventListener('DOMContentLoaded', function () {
   <script src="/assets/js/analytics.js"></script>
   <script src="/assets/js/theme.js"></script>
   <script src="/assets/js/toast.js"></script>
-  <script src="/assets/js/cart.js?v=20261128_01"></script>
+  <script src="/assets/js/cart.js?v=20261128_06"></script>
   <script src="/assets/js/wishlist.js"></script>
   <script src="/assets/js/mobile-menu.js"></script>
   <script src="/assets/js/scroll.js"></script>

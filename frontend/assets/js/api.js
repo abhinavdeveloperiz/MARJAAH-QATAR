@@ -1,30 +1,82 @@
 // ─── MARJAAH Qatar Centralized API Client ─────────────────────────────────
 (function (global) {
-  // Live Cloud Run 2nd Gen API URL deployed on Google Cloud
-  const CLOUD_RUN_API_URL = 'https://api-44oukcn4rq-uc.a.run.app';
-  const CLOUD_FUNCTIONS_API_URL = CLOUD_RUN_API_URL;
+  // All API calls are same-origin (/api/**). Firebase Hosting reverse-proxies /api/** to the
+  // backend function, so the real backend URL is never exposed to the browser.
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-  // If on production, clear any stale localhost or invalid URL accidentally stored in localStorage
-  if (!isLocal) {
-    try {
-      const stored = localStorage.getItem('marjaah_api_url');
-      if (stored && (stored.includes('localhost') || stored.includes('127.0.0.1'))) {
-        localStorage.removeItem('marjaah_api_url');
-      }
-    } catch (e) {}
-  }
+  // Remove any stale API override stored by older versions of the site.
+  try { localStorage.removeItem('marjaah_api_url'); } catch (e) {}
 
-
-  const defaultBaseUrl = isLocal ? (window.location.port === '8080' ? '' : 'http://localhost:3001') : (window.API_BASE_URL || '');
+  // Local dev: the static server on :8080 proxies /api itself; a bare file server on another port talks to :3001.
+  const defaultBaseUrl = isLocal && window.location.port !== '8080' ? 'http://localhost:3001' : '';
 
   const API_CONFIG = {
-    baseUrl: window.API_BASE_URL || localStorage.getItem('marjaah_api_url') || defaultBaseUrl,
+    baseUrl: defaultBaseUrl,
     tokenKey: 'marjaah_auth_token',
     userKey: 'marjaah_auth_user',
-    cloudFunctionsUrl: CLOUD_RUN_API_URL,
-    cloudRunUrl: CLOUD_RUN_API_URL,
   };
+
+  // ─── Stale-while-revalidate cache for public catalog reads ───────────────
+  // 1) paint instantly from the last response stored in this browser,
+  // 2) revalidate with the server (ETag -> 304 when nothing changed),
+  // 3) call onData again ONLY if the data actually changed, and store the fresh copy.
+  const SWR_PREFIX = 'mq_swr_v1:';
+  const SWR_MAX_KEYS = 40;
+  const MQCache = {
+    _read(key) {
+      try { return localStorage.getItem(SWR_PREFIX + key); } catch (e) { return null; }
+    },
+    _write(key, text) {
+      try {
+        localStorage.setItem(SWR_PREFIX + key, text);
+        localStorage.setItem(SWR_PREFIX + 'ts:' + key, String(Date.now()));
+      } catch (e) {
+        // Quota exceeded: drop our oldest entries and retry once.
+        this._prune(true);
+        try { localStorage.setItem(SWR_PREFIX + key, text); } catch (e2) {}
+      }
+      this._prune(false);
+    },
+    _prune(force) {
+      try {
+        const entries = [];
+        for (let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          if (k && k.indexOf(SWR_PREFIX + 'ts:') === 0) entries.push([k, Number(localStorage.getItem(k)) || 0]);
+        }
+        if (!force && entries.length <= SWR_MAX_KEYS) return;
+        entries.sort((a, b) => a[1] - b[1]);
+        const drop = force ? Math.ceil(entries.length / 2) : entries.length - SWR_MAX_KEYS;
+        entries.slice(0, drop).forEach(([tsKey]) => {
+          localStorage.removeItem(tsKey);
+          localStorage.removeItem(SWR_PREFIX + tsKey.slice((SWR_PREFIX + 'ts:').length));
+        });
+      } catch (e) {}
+    },
+    /** @param {string} url same-origin GET url; @param {(data:any, meta:{fromCache:boolean})=>void} onData */
+    async swr(url, onData, options = {}) {
+      const cachedText = this._read(url);
+      let painted = false;
+      if (cachedText) {
+        try { onData(JSON.parse(cachedText), { fromCache: true }); painted = true; } catch (e) {}
+      }
+      try {
+        const res = await fetch(url, { cache: 'no-cache', signal: options.signal });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const text = await res.text();
+        if (text !== cachedText) {
+          const data = JSON.parse(text);
+          this._write(url, text);
+          onData(data, { fromCache: false });
+        }
+      } catch (err) {
+        if (options.signal && options.signal.aborted) return;
+        if (!painted) throw err; // nothing on screen yet: let the caller show its error state
+        console.warn('Background refresh failed, showing cached data:', err && err.message);
+      }
+    },
+  };
+  global.MQCache = MQCache;
 
   class ApiClient {
     constructor(config) {
@@ -154,19 +206,6 @@
       } catch (error) {
         if (error && error.status) {
           throw error;
-        }
-        if (!options._isRetry) {
-          // If calling via one method fails (e.g. cross-origin/CORS or relative rewrite), retry with alternate
-          const isDirectUrl = url.includes('run.app') || url.includes('cloudfunctions.net');
-          const altUrl = isDirectUrl
-            ? cleanEndpoint
-            : `${CLOUD_RUN_API_URL}${cleanEndpoint.startsWith('/api') ? cleanEndpoint : `/api${cleanEndpoint}`}`;
-          console.warn(`API Request failed on [${url}], automatically retrying with fallback [${altUrl}]...`);
-          try {
-            return await this.request(altUrl, { ...options, _isRetry: true });
-          } catch (retryErr) {
-            console.error(`Fallback API Request also failed [${altUrl}]:`, retryErr);
-          }
         }
         console.error(`API Request Failed [${options.method || 'GET'} ${url}]:`, error);
         throw error;

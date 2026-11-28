@@ -11,7 +11,9 @@ import {
   Header,
   UseGuards,
   Request,
+  Req,
 } from '@nestjs/common';
+import { isStaffRequest } from '../auth/staff-check';
 import { ProductsService, ProductFilterQuery } from './products.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RbacGuard } from '../admin/rbac/rbac.guard';
@@ -43,10 +45,28 @@ export class ProductsController {
     return this.productsService.getRecommendations(slugOrId, numLimit);
   }
 
+  // Lightweight freshness probe used by the storefront cache.
+  @Get('version')
+  @Header('Cache-Control', 'no-cache')
+  async getVersion() {
+    return { version: await this.productsService.getCatalogVersionRemote() };
+  }
+
+  // `no-cache` = the browser may keep a copy but must revalidate (Express ETag -> cheap 304 when nothing changed).
   @Get()
-  @Header('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
-  async findAll(@Query() query: ProductFilterQuery) {
-    return this.productsService.findAll(query);
+  @Header('Cache-Control', 'no-cache')
+  async findAll(@Query() query: ProductFilterQuery, @Req() req: any) {
+    const result: any = await this.productsService.findAll(query);
+    // Public storefront lists never show long descriptions/specs (the product page loads the full
+    // record separately), so strip them to keep list responses small. Staff keep the full records.
+    if (isStaffRequest(req)) return result;
+    const slim = (p: any) => {
+      if (!p || typeof p !== 'object') return p;
+      const { description, description_ar, specifications, specs, ...rest } = p;
+      return rest;
+    };
+    const items = Array.isArray(result?.items) ? result.items.map(slim) : result?.items;
+    return { ...result, items, products: items };
   }
 
   @Get('featured')

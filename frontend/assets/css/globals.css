@@ -1269,3 +1269,42 @@ html:not(.dark) .skeleton-shimmer::after {
     transform: translateX(100%);
   }
 }
+
+/* ── Mobile fixes: no iOS focus-zoom, no sideways drift, cart as a true side drawer ── */
+html {
+  max-width: 100%;
+  overflow-x: clip; /* body already clips; clipping html as well stops the page being panned/shifted sideways */
+}
+
+@media (max-width: 768px) {
+  /* iOS Safari zooms the whole page when a field smaller than 16px gets focus and never zooms back. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea,
+  .input {
+    font-size: 16px !important;
+  }
+}
+
+/* Cart drawer: a side panel on every screen size (was full-width on phones, which looked like a new page). */
+html #cart-drawer {
+  width: min(88vw, 420px) !important;
+  max-width: 420px !important;
+  visibility: hidden;                 /* closed: not focusable and cannot widen the page */
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s linear 0.35s !important;
+  overscroll-behavior: contain;
+}
+html #cart-drawer.is-open {
+  visibility: visible;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), visibility 0s !important;
+}
+@media (max-width: 480px) {
+  html #cart-drawer {
+    width: min(90vw, 360px) !important;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html #cart-drawer {
+    transition: none !important;
+  }
+}
